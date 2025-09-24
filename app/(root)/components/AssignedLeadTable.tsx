@@ -26,6 +26,7 @@ import {
   FileText,
   Copy,
   TrainTrackIcon,
+  Users,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -605,21 +606,45 @@ const AssignedLeadTable = ({
                           {lead.email}
                         </span>
                         <span
-                          className={`text-sm text-gray-500 dark:text-gray-300  ${
+                          className={`text-sm text-gray-500 dark:text-gray-300 ${
                             lead.isPinned ? "dark:text-gray-500" : ""
                           }`}
                         >
                           {lead.number}
                         </span>
-                        {isAdmin && (
-                          <span
-                            className={`text-sm text-gray-500 dark:text-gray-300 space-x-1 ${
-                              lead.isPinned ? "dark:text-gray-500" : ""
-                            }`}
-                          >
-                            <span className="font-semibold">Assigned To:</span> {lead.assignedTo}
-                          </span>
-                        )}
+
+                        {isAdmin &&
+                          lead.assignedTo &&
+                          lead.assignedTo.length > 0 && (
+                            <Popover>
+                              <PopoverTrigger asChild>
+                                <button
+                                  className="text-sm text-blue-600 dark:text-blue-400 underline flex items-center gap-1"
+                                  type="button"
+                                >
+                                  <Users size={14} />
+                                  <span>{lead.assignedTo.length} assigned</span>
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-56 bg-white dark:bg-gray-900 shadow-lg rounded-md p-2">
+                                <p className="text-sm font-semibold mb-2">
+                                  Assigned To:
+                                </p>
+                                <ul className="space-y-1">
+                                  {lead.assignedTo.map(
+                                    (user: string, idx: number) => (
+                                      <li
+                                        key={idx}
+                                        className="text-sm text-gray-700 dark:text-gray-300 border-b last:border-0 py-1"
+                                      >
+                                        {user}
+                                      </li>
+                                    )
+                                  )}
+                                </ul>
+                              </PopoverContent>
+                            </Popover>
+                          )}
                       </a>
                     </TableCell>
 

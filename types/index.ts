@@ -164,7 +164,7 @@ export type LeadParams = {
     method: string;
     fileUrl: string;
   }[];
-  assignedTo?: string;
+  assignedTo?: string[];
 };
 
 // ====== REFUND PARAMS

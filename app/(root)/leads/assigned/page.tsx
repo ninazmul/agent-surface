@@ -35,29 +35,26 @@ const Page = async () => {
     // Admin → see all assigned leads
     leads = await getAllAssignedLeads();
   } else if (email) {
-    // Regular user → see only their assigned leads
+    // Regular user → see only leads where they are in assignedTo array
     leads = await getLeadsByAssignedUser(email);
   }
 
   return (
-    <>
-      <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
-        {/* Header + Actions */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
-          {/* Title and Export */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-            <h3 className="h3-bold text-center sm:text-left">
-              All Assigned Leads
-            </h3>
-          </div>
+    <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
+      {/* Header + Actions */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+          <h3 className="h3-bold text-center sm:text-left">
+            All Assigned Leads
+          </h3>
         </div>
+      </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto my-8">
-          <AssignedLeadTable leads={leads} isAdmin={adminStatus} />
-        </div>
-      </section>
-    </>
+      {/* Table */}
+      <div className="overflow-x-auto my-8">
+        <AssignedLeadTable leads={leads} isAdmin={adminStatus} />
+      </div>
+    </section>
   );
 };
 

@@ -122,7 +122,7 @@ export const getLeadsByAssignedUser = async (email: string) => {
   try {
     await connectToDatabase();
 
-    const leads = await Lead.find({ assignedTo: email })
+    const leads = await Lead.find({ assignedTo: { $in: [email] } })
       .sort({ createdAt: -1 })
       .lean();
 

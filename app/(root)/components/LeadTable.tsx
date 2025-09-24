@@ -31,7 +31,6 @@ import {
   Copy,
   TrainTrackIcon,
   ShieldHalf,
-  ChevronDown,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -60,7 +59,6 @@ import { IStudentEvent, ITrack } from "@/lib/database/models/track.model";
 import { ImFacebook, ImInstagram, ImSkype, ImTwitter } from "react-icons/im";
 import countries from "world-countries";
 import { getAllAdmins } from "@/lib/actions/admin.actions";
-import * as Select from "@radix-ui/react-select";
 
 type PinUnpinStatus = ILead & { isPinned: "pinned" | "unpinned" };
 
@@ -107,7 +105,7 @@ const LeadTable = ({
   const [allProfiles, setAllProfiles] = useState<IProfile[]>([]);
 
   const [assignModalOpen, setAssignModalOpen] = useState(false);
-  const [assignedUser, setAssignedUser] = useState<string>("");
+  const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -371,36 +369,46 @@ const LeadTable = ({
   };
 
   const handleBulkAssign = async () => {
-    if (!assignedUser || selectedLeads.length === 0) return;
+    if (assignedUsers.length === 0 || selectedLeads.length === 0) return;
 
     try {
       await Promise.all(
-        selectedLeads.map(
-          (leadId) => assignLeadToUser(leadId, assignedUser) // your API call
+        selectedLeads.map((leadId) =>
+          Promise.all(
+            assignedUsers.map(
+              (user) => assignLeadToUser(leadId, user) // your API call
+            )
+          )
         )
       );
 
       toast.success("Leads assigned successfully!");
+
       await Promise.all(
         selectedLeads.map(async (leadId) => {
           const lead = localLeads.find((l) => l._id === leadId);
           return createTrack({
             student: lead?.email || "",
-            event: `Lead assigned to ${assignedUser}`,
+            event: `Lead assigned to ${assignedUsers.join(", ")}`,
             route: `/leads/${leadId}`,
-            status: `Assigned to ${assignedUser}`,
+            status: `Assigned to ${assignedUsers.join(", ")}`,
           });
         })
       );
 
       setSelectedLeads([]);
-      setAssignedUser("");
+      setAssignedUsers([]);
       setAssignModalOpen(false);
 
       setLocalLeads((prev) =>
         prev.map((lead) => {
           if (selectedLeads.includes(lead._id)) {
-            lead.assignedTo = assignedUser;
+            lead.assignedTo = [
+              ...(lead.assignedTo || []),
+              ...assignedUsers.filter(
+                (u) => !(lead.assignedTo || []).includes(u)
+              ),
+            ];
           }
           return lead;
         })
@@ -1247,40 +1255,46 @@ const LeadTable = ({
 
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              Assign {selectedLeads.length} lead(s) to a user
+              Assign {selectedLeads.length} lead(s) to user(s)
             </p>
 
-            <Select.Root value={assignedUser} onValueChange={setAssignedUser}>
-              <Select.Trigger className="w-full border rounded-md px-3 py-2 flex justify-between items-center">
-                <Select.Value placeholder="Select user" />
-                <Select.Icon>
-                  <ChevronDown size={16} />
-                </Select.Icon>
-              </Select.Trigger>
+            <div className="max-h-64 overflow-y-auto border rounded-md p-2">
+              {allProfiles.map((user) => {
+                const checked = assignedUsers.includes(user.email);
 
-              <Select.Content className="bg-white border rounded-md shadow-md mt-1">
-                <Select.Viewport>
-                  {allProfiles.map((user) => (
-                    <Select.Item
-                      key={user._id}
-                      value={user.email}
-                      className="px-3 py-2 hover:bg-gray-100 flex flex-col"
-                    >
+                return (
+                  <label
+                    key={user._id}
+                    className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setAssignedUsers((prev) => [...prev, user.email]);
+                        } else {
+                          setAssignedUsers((prev) =>
+                            prev.filter((u) => u !== user.email)
+                          );
+                        }
+                      }}
+                    />
+                    <div className="flex flex-col">
                       <span className="font-medium">{user.name}</span>
                       <span className="text-xs text-gray-500">
                         {user.email}
                       </span>
                       <span className="text-xs text-gray-400 flex items-center gap-1">
-                        {/* Optional: flag emoji */}
                         {user.country === "Bangladesh" && "🇧🇩"}
                         {user.country === "USA" && "🇺🇸"}
                         {user.country || ""}
                       </span>
-                    </Select.Item>
-                  ))}
-                </Select.Viewport>
-              </Select.Content>
-            </Select.Root>
+                    </div>
+                  </label>
+                );
+              })}
+            </div>
           </div>
 
           <DialogFooter className="flex justify-end space-x-2 mt-4">
@@ -1289,7 +1303,7 @@ const LeadTable = ({
             </Button>
             <Button
               onClick={handleBulkAssign}
-              disabled={!assignedUser || selectedLeads.length === 0}
+              disabled={!assignedUsers || selectedLeads.length === 0}
             >
               Assign
             </Button>
