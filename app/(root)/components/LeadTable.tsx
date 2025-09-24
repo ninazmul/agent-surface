@@ -972,16 +972,6 @@ const LeadTable = ({
                           </a>
 
                           <Button
-                            onClick={handleBulkAssign}
-                            disabled={
-                              assignedUsers.length === 0 ||
-                              selectedLeads.length === 0
-                            }
-                          >
-                            Assign
-                          </Button>
-
-                          <Button
                             onClick={() => {
                               if (selectedLeads.length === 0) {
                                 setSelectedLeads(
