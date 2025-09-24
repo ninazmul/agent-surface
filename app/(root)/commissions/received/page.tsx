@@ -156,7 +156,7 @@ const Page = async () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <CommissionReceivedTable leads={combinedData} isAdmin={adminStatus} />
+          <CommissionReceivedTable leads={combinedData} isAdmin={adminStatus} email={email} />
         </div>
       </section>
     </>
