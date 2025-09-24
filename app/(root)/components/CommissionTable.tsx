@@ -21,6 +21,7 @@ import {
   FileText,
   Mail,
   XCircle,
+  Badge,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -496,14 +497,23 @@ const CommissionTable = ({
 
                     {/* PaymentStatus */}
                     <TableCell>
-                      {lead.paymentStatus ? (
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+                      {lead.paymentStatus === "Accepted" && (
+                        <Badge className="bg-green-100 text-green-800">
                           Accepted
-                        </span>
-                      ) : (
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">
+                        </Badge>
+                      )}
+                      {lead.paymentStatus === "Pending" && (
+                        <Badge className="bg-yellow-100 text-yellow-800">
                           Pending
-                        </span>
+                        </Badge>
+                      )}
+                      {lead.paymentStatus === "Rejected" && (
+                        <Badge className="bg-red-100 text-red-800">
+                          Rejected
+                        </Badge>
+                      )}
+                      {!lead.paymentStatus && (
+                        <Badge className="bg-gray-100 text-gray-800">N/A</Badge>
                       )}
                     </TableCell>
 
