@@ -20,7 +20,6 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-  Badge,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -407,24 +406,24 @@ const CommissionReceivedTable = ({
 
                     {/* PaymentStatus */}
                     <TableCell>
-                      {lead.paymentStatus === "Accepted" && (
-                        <Badge className="bg-green-100 text-green-800">
-                          Accepted
-                        </Badge>
-                      )}
-                      {lead.paymentStatus === "Pending" && (
-                        <Badge className="bg-yellow-100 text-yellow-800">
-                          Pending
-                        </Badge>
-                      )}
-                      {lead.paymentStatus === "Rejected" && (
-                        <Badge className="bg-red-100 text-red-800">
-                          Rejected
-                        </Badge>
-                      )}
-                      {!lead.paymentStatus && (
-                        <Badge className="bg-gray-100 text-gray-800">N/A</Badge>
-                      )}
+                      {(() => {
+                        const statusStyles: Record<string, string> = {
+                          Accepted: "bg-green-100 text-green-600",
+                          Pending: "bg-yellow-100 text-yellow-600",
+                          Rejected: "bg-red-100 text-red-600",
+                          NA: "bg-gray-100 text-gray-600",
+                        };
+
+                        const status = lead.paymentStatus || "NA";
+
+                        return (
+                          <p
+                            className={`border rounded-md px-2 py-1 text-sm font-semibold ${statusStyles[status]}`}
+                          >
+                            {status === "NA" ? "N/A" : status}
+                          </p>
+                        );
+                      })()}
                     </TableCell>
 
                     {/* Date */}
