@@ -972,12 +972,29 @@ const LeadTable = ({
                           </a>
 
                           <Button
-                            onClick={() => setAssignModalOpen(true)}
+                            onClick={handleBulkAssign}
+                            disabled={
+                              assignedUsers.length === 0 ||
+                              selectedLeads.length === 0
+                            }
+                          >
+                            Assign
+                          </Button>
+
+                          <Button
+                            onClick={() => {
+                              if (selectedLeads.length === 0) {
+                                setSelectedLeads(
+                                  paginatedLeads.map((lead) => lead._id)
+                                );
+                              }
+                              setAssignModalOpen(true);
+                            }}
                             variant="ghost"
                             className="w-full justify-start text-blue-500 gap-2"
                           >
                             <ShieldHalf className="w-4 h-4 text-blue-500" />{" "}
-                            Assign Selected
+                            Assign Lead
                           </Button>
 
                           {/* Delete */}
