@@ -22,7 +22,6 @@ interface ICombinedItem {
   email?: string;
   number?: string;
   quotationStatus?: boolean;
-  paymentStatus?: string;
   isPinned?: boolean;
   discount?: number | string;
   home: {
@@ -90,10 +89,7 @@ const Page = async () => {
   }
 
   // Filter only Converted leads
-  leads = leads.filter(
-    (lead: ILead) =>
-      lead.quotationStatus === true && lead.paymentStatus === "Pending"
-  );
+  leads = leads.filter((lead: ILead) => lead.quotationStatus === true);
 
   let quotations: IQuotation[] = [];
 
@@ -119,8 +115,7 @@ const Page = async () => {
 
   // Filter only Converted quotations
   quotations = quotations.filter(
-    (quotation: IQuotation) =>
-      quotation.quotationStatus === true && quotation.paymentStatus === "Pending"
+    (quotation: IQuotation) => quotation.quotationStatus === true
   );
 
   const mapLeadToCombined = (item: ILead): ICombinedItem => ({
@@ -156,7 +151,11 @@ const Page = async () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <CommissionTable leads={combinedData} isAdmin={adminStatus} email={email} />
+          <CommissionTable
+            leads={combinedData}
+            isAdmin={adminStatus}
+            email={email}
+          />
         </div>
       </section>
     </>
