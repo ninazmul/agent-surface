@@ -184,14 +184,16 @@ export const updateLead = async (
   }
 };
 
-// ====== ASSIGN LEAD TO USER
+// ====== ASSIGN LEAD TO USER (supports multiple)
 export const assignLeadToUser = async (leadId: string, email: string) => {
   try {
     await connectToDatabase();
 
     const updatedLead = await Lead.findByIdAndUpdate(
       leadId,
-      { $set: { assignedTo: email } },
+      {
+        $addToSet: { assignedTo: email }, // adds email if not already in array
+      },
       { new: true, runValidators: true }
     );
 
