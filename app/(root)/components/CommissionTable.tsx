@@ -132,12 +132,12 @@ const CommissionTable = ({
   // Filter and Sort
   const filteredLeads = useMemo(() => {
     const filtered = [...localLeads].filter((lead) => {
-      [
+      return [
         lead.name,
         lead.email,
         lead.number,
         lead.home?.country,
-        lead.paymentStatus || false,
+        lead.paymentStatus || "Not Available",
       ]
         .filter(Boolean)
         .some((value) =>

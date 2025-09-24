@@ -22,6 +22,7 @@ interface ICombinedItem {
   email?: string;
   number?: string;
   quotationStatus?: boolean;
+  paymentStatus?: string;
   isPinned?: boolean;
   discount?: number | string;
   home: {
@@ -60,6 +61,9 @@ const Page = async () => {
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
+  const notAcceptedOrMissing = (status?: string | null) =>
+    !status || status !== "Accepted";
+
   if (!adminStatus && myProfile?.role === "Student") {
     redirect("/profile");
   }
@@ -89,7 +93,10 @@ const Page = async () => {
   }
 
   // Filter only Converted leads
-  leads = leads.filter((lead: ILead) => lead.quotationStatus === true);
+  leads = leads.filter(
+    (lead: ILead) =>
+      lead.quotationStatus === true && notAcceptedOrMissing(lead.paymentStatus)
+  );
 
   let quotations: IQuotation[] = [];
 
@@ -115,7 +122,9 @@ const Page = async () => {
 
   // Filter only Converted quotations
   quotations = quotations.filter(
-    (quotation: IQuotation) => quotation.quotationStatus === true
+    (quotation: IQuotation) =>
+      quotation.quotationStatus === true &&
+      notAcceptedOrMissing(quotation.paymentStatus)
   );
 
   const mapLeadToCombined = (item: ILead): ICombinedItem => ({
