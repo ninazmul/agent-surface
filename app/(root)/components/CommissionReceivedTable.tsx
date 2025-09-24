@@ -144,7 +144,7 @@ const CommissionReceivedTable = ({
         lead.email,
         lead.number,
         lead.home?.country,
-        lead.paymentStatus || false,
+        lead.paymentStatus || "Not Available",
       ]
         .filter(Boolean)
         .some((value) =>
