@@ -1,0 +1,248 @@
+import { IProfile } from "@/lib/database/models/profile.model";
+import { ILead } from "@/lib/database/models/lead.model";
+import Image from "next/image";
+import { IQuotation } from "@/lib/database/models/quotation.model";
+
+type QuotationTemplateProps = {
+  data: ILead | IQuotation;
+  agency: IProfile | null;
+};
+
+interface IServices {
+  title: string;
+  serviceType: string;
+  amount: number;
+}
+
+interface ICourse {
+  name: string;
+  courseType?: string;
+  courseDuration?: string;
+  courseFee?: string;
+  startDate?: Date | string;
+  endDate?: Date | string;
+  campus?: { name: string; shift: string }[];
+}
+
+export default function QuotationTemplate({
+  data,
+  agency,
+}: QuotationTemplateProps) {
+  const services: IServices[] = (data.services || []).map((s) => ({
+    title: s.title,
+    serviceType: s.serviceType,
+    amount: Number(s.amount) || 0,
+  }));
+
+  const courses: ICourse[] = (data.course || []).map((c) => ({
+    name: c.name,
+    courseType: c.courseType,
+    courseDuration: c.courseDuration,
+    courseFee: c.courseFee,
+    startDate: c.startDate,
+    endDate: c.endDate,
+    campus: Array.isArray(c.campus) ? c.campus : c.campus ? [c.campus] : [],
+  }));
+
+  const discount = Number(data.discount) || 0;
+  const subTotal =
+    courses.reduce((sum, c) => sum + Number(c.courseFee || 0), 0) +
+    services.reduce((sum, s) => sum + s.amount, 0);
+  const grandTotal = subTotal - discount;
+
+  const formatDate = (date: string | Date | undefined) =>
+    date
+      ? new Date(date).toLocaleDateString("en-IE", {
+          day: "numeric",
+          month: "long",
+          year: "numeric",
+        })
+      : "N/A";
+
+  return (
+    <div className="w-[210mm] min-h-[297mm] p-10 bg-white text-gray-800 font-serif">
+      {/* Header */}
+      <div className="flex justify-between items-center border-b border-gray-300 mb-6 pb-2">
+        <div className="h-20 w-auto relative">
+          <Image
+            src="/assets/images/placeholder.png"
+            alt="Academic Bridge Logo"
+            width={150}
+            height={80}
+            unoptimized
+            className="object-contain"
+          />
+        </div>
+
+        <div className="text-right text-xs leading-5 space-y-0.5 text-gray-700">
+          <p>33 Gardiner Place, Dublin 1 • Ireland +353 1 878 8616</p>
+          <p>
+            info@academicbridge.ie •{" "}
+            <span className="font-semibold text-primary-700">
+              www.academicbridge.ie
+            </span>
+          </p>
+        </div>
+      </div>
+
+      {/* Quotation & Student Info */}
+      <div className="mb-8 flex justify-between w-full">
+        <div>
+          <h1 className="text-2xl font-extrabold uppercase mb-2 text-primary-700">
+            Quotation
+          </h1>
+          <p className="text-gray-600 text-xs">
+            <span className="font-medium">Issue Date:</span>{" "}
+            {formatDate(data.createdAt)}
+          </p>
+        </div>
+
+        <div className="w-1/3 bg-gray-50 border border-gray-200 rounded-md p-3 text-sm shadow-sm">
+          <h2 className="text-sm font-semibold text-primary-800 border-b pb-1 mb-2">
+            Student Information
+          </h2>
+          <div className="space-y-1 text-gray-700">
+            <p>
+              <span className="font-medium">Name:</span> {data.name}
+            </p>
+            <p>
+              <span className="font-medium">Email:</span> {data.email}
+            </p>
+            <p>
+              <span className="font-medium">Phone:</span> {data.number}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Services + Courses Table */}
+      <div className="mb-10 overflow-x-auto">
+        <table className="w-full border border-gray-300 text-sm text-left rounded-lg overflow-hidden">
+          <thead className="bg-gray-100 text-gray-700 uppercase tracking-wide">
+            <tr>
+              <th className="py-3 px-4">Description</th>
+              <th className="py-3 px-4">Qty</th>
+              <th className="py-3 px-4">Unit Price</th>
+              <th className="py-3 px-4">Total</th>
+            </tr>
+          </thead>
+          <tbody className="bg-white divide-y divide-gray-200">
+            {/* Courses */}
+            {courses.map((course, idx) => (
+              <tr key={idx} className="hover:bg-gray-50">
+                <td className="py-2 px-4 font-medium text-gray-800">
+                  <p className="font-medium">
+                    {course.name} • {course.courseType || "-"}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {course.courseDuration || "-"} •{" "}
+                    {course.startDate
+                      ? new Date(course.startDate).toLocaleDateString()
+                      : "-"}{" "}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {course.campus && course.campus.length > 0
+                      ? course.campus
+                          .map((camp) => `${camp.name} (${camp.shift})`)
+                          .join(", ")
+                      : "-"}
+                  </p>
+                </td>
+                <td className="py-2 px-4">1</td>
+                <td className="py-2 px-4">
+                  €{Number(course.courseFee || 0).toFixed(2)}
+                </td>
+                <td className="py-2 px-4">
+                  €{Number(course.courseFee || 0).toFixed(2)}
+                </td>
+              </tr>
+            ))}
+
+            {/* Services */}
+            {services.map((service, idx) => (
+              <tr key={idx} className="hover:bg-gray-50">
+                <td className="py-2 px-4">
+                  <p className="font-medium">{service.title}</p>
+                  <p className="text-xs text-gray-500">
+                    {service.serviceType || "Additional service"}
+                  </p>
+                </td>
+                <td className="py-2 px-4">1</td>
+                <td className="py-2 px-4">€{service.amount.toFixed(2)}</td>
+                <td className="py-2 px-4">€{service.amount.toFixed(2)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Totals Section */}
+        <div className="mt-4 w-full flex justify-end">
+          <div className="w-1/3 bg-gray-50 border border-gray-200 rounded-md p-4 text-sm shadow-sm">
+            <div className="flex justify-between py-1">
+              <span className="font-medium text-gray-700">Subtotal</span>
+              <span className="font-semibold text-gray-800">
+                €{subTotal.toFixed(2)}
+              </span>
+            </div>
+            <div className="flex justify-between py-1">
+              <span className="font-medium text-gray-700">Discount</span>
+              <span className="font-semibold text-red-600">
+                - €{discount.toFixed(2)}
+              </span>
+            </div>
+            <div className="border-t border-gray-300 mt-2 pt-2 flex justify-between py-1">
+              <span className="font-bold text-gray-900 text-lg">Total</span>
+              <span className="font-bold text-gray-900 text-lg">
+                €{grandTotal.toFixed(2)}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Agency & Payment Info */}
+      <div className="grid grid-cols-2 gap-8 text-sm mb-8 text-gray-800">
+        <div>
+          <h3 className="font-bold text-gray-700 mb-2 text-base">
+            Agency Details
+          </h3>
+          <p>
+            <strong>Agency:</strong> {agency?.name || "N/A"}
+          </p>
+          <p>
+            <strong>Email:</strong> {agency?.email || "N/A"}
+          </p>
+          <p>
+            <strong>Phone:</strong> {agency?.number || "N/A"}
+          </p>
+          <p>
+            <strong>Address:</strong> {agency?.location || "N/A"}
+          </p>
+          <p>
+            <strong>Country:</strong> {agency?.country || "N/A"}
+          </p>
+        </div>
+        <div>
+          <h3 className="font-bold text-gray-700 mb-2 text-base">
+            Payment Info
+          </h3>
+          <p>
+            <strong>Bank:</strong> {agency?.bankName || "N/A"}
+          </p>
+          <p>
+            <strong>Account No:</strong> {agency?.accountNumber || "N/A"}
+          </p>
+          <p>
+            <strong>SWIFT:</strong> {agency?.swiftCode || "N/A"}
+          </p>
+          <p>
+            <strong>Routing No:</strong> {agency?.routingNumber || "N/A"}
+          </p>
+          <p>
+            <strong>Branch:</strong> {agency?.branchAddress || "N/A"}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

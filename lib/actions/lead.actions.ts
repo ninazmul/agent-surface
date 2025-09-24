@@ -1,0 +1,224 @@
+"use server";
+
+import { handleError } from "../utils";
+import { connectToDatabase } from "../database";
+import Lead from "../database/models/lead.model";
+import { LeadParams } from "@/types";
+
+// ====== CREATE LEAD
+export const createLead = async (params: LeadParams) => {
+  try {
+    await connectToDatabase();
+    const newLead = await Lead.create(params);
+    return JSON.parse(JSON.stringify(newLead));
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// ====== BULK CREATE LEAD
+export const bulkCreateLeads = async (leads: LeadParams[]) => {
+  try {
+    await connectToDatabase();
+
+    const newLeads = await Lead.insertMany(leads, { ordered: false });
+    // ordered:false → continues inserting even if some fail
+
+    return JSON.parse(JSON.stringify(newLeads));
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// ====== GET ALL LEADS
+export const getAllLeads = async () => {
+  try {
+    await connectToDatabase();
+    const leads = await Lead.find().sort({ createdAt: -1 }).lean();
+    return JSON.parse(JSON.stringify(leads));
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// ====== GET LEAD BY ID
+export const getLeadById = async (leadId: string) => {
+  try {
+    await connectToDatabase();
+
+    const lead = await Lead.findById(leadId).lean();
+
+    if (!lead) {
+      throw new Error("Lead not found");
+    }
+
+    return JSON.parse(JSON.stringify(lead));
+  } catch (error) {
+    console.error("Error fetching lead by ID:", error);
+    handleError(error);
+  }
+};
+
+// ====== GET LEAD BY EMAIL
+export const getLeadByEmail = async (email: string) => {
+  try {
+    await connectToDatabase();
+
+    const lead = await Lead.findOne({ email }).lean();
+
+    if (!lead) {
+      console.warn(`Lead not found for email: ${email}`);
+      return null;
+    }
+
+    return JSON.parse(JSON.stringify(lead));
+  } catch (error) {
+    console.error("Error fetching lead by email:", error);
+    handleError(error);
+    return null;
+  }
+};
+
+// ====== GET LEADS BY AGENCY
+export const getLeadsByAgency = async (author: string) => {
+  try {
+    await connectToDatabase();
+    const leads = await Lead.find({ author }).sort({ date: -1 }).lean();
+
+    if (!leads.length) {
+      console.warn(`No leads found for author: ${author}`);
+      return [];
+    }
+
+    return JSON.parse(JSON.stringify(leads));
+  } catch (error) {
+    console.error("Error fetching leads by author:", error);
+    handleError(error);
+  }
+};
+
+// ====== GET LEADS BY PROMOTION
+export const getLeadsByPromotion = async (promotionSku: string) => {
+  try {
+    await connectToDatabase();
+
+    const leads = await Lead.find({ promotionSku }).sort({ date: -1 }).lean();
+
+    if (!leads.length) {
+      console.warn(`No leads found for promotion SKU: ${promotionSku}`);
+      return [];
+    }
+
+    return JSON.parse(JSON.stringify(leads));
+  } catch (error) {
+    console.error("Error fetching leads by promotion SKU:", error);
+    handleError(error);
+    return [];
+  }
+};
+
+// ====== GET LEADS BY ASSIGNED USER
+export const getLeadsByAssignedUser = async (email: string) => {
+  try {
+    await connectToDatabase();
+
+    const leads = await Lead.find({ assignedTo: email })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    if (!leads.length) {
+      console.warn(`No leads found assigned to: ${email}`);
+      return [];
+    }
+
+    return JSON.parse(JSON.stringify(leads));
+  } catch (error) {
+    console.error("Error fetching leads by assigned user:", error);
+    handleError(error);
+    return [];
+  }
+};
+
+// ====== GET ALL ASSIGNED LEADS (for admins)
+export const getAllAssignedLeads = async () => {
+  try {
+    await connectToDatabase();
+
+    const leads = await Lead.find({ assignedTo: { $exists: true, $ne: null } })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    if (!leads.length) {
+      console.warn("No assigned leads found");
+      return [];
+    }
+
+    return JSON.parse(JSON.stringify(leads));
+  } catch (error) {
+    console.error("Error fetching all assigned leads:", error);
+    handleError(error);
+    return [];
+  }
+};
+
+// ====== UPDATE LEAD
+export const updateLead = async (
+  leadId: string,
+  updateData: Partial<LeadParams>
+) => {
+  try {
+    await connectToDatabase();
+
+    const updatedLead = await Lead.findByIdAndUpdate(leadId, updateData, {
+      new: true,
+      runValidators: true,
+    });
+
+    if (!updatedLead) {
+      throw new Error("Lead not found");
+    }
+
+    return JSON.parse(JSON.stringify(updatedLead));
+  } catch (error) {
+    handleError(error);
+  }
+};
+
+// ====== ASSIGN LEAD TO USER
+export const assignLeadToUser = async (leadId: string, email: string) => {
+  try {
+    await connectToDatabase();
+
+    const updatedLead = await Lead.findByIdAndUpdate(
+      leadId,
+      { $set: { assignedTo: email } },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedLead) {
+      throw new Error("Lead not found");
+    }
+
+    return JSON.parse(JSON.stringify(updatedLead));
+  } catch (error) {
+    console.error("Error assigning lead:", error);
+    handleError(error);
+  }
+};
+
+// ====== DELETE LEAD
+export const deleteLead = async (leadId: string) => {
+  try {
+    await connectToDatabase();
+
+    const deletedLead = await Lead.findByIdAndDelete(leadId);
+
+    if (!deletedLead) {
+      throw new Error("Lead not found");
+    }
+
+    return { message: "Lead deleted successfully" };
+  } catch (error) {
+    handleError(error);
+  }
+};

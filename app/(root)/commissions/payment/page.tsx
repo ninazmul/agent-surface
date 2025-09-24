@@ -1,0 +1,84 @@
+import { auth } from "@clerk/nextjs/server";
+import { getUserEmailById } from "@/lib/actions/user.actions";
+import { Button } from "@/components/ui/button";
+import {
+  getAllPayments,
+  getPaymentsByAgency,
+} from "@/lib/actions/payment.actions";
+import {
+  getAdminCountriesByEmail,
+  getAdminRolePermissionsByEmail,
+  isAdmin,
+} from "@/lib/actions/admin.actions";
+import { redirect } from "next/navigation";
+import { getProfileByEmail } from "@/lib/actions/profile.actions";
+import { IPayment } from "@/lib/database/models/payment.model";
+import PaymentTable from "../../components/PaymentTable";
+
+const Page = async () => {
+  const { sessionClaims } = await auth();
+  const userId = sessionClaims?.userId as string;
+  const email = await getUserEmailById(userId);
+  const adminStatus = await isAdmin(email);
+  const adminCountry = await getAdminCountriesByEmail(email);
+  const rolePermissions = await getAdminRolePermissionsByEmail(email);
+  const myProfile = await getProfileByEmail(email);
+
+  if (!adminStatus && myProfile?.role === "Student") {
+    redirect("/profile");
+  }
+
+  if (adminStatus && !rolePermissions.includes("commissions")) {
+    redirect("/");
+  }
+
+  let payments: IPayment[] = [];
+
+  if (adminStatus) {
+    const allPayments = await getAllPayments();
+
+    payments =
+      adminCountry.length === 0
+        ? allPayments
+        : allPayments.filter((p: IPayment) => adminCountry.includes(p.country));
+  } else {
+    const profile = await getProfileByEmail(email);
+    const agentEmails = [email, ...(profile?.subAgents || [])];
+
+    const payResults = await Promise.all(
+      agentEmails.map((agent) => getPaymentsByAgency(agent))
+    );
+
+
+    payments = payResults.flat().filter(Boolean);
+  }
+
+  return (
+    <>
+      <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
+        {/* Header + Actions */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+          <h3 className="h3-bold text-center sm:text-left">Payment Withdraw</h3>
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+            <a
+              href={`/commissions/payment/create`}
+              className="w-full sm:w-auto"
+            >
+              <Button size="lg" className="rounded-full w-full sm:w-auto">
+                Request Payment
+              </Button>
+            </a>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <PaymentTable payments={payments} isAdmin={adminStatus} />
+        </div>
+      </section>
+    </>
+  );
+};
+
+export default Page;
