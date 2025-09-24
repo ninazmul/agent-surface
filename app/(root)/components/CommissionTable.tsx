@@ -103,6 +103,11 @@ const CommissionTable = ({
   const itemsPerPage = 10;
   const [profiles, setProfiles] = useState<Record<string, IProfile>>({});
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
+  const [localLeads, setLocalLeads] = useState<ICombinedItem[]>(leads);
+
+  useEffect(() => {
+    setLocalLeads(leads); // sync when prop changes
+  }, [leads]);
 
   // Dynamic Email State
   const [emailModalOpen, setEmailModalOpen] = useState(false);
@@ -126,7 +131,7 @@ const CommissionTable = ({
 
   // Filter and Sort
   const filteredLeads = useMemo(() => {
-    const filtered = [...leads].filter((lead) =>
+    const filtered = [...localLeads].filter((lead) => {
       [
         lead.name,
         lead.email,
@@ -139,8 +144,8 @@ const CommissionTable = ({
           (value?.toString() || "")
             .toLowerCase()
             .includes(searchQuery.toLowerCase())
-        )
-    );
+        );
+    });
 
     filtered.sort((a, b) => {
       // Pinned first
@@ -171,7 +176,7 @@ const CommissionTable = ({
     });
 
     return filtered;
-  }, [leads, searchQuery, sortKey, sortOrder]);
+  }, [localLeads, searchQuery, sortKey, sortOrder]);
 
   const paginatedLeads = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -591,26 +596,34 @@ const CommissionTable = ({
                                       ? "Rejected"
                                       : "Pending";
 
-                                  // prepare payload
                                   const updatePayload: {
                                     paymentStatus:
                                       | "Pending"
                                       | "Accepted"
                                       | "Rejected";
                                     paymentAcceptedAt?: Date | null;
-                                  } = {
-                                    paymentStatus: nextStatus,
-                                  };
+                                  } = { paymentStatus: nextStatus };
 
-                                  // set or reset accept date
                                   if (nextStatus === "Accepted") {
                                     updatePayload.paymentAcceptedAt =
                                       new Date();
                                   } else {
-                                    updatePayload.paymentAcceptedAt = null; // clears date when rejected/pending
+                                    updatePayload.paymentAcceptedAt = null;
                                   }
 
-                                  // update lead or quotation
+                                  // ✅ Optimistic update
+                                  setLocalLeads((prev) =>
+                                    prev.map((l) =>
+                                      l._id === lead._id
+                                        ? ({
+                                            ...l,
+                                            ...updatePayload,
+                                          } as ICombinedItem)
+                                        : l
+                                    )
+                                  );
+
+                                  // Update backend
                                   if ("quotationNumber" in lead) {
                                     updated = await updateQuotation(
                                       lead._id,
@@ -623,25 +636,21 @@ const CommissionTable = ({
                                     );
                                   }
 
-                                  const newStatus:
-                                    | "Pending"
-                                    | "Accepted"
-                                    | "Rejected" =
+                                  const newStatus =
                                     updated?.paymentStatus ?? nextStatus;
 
-                                  if (updated) {
-                                    toast.success(
-                                      `Payment status set to ${newStatus}`
-                                    );
-                                    await createTrack({
-                                      student: updated.email,
-                                      event: `${updated.name}'s payment status set to ${newStatus} by ${email}`,
-                                      route: `/commissions`,
-                                      status: newStatus,
-                                    });
-                                  }
+                                  toast.success(
+                                    `Payment status set to ${newStatus}`
+                                  );
 
-                                  router.refresh();
+                                  await createTrack({
+                                    student: updated.email,
+                                    event: `${updated.name}'s payment status set to ${newStatus} by ${email}`,
+                                    route: `/commissions`,
+                                    status: newStatus,
+                                  });
+
+                                  router.refresh(); // still keep this to sync with DB
                                 } catch (err) {
                                   console.error(err);
                                   toast.error(
