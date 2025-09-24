@@ -140,6 +140,10 @@ const Page = async () => {
     return dateB - dateA;
   });
 
+  console.log("Leads:", leads.length, leads);
+  console.log("Quotations:", quotations.length, quotations);
+  console.log("Combined Data:", combinedData.length, combinedData);
+
   return (
     <>
       <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
