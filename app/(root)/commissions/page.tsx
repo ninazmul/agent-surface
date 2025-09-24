@@ -61,6 +61,8 @@ const Page = async () => {
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
+  const notAccepted = (status?: string) => status !== "Accepted";
+
   if (!adminStatus && myProfile?.role === "Student") {
     redirect("/profile");
   }
@@ -92,10 +94,7 @@ const Page = async () => {
   // Filter only Converted leads
   leads = leads.filter(
     (lead: ILead) =>
-      lead.quotationStatus === true &&
-      (lead.paymentStatus === null ||
-        lead.paymentStatus === undefined ||
-        lead.paymentStatus === "Pending")
+      lead.quotationStatus === true && notAccepted(lead.paymentStatus)
   );
 
   let quotations: IQuotation[] = [];
@@ -123,10 +122,7 @@ const Page = async () => {
   // Filter only Converted quotations
   quotations = quotations.filter(
     (quotation: IQuotation) =>
-      quotation.quotationStatus === true &&
-      (quotation.paymentStatus === null ||
-        quotation.paymentStatus === undefined ||
-        quotation.paymentStatus === "Pending")
+      quotation.quotationStatus === true && notAccepted(quotation.paymentStatus)
   );
 
   const mapLeadToCombined = (item: ILead): ICombinedItem => ({
