@@ -44,7 +44,7 @@ export default function QuotesInvoiceTemplate({
   return (
     <div className="relative w-[210mm] min-h-[297mm] p-10 bg-white text-gray-800 font-serif">
       {/* === PAID Watermark === */}
-      {data?.paymentStatus && (
+      {data?.paymentStatus === "Accepted" && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none">
           <Image
             src="/assets/images/paid.png"
