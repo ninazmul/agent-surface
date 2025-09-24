@@ -90,7 +90,10 @@ const Page = async () => {
   }
 
   // Filter only Converted leads
-  leads = leads.filter((lead: ILead) => lead.quotationStatus === true);
+  leads = leads.filter(
+    (lead: ILead) =>
+      lead.quotationStatus === true && lead.paymentStatus === "Pending"
+  );
 
   let quotations: IQuotation[] = [];
 
@@ -116,7 +119,8 @@ const Page = async () => {
 
   // Filter only Converted quotations
   quotations = quotations.filter(
-    (quotation: IQuotation) => quotation.quotationStatus === true
+    (quotation: IQuotation) =>
+      quotation.quotationStatus === true && quotation.paymentStatus === "Pending"
   );
 
   const mapLeadToCombined = (item: ILead): ICombinedItem => ({
@@ -140,10 +144,6 @@ const Page = async () => {
     return dateB - dateA;
   });
 
-  console.log("Leads:", leads.length, leads);
-  console.log("Quotations:", quotations.length, quotations);
-  console.log("Combined Data:", combinedData.length, combinedData);
-
   return (
     <>
       <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
@@ -156,11 +156,7 @@ const Page = async () => {
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <CommissionTable
-            leads={combinedData}
-            isAdmin={adminStatus}
-            email={email}
-          />
+          <CommissionTable leads={combinedData} isAdmin={adminStatus} email={email} />
         </div>
       </section>
     </>
