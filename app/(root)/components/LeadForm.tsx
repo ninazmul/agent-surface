@@ -218,7 +218,7 @@ const LeadForm = ({
         })) || [],
 
       note: Lead?.note || "",
-      author: isAdmin ? "" : email || "",
+      author: isAdmin ? Lead?.author : email || "",
       progress:
         (Lead?.progress as "Open" | "Contacted" | "Converted" | "Closed") ||
         "Open",
