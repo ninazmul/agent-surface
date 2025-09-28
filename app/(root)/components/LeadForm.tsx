@@ -218,7 +218,7 @@ const LeadForm = ({
         })) || [],
 
       note: Lead?.note || "",
-      author: isAdmin ? Lead?.author : email || "",
+      author: isAdmin ? Lead?.author || "" : email || "",
       progress:
         (Lead?.progress as "Open" | "Contacted" | "Converted" | "Closed") ||
         "Open",
@@ -449,7 +449,7 @@ const LeadForm = ({
             )}
           />
           {/* Agency (Admin only) */}
-          {isAdmin ? (
+          {isAdmin && (
             <FormField
               name="author"
               control={form.control}
@@ -479,9 +479,6 @@ const LeadForm = ({
                 </FormItem>
               )}
             />
-          ) : (
-            // Keep current author (hidden input)
-            <input type="hidden" {...form.register("author")} value={email} />
           )}
         </div>
 
