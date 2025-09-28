@@ -3,18 +3,18 @@ import { Document, Schema, model, models } from "mongoose";
 export interface IProfile extends Document {
   _id: string;
   name: string;
-  logo: string;
+  logo?: string;
   email: string;
   number: string;
   country: string;
   location: string;
   licenseDocument?: string;
   agreementDocument?: string;
-  bankName: string;
-  accountNumber: string;
-  swiftCode: string;
-  routingNumber: string;
-  branchAddress: string;
+  bankName?: string;
+  accountNumber?: string;
+  swiftCode?: string;
+  routingNumber?: string;
+  branchAddress?: string;
   role: string;
   countryAgent?: string;
   subAgents?: string[];
@@ -25,18 +25,18 @@ export interface IProfile extends Document {
 
 const ProfileSchema = new Schema<IProfile>({
   name: { type: String, required: true },
-  logo: { type: String, required: true },
+  logo: { type: String, required: false },
   email: { type: String, required: true },
   number: { type: String, required: true },
   country: { type: String, required: true },
   location: { type: String, required: true },
   licenseDocument: { type: String, required: false },
   agreementDocument: { type: String, required: false },
-  bankName: { type: String, required: true },
-  accountNumber: { type: String, required: true },
-  swiftCode: { type: String, required: true },
-  routingNumber: { type: String, required: true },
-  branchAddress: { type: String, required: true },
+  bankName: { type: String, required: false },
+  accountNumber: { type: String, required: false },
+  swiftCode: { type: String, required: false },
+  routingNumber: { type: String, required: false },
+  branchAddress: { type: String, required: false },
   role: { type: String, required: true },
   countryAgent: { type: String, required: false },
   subAgents: { type: [String], default: undefined },

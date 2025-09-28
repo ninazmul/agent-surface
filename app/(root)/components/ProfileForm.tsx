@@ -32,20 +32,18 @@ import countries from "world-countries";
 export const profileFormSchema = z
   .object({
     name: z.string().min(2, "Name must be at least 2 characters."),
-    logo: z.string().min(5, "Logo must be provided."),
+    logo: z.string().optional(),
     email: z.string().email("Invalid email address."),
     number: z.string().min(10, "Phone number must be valid."),
     country: z.string().min(2, "Country must be at least 2 characters."),
     location: z.string().min(2, "Location must be at least 2 characters."),
     licenseDocument: z.string().optional(),
     agreementDocument: z.string().optional(),
-    bankName: z.string().min(2, "Bank name must be at least 2 characters."),
-    accountNumber: z.string().min(5, "Account number must be valid."),
-    swiftCode: z.string().min(5, "SWIFT code must be valid."),
-    routingNumber: z.string().min(5, "Routing number must be valid."),
-    branchAddress: z
-      .string()
-      .min(5, "Branch address must be at least 5 characters."),
+    bankName: z.string().optional(),
+    accountNumber: z.string().optional(),
+    swiftCode: z.string().optional(),
+    routingNumber: z.string().optional(),
+    branchAddress: z.string().optional(),
     role: z.enum(["Agent", "Sub Agent", "Student"], {
       required_error: "Role is required",
     }),
@@ -90,23 +88,23 @@ const ProfileForm = ({ type, profile, profileId, agent }: ProfileFormProps) => {
     profile && type === "Update"
       ? {
           name: profile.name,
-          logo: profile.logo,
+          logo: profile?.logo,
           email: profile.email,
           number: profile.number,
           country: profile.country,
           location: profile.location,
-          licenseDocument: profile.licenseDocument,
-          agreementDocument: profile.agreementDocument,
-          bankName: profile.bankName,
-          accountNumber: profile.accountNumber,
-          swiftCode: profile.swiftCode,
-          routingNumber: profile.routingNumber,
-          branchAddress: profile.branchAddress,
+          licenseDocument: profile?.licenseDocument,
+          agreementDocument: profile?.agreementDocument,
+          bankName: profile?.bankName,
+          accountNumber: profile?.accountNumber,
+          swiftCode: profile?.swiftCode,
+          routingNumber: profile?.routingNumber,
+          branchAddress: profile?.branchAddress,
           role:
             profile.role === "Agent" || profile.role === "Sub Agent"
               ? (profile.role as "Agent" | "Sub Agent")
               : "Agent",
-          countryAgent: profile.countryAgent,
+          countryAgent: profile?.countryAgent,
           status: profile.status,
         }
       : {

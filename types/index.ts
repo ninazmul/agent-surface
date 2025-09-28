@@ -339,18 +339,18 @@ export type QuotationParams = {
 // ====== PROFILE PARAMS
 export type ProfileParams = {
   name: string;
-  logo: string;
+  logo?: string;
   email: string;
   number: string;
   country: string;
   location: string;
   licenseDocument?: string;
   agreementDocument?: string;
-  bankName: string;
-  accountNumber: string;
-  swiftCode: string;
-  routingNumber: string;
-  branchAddress: string;
+  bankName?: string;
+  accountNumber?: string;
+  swiftCode?: string;
+  routingNumber?: string;
+  branchAddress?: string;
   role: string;
   countryAgent?: string;
   subAgents?: string[];
