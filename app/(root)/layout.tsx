@@ -14,6 +14,7 @@ import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import NotificationsCount from "./components/Notifications";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import ThemeToggle from "@/components/shared/ThemeToggle";
+import { DashboardProvider } from "@/components/shared/DashboardProvider";
 
 export default async function AdminLayout({
   children,
@@ -41,7 +42,11 @@ export default async function AdminLayout({
 
   return (
     <SidebarProvider defaultOpen={true}>
-      <HomeSidebar rolePermissions={rolePermissions} isAdmin={adminStatus} role={myProfile?.role} />
+      <HomeSidebar
+        rolePermissions={rolePermissions}
+        isAdmin={adminStatus}
+        role={myProfile?.role}
+      />
       <Toaster />
       <main className="flex-1 h-screen mx-auto overflow-y-auto">
         <div
@@ -64,7 +69,9 @@ export default async function AdminLayout({
         <div className="p-2">
           <Breadcrumbs />
         </div>
-        <div className="p-2">{children}</div>
+        <div className="p-2">
+          <DashboardProvider>{children}</DashboardProvider>
+        </div>
       </main>
     </SidebarProvider>
   );
