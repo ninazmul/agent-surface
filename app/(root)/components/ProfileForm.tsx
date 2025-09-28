@@ -69,9 +69,18 @@ type ProfileFormProps = {
   profile?: IProfile;
   profileId?: string;
   agent?: IProfile[];
+  isAgent?: boolean;
+  email?: string;
 };
 
-const ProfileForm = ({ type, profile, profileId, agent }: ProfileFormProps) => {
+const ProfileForm = ({
+  type,
+  profile,
+  profileId,
+  agent,
+  isAgent,
+  email,
+}: ProfileFormProps) => {
   const [logo, setLogo] = useState<File[]>([]);
   const [licenseDocument, setLicenseDocument] = useState<File[]>([]);
   const [agreementDocument, setAgreementDocument] = useState<File[]>([]);
@@ -320,9 +329,9 @@ const ProfileForm = ({ type, profile, profileId, agent }: ProfileFormProps) => {
                       className="w-full p-2 border rounded dark:bg-gray-700"
                     >
                       <option value="">Select role</option>
-                      <option value="Agent">Agent</option>
+                      {!isAgent && <option value="Agent">Agent</option>}
                       <option value="Sub Agent">Sub Agent</option>
-                      <option value="Student">Student</option>
+                      {!isAgent && <option value="Student">Student</option>}
                     </select>
                   </FormControl>
                   <FormMessage />
@@ -333,36 +342,47 @@ const ProfileForm = ({ type, profile, profileId, agent }: ProfileFormProps) => {
               <FormItem>
                 <FormLabel>Country Agent</FormLabel>
                 <FormControl>
-                  <Controller
-                    control={form.control}
-                    name="countryAgent"
-                    render={({ field }) => {
-                      const options = Array.isArray(agent)
-                        ? agent
-                            .filter((a) => a.country === selectedCountry)
-                            .map((a) => ({
-                              label: `${a.name} (${a.email})`,
-                              value: a.email,
-                            }))
-                        : [];
+                  {isAgent ? (
+                    // Automatically set countryAgent to current user's email
+                    <input
+                      type="text"
+                      value={email || ""}
+                      readOnly
+                      className="w-full p-2 border rounded dark:bg-gray-200"
+                    />
+                  ) : (
+                    <Controller
+                      control={form.control}
+                      name="countryAgent"
+                      render={({ field }) => {
+                        const options = Array.isArray(agent)
+                          ? agent
+                              .filter((a) => a.country === selectedCountry)
+                              .map((a) => ({
+                                label: `${a.name} (${a.email})`,
+                                value: a.email,
+                              }))
+                          : [];
 
-                      return (
-                        <Select
-                          options={options}
-                          isSearchable
-                          value={
-                            options.find((opt) => opt.value === field.value) ||
-                            null
-                          }
-                          onChange={(selected) =>
-                            field.onChange(selected?.value || "")
-                          }
-                          placeholder="Search and select agent"
-                          classNamePrefix="react-select"
-                        />
-                      );
-                    }}
-                  />
+                        return (
+                          <Select
+                            options={options}
+                            isSearchable
+                            value={
+                              options.find(
+                                (opt) => opt.value === field.value
+                              ) || null
+                            }
+                            onChange={(selected) =>
+                              field.onChange(selected?.value || "")
+                            }
+                            placeholder="Search and select agent"
+                            classNamePrefix="react-select"
+                          />
+                        );
+                      }}
+                    />
+                  )}
                 </FormControl>
                 <FormMessage />
               </FormItem>
