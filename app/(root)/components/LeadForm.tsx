@@ -136,6 +136,7 @@ const LeadForm = ({
   type,
   Lead,
   LeadId,
+  agency,
   isAdmin,
   email,
   courses,
@@ -447,6 +448,41 @@ const LeadForm = ({
               </FormItem>
             )}
           />
+          {/* Agency (Admin only) */}
+          {isAdmin ? (
+            <FormField
+              name="author"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Agency</FormLabel>
+                  <FormControl>
+                    <Select
+                      options={agency?.map((a) => ({
+                        value: a.email,
+                        label: a.name || a.email,
+                      }))}
+                      value={
+                        agency
+                          ?.map((a) => ({
+                            value: a.email,
+                            label: a.name || a.email,
+                          }))
+                          .find((option) => option.value === field.value) ||
+                        null
+                      }
+                      onChange={(val) => field.onChange(val?.value)}
+                      placeholder="Select agency"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ) : (
+            // Keep current author (hidden input)
+            <input type="hidden" {...form.register("author")} value={email} />
+          )}
         </div>
 
         {/* ===== Home Address ===== */}
