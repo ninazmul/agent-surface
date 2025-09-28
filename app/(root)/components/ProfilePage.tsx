@@ -219,16 +219,18 @@ export default function ProfilePage({
                   </>
                 ))}
 
-              <SalesTargetProgress
-                profile={{
-                  ...myProfile,
-                  salesTarget: myProfile?.salesTarget
-                    ? Number(myProfile.salesTarget)
-                    : 0,
-                  email: myProfile?.email || "",
-                }}
-                leads={myLeads}
-              />
+              {myProfile.salesTarget && (
+                <SalesTargetProgress
+                  profile={{
+                    ...myProfile,
+                    salesTarget: myProfile?.salesTarget
+                      ? Number(myProfile.salesTarget)
+                      : 0,
+                    email: myProfile?.email || "",
+                  }}
+                  leads={myLeads}
+                />
+              )}
 
               {/* Profile Status or Update */}
               <div>
