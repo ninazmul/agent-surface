@@ -21,6 +21,7 @@ import { useUser } from "@clerk/nextjs";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
 import { getAdminCountriesByEmail, isAdmin } from "@/lib/actions/admin.actions";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
+import { useDashboardData } from "@/components/shared/DashboardProvider";
 
 ChartJS.register(
   ArcElement,
@@ -60,10 +61,17 @@ const SalesDashboard = () => {
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [loading, setLoading] = useState(true);
+  const { dashboardData, setDashboardData } = useDashboardData();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (dashboardData?.leads && dashboardData.leads.length > 0) {
+          setLeads(dashboardData.leads);
+          setLoading(false);
+          return;
+        }
+
         const userID = await getUserByClerkId(userId);
         const email = await getUserEmailById(userID);
         const adminStatus = await isAdmin(email);
@@ -89,6 +97,21 @@ const SalesDashboard = () => {
         }
 
         setLeads(allLeads);
+        setDashboardData({
+          ...(dashboardData || {
+            admins: [],
+            resources: [],
+            courses: [],
+            downloads: [],
+            eventCalendars: [],
+            profiles: [],
+            promotions: [],
+            services: [],
+            users: [],
+            myProfile: null,
+          }),
+          leads: allLeads,
+        });
       } catch (err) {
         console.error("Sales data load error:", err);
       } finally {
@@ -97,7 +120,7 @@ const SalesDashboard = () => {
     };
 
     fetchData();
-  }, [userId]);
+  }, [dashboardData, setDashboardData, userId]);
 
   // Filter by date
   const filterByDateRange = (data: ILead[], range: string) => {
