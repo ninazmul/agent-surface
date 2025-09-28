@@ -63,6 +63,14 @@ import { IProfile } from "@/lib/database/models/profile.model";
 import CountrySalesTargets from "./components/CountrySalesTargets";
 import LeadsToEnrolled from "./components/LeadsToEnrolled";
 import LeadsFinancial from "./components/LeadsFinancial";
+import { useDashboardData } from "@/components/shared/DashboardProvider";
+import { IAdmin } from "@/lib/database/models/admin.model";
+import { IResource } from "@/lib/database/models/resource.model";
+import { ICourse } from "@/lib/database/models/course.model";
+import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
+import { IPromotion } from "@/lib/database/models/promotion.model";
+import { IServices } from "@/lib/database/models/service.model";
+import { IUser } from "@/lib/database/models/user.model";
 
 // Register Chart.js components
 ChartJS.register(
@@ -102,27 +110,45 @@ const Dashboard = () => {
   const [adminStatus, setAdminStatus] = useState(false);
   const [myProfile, setMyProfile] = useState<IProfile | null>(null);
 
-  const [admins, setAdmins] = useState([]);
-  const [resources, setResources] = useState([]);
-  const [courses, setCourses] = useState([]);
+  const [admins, setAdmins] = useState<IAdmin[]>([]);
+  const [resources, setResources] = useState<IResource[]>([]);
+  const [courses, setCourses] = useState<ICourse[]>([]);
   const [downloads, setDownloads] = useState<IDownload[]>([]);
-  const [eventCalendars, setEventCalendars] = useState([]);
+  const [eventCalendars, setEventCalendars] = useState<IEventCalendar[]>([]);
   const [leads, setLeads] = useState<ILead[]>([]);
-  const [profiles, setProfiles] = useState([]);
-  const [promotions, setPromotions] = useState([]);
-  const [services, setServices] = useState([]);
-  const [users, setUsers] = useState([]);
+  const [profiles, setProfiles] = useState<IProfile[]>([]);
+  const [promotions, setPromotions] = useState<IPromotion[]>([]);
+  const [services, setServices] = useState<IServices[]>([]);
+  const [users, setUsers] = useState<IUser[]>([]);
   const [subAgentCount, setSubAgentCount] = useState(0);
+  const { dashboardData, setDashboardData } = useDashboardData();
 
   useEffect(() => {
     const shouldReload = searchParams.get("reload");
     if (shouldReload) {
+      setDashboardData(null);
       router.replace("/");
       window.location.reload();
     }
-  }, [router, searchParams]);
+  }, [router, searchParams, setDashboardData]);
 
   useEffect(() => {
+    if (dashboardData) {
+      setDownloads(dashboardData.downloads);
+      setLeads(dashboardData.leads);
+      setAdmins(dashboardData.admins);
+      setResources(dashboardData.resources);
+      setCourses(dashboardData.courses);
+      setEventCalendars(dashboardData.eventCalendars);
+      setProfiles(dashboardData.profiles);
+      setPromotions(dashboardData.promotions);
+      setServices(dashboardData.services);
+      setUsers(dashboardData.users);
+      setMyProfile(dashboardData.myProfile);
+      setLoading(false);
+      return;
+    }
+
     const fetchInitialData = async () => {
       try {
         setLoading(true);
@@ -156,7 +182,24 @@ const Dashboard = () => {
           getAllUsers(),
         ]);
 
-        // Immediately set unfiltered data (fast render)
+        const snapshot = {
+          admins: adminsData,
+          resources: resourcesData,
+          courses: coursesData,
+          downloads: downloadsRaw,
+          eventCalendars: eventCalendarsData,
+          leads: leadsRaw,
+          profiles: profilesData,
+          promotions: promotionsData,
+          services: servicesData,
+          users: usersData,
+          myProfile: profile,
+        };
+
+        // save in context
+        setDashboardData(snapshot);
+
+        // update local state
         setDownloads(downloadsRaw);
         setLeads(leadsRaw);
         setAdmins(adminsData);
@@ -235,7 +278,7 @@ const Dashboard = () => {
     };
 
     fetchInitialData();
-  }, [router, userId, user]);
+  }, [router, userId, user, dashboardData, setDashboardData]);
 
   const allLabels = [
     "Admins",
