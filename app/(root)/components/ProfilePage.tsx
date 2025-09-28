@@ -223,7 +223,7 @@ export default function ProfilePage({
                   ...myProfile,
                   salesTarget: myProfile?.salesTarget
                     ? Number(myProfile.salesTarget)
-                    : undefined,
+                    : 0,
                   email: myProfile?.email || "",
                 }}
                 leads={myLead ? [myLead] : []}
