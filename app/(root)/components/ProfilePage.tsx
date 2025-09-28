@@ -34,11 +34,9 @@ export default function ProfilePage({
 
   // Fetch leads client-side
   useEffect(() => {
-    if (!myProfile?.email) return;
-
     const fetchData = async () => {
       try {
-        const lead = await getLeadByEmail(myProfile.email);
+        const lead = await getLeadByEmail(myProfile?.email || "");
         setMyLead(lead || null);
       } catch (error) {
         console.error("Error fetching leads:", error);
