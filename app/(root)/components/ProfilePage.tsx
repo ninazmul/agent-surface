@@ -298,9 +298,16 @@ export default function ProfilePage({
         {/* Sub Agents Section */}
         {subAgents.length > 0 && (
           <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
-            <h3 className="text-lg font-semibold mb-4 text-indigo-800 dark:text-gray-100">
-              Your Sub Agents
-            </h3>
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
+              <h3 className="text-lg font-semibold mb-4 text-indigo-800 dark:text-gray-100">
+                Your Sub Agents
+              </h3>
+              <a href={"/profile/create"} className="w-full sm:w-auto">
+                <Button size="lg" className="rounded-full w-full sm:w-auto">
+                  Add Sub Agent
+                </Button>
+              </a>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {subAgents.map((agent) => (
                 <a
