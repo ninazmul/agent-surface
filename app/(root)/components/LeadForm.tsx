@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createLead, updateLead } from "@/lib/actions/lead.actions";
 import { ILead } from "@/lib/database/models/lead.model";
 import { IProfile } from "@/lib/database/models/profile.model";
@@ -279,7 +279,7 @@ const LeadForm = ({
             route: `/leads/${created._id}`,
             status: "created",
           });
-          redirect("/leads");
+          router.push("/leads");
         }
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
