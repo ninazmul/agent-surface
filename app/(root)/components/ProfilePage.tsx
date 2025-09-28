@@ -5,11 +5,11 @@ import Image from "next/image";
 import ProfileForm from "./ProfileForm";
 import { Button } from "@/components/ui/button";
 import ProfileTable from "./ProfileTable";
-import { getLeadsByAgency } from "@/lib/actions/lead.actions";
-import { ILead } from "@/lib/database/models/lead.model";
-import { useEffect, useState } from "react";
 import SalesTargetProgress from "./SalesTargetProgress";
 import { FileEdit } from "lucide-react";
+import { ILead } from "@/lib/database/models/lead.model";
+import { useEffect, useState } from "react";
+import { getLeadByEmail } from "@/lib/actions/lead.actions";
 
 interface ProfilePageProps {
   adminStatus: boolean;
@@ -18,6 +18,7 @@ interface ProfilePageProps {
   countryAgent: IProfile | null;
   agent: IProfile[];
   subAgents: IProfile[];
+  myLeads: ILead[];
 }
 
 export default function ProfilePage({
@@ -27,6 +28,7 @@ export default function ProfilePage({
   countryAgent,
   agent,
   subAgents,
+  myLeads,
 }: ProfilePageProps) {
   const [myLead, setMyLead] = useState<ILead | null>(null);
 
@@ -36,8 +38,8 @@ export default function ProfilePage({
 
     const fetchData = async () => {
       try {
-        const lead = await getLeadsByAgency(myProfile.email);
-        setMyLead(lead || []);
+        const lead = await getLeadByEmail(myProfile.email);
+        setMyLead(lead || null);
       } catch (error) {
         console.error("Error fetching leads:", error);
       }
@@ -45,7 +47,6 @@ export default function ProfilePage({
 
     fetchData();
   }, [myProfile?.email]);
-
   return (
     <div className="space-y-10 pb-10">
       {/* User Profile Section */}
@@ -226,7 +227,7 @@ export default function ProfilePage({
                     : 0,
                   email: myProfile?.email || "",
                 }}
-                leads={myLead ? [myLead] : []}
+                leads={myLeads}
               />
 
               {/* Profile Status or Update */}

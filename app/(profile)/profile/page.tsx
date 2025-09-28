@@ -14,6 +14,7 @@ import {
 import { redirect } from "next/navigation";
 import { IProfile } from "@/lib/database/models/profile.model";
 import ProfilePage from "@/app/(root)/components/ProfilePage";
+import { getLeadsByAgency } from "@/lib/actions/lead.actions";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -44,6 +45,7 @@ const Page = async () => {
   }
 
   const myProfile = await getProfileByEmail(email);
+  const myLeads = await getLeadsByAgency(myProfile.email);
   const subAgents = await getSubAgentsByEmail(email);
   const countryAgent = await getProfileByEmail(myProfile?.countryAgent || "");
 
@@ -59,6 +61,7 @@ const Page = async () => {
       countryAgent={countryAgent}
       agent={agent}
       subAgents={subAgents}
+      myLeads={myLeads}
     />
   );
 };
