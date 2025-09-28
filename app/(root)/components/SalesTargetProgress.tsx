@@ -5,8 +5,8 @@ import { ILead } from "@/lib/database/models/lead.model";
 import { useEffect, useState, useMemo } from "react";
 
 type Props = {
-  profile: { salesTarget?: number; email: string };
-  leads: ILead[];
+  profile?: { salesTarget?: number; email: string };
+  leads?: ILead[];
 };
 
 export default function SalesTargetProgress({ profile, leads }: Props) {
@@ -76,14 +76,14 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
   const salesAchieved = useMemo(() => {
     if (!startDate || !endDate) return 0;
 
-    const paidLeads = leads.filter((l) => l.paymentStatus === "Accepted");
+    const paidLeads = leads?.filter((l) => l.paymentStatus === "Accepted");
 
-    const filteredLeads = paidLeads.filter((lead) => {
+    const filteredLeads = paidLeads?.filter((lead) => {
       const leadDate = new Date(lead.createdAt); // adjust if another date field
       return leadDate >= startDate && leadDate <= endDate;
     });
 
-    return filteredLeads.reduce((sum, lead) => {
+    return filteredLeads?.reduce((sum, lead) => {
       const courseAmount = Array.isArray(lead.course)
         ? lead.course.reduce((s, c) => s + Number(c.courseFee || 0), 0)
         : 0;
@@ -96,7 +96,7 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
     }, 0);
   }, [leads, startDate, endDate]);
 
-  if (!profile.salesTarget) return null;
+  if (!profile?.salesTarget) return null;
 
   return (
     <section className="mb-10">
@@ -149,7 +149,7 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
       {/* Progress Display */}
       <div className="bg-gray-50 dark:bg-gray-800 border rounded-xl p-6">
         <p className="mb-2 text-sm text-gray-600 dark:text-gray-300">
-          {salesAchieved.toLocaleString()} /{" "}
+          {salesAchieved?.toLocaleString()} /{" "}
           {profile.salesTarget.toLocaleString()} €
         </p>
         <div className="w-full bg-gray-200 dark:text-gray-500 rounded-full h-3 overflow-hidden">
@@ -157,14 +157,14 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
             className="bg-green-500 h-3"
             style={{
               width: `${Math.min(
-                (salesAchieved / profile.salesTarget) * 100,
+                (salesAchieved || 0 / profile.salesTarget) * 100,
                 100
               )}%`,
             }}
           />
         </div>
         <p className="mt-2 text-xs text-gray-500 dark:text-gray-300">
-          {((salesAchieved / profile.salesTarget) * 100).toFixed(1)}% achieved
+          {((salesAchieved || 0 / profile.salesTarget) * 100).toFixed(1)}% achieved
         </p>
       </div>
     </section>
