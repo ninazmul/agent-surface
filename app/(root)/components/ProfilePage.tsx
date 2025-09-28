@@ -217,7 +217,7 @@ export default function ProfilePage({
                   </>
                 ))}
 
-              {myProfile.salesTarget && (
+              {myProfile && (
                 <SalesTargetProgress
                   profile={{
                     ...myProfile,
