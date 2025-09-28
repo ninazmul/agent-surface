@@ -2,17 +2,14 @@
 
 import { useSearchParams, useRouter } from "next/navigation";
 import { ILead } from "@/lib/database/models/lead.model";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 
 type Props = {
   profile: { salesTarget?: number; email: string };
   leads: ILead[];
 };
 
-export default function SalesTargetProgress({
-  profile,
-}: //  leads
-Props) {
+export default function SalesTargetProgress({ profile, leads }: Props) {
   const searchParams = useSearchParams();
   const router = useRouter();
 
@@ -35,28 +32,6 @@ Props) {
       setEndDate(today);
     }
   }, [searchParams]);
-
-  // const filteredRegs = useMemo(() => {
-  //   if (!leads || !startDate || !endDate) return [];
-
-  //   return leads.filter((reg) => {
-  //     const createdAt = new Date(reg.createdAt);
-  //     const matchesStatus = reg.progress === "Enrolled";
-  //     const matchesStart = createdAt >= startDate;
-  //     const matchesEnd = createdAt <= endDate;
-  //     return matchesStatus && matchesStart && matchesEnd;
-  //   });
-  // }, [leads, startDate, endDate]);
-
-  // const salesAchieved = useMemo(() => {
-  //   return filteredRegs.reduce((sum, reg) => {
-  //     const amountNum =
-  //       typeof reg.amount === "string"
-  //         ? parseFloat(reg.amount)
-  //         : reg.amount || 0;
-  //     return sum + amountNum;
-  //   }, 0);
-  // }, [filteredRegs]);
 
   const updateDateRange = (
     range: "7d" | "1m" | "1y" | "custom",
@@ -94,6 +69,33 @@ Props) {
     router.push(`?${params.toString()}`);
   };
 
+  const parseNumber = (value: string | undefined) =>
+    parseFloat((value || "0").toString().replace(/,/g, "").trim()) || 0;
+
+  // Filter leads based on paymentStatus and date range
+  const salesAchieved = useMemo(() => {
+    if (!startDate || !endDate) return 0;
+
+    const paidLeads = leads.filter((l) => l.paymentStatus === "Accepted");
+
+    const filteredLeads = paidLeads.filter((lead) => {
+      const leadDate = new Date(lead.createdAt); // adjust if another date field
+      return leadDate >= startDate && leadDate <= endDate;
+    });
+
+    return filteredLeads.reduce((sum, lead) => {
+      const courseAmount = Array.isArray(lead.course)
+        ? lead.course.reduce((s, c) => s + Number(c.courseFee || 0), 0)
+        : 0;
+      const discount = parseNumber(lead.discount);
+      const servicesTotal = Array.isArray(lead.services)
+        ? lead.services.reduce((s, serv) => s + parseNumber(serv.amount), 0)
+        : 0;
+
+      return sum + courseAmount + servicesTotal - discount;
+    }, 0);
+  }, [leads, startDate, endDate]);
+
   if (!profile.salesTarget) return null;
 
   return (
@@ -106,7 +108,7 @@ Props) {
       <div className="flex gap-4 mb-4 items-center flex-wrap">
         <select
           onChange={(e) =>
-            updateDateRange(e.target.value as "7d" | "1m" | "1y")
+            updateDateRange(e.target.value as "7d" | "1m" | "1y" | "custom")
           }
           className="border rounded px-3 py-2"
           defaultValue="7d"
@@ -120,7 +122,7 @@ Props) {
         {/* Custom Date Range */}
         <input
           type="date"
-          defaultValue={startDate ? startDate.toISOString().split("T")[0] : ""}
+          value={startDate ? startDate.toISOString().split("T")[0] : ""}
           onChange={(e) =>
             updateDateRange(
               "custom",
@@ -132,7 +134,7 @@ Props) {
         />
         <input
           type="date"
-          defaultValue={endDate ? endDate.toISOString().split("T")[0] : ""}
+          value={endDate ? endDate.toISOString().split("T")[0] : ""}
           onChange={(e) =>
             updateDateRange(
               "custom",
@@ -145,7 +147,7 @@ Props) {
       </div>
 
       {/* Progress Display */}
-      {/* <div className="bg-gray-50 dark:bg-gray-800 border rounded-xl p-6">
+      <div className="bg-gray-50 dark:bg-gray-800 border rounded-xl p-6">
         <p className="mb-2 text-sm text-gray-600 dark:text-gray-300">
           {salesAchieved.toLocaleString()} /{" "}
           {profile.salesTarget.toLocaleString()} €
@@ -164,7 +166,7 @@ Props) {
         <p className="mt-2 text-xs text-gray-500 dark:text-gray-300">
           {((salesAchieved / profile.salesTarget) * 100).toFixed(1)}% achieved
         </p>
-      </div> */}
+      </div>
     </section>
   );
 }
