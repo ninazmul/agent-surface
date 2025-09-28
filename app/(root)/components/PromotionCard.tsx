@@ -66,17 +66,15 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
       <Dialog>
         <DialogTrigger asChild>
           <div className="group bg-gradient-to-b from-fuchsia-100 via-pink-100 to-white dark:from-gray-800 dark:via-gray-900 dark:to-black cursor-pointer shadow-md hover:shadow-lg rounded-2xl overflow-hidden transition-transform hover:scale-[1.02] relative">
-            {promotion.photo && (
-              <div className="relative w-full h-56 sm:h-64">
+             <div className="relative w-full h-56 sm:h-64">
                 <Image
-                  src={promotion.photo}
+                  src={promotion.photo || "/assets/images/placeholder.png"}
                   alt={promotion.title}
                   fill
                   className="object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent group-hover:scale-105 transition-transform duration-300" />
               </div>
-            )}
 
             {isPaused && (
               <span className="absolute top-3 right-3 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">
