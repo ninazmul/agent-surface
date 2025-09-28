@@ -45,7 +45,7 @@ const Page = async () => {
   }
 
   const myProfile = await getProfileByEmail(email);
-  const myLeads = await getLeadsByAgency(myProfile.email);
+  const myLeads = await getLeadsByAgency(myProfile?.email || "");
   const subAgents = await getSubAgentsByEmail(email);
   const countryAgent = await getProfileByEmail(myProfile?.countryAgent || "");
 
