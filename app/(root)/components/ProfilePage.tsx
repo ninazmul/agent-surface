@@ -18,7 +18,7 @@ interface ProfilePageProps {
   countryAgent: IProfile | null;
   agent: IProfile[];
   subAgents: IProfile[];
-  myLeads: ILead[];
+  myLeads?: ILead[];
 }
 
 export default function ProfilePage({
@@ -228,7 +228,7 @@ export default function ProfilePage({
                       : 0,
                     email: myProfile?.email || "",
                   }}
-                  leads={myLeads}
+                  leads={myLeads || []}
                 />
               )}
 
