@@ -6,7 +6,7 @@ import ProfileForm from "./ProfileForm";
 import { Button } from "@/components/ui/button";
 import ProfileTable from "./ProfileTable";
 import SalesTargetProgress from "./SalesTargetProgress";
-import { FileEdit } from "lucide-react";
+import { FileEdit, Plus } from "lucide-react";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useEffect, useState } from "react";
 import { getLeadByEmail } from "@/lib/actions/lead.actions";
@@ -302,8 +302,12 @@ export default function ProfilePage({
                 Your Sub Agents
               </h3>
               <a href={"/profile/create"} className="w-full sm:w-auto">
-                <Button size="lg" className="rounded-full w-full sm:w-auto">
-                  Add Sub Agent
+                <Button
+                  size="lg"
+                  variant={"ghost"}
+                  className="rounded-full w-full sm:w-auto"
+                >
+                  <Plus /> Add Sub Agent
                 </Button>
               </a>
             </div>
