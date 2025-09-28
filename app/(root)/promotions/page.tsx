@@ -91,6 +91,7 @@ const Page = async () => {
         <PromotionListClient
           promotions={dateFilteredPromotions}
           agency={agency}
+          isAdmin={adminStatus}
         />
       </section>
 
