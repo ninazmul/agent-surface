@@ -5,7 +5,7 @@ import Image from "next/image";
 import ProfileForm from "./ProfileForm";
 import { Button } from "@/components/ui/button";
 import ProfileTable from "./ProfileTable";
-import { getLeadByEmail, getLeadsByAgency } from "@/lib/actions/lead.actions";
+import { getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useEffect, useState } from "react";
 import SalesTargetProgress from "./SalesTargetProgress";
@@ -28,7 +28,6 @@ export default function ProfilePage({
   agent,
   subAgents,
 }: ProfilePageProps) {
-  const [leads, setLeads] = useState<ILead[]>([]);
   const [myLead, setMyLead] = useState<ILead | null>(null);
 
   // Fetch leads client-side
@@ -37,13 +36,10 @@ export default function ProfilePage({
 
     const fetchData = async () => {
       try {
-        const data = await getLeadsByAgency(myProfile.email);
-        const lead = await getLeadByEmail(myProfile.email);
-        setLeads(Array.isArray(data) ? data : []);
-        setMyLead(lead || null);
+        const lead = await getLeadsByAgency(myProfile.email);
+        setMyLead(lead || []);
       } catch (error) {
         console.error("Error fetching leads:", error);
-        setLeads([]);
       }
     };
 
@@ -230,7 +226,7 @@ export default function ProfilePage({
                     : undefined,
                   email: myProfile?.email || "",
                 }}
-                leads={leads}
+                leads={myLead ? [myLead] : []}
               />
 
               {/* Profile Status or Update */}
