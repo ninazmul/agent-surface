@@ -158,6 +158,14 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     );
   }
 
+  if (salesTargetEntries.length === 0) {
+    return (
+      <p className="text-center text-gray-600 dark:text-gray-300 mt-4">
+        No sales data available.
+      </p>
+    );
+  }
+
   return (
     <section>
       <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-gray-800 dark:text-gray-100">

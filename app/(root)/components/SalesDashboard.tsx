@@ -234,6 +234,14 @@ const SalesDashboard = () => {
     return <Skeleton />;
   }
 
+  if (leads.length === 0) {
+    return (
+      <p className="text-center text-gray-600 dark:text-gray-300 mt-4">
+        No lead data available.
+      </p>
+    );
+  }
+
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
