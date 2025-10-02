@@ -97,12 +97,11 @@ const PromotionLeadsStats: React.FC<PromotionLeadsStatsProps> = ({ leads }) => {
       {/* Leads Financial Overview */}
       <div>
         <h4 className="font-semibold mb-2">Leads Financial Overview</h4>
-        <table className="w-full text-sm border">
+        <table className="w-full text-sm border rounded-2xl overflow-hidden">
           <thead>
             <tr className="bg-gray-100 dark:bg-gray-800">
               <th className="p-2 text-left">Student</th>
-              <th className="p-2">Course Fees</th>
-              <th className="p-2">Service Fees</th>
+              <th className="p-2">Fees</th>
               <th className="p-2">Discount</th>
               <th className="p-2">Total</th>
               <th className="p-2">Paid</th>
@@ -132,8 +131,7 @@ const PromotionLeadsStats: React.FC<PromotionLeadsStatsProps> = ({ leads }) => {
               return (
                 <tr key={lead._id}>
                   <td className="p-2">{lead.name}</td>
-                  <td className="p-2">€{courseAmount}</td>
-                  <td className="p-2">€{serviceAmount}</td>
+                  <td className="p-2">€{courseAmount} + €{serviceAmount}</td>
                   <td className="p-2 text-yellow-600">-€{discount}</td>
                   <td className="p-2 font-semibold">€{totalAmount}</td>
                   <td className="p-2 text-green-600">€{paidAmount}</td>
