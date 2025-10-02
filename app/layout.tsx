@@ -44,7 +44,7 @@ export const metadata: Metadata = {
     siteName: "Agent Surface",
     images: [
       {
-        url: "https://agentsurface.com/assets/images/dashboard-preview.jpg",
+        url: "https://agentsurface.com/assets/images/dashboard-preview.png",
         width: 1200,
         height: 630,
         alt: "Agent Surface CRM Dashboard",
@@ -58,7 +58,7 @@ export const metadata: Metadata = {
     description:
       "A modern CRM platform for universities, agents, and students to simplify applications, recruitment, and collaboration.",
     images: [
-      "https://agentsurface.com/assets/images/dashboard-preview.jpg",
+      "https://agentsurface.com/assets/images/dashboard-preview.png",
     ],
   },
 };
