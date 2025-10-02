@@ -16,17 +16,17 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Agent Surface – Learn English in Dublin",
+  title: "Agent Surface – University, Agent & Student CRM Dashboard",
   description:
-    "Agent Surface is a Dublin‑based English language school offering high‑quality general, exam-prep & immersive courses since 2012.",
+    "Agent Surface is a powerful CRM dashboard designed for universities, agents, and students to streamline applications, communication, and management in one platform.",
   keywords: [
     "Agent Surface",
-    "English Language School",
-    "Dublin",
-    "IELTS",
-    "Cambridge Exam Prep",
-    "English Courses",
-    "Study English Ireland",
+    "University CRM",
+    "Education Agents",
+    "Student Management",
+    "Admissions Dashboard",
+    "Agent Portal",
+    "Student Recruitment",
   ],
   icons: {
     icon: "/assets/images/favicon.ico",
@@ -34,31 +34,31 @@ export const metadata: Metadata = {
     apple: "/assets/images/placeholder.png",
   },
   alternates: {
-    canonical: "https://academicbridge.ie/",
+    canonical: "https://agentsurface.com/",
   },
   openGraph: {
-    title: "Agent Surface – Learn English in Dublin",
+    title: "Agent Surface – University, Agent & Student CRM Dashboard",
     description:
-      "Join Agent Surface in Dublin for immersive English courses, exam prep (IELTS, CAE, FCE), social & cultural programs since 2012.",
-    url: "https://academicbridge.ie/",
+      "Manage student recruitment, agent partnerships, and university admissions in one seamless CRM dashboard with Agent Surface.",
+    url: "https://agentsurface.com/",
     siteName: "Agent Surface",
     images: [
       {
-        url: "https://academicbridge.ie/wp-content/uploads/2025/05/school-photo.jpg",
+        url: "https://agentsurface.com/assets/images/dashboard-preview.jpg",
         width: 1200,
         height: 630,
-        alt: "Agent Surface English School Dublin",
+        alt: "Agent Surface CRM Dashboard",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Agent Surface – Learn English in Dublin",
+    title: "Agent Surface – University, Agent & Student CRM Dashboard",
     description:
-      "Immersive English courses, exam prep (IELTS, Cambridge), and vibrant cultural activities in Dublin since 2012.",
+      "A modern CRM platform for universities, agents, and students to simplify applications, recruitment, and collaboration.",
     images: [
-      "https://academicbridge.ie/wp-content/uploads/2025/05/school-photo.jpg",
+      "https://agentsurface.com/assets/images/dashboard-preview.jpg",
     ],
   },
 };

@@ -96,7 +96,7 @@ export default function ProfilePage({
                     className="w-10 md:w-20 h-10 md:h-20 rounded-full object-cover border border-indigo-300"
                   />
                   <div>
-                    <h2 className="text-xl md:text-2xl font-semibold text-indigo-800 dark:text-gray-100 flex items-center gap-2">
+                    <h2 className="text-lg md:text-2xl font-semibold text-indigo-800 dark:text-gray-100 flex items-center gap-2">
                       {myProfile?.name}
                       <span className="text-xs px-2 py-1 rounded-full bg-indigo-200 text-indigo-600 dark:text-gray-500">
                         {myProfile?.role}
