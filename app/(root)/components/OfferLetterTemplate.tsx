@@ -41,7 +41,7 @@ export default function OfferLetterTemplate({
         <div className="h-20 w-auto relative">
           <Image
             src="/assets/images/placeholder.png"
-            alt="Academic Bridge Logo"
+            alt="Agent Surface Logo"
             width={150}
             height={80}
             unoptimized
@@ -169,7 +169,7 @@ export default function OfferLetterTemplate({
           <strong>Bank:</strong> AIB (Allied Irish Banks)
         </p>
         <p>
-          <strong>Account Name:</strong> ACADEMIC BRIDGE LIMITED
+          <strong>Account Name:</strong> Agent Surface LIMITED
         </p>
         <p>
           <strong>Account No.:</strong> 50998180

@@ -56,7 +56,7 @@ const OfferLetter = async ({ params }: PageProps) => {
       <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-6">
         <Image
           src="/assets/images/placeholder.png"
-          alt="Academic Bridge Logo"
+          alt="Agent Surface Logo"
           width={120}
           height={120}
           className="object-contain"
@@ -182,7 +182,7 @@ const OfferLetter = async ({ params }: PageProps) => {
           <strong>Bank:</strong> AIB (Allied Irish Banks)
         </p>
         <p>
-          <strong>Account Name:</strong> ACADEMIC BRIDGE LIMITED
+          <strong>Account Name:</strong> Agent Surface LIMITED
         </p>
         <p>
           <strong>Account No.:</strong> 50998180

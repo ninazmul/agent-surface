@@ -91,7 +91,7 @@ const Receipt = async ({ params }: PageProps) => {
       <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-6">
         <Image
           src="/assets/images/placeholder.png"
-          alt="Academic Bridge Logo"
+          alt="Agent Surface Logo"
           width={150}
           height={80}
           unoptimized
@@ -130,7 +130,7 @@ const Receipt = async ({ params }: PageProps) => {
       <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
         This is to confirm that the student named below has paid for a place on
         an English Language course (subject to standard terms and conditions) at
-        Academic Bridge. The particulars for this admission are as below.
+        Agent Surface. The particulars for this admission are as below.
       </p>
 
       {/* Student Details */}

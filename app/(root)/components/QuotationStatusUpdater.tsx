@@ -57,7 +57,7 @@ const QuotationStatusUpdater = ({
               <li><a href="${quotationLink}">View Quotation</a></li>
               <li><a href="${invoiceLink}">View Invoice</a></li>
             </ul>
-            <p>Thank you for choosing Academic Bridge!</p>
+            <p>Thank you for choosing Agent Surface!</p>
           `,
         }),
       });

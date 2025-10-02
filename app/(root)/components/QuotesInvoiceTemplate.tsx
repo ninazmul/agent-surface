@@ -62,7 +62,7 @@ export default function QuotesInvoiceTemplate({
         <div className="h-20 w-auto relative">
           <Image
             src="/assets/images/placeholder.png"
-            alt="Academic Bridge Logo"
+            alt="Agent Surface Logo"
             width={150}
             height={80}
             unoptimized

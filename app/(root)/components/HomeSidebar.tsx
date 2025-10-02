@@ -209,18 +209,15 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
           <SidebarGroupLabel>
             <a
               href={role === "Student" ? "/profile" : "/"}
-              className="flex items-center gap-2 px-4 py-3"
+              className="px-4 py-3"
             >
               <Image
                 src="/assets/images/logo.png"
                 width={100}
                 height={100}
-                alt="Academic Bridge logo"
+                alt="Agent Surface logo"
                 className="h-8 w-auto"
               />
-              <h1 className="text-lg font-bold line-clamp-1">
-                Academic Bridge
-              </h1>
             </a>
           </SidebarGroupLabel>
           <SidebarGroupContent>

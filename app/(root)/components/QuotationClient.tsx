@@ -67,7 +67,7 @@ export default function QuotationClient({
       <div className="flex items-center justify-center">
         <Image
           src="/assets/images/placeholder.png"
-          alt="Academic Bridge Logo"
+          alt="Agent Surface Logo"
           width={200}
           height={200}
           className="object-contain"
@@ -128,7 +128,7 @@ export default function QuotationClient({
               {" "}
               <Image
                 src="/assets/images/placeholder.png"
-                alt="Academic Bridge Logo"
+                alt="Agent Surface Logo"
                 width={120}
                 height={120}
                 className="object-contain"
@@ -395,9 +395,7 @@ export default function QuotationClient({
 
               {/* Void Quotation */}
               <div className="mt-4">
-                <QuotationVoidStatusUpdater
-                  data={data}
-                />
+                <QuotationVoidStatusUpdater data={data} />
               </div>
             </div>
 

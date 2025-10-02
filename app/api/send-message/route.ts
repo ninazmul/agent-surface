@@ -20,12 +20,14 @@ export const POST = async (req: NextRequest) => {
     });
 
     await transporter.sendMail({
-      from: `"Academic Bridge" <${process.env.EMAIL_USER}>`,
+      from: `"Agent Surface" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: subject || "Message from Academic Bridge",
+      subject: subject || "Message from Agent Surface",
       html:
         html ||
-        `<p>Hi ${name || "there"},</p><p>This is a message from Academic Bridge.</p>`,
+        `<p>Hi ${
+          name || "there"
+        },</p><p>This is a message from Agent Surface.</p>`,
     });
 
     return new Response("Email sent successfully!", { status: 200 });

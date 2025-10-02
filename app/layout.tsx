@@ -16,11 +16,11 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Academic Bridge – Learn English in Dublin",
+  title: "Agent Surface – Learn English in Dublin",
   description:
-    "Academic Bridge is a Dublin‑based English language school offering high‑quality general, exam-prep & immersive courses since 2012.",
+    "Agent Surface is a Dublin‑based English language school offering high‑quality general, exam-prep & immersive courses since 2012.",
   keywords: [
-    "Academic Bridge",
+    "Agent Surface",
     "English Language School",
     "Dublin",
     "IELTS",
@@ -37,24 +37,24 @@ export const metadata: Metadata = {
     canonical: "https://academicbridge.ie/",
   },
   openGraph: {
-    title: "Academic Bridge – Learn English in Dublin",
+    title: "Agent Surface – Learn English in Dublin",
     description:
-      "Join Academic Bridge in Dublin for immersive English courses, exam prep (IELTS, CAE, FCE), social & cultural programs since 2012.",
+      "Join Agent Surface in Dublin for immersive English courses, exam prep (IELTS, CAE, FCE), social & cultural programs since 2012.",
     url: "https://academicbridge.ie/",
-    siteName: "Academic Bridge",
+    siteName: "Agent Surface",
     images: [
       {
         url: "https://academicbridge.ie/wp-content/uploads/2025/05/school-photo.jpg",
         width: 1200,
         height: 630,
-        alt: "Academic Bridge English School Dublin",
+        alt: "Agent Surface English School Dublin",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Academic Bridge – Learn English in Dublin",
+    title: "Agent Surface – Learn English in Dublin",
     description:
       "Immersive English courses, exam prep (IELTS, Cambridge), and vibrant cultural activities in Dublin since 2012.",
     images: [

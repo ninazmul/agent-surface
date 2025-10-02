@@ -99,7 +99,7 @@ export default function ReceiptTemplate({
         <div className="h-20 w-auto relative">
           <Image
             src="/assets/images/placeholder.png"
-            alt="Academic Bridge Logo"
+            alt="Agent Surface Logo"
             width={150}
             height={80}
             unoptimized
@@ -140,7 +140,7 @@ export default function ReceiptTemplate({
       <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
         This is to confirm that the student named below has paid for a place on
         an English Language course (subject to standard terms and conditions) at
-        Academic Bridge. The particulars for this admission are as below.
+        Agent Surface. The particulars for this admission are as below.
       </p>
 
       {/* Student Details */}

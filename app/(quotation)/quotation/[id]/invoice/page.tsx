@@ -82,7 +82,7 @@ const Invoice = async ({ params }: PageProps) => {
       <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-6">
         <Image
           src="/assets/images/placeholder.png"
-          alt="Academic Bridge Logo"
+          alt="Agent Surface Logo"
           width={120}
           height={120}
           className="object-contain"
