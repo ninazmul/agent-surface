@@ -216,7 +216,7 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
                 width={100}
                 height={100}
                 alt="Agent Surface logo"
-                className="h-8 w-auto"
+                className="w-full h-auto"
               />
             </a>
           </SidebarGroupLabel>

@@ -65,7 +65,7 @@ export default function ProfilePage({
               <Image
                 src="/assets/images/logo.png"
                 alt="AB logo"
-                width={40}
+                width={120}
                 height={40}
                 className="self-center sm:self-start"
               />
