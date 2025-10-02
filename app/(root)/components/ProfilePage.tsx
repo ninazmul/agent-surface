@@ -93,25 +93,25 @@ export default function ProfilePage({
                     alt={myProfile?.name || "N/A"}
                     height={80}
                     width={80}
-                    className="w-20 h-20 rounded-full object-cover border border-indigo-300"
+                    className="w-10 md:w-20 h-10 md:h-20 rounded-full object-cover border border-indigo-300"
                   />
                   <div>
-                    <h2 className="text-2xl font-semibold text-indigo-800 dark:text-gray-100 flex items-center gap-2">
+                    <h2 className="text-xl md:text-2xl font-semibold text-indigo-800 dark:text-gray-100 flex items-center gap-2">
                       {myProfile?.name}
                       <span className="text-xs px-2 py-1 rounded-full bg-indigo-200 text-indigo-600 dark:text-gray-500">
                         {myProfile?.role}
                       </span>
                     </h2>
-                    <p className="text-sm text-indigo-500 dark:text-gray-300">
+                    <p className="text-xs md:text-sm text-indigo-500 dark:text-gray-300">
                       {myProfile?.email}
                     </p>
-                    <p className="text-sm text-indigo-500 dark:text-gray-300">
+                    <p className="text-xs md:text-sm text-indigo-500 dark:text-gray-300">
                       {myProfile?.number}
                     </p>
                   </div>
                 </div>
                 <span
-                  className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
+                  className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium ${
                     myProfile?.status === "Approved"
                       ? "bg-green-100 text-green-800"
                       : "bg-yellow-100 text-yellow-800"
