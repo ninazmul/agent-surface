@@ -64,7 +64,7 @@ export default function QuotationClient({
   return (
     <div className="max-w-7xl mx-auto">
       {/* Logo */}
-      <div className="flex items-center justify-center h-32 max-w-md mx-auto">
+      <div className="flex items-center justify-center h-24 md:h-32 max-w-md mx-auto">
         <Image
           src="/assets/images/logo.png"
           alt="Agent Surface Logo"
