@@ -10,6 +10,7 @@ import { FileEdit, Plus } from "lucide-react";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useEffect, useState } from "react";
 import { getLeadByEmail } from "@/lib/actions/lead.actions";
+import { useTheme } from "next-themes";
 
 interface ProfilePageProps {
   adminStatus: boolean;
@@ -30,6 +31,7 @@ export default function ProfilePage({
   subAgents,
   myLeads,
 }: ProfilePageProps) {
+  const { theme } = useTheme();
   const [myLead, setMyLead] = useState<ILead | null>(null);
 
   // Fetch leads client-side
@@ -63,7 +65,11 @@ export default function ProfilePage({
 
             <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-purple-50 dark:bg-gray-800 border border-purple-200 rounded-lg">
               <Image
-                src="/assets/images/logo.png"
+                src={
+                  theme === "dark"
+                    ? "/assets/images/logo-white.png"
+                    : "/assets/images/logo.png"
+                }
                 alt="AB logo"
                 width={120}
                 height={40}

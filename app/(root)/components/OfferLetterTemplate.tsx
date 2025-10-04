@@ -40,12 +40,18 @@ export default function OfferLetterTemplate({
       <div className="flex justify-between items-center border-b border-gray-300 mb-6 pb-2">
         <div className="h-20 w-auto relative">
           <Image
-            src="/assets/images/placeholder.png"
+            src="/assets/images/logo.png"
             alt="Agent Surface Logo"
             width={150}
             height={80}
-            unoptimized
-            className="object-contain"
+            className="object-contain dark:hidden"
+          />
+          <Image
+            src="/assets/images/logo-white.png"
+            alt="Agent Surface Logo"
+            width={150}
+            height={80}
+            className="object-contain hidden dark:block"
           />
         </div>
 

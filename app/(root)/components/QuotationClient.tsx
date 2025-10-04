@@ -66,11 +66,18 @@ export default function QuotationClient({
       {/* Logo */}
       <div className="flex items-center justify-center">
         <Image
-          src="/assets/images/placeholder.png"
+          src="/assets/images/logo.png"
           alt="Agent Surface Logo"
           width={200}
           height={200}
-          className="object-contain"
+          className="object-contain dark:hidden"
+        />
+        <Image
+          src="/assets/images/logo-white.png"
+          alt="Agent Surface Logo"
+          width={200}
+          height={200}
+          className="object-contain hidden dark:block"
         />
       </div>
 
@@ -127,12 +134,19 @@ export default function QuotationClient({
             <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-6">
               {" "}
               <Image
-                src="/assets/images/placeholder.png"
+                src="/assets/images/logo.png"
                 alt="Agent Surface Logo"
                 width={120}
                 height={120}
-                className="object-contain"
-              />{" "}
+                className="object-contain dark:hidden"
+              />
+              <Image
+                src="/assets/images/logo-white.png"
+                alt="Agent Surface Logo"
+                width={120}
+                height={120}
+                className="object-contain hidden dark:block"
+              />
               <div className="text-right text-xs text-gray-600 dark:text-gray-300 space-y-0.5">
                 {" "}
                 <p>

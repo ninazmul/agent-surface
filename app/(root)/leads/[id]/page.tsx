@@ -80,11 +80,18 @@ const leadDetails = async ({ params }: PageProps) => {
       <header className="flex flex-col md:flex-row items-center justify-between mb-10 border-b pb-4">
         <div className="flex items-center gap-4">
           <Image
-            src="/assets/images/placeholder.png"
+            src="/assets/images/logo.png"
             alt="Agent Surface Logo"
             width={500}
             height={500}
-            className="h-28 w-auto"
+            className="h-28 w-auto dark:hidden"
+          />
+          <Image
+            src="/assets/images/logo-white.png"
+            alt="Agent Surface Logo"
+            width={500}
+            height={500}
+            className="h-28 w-auto hidden dark:block"
           />
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">

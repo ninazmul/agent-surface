@@ -90,12 +90,18 @@ const Receipt = async ({ params }: PageProps) => {
       {/* Header */}
       <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-6">
         <Image
-          src="/assets/images/placeholder.png"
+          src="/assets/images/logo.png"
           alt="Agent Surface Logo"
           width={150}
           height={80}
-          unoptimized
-          className="object-contain"
+          className="object-contain dark:hidden"
+        />
+        <Image
+          src="/assets/images/logo-white.png"
+          alt="Agent Surface Logo"
+          width={150}
+          height={80}
+          className="object-contain hidden dark:block"
         />
         <div className="text-right text-xs text-gray-600 dark:text-gray-300 space-y-0.5">
           <p>33 Gardiner Place, Dublin 1 • Ireland +353 1 878 8616</p>

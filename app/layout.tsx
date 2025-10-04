@@ -31,7 +31,7 @@ export const metadata: Metadata = {
   icons: {
     icon: "/assets/images/favicon.ico",
     shortcut: "/assets/images/favicon.ico",
-    apple: "/assets/images/placeholder.png",
+    apple: "/assets/images/logo.png",
   },
   alternates: {
     canonical: "https://agentsurface.com/",
@@ -57,9 +57,7 @@ export const metadata: Metadata = {
     title: "Agent Surface – University, Agent & Student CRM Dashboard",
     description:
       "A modern CRM platform for universities, agents, and students to simplify applications, recruitment, and collaboration.",
-    images: [
-      "https://agentsurface.com/assets/images/dashboard-preview.png",
-    ],
+    images: ["https://agentsurface.com/assets/images/dashboard-preview.png"],
   },
 };
 

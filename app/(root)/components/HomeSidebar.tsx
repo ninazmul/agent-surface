@@ -35,6 +35,7 @@ import {
   Grid2x2Icon,
   Grid2X2PlusIcon,
 } from "lucide-react";
+import { useTheme } from "next-themes";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
@@ -139,6 +140,7 @@ type HomeSidebarProps = {
 
 const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
   const currentPath = usePathname();
+  const { theme } = useTheme();
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
   const allowedForNonAdmins = [
@@ -212,7 +214,11 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
               className="px-4 py-3"
             >
               <Image
-                src="/assets/images/logo.png"
+                src={
+                  theme === "dark"
+                    ? "/assets/images/logo-white.png"
+                    : "/assets/images/logo.png"
+                }
                 width={100}
                 height={100}
                 alt="Agent Surface logo"

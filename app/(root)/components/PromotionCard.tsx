@@ -69,7 +69,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
           <div className="group bg-gradient-to-b from-fuchsia-100 via-pink-100 to-white dark:from-gray-800 dark:via-gray-900 dark:to-black cursor-pointer shadow-md hover:shadow-lg rounded-2xl overflow-hidden transition-transform hover:scale-[1.02] relative">
             <div className="relative w-full h-56 sm:h-64">
               <Image
-                src={promotion.photo || "/assets/images/placeholder.png"}
+                src={promotion.photo || "/assets/images/logo.png"}
                 alt={promotion.title}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
@@ -303,7 +303,6 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
                   </div>
                 </div>
                 <PromotionLeadsStats leads={leads} loading={loading} />
-
               </div>
             )}
           </DialogContent>
