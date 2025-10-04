@@ -420,12 +420,18 @@ const PromotionLeadForm = ({
                   <Input
                     type="date"
                     value={
-                      field.value
-                        ? new Date(field.value).toISOString().slice(0, 10)
+                      field.value instanceof Date &&
+                      !isNaN(field.value.getTime())
+                        ? field.value.toISOString().slice(0, 10)
                         : ""
                     }
                     placeholder="Date of Birth"
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                    onChange={(e) => {
+                      const dateValue = e.target.value
+                        ? new Date(e.target.value)
+                        : undefined;
+                      field.onChange(dateValue);
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
@@ -736,10 +742,18 @@ const PromotionLeadForm = ({
                 <FormControl>
                   <Input
                     type="date"
-                    value={new Date(field.value || new Date())
-                      .toISOString()
-                      .slice(0, 10)}
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                    value={
+                      field.value instanceof Date &&
+                      !isNaN(field.value.getTime())
+                        ? field.value.toISOString().slice(0, 10)
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const dateValue = e.target.value
+                        ? new Date(e.target.value)
+                        : undefined;
+                      field.onChange(dateValue);
+                    }}
                   />
                 </FormControl>
               </FormItem>
@@ -754,10 +768,18 @@ const PromotionLeadForm = ({
                 <FormControl>
                   <Input
                     type="date"
-                    value={new Date(field.value || new Date())
-                      .toISOString()
-                      .slice(0, 10)}
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                    value={
+                      field.value instanceof Date &&
+                      !isNaN(field.value.getTime())
+                        ? field.value.toISOString().slice(0, 10)
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const dateValue = e.target.value
+                        ? new Date(e.target.value)
+                        : undefined;
+                      field.onChange(dateValue);
+                    }}
                   />
                 </FormControl>
               </FormItem>
@@ -807,10 +829,18 @@ const PromotionLeadForm = ({
                 <FormControl>
                   <Input
                     type="date"
-                    value={new Date(field.value || new Date())
-                      .toISOString()
-                      .slice(0, 10)}
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                    value={
+                      field.value instanceof Date &&
+                      !isNaN(field.value.getTime())
+                        ? field.value.toISOString().slice(0, 10)
+                        : ""
+                    }
+                    onChange={(e) => {
+                      const dateValue = e.target.value
+                        ? new Date(e.target.value)
+                        : undefined;
+                      field.onChange(dateValue);
+                    }}
                   />
                 </FormControl>
               </FormItem>

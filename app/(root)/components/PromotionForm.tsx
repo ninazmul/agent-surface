@@ -345,11 +345,17 @@ const PromotionForm = ({
                   <Input
                     type="date"
                     value={
-                      field.value
-                        ? new Date(field.value).toISOString().split("T")[0]
+                      field.value instanceof Date &&
+                      !isNaN(field.value.getTime())
+                        ? field.value.toISOString().split("T")[0]
                         : ""
                     }
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                    onChange={(e) => {
+                      const dateValue = e.target.value
+                        ? new Date(e.target.value)
+                        : undefined;
+                      field.onChange(dateValue);
+                    }}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   />
                 </FormControl>
@@ -369,11 +375,17 @@ const PromotionForm = ({
                   <Input
                     type="date"
                     value={
-                      field.value
-                        ? new Date(field.value).toISOString().split("T")[0]
+                      field.value instanceof Date &&
+                      !isNaN(field.value.getTime())
+                        ? field.value.toISOString().split("T")[0]
                         : ""
                     }
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                    onChange={(e) => {
+                      const dateValue = e.target.value
+                        ? new Date(e.target.value)
+                        : undefined;
+                      field.onChange(dateValue);
+                    }}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   />
                 </FormControl>

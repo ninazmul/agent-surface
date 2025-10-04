@@ -327,11 +327,18 @@ const AdditionalQuotationForm = ({
                   <Input
                     type="date"
                     value={
-                      field.value
-                        ? new Date(field.value).toISOString().split("T")[0]
+                      field.value instanceof Date &&
+                      !isNaN(field.value.getTime())
+                        ? field.value.toISOString().slice(0, 10)
                         : ""
                     }
-                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                    placeholder="Date of Birth"
+                    onChange={(e) => {
+                      const dateValue = e.target.value
+                        ? new Date(e.target.value)
+                        : undefined;
+                      field.onChange(dateValue);
+                    }}
                   />
                 </FormControl>
                 <FormMessage />
