@@ -69,20 +69,20 @@ const Page = async () => {
           <div className="flex items-center gap-2">
             <a href={"/leads/create"} className="">
               <Button
-                size="lg"
+                size="sm"
                 className="rounded-full w-full flex items-center gap-2 justify-center"
               >
-                <Plus className="h-5 w-5" />
+                <Plus className="h-4 w-4" />
                 <span className="hidden lg:inline">Add Lead</span>
               </Button>
             </a>
 
             <a href={"/leads/create/bulk-import"} className="">
               <Button
-                size="lg"
+                size="sm"
                 className="rounded-full w-full flex items-center gap-2 justify-center"
               >
-                <File className="h-5 w-5" />
+                <File className="h-4 w-4" />
                 <span className="hidden lg:inline">Import Leads</span>
               </Button>
             </a>

@@ -27,7 +27,7 @@ export default function SendRemindersButton({iconOnly}: {iconOnly?: boolean}) {
   return (
     <Button
       onClick={handleReminderClick}
-      size="lg"
+      size="sm"
       variant="outline"
       className="rounded-full flex items-center gap-2 text-blue-600"
     >
