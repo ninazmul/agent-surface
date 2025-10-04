@@ -68,15 +68,15 @@ export default function QuotationClient({
         <Image
           src="/assets/images/logo.png"
           alt="Agent Surface Logo"
-          width={200}
-          height={200}
+          width={500}
+          height={500}
           className="object-contain dark:hidden"
         />
         <Image
           src="/assets/images/logo-white.png"
           alt="Agent Surface Logo"
-          width={200}
-          height={200}
+          width={500}
+          height={500}
           className="object-contain hidden dark:block"
         />
       </div>
