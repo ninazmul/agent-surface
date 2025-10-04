@@ -422,7 +422,7 @@ const LeadTable = ({
   return (
     <div className="space-y-6">
       {/* --- Filters --- */}
-      <div className="flex flex-col sm:flex-row gap-3 items-center">
+      <div className="flex flex-col lg:flex-row gap-3 items-center">
         <Input
           placeholder="Search leads..."
           value={searchQuery}
@@ -438,7 +438,7 @@ const LeadTable = ({
               e.target.value as "all" | "promotion" | "general"
             )
           }
-          className="border rounded-2xl px-3 py-2 text-sm"
+          className="border rounded-2xl px-2 md:px-3 py-2 text-sm"
         >
           <option value="all">All Leads</option>
           <option value="promotion">Promotion Leads</option>
@@ -450,7 +450,7 @@ const LeadTable = ({
           <select
             value={promotionSkuFilter}
             onChange={(e) => setPromotionSkuFilter(e.target.value)}
-            className="border rounded-2xl px-3 py-2 text-sm"
+            className="border rounded-2xl px-2 md:px-3 py-2 text-sm"
           >
             <option value="all">All Promotions</option>
             {promotions.map((promo) => (
