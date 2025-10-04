@@ -40,7 +40,9 @@ const Page = async () => {
     leads =
       adminCountry.length === 0
         ? allLeads
-        : allLeads.filter((r: ILead) => adminCountry.includes(r.home.country));
+        : allLeads.filter((r: ILead) =>
+            adminCountry.includes(r.home.country)
+          );
   } else {
     const profile = await getProfileByEmail(email);
     const agentEmails = [email, ...(profile?.subAgents || [])];
@@ -56,21 +58,19 @@ const Page = async () => {
     <>
       <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
         {/* Header + Actions */}
-        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 px-4 py-3">
+        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 px-4">
           {/* Title and Export */}
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between lg:justify-start gap-2 w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
             <h3 className="h3-bold text-center sm:text-left">All Leads</h3>
-            <div className="flex justify-center sm:justify-start">
-              <JsonToExcel data={leads} fileName="leads.xlsx" />
-            </div>
+            <JsonToExcel data={leads} fileName="leads.xlsx" />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row flex-wrap justify-center sm:justify-end gap-2 w-full lg:w-auto">
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
             <a href={"/leads/create"} className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="rounded-full w-full sm:w-auto flex items-center gap-2 justify-center"
+                className="rounded-full w-full flex items-center gap-2 justify-center"
               >
                 <Plus /> Add Lead
               </Button>
@@ -79,18 +79,14 @@ const Page = async () => {
             <a href={"/leads/create/bulk-import"} className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="rounded-full w-full sm:w-auto flex items-center gap-2 justify-center"
+                className="rounded-full w-full flex items-center gap-2 justify-center"
               >
                 <File /> Import Leads
               </Button>
             </a>
 
-            {/* Daily Reminder Button (visible only for admins) */}
-            {adminStatus && (
-              <div className="w-full sm:w-auto">
-                <SendRemindersButton />
-              </div>
-            )}
+            {/* Daily Reminder Button */}
+            {adminStatus && <SendRemindersButton />}
           </div>
         </div>
 
