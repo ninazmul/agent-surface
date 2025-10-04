@@ -408,9 +408,11 @@ export default function QuotationClient({
               />
 
               {/* Void Quotation */}
-              <div className="mt-4">
-                <QuotationVoidStatusUpdater data={data} />
-              </div>
+              {hasAccess && (
+                <div className="mt-4">
+                  <QuotationVoidStatusUpdater data={data} />
+                </div>
+              )}
             </div>
 
             {/* Actions */}
