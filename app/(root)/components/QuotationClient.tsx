@@ -70,14 +70,14 @@ export default function QuotationClient({
           alt="Agent Surface Logo"
           width={500}
           height={500}
-          className="w-full h-auto dark:hidden"
+          className="w-full h-auto object-cover dark:hidden"
         />
         <Image
           src="/assets/images/logo-white.png"
           alt="Agent Surface Logo"
           width={500}
           height={500}
-          className="w-full h-auto hidden dark:block"
+          className="w-full h-auto hidden object-cover dark:block"
         />
       </div>
 

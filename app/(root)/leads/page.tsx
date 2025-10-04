@@ -58,16 +58,16 @@ const Page = async () => {
     <>
       <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
         {/* Header + Actions */}
-        <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4 px-4">
+        <div className="flex justify-between items-center gap-4 px-4">
           {/* Title and Export */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+          <div className="flex items-center gap-2">
             <h3 className="h3-bold text-center sm:text-left">All Leads</h3>
             <JsonToExcel data={leads} fileName="leads.xlsx" />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <a href={"/leads/create"} className="w-full sm:w-auto">
+          <div className="flex items-center gap-2">
+            <a href={"/leads/create"} className="">
               <Button
                 size="lg"
                 className="rounded-full w-full flex items-center gap-2 justify-center"
@@ -77,7 +77,7 @@ const Page = async () => {
               </Button>
             </a>
 
-            <a href={"/leads/create/bulk-import"} className="w-full sm:w-auto">
+            <a href={"/leads/create/bulk-import"} className="">
               <Button
                 size="lg"
                 className="rounded-full w-full flex items-center gap-2 justify-center"
@@ -89,7 +89,7 @@ const Page = async () => {
 
             {/* Daily Reminder Button (icon-only on small devices) */}
             {adminStatus && (
-              <div className="w-full sm:w-auto">
+              <div className="">
                 <SendRemindersButton iconOnly />
               </div>
             )}
