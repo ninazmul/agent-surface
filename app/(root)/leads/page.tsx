@@ -90,7 +90,7 @@ const Page = async () => {
             {/* Daily Reminder Button (icon-only on small devices) */}
             {adminStatus && (
               <div className="">
-                <SendRemindersButton iconOnly />
+                <SendRemindersButton />
               </div>
             )}
           </div>
