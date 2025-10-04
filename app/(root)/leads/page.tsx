@@ -58,7 +58,7 @@ const Page = async () => {
     <>
       <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
         {/* Header + Actions */}
-        <div className="flex justify-between items-center gap-4 px-4">
+        <div className="flex justify-between items-center gap-4">
           {/* Title and Export */}
           <div className="flex items-center gap-2">
             <h3 className="h3-bold text-center sm:text-left">All Leads</h3>
