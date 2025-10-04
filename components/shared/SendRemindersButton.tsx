@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Bell } from "lucide-react";
 import toast from "react-hot-toast";
 
-export default function SendRemindersButton() {
+export default function SendRemindersButton({iconOnly}: {iconOnly?: boolean}) {
   async function handleReminderClick() {
     try {
       const res = await fetch("/api/send-reminders", {
@@ -31,7 +31,13 @@ export default function SendRemindersButton() {
       variant="outline"
       className="rounded-full flex items-center gap-2 text-blue-600"
     >
-      <Bell /> <span>Send Reminders</span>
+      {iconOnly ? (
+        <Bell />
+      ) : (
+        <>
+          <Bell /> Send Reminders
+        </>
+      )}
     </Button>
   );
 }

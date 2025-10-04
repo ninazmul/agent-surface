@@ -72,7 +72,8 @@ const Page = async () => {
                 size="lg"
                 className="rounded-full w-full flex items-center gap-2 justify-center"
               >
-                <Plus /> Add Lead
+                <Plus className="h-5 w-5" />
+                <span className="hidden lg:inline">Add Lead</span>
               </Button>
             </a>
 
@@ -81,12 +82,17 @@ const Page = async () => {
                 size="lg"
                 className="rounded-full w-full flex items-center gap-2 justify-center"
               >
-                <File /> Import Leads
+                <File className="h-5 w-5" />
+                <span className="hidden lg:inline">Import Leads</span>
               </Button>
             </a>
 
-            {/* Daily Reminder Button */}
-            {adminStatus && <SendRemindersButton />}
+            {/* Daily Reminder Button (icon-only on small devices) */}
+            {adminStatus && (
+              <div className="w-full sm:w-auto">
+                <SendRemindersButton iconOnly />
+              </div>
+            )}
           </div>
         </div>
 
