@@ -65,22 +65,20 @@ export default function QuotationClient({
     <div className="max-w-7xl mx-auto">
       {/* Logo */}
       <div className="flex items-center justify-center">
-        <div className="relative w-40 sm:w-48 lg:w-56 h-auto">
-          <Image
-            src="/assets/images/logo.png"
-            alt="Agent Surface Logo"
-            fill
-            className="object-contain dark:hidden"
-            sizes="(max-width: 640px) 160px, (max-width: 1024px) 192px, 224px"
-          />
-          <Image
-            src="/assets/images/logo-white.png"
-            alt="Agent Surface Logo"
-            fill
-            className="object-contain hidden dark:block"
-            sizes="(max-width: 640px) 160px, (max-width: 1024px) 192px, 224px"
-          />
-        </div>
+        <Image
+          src="/assets/images/logo.png"
+          alt="Agent Surface Logo"
+          width={500}
+          height={500}
+          className="object-contain dark:hidden"
+        />
+        <Image
+          src="/assets/images/logo-white.png"
+          alt="Agent Surface Logo"
+          width={500}
+          height={500}
+          className="object-contain hidden dark:block"
+        />
       </div>
 
       <div className="m-4 p-6 bg-white dark:bg-gray-900 text-primary-900 dark:text-gray-100 font-serif shadow-xl rounded-2xl print-container">
