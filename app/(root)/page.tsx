@@ -27,30 +27,11 @@ import {
   Users,
 } from "lucide-react";
 
-import {
-  getAdminCountriesByEmail,
-  getAllAdmins,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { getAllResources } from "@/lib/actions/resource.actions";
-import { getAllCourses } from "@/lib/actions/course.actions";
-import {
-  getAllDownloads,
-  getDownloadsByAgency,
-} from "@/lib/actions/download.actions";
-import { getAllEventCalendars } from "@/lib/actions/eventCalender.actions";
-import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
-import {
-  getAllProfiles,
-  getProfileByEmail,
-} from "@/lib/actions/profile.actions";
-import { getAllPromotions } from "@/lib/actions/promotion.actions";
-import { getAllServices } from "@/lib/actions/service.actions";
-import {
-  getAllUsers,
-  getUserByClerkId,
-  getUserEmailById,
-} from "@/lib/actions/user.actions";
+import { getAdminCountriesByEmail, isAdmin } from "@/lib/actions/admin.actions";
+import { getDownloadsByAgency } from "@/lib/actions/download.actions";
+import { getLeadsByAgency } from "@/lib/actions/lead.actions";
+import { getProfileByEmail } from "@/lib/actions/profile.actions";
+import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
 
 import SalesDashboard from "./components/SalesDashboard";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -71,6 +52,7 @@ import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { IServices } from "@/lib/database/models/service.model";
 import { IUser } from "@/lib/database/models/user.model";
+import { getDashboardSummary } from "@/lib/actions/summary.actions";
 
 // Register Chart.js components
 ChartJS.register(
@@ -105,11 +87,11 @@ const Dashboard = () => {
   const { user } = useUser();
   const userId = user?.id || "";
   const searchParams = useSearchParams();
+  const { dashboardData, setDashboardData } = useDashboardData();
 
   const [loading, setLoading] = useState(true);
   const [adminStatus, setAdminStatus] = useState(false);
   const [myProfile, setMyProfile] = useState<IProfile | null>(null);
-
   const [admins, setAdmins] = useState<IAdmin[]>([]);
   const [resources, setResources] = useState<IResource[]>([]);
   const [courses, setCourses] = useState<ICourse[]>([]);
@@ -121,95 +103,85 @@ const Dashboard = () => {
   const [services, setServices] = useState<IServices[]>([]);
   const [users, setUsers] = useState<IUser[]>([]);
   const [subAgentCount, setSubAgentCount] = useState(0);
-  const { dashboardData, setDashboardData } = useDashboardData();
 
+  // ======== Handle reloads via query params
   useEffect(() => {
     const shouldReload = searchParams.get("reload");
     if (shouldReload) {
       setDashboardData(null);
       router.replace("/");
-      window.location.reload();
+      fetchInitialData();
     }
   }, [router, searchParams, setDashboardData]);
 
+  // ======== Load from localStorage cache
+  useEffect(() => {
+    const cached = localStorage.getItem("dashboardData");
+    if (cached && !dashboardData) {
+      setDashboardData(JSON.parse(cached));
+    }
+  }, [dashboardData, setDashboardData]);
+
+  // ======== Main Data Fetch
   useEffect(() => {
     if (dashboardData) {
-      setDownloads(dashboardData.downloads);
-      setLeads(dashboardData.leads);
-      setAdmins(dashboardData.admins);
-      setResources(dashboardData.resources);
-      setCourses(dashboardData.courses);
-      setEventCalendars(dashboardData.eventCalendars);
-      setProfiles(dashboardData.profiles);
-      setPromotions(dashboardData.promotions);
-      setServices(dashboardData.services);
-      setUsers(dashboardData.users);
-      setMyProfile(dashboardData.myProfile);
-      setLoading(false);
-      return;
+      localStorage.setItem("dashboardData", JSON.stringify(dashboardData));
     }
 
     const fetchInitialData = async () => {
       try {
         setLoading(true);
 
-        // Kick off everything at once (parallel)
-        const [
-          userID,
-          profile,
-          downloadsRaw,
-          leadsRaw,
-          adminsData,
-          resourcesData,
-          coursesData,
-          eventCalendarsData,
-          profilesData,
-          promotionsData,
-          servicesData,
-          usersData,
-        ] = await Promise.all([
+        // Fetch user + profile + summary in parallel
+        const [userID, profile, summary] = await Promise.all([
           getUserByClerkId(userId),
           getProfileByEmail(user?.emailAddresses?.[0]?.emailAddress || ""),
-          getAllDownloads(),
-          getAllLeads(),
-          getAllAdmins(),
-          getAllResources(),
-          getAllCourses(),
-          getAllEventCalendars(),
-          getAllProfiles(),
-          getAllPromotions(),
-          getAllServices(),
-          getAllUsers(),
+          getDashboardSummary(),
         ]);
 
+        if (!summary) throw new Error("Failed to load summary data");
+
+        const {
+          admins,
+          resources,
+          courses,
+          downloads,
+          eventCalendars,
+          leads,
+          profiles,
+          promotions,
+          services,
+          users,
+        } = summary;
+
+        // Save snapshot in context
         const snapshot = {
-          admins: adminsData,
-          resources: resourcesData,
-          courses: coursesData,
-          downloads: downloadsRaw,
-          eventCalendars: eventCalendarsData,
-          leads: leadsRaw,
-          profiles: profilesData,
-          promotions: promotionsData,
-          services: servicesData,
-          users: usersData,
+          admins,
+          resources,
+          courses,
+          downloads,
+          eventCalendars,
+          leads,
+          profiles,
+          promotions,
+          services,
+          users,
           myProfile: profile,
         };
 
-        // save in context
         setDashboardData(snapshot);
 
-        // update local state
-        setDownloads(downloadsRaw);
-        setLeads(leadsRaw);
-        setAdmins(adminsData);
-        setResources(resourcesData);
-        setCourses(coursesData);
-        setEventCalendars(eventCalendarsData);
-        setProfiles(profilesData);
-        setPromotions(promotionsData);
-        setServices(servicesData);
-        setUsers(usersData);
+        // Update local states
+        setAdmins(admins);
+        setResources(resources);
+        setCourses(courses);
+        setDownloads(downloads);
+        setEventCalendars(eventCalendars);
+        setLeads(leads);
+        setProfiles(profiles);
+        setPromotions(promotions);
+        setServices(services);
+        setUsers(users);
         setMyProfile(profile);
 
         // Redirect if student
@@ -218,31 +190,30 @@ const Dashboard = () => {
           return;
         }
 
-        // Fetch email + admin checks AFTER render
+        // Admin validation after render
         const email = await getUserEmailById(userID);
-        const [adminStatus, adminCountry] = await Promise.all([
+        const [isAdminStatus, adminCountry] = await Promise.all([
           isAdmin(email),
           getAdminCountriesByEmail(email),
         ]);
 
-        setAdminStatus(adminStatus);
+        setAdminStatus(isAdminStatus);
 
-        if (adminStatus) {
-          // Filter admin data by country
+        if (isAdminStatus) {
+          // Filter data by country for admins
           const filterByCountry = <T extends { country?: string }>(
             data: T[]
           ): T[] =>
             adminCountry.length === 0
-              ? data.filter(Boolean)
+              ? data
               : data.filter(
-                  (item): item is T =>
-                    Boolean(item) &&
+                  (item) =>
                     typeof item.country === "string" &&
                     adminCountry.includes(item.country)
                 );
 
-          setDownloads(filterByCountry(downloadsRaw) as IDownload[]);
-          setLeads(filterByCountry(leadsRaw) as ILead[]);
+          setDownloads(filterByCountry(downloads) as IDownload[]);
+          setLeads(filterByCountry(leads) as ILead[]);
         } else {
           // Sub-agent filtering
           const agentEmails = [email, ...(profile?.subAgents || [])];
@@ -280,6 +251,7 @@ const Dashboard = () => {
     fetchInitialData();
   }, [router, userId, user, dashboardData, setDashboardData]);
 
+  // ======== Chart Data
   const allLabels = [
     "Admins",
     "Leads",
@@ -311,7 +283,6 @@ const Dashboard = () => {
       if (!adminStatus && ["Admins", "Profiles", "Users"].includes(label)) {
         return acc;
       }
-
       acc.labels.push(label);
       acc.values.push(allValues[index]);
       return acc;
@@ -668,3 +639,6 @@ const SkeletonCard = () => (
 );
 
 export default Dashboard;
+function fetchInitialData() {
+  throw new Error("Function not implemented.");
+}
