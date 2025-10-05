@@ -37,6 +37,7 @@ import {
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -209,7 +210,7 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
       <SidebarContent>
         <SidebarGroup className="space-y-4">
           <SidebarGroupLabel>
-            <a
+            <Link
               href={role === "Student" ? "/profile" : "/"}
               className="px-4 py-3"
             >
@@ -224,7 +225,7 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
                 alt="Agent Surface logo"
                 className="w-full h-auto"
               />
-            </a>
+            </Link>
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
@@ -255,7 +256,7 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
                           </span>
                         </button>
                       ) : (
-                        <a
+                        <Link
                           href={item.url}
                           className="flex items-center space-x-4 flex-1"
                         >
@@ -263,7 +264,7 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
                           <span className="text-sm font-medium">
                             {item.title}
                           </span>
-                        </a>
+                        </Link>
                       )}
 
                       {hasChildren && (
@@ -298,14 +299,14 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
                               normalizePath(currentPath) ===
                               normalizePath(child.url);
                             return (
-                              <a
+                              <Link
                                 key={child.key}
                                 href={child.url}
                                 className={getChildItemClasses(isChildActive)}
                               >
                                 <child.icon className="w-4 h-4" />
                                 <span>{child.title}</span>
-                              </a>
+                              </Link>
                             );
                           })}
                       </div>
