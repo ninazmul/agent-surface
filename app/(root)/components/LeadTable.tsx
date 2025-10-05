@@ -430,7 +430,7 @@ const LeadTable = ({
           className="w-full sm:max-w-md rounded-2xl"
         />
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center justify-between gap-2">
           {/* Promotion Type Filter */}
           <select
             value={promotionFilter}
@@ -439,7 +439,7 @@ const LeadTable = ({
                 e.target.value as "all" | "promotion" | "general"
               )
             }
-            className="border rounded-2xl px-2 md:px-3 py-2 text-sm"
+            className="border rounded-2xl px-1 md:px-3 py-2 text-sm"
           >
             <option value="all">All Leads</option>
             <option value="promotion">Promotion Leads</option>
@@ -451,7 +451,7 @@ const LeadTable = ({
             <select
               value={promotionSkuFilter}
               onChange={(e) => setPromotionSkuFilter(e.target.value)}
-              className="border rounded-2xl px-2 md:px-3 py-2 text-sm"
+              className="border rounded-2xl px-1 md:px-3 py-2 text-sm"
             >
               <option value="all">All Promotions</option>
               {promotions.map((promo) => (
