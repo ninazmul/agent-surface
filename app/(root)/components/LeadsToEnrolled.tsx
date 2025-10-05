@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -13,7 +13,7 @@ type AgentProgress = {
 interface LeadsToEnrolledProps {
   profiles: IProfile[];
   leads: ILead[];
-  loading?: boolean; // optional loading prop
+  loading?: boolean;
 }
 
 const stageColors: Record<string, string> = {
@@ -23,69 +23,77 @@ const stageColors: Record<string, string> = {
   Closed: "bg-red-400 dark:bg-red-600",
 };
 
+const leadStages = ["Open", "Contacted", "Converted", "Closed"];
+
 const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
   profiles,
   leads,
   loading = false,
 }) => {
-  const [filter, setFilter] = useState<string>("month");
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
+  const [filter, setFilter] = useState("month");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
-  const filterByDateRange = <T extends { createdAt: string | Date }>(
-    data: T[]
-  ) => {
-    const now = new Date();
-    let from: Date | null = null;
+  const filterByDateRange = React.useCallback(
+    <T extends { createdAt: string | Date }>(data: T[]) => {
+      const now = new Date();
+      let from: Date | null = null;
 
-    if (filter === "custom" && startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      return data.filter((item) => {
-        const created = new Date(item.createdAt);
-        return created >= start && created <= end;
-      });
-    }
+      if (filter === "custom" && startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        return data.filter(
+          (item) =>
+            new Date(item.createdAt) >= start && new Date(item.createdAt) <= end
+        );
+      }
 
-    switch (filter) {
-      case "week":
-        from = subWeeks(now, 1);
-        break;
-      case "month":
-        from = subMonths(now, 1);
-        break;
-      case "quarter":
-        from = subQuarters(now, 1);
-        break;
-      case "year":
-        from = subYears(now, 1);
-        break;
-      case "all":
-        return data;
-    }
+      switch (filter) {
+        case "week":
+          from = subWeeks(now, 1);
+          break;
+        case "month":
+          from = subMonths(now, 1);
+          break;
+        case "quarter":
+          from = subQuarters(now, 1);
+          break;
+        case "year":
+          from = subYears(now, 1);
+          break;
+        case "all":
+          return data;
+      }
 
-    if (!from) return data;
-    return data.filter((item) => new Date(item.createdAt) >= from);
-  };
+      return from
+        ? data.filter((item) => new Date(item.createdAt) >= from)
+        : data;
+    },
+    [filter, startDate, endDate]
+  );
 
-  const filteredLeads = filterByDateRange(leads);
+  const filteredLeads = useMemo(
+    () => filterByDateRange(leads),
+    [filterByDateRange, leads]
+  );
 
-  const leadStages = ["Open", "Contacted", "Converted", "Closed"];
+  const agentsData: AgentProgress[] = useMemo(() => {
+    return profiles
+      .map((agent) => {
+        const agentLeads = filteredLeads.filter(
+          (l) => l.author === agent.email
+        );
+        const counts: Record<string, number> = {};
+        leadStages.forEach((stage) => {
+          counts[stage] =
+            agentLeads.filter((l) => l.progress === stage).length || 0;
+        });
 
-  const agentsData: AgentProgress[] = profiles
-    .map((agent) => {
-      const agentLeads = filteredLeads.filter((l) => l.author === agent.email);
-      const counts: Record<string, number> = {};
-
-      leadStages.forEach((stage) => {
-        counts[stage] = agentLeads.filter((l) => l.progress === stage).length;
-      });
-
-      const total = Object.values(counts).reduce((sum, v) => sum + v, 0);
-
-      return total > 0 ? { agentName: agent.name, ...counts } : null;
-    })
-    .filter((a): a is AgentProgress => a !== null);
+        const total = Object.values(counts).reduce((sum, v) => sum + v, 0);
+        return total > 0 ? { agentName: agent.name, ...counts } : null;
+      })
+      .filter((a): a is AgentProgress => a !== null);
+  }, [profiles, filteredLeads]);
 
   // Loading skeleton
   if (loading) {
@@ -104,7 +112,6 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
     );
   }
 
-  // Empty state
   if (agentsData.length === 0) {
     return (
       <p className="text-center text-gray-600 dark:text-gray-300 mt-4">
@@ -167,9 +174,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {agentsData.map((agent) => {
           const maxCount = Math.max(
-            ...leadStages.map((stage) =>
-              Number(agent[stage as keyof typeof agent] || 0)
-            ),
+            ...leadStages.map((stage) => agent[stage] || 0),
             1
           );
 
@@ -185,7 +190,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
               </h3>
 
               {leadStages.map((stage) => {
-                const count = Number(agent[stage as keyof typeof agent] || 0);
+                const count = agent[stage] || 0;
                 const progress = (count / maxCount) * 100;
 
                 return (
