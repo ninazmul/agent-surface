@@ -441,7 +441,7 @@ const Dashboard = () => {
 
   return (
     <div className="container mx-auto p-6 space-y-10 bg-white dark:bg-gray-900 rounded-2xl">
-      {myProfile?.role !== "Student" && <SalesDashboard />}
+      {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
 
       {myProfile?.role !== "Student" && (
         <CountrySalesTargets
