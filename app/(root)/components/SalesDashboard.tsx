@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Line, Pie } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -35,14 +35,16 @@ ChartJS.register(
   TimeScale
 );
 
-// Reusable skeleton component
 const Skeleton = () => (
   <div className="animate-pulse space-y-6">
     <div className="h-8 w-1/3 bg-gray-300 dark:bg-gray-800 rounded"></div>
     <div className="flex flex-wrap gap-4 bg-blue-50 dark:bg-gray-800 p-4 rounded-2xl shadow">
-      <div className="h-10 w-32 bg-gray-300 dark:bg-gray-500 rounded"></div>
-      <div className="h-10 w-32 bg-gray-300 dark:bg-gray-500 rounded"></div>
-      <div className="h-10 w-32 bg-gray-300 dark:bg-gray-500 rounded"></div>
+      {[...Array(3)].map((_, i) => (
+        <div
+          key={i}
+          className="h-10 w-32 bg-gray-300 dark:bg-gray-500 rounded"
+        ></div>
+      ))}
     </div>
     <div className="bg-green-50 dark:bg-gray-800 shadow rounded-2xl p-6">
       <div className="h-6 w-32 bg-gray-300 dark:bg-gray-500 rounded mb-4"></div>
@@ -55,17 +57,17 @@ interface SalesDashboardProps {
   leads: ILead[];
 }
 
-const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads }) => {
+const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const { user } = useUser();
   const userId = user?.id || "";
-
   const [filter, setFilter] = useState("month");
   const [country, setCountry] = useState("All");
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(true);
   const { dashboardData, setDashboardData } = useDashboardData();
 
+  // ✅ Fetch leads only once
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -74,13 +76,10 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads }) => {
         const adminStatus = await isAdmin(email);
         const adminCountries = await getAdminCountriesByEmail(email);
 
-        // ✅ Always fetch once
         const fetchedLeads = await getAllLeads();
-
         let allLeads: ILead[] = [];
 
         if (adminStatus) {
-          // Admin: keep all or restrict by allowed countries
           allLeads =
             adminCountries.length === 0
               ? fetchedLeads
@@ -88,11 +87,9 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads }) => {
                   adminCountries.includes(l.home.country)
                 );
         } else {
-          // Non-admin: filter by agency here
-          const agencyLeads = await getLeadsByAgency(email);
-          allLeads = agencyLeads || [];
+          allLeads = await getLeadsByAgency(email);
         }
-        
+
         setDashboardData({
           ...(dashboardData || {
             admins: [],
@@ -115,128 +112,115 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads }) => {
       }
     };
 
-    fetchData();
+    if (!dashboardData?.leads?.length) fetchData();
+    else setLoading(false);
   }, [dashboardData, setDashboardData, userId]);
 
-  // Filter by date
-  const filterByDateRange = (data: ILead[], range: string) => {
+  // ✅ Date filter logic (memoized)
+  const filteredLeads = useMemo(() => {
     const now = new Date();
-    let from: Date;
+    const rangeStart =
+      filter === "week"
+        ? subWeeks(now, 1)
+        : filter === "month"
+        ? subMonths(now, 1)
+        : filter === "quarter"
+        ? subQuarters(now, 1)
+        : filter === "year"
+        ? subYears(now, 1)
+        : null;
 
-    if (range === "custom" && startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      return data.filter((item) => {
-        const date = new Date(item.updatedAt || item.createdAt);
-        return date >= start && date <= end;
-      });
-    }
+    return (leads || [])
+      .filter((l) => l.paymentStatus === "Accepted")
+      .filter((l) => {
+        const date = new Date(l.updatedAt || l.createdAt);
+        if (filter === "custom" && startDate && endDate) {
+          return date >= new Date(startDate) && date <= new Date(endDate);
+        }
+        return !rangeStart || date >= rangeStart;
+      })
+      .filter((l) => (country === "All" ? true : l.home.country === country));
+  }, [leads, filter, startDate, endDate, country]);
 
-    switch (range) {
-      case "week":
-        from = subWeeks(now, 1);
-        break;
-      case "month":
-        from = subMonths(now, 1);
-        break;
-      case "quarter":
-        from = subQuarters(now, 1);
-        break;
-      case "year":
-        from = subYears(now, 1);
-        break;
-      default:
-        return data;
-    }
+  // ✅ Helper
+  const parseNumber = (v?: string) =>
+    parseFloat((v || "0").replace(/,/g, "").trim()) || 0;
 
-    return data.filter((item) => {
-      const date = new Date(item.updatedAt || item.createdAt);
-      return date >= from;
-    });
-  };
-
-  const paidLeads = leads.filter((l) => l.paymentStatus === "Accepted");
-  const filteredLeads = filterByDateRange(paidLeads, filter).filter((l) =>
-    country === "All" ? true : l.home.country?.trim() === country
+  // ✅ Compute total sales fast (memoized)
+  const totalSales = useMemo(
+    () =>
+      filteredLeads.reduce((sum, lead) => {
+        const courseTotal = Array.isArray(lead.course)
+          ? lead.course.reduce((s, c) => s + Number(c.courseFee || 0), 0)
+          : 0;
+        const servicesTotal = Array.isArray(lead.services)
+          ? lead.services.reduce((s, c) => s + parseNumber(c.amount), 0)
+          : 0;
+        const discount = parseNumber(lead.discount);
+        return sum + courseTotal + servicesTotal - discount;
+      }, 0),
+    [filteredLeads]
   );
 
-  const parseNumber = (value: string | undefined) =>
-    parseFloat((value || "0").toString().replace(/,/g, "").trim()) || 0;
+  // ✅ Sales by country (memoized)
+  const salesByCountry = useMemo(() => {
+    const result: Record<string, number> = {};
+    filteredLeads.forEach((lead) => {
+      const c = lead.home.country?.trim() || "Unknown";
+      const courseTotal = Array.isArray(lead.course)
+        ? lead.course.reduce((s, c2) => s + Number(c2.courseFee || 0), 0)
+        : 0;
+      const servicesTotal = Array.isArray(lead.services)
+        ? lead.services.reduce((s, c2) => s + parseNumber(c2.amount), 0)
+        : 0;
+      const discount = parseNumber(lead.discount);
+      result[c] = (result[c] || 0) + courseTotal + servicesTotal - discount;
+    });
+    return result;
+  }, [filteredLeads]);
 
-  const totalSales = filteredLeads.reduce((sum, lead) => {
-    const courseAmount = Array.isArray(lead.course)
-      ? lead.course.reduce((sum, s) => sum + Number(s.courseFee || 0), 0)
-      : 0;
-    const discount = parseNumber(lead.discount);
-    const servicesTotal = Array.isArray(lead.services)
-      ? lead.services.reduce((acc, s) => acc + parseNumber(s.amount), 0)
-      : 0;
-    return sum + courseAmount + servicesTotal - discount;
-  }, 0);
+  // ✅ Sales over time (memoized)
+  const sortedSalesOverTime = useMemo(() => {
+    const daily: Record<string, number> = {};
+    filteredLeads.forEach((lead) => {
+      const d = format(
+        new Date(lead.updatedAt || lead.createdAt),
+        "yyyy-MM-dd"
+      );
+      const courseTotal = Array.isArray(lead.course)
+        ? lead.course.reduce((s, c) => s + Number(c.courseFee || 0), 0)
+        : 0;
+      const servicesTotal = Array.isArray(lead.services)
+        ? lead.services.reduce((s, c) => s + parseNumber(c.amount), 0)
+        : 0;
+      const discount = parseNumber(lead.discount);
+      daily[d] = (daily[d] || 0) + courseTotal + servicesTotal - discount;
+    });
+    return Object.keys(daily)
+      .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
+      .reduce((acc, k) => {
+        acc[k] = daily[k];
+        return acc;
+      }, {} as Record<string, number>);
+  }, [filteredLeads]);
 
-  const salesByCountry: Record<string, number> = {};
-  filteredLeads.forEach((lead) => {
-    const countryKey = lead.home.country?.trim() || "Unknown";
-    const courseAmount = Array.isArray(lead.course)
-      ? lead.course.reduce((sum, s) => sum + Number(s.courseFee || 0), 0)
-      : 0;
-    const discount = parseNumber(lead.discount);
-    const servicesTotal = Array.isArray(lead.services)
-      ? lead.services.reduce((acc, s) => acc + parseNumber(s.amount), 0)
-      : 0;
-    const grandTotal = courseAmount + servicesTotal - discount;
-
-    salesByCountry[countryKey] = (salesByCountry[countryKey] || 0) + grandTotal;
-  });
-
-  const salesOverTime: Record<string, number> = {};
-  filteredLeads.forEach((lead) => {
-    const date = format(
-      new Date(lead.updatedAt || lead.createdAt),
-      "yyyy-MM-dd"
-    );
-    const courseAmount = Array.isArray(lead.course)
-      ? lead.course.reduce((sum, s) => sum + Number(s.courseFee || 0), 0)
-      : 0;
-    const discount = parseNumber(lead.discount);
-    const servicesTotal = Array.isArray(lead.services)
-      ? lead.services.reduce((acc, s) => acc + parseNumber(s.amount), 0)
-      : 0;
-    const grandTotal = courseAmount + servicesTotal - discount;
-
-    salesOverTime[date] = (salesOverTime[date] || 0) + grandTotal;
-  });
-
-  const sortedSalesOverTime = Object.keys(salesOverTime)
-    .sort((a, b) => new Date(a).getTime() - new Date(b).getTime())
-    .reduce((acc: Record<string, number>, key) => {
-      acc[key] = salesOverTime[key];
-      return acc;
-    }, {});
-
-  const countries = Array.from(
-    new Set(paidLeads.map((l) => l.home.country?.trim() || "Unknown"))
+  const countries = useMemo(
+    () =>
+      Array.from(
+        new Set((leads || []).map((l) => l.home.country || "Unknown"))
+      ),
+    [leads]
   );
 
   const handleResetFilters = () => {
     setFilter("month");
+    setCountry("All");
     setStartDate("");
     setEndDate("");
-    setCountry("All");
   };
 
-  // Show skeleton if loading OR no data
-  if (loading || leads.length === 0) {
-    return <Skeleton />;
-  }
-
-  if (leads.length === 0) {
-    return (
-      <p className="text-center text-gray-600 dark:text-gray-300 mt-4">
-        No lead data available.
-      </p>
-    );
-  }
+  // ✅ Default 0 view
+  if (loading) return <Skeleton />;
 
   return (
     <div>
@@ -247,7 +231,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads }) => {
       {/* Filters */}
       <div className="flex flex-wrap gap-4 mb-6 items-center bg-blue-50 dark:bg-gray-800 p-4 rounded-2xl shadow">
         <select
-          className="border px-4 py-2 rounded-2xl bg-blue-200 dark:bg-gray-500 text-gray-800 dark:text-gray-200"
+          className="border px-4 py-2 rounded-2xl bg-blue-200 dark:bg-gray-500"
           onChange={(e) => setFilter(e.target.value)}
           value={filter}
         >
@@ -263,37 +247,35 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads }) => {
           <>
             <input
               type="date"
-              className="border px-4 py-2 rounded-2xl bg-blue-200 dark:bg-gray-500 text-gray-800 dark:text-gray-200"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
+              className="border px-4 py-2 rounded-2xl bg-blue-200 dark:bg-gray-500"
             />
             <input
               type="date"
-              className="border px-4 py-2 rounded-2xl bg-blue-200 dark:bg-gray-500 text-gray-800 dark:text-gray-200"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
+              className="border px-4 py-2 rounded-2xl bg-blue-200 dark:bg-gray-500"
             />
           </>
         )}
 
         <select
-          className="border px-4 py-2 rounded-2xl bg-blue-200 dark:bg-gray-500 text-gray-800 dark:text-gray-200"
+          className="border px-4 py-2 rounded-2xl bg-blue-200 dark:bg-gray-500"
           onChange={(e) => setCountry(e.target.value)}
           value={country}
         >
           <option value="All">All Locations</option>
           {countries.map((c) => (
-            <option key={c} value={c}>
-              {c}
-            </option>
+            <option key={c}>{c}</option>
           ))}
         </select>
 
         <button
-          className="bg-red-500 dark:bg-red-600 text-white px-4 py-2 rounded-2xl hover:bg-red-600 dark:hover:bg-red-700 transition"
           onClick={handleResetFilters}
+          className="bg-red-500 text-white px-4 py-2 rounded-2xl hover:bg-red-600"
         >
-          Reset Filters
+          Reset
         </button>
       </div>
 
@@ -303,16 +285,16 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads }) => {
           Total Sales
         </h2>
         <p className="text-3xl font-bold mt-2 text-indigo-600 dark:text-indigo-400">
-          €{totalSales.toLocaleString()}
+          €{totalSales.toLocaleString() || 0}
         </p>
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Sales by Country */}
+        {/* Pie */}
         <div className="md:w-2/5 w-full">
-          <div className="bg-purple-50 dark:bg-gray-800 shadow rounded-2xl p-6 h-full min-h-[400px] flex items-center justify-center">
+          <div className="bg-purple-50 dark:bg-gray-800 shadow rounded-2xl p-6 h-full flex items-center justify-center">
             {Object.keys(salesByCountry).length === 0 ? (
-              <Skeleton />
+              <p>No data</p>
             ) : (
               <Pie
                 data={{
@@ -326,35 +308,20 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads }) => {
                         "#FFC107",
                         "#FD7E14",
                         "#6610F2",
-                        "#20C997",
-                        "#DC3545",
-                        "#17A2B8",
-                        "#FF6384",
-                        "#36A2EB",
                       ],
                     },
                   ],
-                }}
-                options={{
-                  plugins: {
-                    legend: { labels: { color: "#6B7280" } },
-                    title: { color: "#6B7280" },
-                    tooltip: {
-                      titleColor: "#6B7280",
-                      bodyColor: "#6B7280",
-                    },
-                  },
                 }}
               />
             )}
           </div>
         </div>
 
-        {/* Sales Over Time */}
+        {/* Line */}
         <div className="md:w-3/5 w-full">
           <div className="bg-orange-50 dark:bg-gray-800 shadow rounded-2xl p-6 h-full flex items-center justify-center">
             {Object.keys(sortedSalesOverTime).length === 0 ? (
-              <Skeleton />
+              <p>No data</p>
             ) : (
               <Line
                 data={{
@@ -369,38 +336,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads }) => {
                       tension: 0.4,
                     },
                   ],
-                }}
-                options={{
-                  scales: {
-                    x: {
-                      type: "time",
-                      time: { unit: "day", tooltipFormat: "MMM d" },
-                      title: {
-                        display: true,
-                        text: "Date",
-                        color: "#6B7280",
-                      },
-                      ticks: { color: "#6B7280" },
-                      grid: { color: "rgba(255,255,255,0.1)" },
-                    },
-                    y: {
-                      beginAtZero: true,
-                      title: {
-                        display: true,
-                        text: "Sales (€)",
-                        color: "#6B7280",
-                      },
-                      ticks: { color: "#6B7280" },
-                      grid: { color: "rgba(255,255,255,0.1)" },
-                    },
-                  },
-                  plugins: {
-                    legend: { labels: { color: "#6B7280" } },
-                    tooltip: {
-                      titleColor: "#6B7280",
-                      bodyColor: "#6B7280",
-                    },
-                  },
                 }}
               />
             )}
