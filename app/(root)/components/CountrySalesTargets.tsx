@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -11,7 +11,7 @@ interface CountrySalesTargetsProps {
   profiles: IProfile[];
   leads: ILead[];
   myProfile?: IProfile | null;
-  loading?: boolean; // optional loading prop
+  loading?: boolean;
 }
 
 const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
@@ -21,116 +21,140 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   myProfile,
   loading = false,
 }) => {
-  const [filter, setFilter] = useState<string>("month");
-  const [startDate, setStartDate] = useState<string>("");
-  const [endDate, setEndDate] = useState<string>("");
-  const [selectedCountry, setSelectedCountry] = useState<string>("All");
-  const [selectedAgency, setSelectedAgency] = useState<string>("All");
+  const [filter, setFilter] = useState("month");
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
+  const [selectedCountry, setSelectedCountry] = useState("All");
+  const [selectedAgency, setSelectedAgency] = useState("All");
 
   const parseNumber = (value: string | number | undefined) =>
     parseFloat((value || 0).toString().replace(/,/g, "").trim()) || 0;
 
-  const filterByDateRange = (data: ILead[], range: string) => {
-    const now = new Date();
-    let from: Date | null = null;
-
-    if (range === "custom" && startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      return data.filter((item) => {
-        const date = new Date(item.updatedAt || item.createdAt);
-        return date >= start && date <= end;
-      });
-    }
-
-    switch (range) {
-      case "week":
-        from = subWeeks(now, 1);
-        break;
-      case "month":
-        from = subMonths(now, 1);
-        break;
-      case "quarter":
-        from = subQuarters(now, 1);
-        break;
-      case "year":
-        from = subYears(now, 1);
-        break;
-      case "all":
-        return data;
-    }
-
-    if (!from) return data;
-    return data.filter(
-      (item) => new Date(item.updatedAt || item.createdAt) >= from
-    );
-  };
-
-  const filteredProfiles = adminStatus
-    ? profiles
-    : profiles.filter((p) => p.country === myProfile?.country);
-
-  const filteredLeads = adminStatus
-    ? filterByDateRange(leads, filter).filter(
-        (l) =>
-          l.paymentStatus === "Accepted" &&
-          (selectedCountry === "All"
-            ? true
-            : l.home.country?.trim() === selectedCountry) &&
-          (selectedAgency === "All" ? true : l.author === selectedAgency)
-      )
-    : leads.filter(
-        (l) => l.paymentStatus === "Accepted" && l.home.country === myProfile?.country
-      );
-
-  const salesTargetByCountry = filteredProfiles.reduce<Record<string, number>>(
-    (acc, profile) => {
-      if (profile.country && profile.salesTarget != null) {
-        const countryKey = profile.country.trim();
-        acc[countryKey] =
-          (acc[countryKey] || 0) + parseNumber(profile.salesTarget);
+  const filterByDateRange = React.useCallback(
+    (data: ILead[]) => {
+      if (filter === "custom" && startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        return data.filter((lead) => {
+          const date = new Date(lead.updatedAt || lead.createdAt);
+          return date >= start && date <= end;
+        });
       }
-      return acc;
+
+      const now = new Date();
+      let from: Date | null = null;
+
+      switch (filter) {
+        case "week":
+          from = subWeeks(now, 1);
+          break;
+        case "month":
+          from = subMonths(now, 1);
+          break;
+        case "quarter":
+          from = subQuarters(now, 1);
+          break;
+        case "year":
+          from = subYears(now, 1);
+          break;
+        case "all":
+          return data;
+      }
+
+      return from
+        ? data.filter(
+            (lead) => new Date(lead.updatedAt || lead.createdAt) >= from
+          )
+        : data;
     },
-    {}
+    [filter, startDate, endDate]
   );
 
-  const salesByCountry = filteredLeads.reduce<Record<string, number>>(
-    (acc, lead) => {
-      if (lead.home.country) {
-        const countryKey = lead.home.country.trim();
-        const courseAmount = Array.isArray(lead.course)
-          ? lead.course.reduce((sum, s) => sum + Number(s.courseFee || 0), 0)
-          : 0;
-        const discount = parseNumber(lead.discount);
-        const servicesTotal = Array.isArray(lead.services)
-          ? lead.services.reduce((sum, s) => sum + parseNumber(s.amount), 0)
-          : 0;
-        const grandTotal = courseAmount + servicesTotal - discount;
+  // Memoized filtered leads to improve performance
+  const filteredLeads = useMemo(() => {
+    const acceptedLeads = leads.filter((l) => l.paymentStatus === "Accepted");
+    const dateFiltered = adminStatus
+      ? filterByDateRange(acceptedLeads)
+      : acceptedLeads;
 
-        acc[countryKey] = (acc[countryKey] || 0) + grandTotal;
+    return dateFiltered.filter((l) => {
+      const countryMatch =
+        selectedCountry === "All"
+          ? true
+          : l.home.country?.trim() === selectedCountry;
+      const agencyMatch =
+        selectedAgency === "All" ? true : l.author === selectedAgency;
+      return adminStatus
+        ? countryMatch && agencyMatch
+        : l.home.country === myProfile?.country;
+    });
+  }, [
+    leads,
+    adminStatus,
+    filterByDateRange,
+    selectedCountry,
+    selectedAgency,
+    myProfile?.country,
+  ]);
+
+  // Memoized sales target calculation
+  const salesTargetByCountry = useMemo(() => {
+    const relevantProfiles = adminStatus
+      ? profiles
+      : myProfile
+      ? [myProfile]
+      : [];
+    return relevantProfiles.reduce<Record<string, number>>((acc, p) => {
+      if (p.country) {
+        const countryKey = p.country.trim();
+        acc[countryKey] = (acc[countryKey] || 0) + parseNumber(p.salesTarget);
       }
       return acc;
-    },
-    {}
-  );
+    }, {});
+  }, [profiles, adminStatus, myProfile]);
+
+  // Memoized actual sales calculation
+  const salesByCountry = useMemo(() => {
+    return filteredLeads.reduce<Record<string, number>>((acc, lead) => {
+      if (!lead.home.country) return acc;
+      const countryKey = lead.home.country.trim();
+      const courseAmount = Array.isArray(lead.course)
+        ? lead.course.reduce((sum, c) => sum + parseNumber(c.courseFee), 0)
+        : 0;
+      const servicesTotal = Array.isArray(lead.services)
+        ? lead.services.reduce((sum, s) => sum + parseNumber(s.amount), 0)
+        : 0;
+      const discount = parseNumber(lead.discount);
+      acc[countryKey] =
+        (acc[countryKey] || 0) + courseAmount + servicesTotal - discount;
+      return acc;
+    }, {});
+  }, [filteredLeads]);
 
   const salesTargetEntries = adminStatus
     ? Object.entries(salesTargetByCountry)
-    : myProfile?.country
+    : myProfile
     ? [[myProfile.country, salesTargetByCountry[myProfile.country] || 0]]
     : [];
 
-  const countriesList = Array.from(
-    new Set(profiles.map((p) => p.country?.trim()).filter(Boolean))
+  const countriesList = useMemo(
+    () =>
+      Array.from(
+        new Set(profiles.map((p) => p.country?.trim()).filter(Boolean))
+      ),
+    [profiles]
   );
 
-  const agenciesList = Array.from(
-    new Map(
-      profiles
-        .filter((p) => p.email && p.name)
-        .map((p) => [p.email, { email: p.email, name: p.name }])
-    ).values()
+  const agenciesList = useMemo(
+    () =>
+      Array.from(
+        new Map(
+          profiles
+            .filter((p) => p.email && p.name)
+            .map((p) => [p.email, { email: p.email, name: p.name }])
+        ).values()
+      ),
+    [profiles]
   );
 
   const handleResetFilters = () => {
@@ -141,8 +165,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     setSelectedAgency("All");
   };
 
-  // Skeleton for loading
-  if (loading || salesTargetEntries.length === 0) {
+  if (loading) {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="h-8 w-1/3 bg-gray-300 dark:bg-gray-700 rounded"></div>
