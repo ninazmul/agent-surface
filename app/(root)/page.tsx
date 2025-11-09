@@ -132,74 +132,115 @@ const Dashboard = () => {
       try {
         setLoading(true);
 
-        // Common: fetch profile
-        const profile = await getProfileByEmail(
-          user?.emailAddresses?.[0]?.emailAddress || ""
-        );
+        // Fetch user + profile + summary in parallel
+        const [userID, profile, summary] = await Promise.all([
+          getUserByClerkId(userId),
+          getProfileByEmail(user?.emailAddresses?.[0]?.emailAddress || ""),
+          getDashboardSummary(),
+        ]);
+
+        if (!summary) throw new Error("Failed to load summary data");
+
+        const {
+          admins,
+          resources,
+          courses,
+          downloads,
+          eventCalendars,
+          leads,
+          profiles,
+          promotions,
+          services,
+          users,
+        } = summary;
+
+        // Save snapshot in context
+        const snapshot = {
+          admins,
+          resources,
+          courses,
+          downloads,
+          eventCalendars,
+          leads,
+          profiles,
+          promotions,
+          services,
+          users,
+          myProfile: profile,
+        };
+
+        setDashboardData(snapshot);
+
+        // Update local states
+        setAdmins(admins);
+        setResources(resources);
+        setCourses(courses);
+        setDownloads(downloads);
+        setEventCalendars(eventCalendars);
+        setLeads(leads);
+        setProfiles(profiles);
+        setPromotions(promotions);
+        setServices(services);
+        setUsers(users);
         setMyProfile(profile);
 
-        if (profile.role === "Student") {
+        // Redirect if student
+        if (profile?.role === "Student") {
           router.replace("/profile");
           return;
         }
 
-        if (profile.role === "Agent") {
-          const agentEmails = [profile.email, ...(profile.subAgents || [])];
-
-          // Fetch only what agent needs
-          const [downloadsRes, leadsRes] = await Promise.all([
-            Promise.allSettled(agentEmails.map(getDownloadsByAgency)),
-            Promise.allSettled(agentEmails.map(getLeadsByAgency)),
-          ]);
-
-          setDownloads(
-            downloadsRes
-              .filter((r) => r.status === "fulfilled")
-              .flatMap((r) => (r as PromiseFulfilledResult<IDownload[]>).value)
-          );
-
-          setLeads(
-            leadsRes
-              .filter((r) => r.status === "fulfilled")
-              .flatMap((r) => (r as PromiseFulfilledResult<ILead[]>).value)
-          );
-
-          setSubAgentCount(profile.subAgents?.length || 0);
-          return;
-        }
-
-        // Admin
-        const [summary, email] = await Promise.all([
-          getUserByClerkId(userId),
-          getDashboardSummary(), // filtered server-side if possible
-          getUserEmailById(userId),
-        ]);
-
-        const [isAdminStatus, adminCountries] = await Promise.all([
+        // Admin validation after render
+        const email = await getUserEmailById(userID);
+        const [isAdminStatus, adminCountry] = await Promise.all([
           isAdmin(email),
           getAdminCountriesByEmail(email),
         ]);
 
         setAdminStatus(isAdminStatus);
 
-        // If admin, filter only by their allowed countries
-        const filterByCountry = <T extends { country?: string }>(data: T[]) =>
-          adminCountries.length
-            ? data.filter(
-                (item) => item.country && adminCountries.includes(item.country)
-              )
-            : data;
+        if (isAdminStatus) {
+          // Filter data by country for admins
+          const filterByCountry = <T extends { country?: string }>(
+            data: T[]
+          ): T[] =>
+            adminCountry.length === 0
+              ? data
+              : data.filter(
+                  (item) =>
+                    typeof item.country === "string" &&
+                    adminCountry.includes(item.country)
+                );
 
-        setDownloads(filterByCountry(summary.downloads) as IDownload[]);
-        setLeads(filterByCountry(summary.leads) as ILead[]);
-        setAdmins(summary.admins);
-        setResources(summary.resources);
-        setCourses(summary.courses);
-        setEventCalendars(summary.eventCalendars);
-        setProfiles(summary.profiles);
-        setPromotions(summary.promotions);
-        setServices(summary.services);
-        setUsers(summary.users);
+          setDownloads(filterByCountry(downloads) as IDownload[]);
+          setLeads(filterByCountry(leads) as ILead[]);
+        } else {
+          // Sub-agent filtering
+          const agentEmails = [email, ...(profile?.subAgents || [])];
+          setSubAgentCount(profile?.subAgents?.length || 0);
+
+          const [downloadResults, leadResults] = await Promise.all([
+            Promise.allSettled(
+              agentEmails.map((agent) => getDownloadsByAgency(agent))
+            ),
+            Promise.allSettled(
+              agentEmails.map((agent) => getLeadsByAgency(agent))
+            ),
+          ]);
+
+          const filteredDownloads = downloadResults
+            .filter((res) => res.status === "fulfilled")
+            .flatMap(
+              (res) => (res as PromiseFulfilledResult<IDownload[]>).value
+            );
+
+          const filteredLeads = leadResults
+            .filter((res) => res.status === "fulfilled")
+            .flatMap((res) => (res as PromiseFulfilledResult<ILead[]>).value);
+
+          setDownloads(filteredDownloads);
+          setLeads(filteredLeads);
+        }
       } catch (error) {
         console.error("Dashboard load failed:", error);
       } finally {
