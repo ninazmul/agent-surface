@@ -1,7 +1,7 @@
 "use client";
 
 import { Card } from "@/components/ui/card";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Pie, Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -12,8 +12,8 @@ import {
   BarElement,
   CategoryScale,
   LinearScale,
+  TooltipItem,
 } from "chart.js";
-
 import {
   UserCog,
   FileText,
@@ -32,19 +32,17 @@ import { getDownloadsByAgency } from "@/lib/actions/download.actions";
 import { getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
+import { getDashboardSummary } from "@/lib/actions/summary.actions";
 
 import SalesDashboard from "./components/SalesDashboard";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useUser } from "@clerk/nextjs";
-import { IDownload } from "@/lib/database/models/download.model";
-import { ILead } from "@/lib/database/models/lead.model";
-import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
-import "react-circular-progressbar/dist/styles.css";
-import { IProfile } from "@/lib/database/models/profile.model";
 import CountrySalesTargets from "./components/CountrySalesTargets";
 import LeadsToEnrolled from "./components/LeadsToEnrolled";
 import LeadsFinancial from "./components/LeadsFinancial";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
+
+import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
+import "react-circular-progressbar/dist/styles.css";
+
 import { IAdmin } from "@/lib/database/models/admin.model";
 import { IResource } from "@/lib/database/models/resource.model";
 import { ICourse } from "@/lib/database/models/course.model";
@@ -52,7 +50,12 @@ import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { IServices } from "@/lib/database/models/service.model";
 import { IUser } from "@/lib/database/models/user.model";
-import { getDashboardSummary } from "@/lib/actions/summary.actions";
+import { IProfile } from "@/lib/database/models/profile.model";
+import { IDownload } from "@/lib/database/models/download.model";
+import { ILead } from "@/lib/database/models/lead.model";
+
+import { useRouter, useSearchParams } from "next/navigation";
+import { useUser } from "@clerk/nextjs";
 
 // Register Chart.js components
 ChartJS.register(
@@ -85,13 +88,14 @@ const cardBgColors: Record<string, string> = {
 const Dashboard = () => {
   const router = useRouter();
   const { user } = useUser();
-  const userId = user?.id || "";
   const searchParams = useSearchParams();
   const { dashboardData, setDashboardData } = useDashboardData();
 
   const [loading, setLoading] = useState(true);
   const [adminStatus, setAdminStatus] = useState(false);
   const [myProfile, setMyProfile] = useState<IProfile | null>(null);
+  const [subAgentCount, setSubAgentCount] = useState(0);
+
   const [admins, setAdmins] = useState<IAdmin[]>([]);
   const [resources, setResources] = useState<IResource[]>([]);
   const [courses, setCourses] = useState<ICourse[]>([]);
@@ -102,157 +106,128 @@ const Dashboard = () => {
   const [promotions, setPromotions] = useState<IPromotion[]>([]);
   const [services, setServices] = useState<IServices[]>([]);
   const [users, setUsers] = useState<IUser[]>([]);
-  const [subAgentCount, setSubAgentCount] = useState(0);
 
-  // ======== Handle reloads via query params
-  useEffect(() => {
-    const shouldReload = searchParams.get("reload");
-    if (shouldReload) {
-      setDashboardData(null);
-      router.replace("/");
-      fetchInitialData();
-    }
-  }, [router, searchParams, setDashboardData]);
-
-  // ======== Load from localStorage cache
+  // ===== Load cached dashboardData
   useEffect(() => {
     const cached = localStorage.getItem("dashboardData");
-    if (cached && !dashboardData) {
-      setDashboardData(JSON.parse(cached));
-    }
+    if (cached && !dashboardData) setDashboardData(JSON.parse(cached));
   }, [dashboardData, setDashboardData]);
 
-  // ======== Main Data Fetch
-  useEffect(() => {
-    if (dashboardData) {
-      localStorage.setItem("dashboardData", JSON.stringify(dashboardData));
-    }
+  // ===== Main fetch function
 
-    const fetchInitialData = async () => {
-      try {
-        setLoading(true);
+  const loadDashboardData = useCallback(async () => {
+    if (!user?.id) return;
+    setLoading(true);
 
-        // Fetch user + profile + summary in parallel
-        const [userID, profile, summary] = await Promise.all([
-          getUserByClerkId(userId),
-          getProfileByEmail(user?.emailAddresses?.[0]?.emailAddress || ""),
-          getDashboardSummary(),
-        ]);
+    try {
+      const [userDetails, profile, summary] = await Promise.all([
+        getUserByClerkId(user.id),
+        getProfileByEmail(user.emailAddresses?.[0]?.emailAddress || ""),
+        getDashboardSummary(),
+      ]);
 
-        if (!summary) throw new Error("Failed to load summary data");
+      if (!summary) throw new Error("Failed to load dashboard summary");
 
-        const {
-          admins,
-          resources,
-          courses,
-          downloads,
-          eventCalendars,
-          leads,
-          profiles,
-          promotions,
-          services,
-          users,
-        } = summary;
+      // Save context
+      setDashboardData({ ...summary, myProfile: profile });
 
-        // Save snapshot in context
-        const snapshot = {
-          admins,
-          resources,
-          courses,
-          downloads,
-          eventCalendars,
-          leads,
-          profiles,
-          promotions,
-          services,
-          users,
-          myProfile: profile,
-        };
+      // Update local state
+      setAdmins(summary.admins);
+      setResources(summary.resources);
+      setCourses(summary.courses);
+      setDownloads(summary.downloads);
+      setEventCalendars(summary.eventCalendars);
+      setLeads(summary.leads);
+      setProfiles(summary.profiles);
+      setPromotions(summary.promotions);
+      setServices(summary.services);
+      setUsers(summary.users);
+      setMyProfile(profile);
 
-        setDashboardData(snapshot);
-
-        // Update local states
-        setAdmins(admins);
-        setResources(resources);
-        setCourses(courses);
-        setDownloads(downloads);
-        setEventCalendars(eventCalendars);
-        setLeads(leads);
-        setProfiles(profiles);
-        setPromotions(promotions);
-        setServices(services);
-        setUsers(users);
-        setMyProfile(profile);
-
-        // Redirect if student
-        if (profile?.role === "Student") {
-          router.replace("/profile");
-          return;
-        }
-
-        // Admin validation after render
-        const email = await getUserEmailById(userID);
-        const [isAdminStatus, adminCountry] = await Promise.all([
-          isAdmin(email),
-          getAdminCountriesByEmail(email),
-        ]);
-
-        setAdminStatus(isAdminStatus);
-
-        if (isAdminStatus) {
-          // Filter data by country for admins
-          const filterByCountry = <T extends { country?: string }>(
-            data: T[]
-          ): T[] =>
-            adminCountry.length === 0
-              ? data
-              : data.filter(
-                  (item) =>
-                    typeof item.country === "string" &&
-                    adminCountry.includes(item.country)
-                );
-
-          setDownloads(filterByCountry(downloads) as IDownload[]);
-          setLeads(filterByCountry(leads) as ILead[]);
-        } else {
-          // Sub-agent filtering
-          const agentEmails = [email, ...(profile?.subAgents || [])];
-          setSubAgentCount(profile?.subAgents?.length || 0);
-
-          const [downloadResults, leadResults] = await Promise.all([
-            Promise.allSettled(
-              agentEmails.map((agent) => getDownloadsByAgency(agent))
-            ),
-            Promise.allSettled(
-              agentEmails.map((agent) => getLeadsByAgency(agent))
-            ),
-          ]);
-
-          const filteredDownloads = downloadResults
-            .filter((res) => res.status === "fulfilled")
-            .flatMap(
-              (res) => (res as PromiseFulfilledResult<IDownload[]>).value
-            );
-
-          const filteredLeads = leadResults
-            .filter((res) => res.status === "fulfilled")
-            .flatMap((res) => (res as PromiseFulfilledResult<ILead[]>).value);
-
-          setDownloads(filteredDownloads);
-          setLeads(filteredLeads);
-        }
-      } catch (error) {
-        console.error("Dashboard load failed:", error);
-      } finally {
-        setLoading(false);
+      // Redirect student
+      if (profile?.role === "Student") {
+        router.replace("/profile");
+        return;
       }
-    };
 
-    fetchInitialData();
-  }, [router, userId, user, dashboardData, setDashboardData]);
+      // Admin validation
+      const email = await getUserEmailById(userDetails);
+      const [isAdminStatus, adminCountry] = await Promise.all([
+        isAdmin(email),
+        getAdminCountriesByEmail(email),
+      ]);
+      setAdminStatus(isAdminStatus);
 
-  // ======== Chart Data
-  const allLabels = [
+      if (isAdminStatus) {
+        const filterByCountry = <T,>(
+          data: T[],
+          getCountry: (item: T) => string | undefined
+        ): T[] =>
+          adminCountry.length
+            ? data.filter((item) => {
+                const country = getCountry(item);
+                return country && adminCountry.includes(country);
+              })
+            : data;
+
+        setDownloads(
+          filterByCountry(summary.downloads, (d) => d.country) as IDownload[]
+        );
+        setLeads(
+          filterByCountry(summary.leads, (l) => l.home?.country) as ILead[]
+        );
+      } else {
+        const agentEmails = [email, ...(profile?.subAgents || [])];
+        setSubAgentCount(profile?.subAgents?.length || 0);
+
+        const [downloadResults, leadResults] = await Promise.all([
+          Promise.allSettled(
+            agentEmails.map((agent) => getDownloadsByAgency(agent))
+          ),
+          Promise.allSettled(
+            agentEmails.map((agent) => getLeadsByAgency(agent))
+          ),
+        ]);
+
+        const filteredDownloads = downloadResults
+          .filter((res) => res.status === "fulfilled")
+          .flatMap((res) => (res as PromiseFulfilledResult<IDownload[]>).value);
+
+        const filteredLeads = leadResults
+          .filter((res) => res.status === "fulfilled")
+          .flatMap((res) => (res as PromiseFulfilledResult<ILead[]>).value);
+
+        setDownloads(filteredDownloads);
+        setLeads(filteredLeads);
+      }
+
+      // Cache in localStorage
+      localStorage.setItem(
+        "dashboardData",
+        JSON.stringify({ ...summary, myProfile: profile })
+      );
+    } catch (error) {
+      console.error("Dashboard load failed:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [user, router, setDashboardData]);
+
+  // ===== Reload via query param
+  useEffect(() => {
+    if (searchParams.get("reload")) {
+      setDashboardData(null);
+      router.replace("/");
+      loadDashboardData();
+    }
+  }, [searchParams, router, setDashboardData, loadDashboardData]);
+
+  useEffect(() => {
+    loadDashboardData();
+  }, [loadDashboardData, user]);
+
+  // ===== Chart setup
+  const chartLabels = [
     "Admins",
     "Leads",
     "Resources",
@@ -264,8 +239,7 @@ const Dashboard = () => {
     "Services",
     "Users",
   ];
-
-  const allValues = [
+  const chartValues = [
     admins.length,
     leads.length,
     resources.length,
@@ -278,16 +252,15 @@ const Dashboard = () => {
     users.length,
   ];
 
-  const filteredChartData = allLabels.reduce(
-    (acc, label, index) => {
-      if (!adminStatus && ["Admins", "Profiles", "Users"].includes(label)) {
+  const filteredChartData = chartLabels.reduce(
+    (acc, label, idx) => {
+      if (!adminStatus && ["Admins", "Profiles", "Users"].includes(label))
         return acc;
-      }
       acc.labels.push(label);
-      acc.values.push(allValues[index]);
+      acc.values.push(chartValues[idx]);
       return acc;
     },
-    { labels: [], values: [] } as { labels: string[]; values: number[] }
+    { labels: [] as string[], values: [] as number[] }
   );
 
   const chartColors = [
@@ -303,7 +276,6 @@ const Dashboard = () => {
     "#E83E8C",
     "#6C757D",
   ];
-
   const chartHoverColors = [
     "#007BFF",
     "#218838",
@@ -331,7 +303,6 @@ const Dashboard = () => {
       },
     ],
   };
-
   const barData = {
     labels: filteredChartData.labels,
     datasets: [
@@ -353,7 +324,7 @@ const Dashboard = () => {
         titleColor: "#6B7280",
         bodyColor: "#6B7280",
         callbacks: {
-          label: (context: import("chart.js").TooltipItem<"bar">) =>
+          label: (context: TooltipItem<"bar">) =>
             `${context.dataset.label}: ${context.raw}`,
         },
       },
@@ -362,46 +333,34 @@ const Dashboard = () => {
     scales: {
       y: {
         beginAtZero: true,
-        ticks: {
-          stepSize: 1,
-          font: { size: 14 },
-          color: "#6B7280", // y-axis text color
-        },
+        ticks: { stepSize: 1, font: { size: 14 }, color: "#6B7280" },
         grid: { color: "#eee" },
       },
       x: {
-        ticks: {
-          font: { size: 14 },
-          color: "#6B7280", // x-axis text color
-        },
+        ticks: { font: { size: 14 }, color: "#6B7280" },
         grid: { display: false },
       },
     },
   };
-
   const pieOptions = {
     responsive: true,
     plugins: {
       legend: {
         position: "bottom" as const,
-        labels: {
-          font: { size: 14 },
-          padding: 16,
-          color: "#6B7280", // legend text color
-        },
+        labels: { font: { size: 14 }, padding: 16, color: "#6B7280" },
       },
       tooltip: {
         titleColor: "#6B7280",
         bodyColor: "#6B7280",
         callbacks: {
-          label: (context: import("chart.js").TooltipItem<"pie">) => {
+          label: (context: TooltipItem<"pie">) => {
             const label = context.label || "";
-            const value = context.raw;
+            const value = context.raw as number;
             const total = context.dataset.data.reduce(
-              (sum: number, val: number) => sum + val,
+              (sum, val) => sum + (val as number),
               0
             );
-            const percentage = ((Number(value) / total) * 100).toFixed(1);
+            const percentage = ((value / total) * 100).toFixed(1);
             return `${label}: ${value} (${percentage}%)`;
           },
         },
@@ -413,7 +372,6 @@ const Dashboard = () => {
   return (
     <div className="container mx-auto p-6 space-y-10 bg-white dark:bg-gray-900 rounded-2xl">
       {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
-
       {myProfile?.role !== "Student" && (
         <CountrySalesTargets
           adminStatus={adminStatus}
@@ -422,130 +380,29 @@ const Dashboard = () => {
           myProfile={myProfile}
         />
       )}
-
       {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
-
       {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
-
       <div className="overflow-x-auto">
         {loading ? (
           Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
         ) : (
-          <>
-            <h1 className="text-2xl font-bold mb-6 dark:text-gray-100">
-              Dashboard Stats
-            </h1>
-            <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
-              {adminStatus && (
-                <a href={`/admins`}>
-                  <DashboardCard
-                    icon={<UserCog className="text-3xl text-blue-500" />}
-                    title="Admins"
-                    value={admins.length}
-                    bg={cardBgColors["Admins"]}
-                  />
-                </a>
-              )}
-              <a href={`/leads`}>
-                <DashboardCard
-                  icon={<PhoneCall className="text-3xl text-pink-500" />}
-                  title="Leads"
-                  value={leads.length}
-                  bg={cardBgColors["Leads"]}
-                />
-              </a>
-              <a href={`/resources`}>
-                <DashboardCard
-                  icon={<FileText className="text-3xl text-purple-500" />}
-                  title="Resources"
-                  value={resources.length}
-                  bg={cardBgColors["Resources"]}
-                />
-              </a>
-              {adminStatus && (
-                <a href={`/courses`}>
-                  <DashboardCard
-                    icon={<BookOpen className="text-3xl text-orange-500" />}
-                    title="Courses"
-                    value={courses.length}
-                    bg={cardBgColors["Courses"]}
-                  />
-                </a>
-              )}
-              <a href={`/downloads`}>
-                <DashboardCard
-                  icon={<Download className="text-3xl text-yellow-500" />}
-                  title="Documents"
-                  value={downloads.length}
-                  bg={cardBgColors["Documents"]}
-                />
-              </a>
-              <a href={`/events`}>
-                <DashboardCard
-                  icon={<CalendarClock className="text-3xl text-cyan-500" />}
-                  title="Events"
-                  value={eventCalendars.length}
-                  bg={cardBgColors["Events"]}
-                />
-              </a>
-              {adminStatus && (
-                <a href={`/profiles`}>
-                  <DashboardCard
-                    icon={<User className="text-3xl text-indigo-500" />}
-                    title="Agency"
-                    value={profiles.length}
-                    bg={cardBgColors["Agency"]}
-                  />
-                </a>
-              )}
-              <a href={`/promotions`}>
-                <DashboardCard
-                  icon={<Megaphone className="text-3xl text-fuchsia-500" />}
-                  title="Promotions"
-                  value={promotions.length}
-                  bg={cardBgColors["Promotions"]}
-                />
-              </a>
-              {adminStatus && (
-                <a href={`/services`}>
-                  <DashboardCard
-                    icon={<Wrench className="text-3xl text-teal-500" />}
-                    title="Services"
-                    value={services.length}
-                    bg={cardBgColors["Services"]}
-                  />
-                </a>
-              )}
-              {adminStatus && (
-                <a href={`/users`}>
-                  <DashboardCard
-                    icon={<Users className="text-3xl text-gray-600" />}
-                    title="Users"
-                    value={users.length}
-                    bg={cardBgColors["Users"]}
-                  />
-                </a>
-              )}
-              {/* <a href={`/applications`}>
-                <DashboardCard
-                  icon={<UserX className="text-3xl text-rose-500" />}
-                  title="Rejected"
-                  value={rejectedCount}
-                  bg={cardBgColors["Rejected"]}
-                />
-              </a> */}
-              {adminStatus && myProfile?.role === "Agent" && (
-                <a href={`/profile`}>
-                  <DashboardCard
-                    icon={<Users className="text-3xl text-emerald-600" />}
-                    title="Sub Agents"
-                    value={subAgentCount}
-                    bg={cardBgColors["Sub Agents"]}
-                  />
-                </a>
-              )}
-            </div>
-          </>
+          <DashboardStats
+            cards={{
+              admins,
+              leads,
+              resources,
+              courses,
+              downloads,
+              eventCalendars,
+              profiles,
+              promotions,
+              services,
+              users,
+            }}
+            adminStatus={adminStatus}
+            myProfile={myProfile}
+            subAgentCount={subAgentCount}
+          />
         )}
       </div>
       {!loading && (
@@ -553,9 +410,7 @@ const Dashboard = () => {
           <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
             Data Overview
           </h2>
-
           <div className="flex flex-col md:flex-row gap-8 h-full">
-            {/* Bar Chart */}
             <div className="md:w-3/5 w-full h-full mx-auto">
               <Card className="p-6 rounded-2xl shadow-md bg-yellow-50 dark:bg-gray-800 h-full">
                 <h3 className="text-lg font-semibold text-center text-gray-700 dark:text-gray-200 mb-4">
@@ -564,8 +419,6 @@ const Dashboard = () => {
                 <Bar data={barData} options={barOptions} />
               </Card>
             </div>
-
-            {/* Pie Chart */}
             <div className="md:w-2/5 w-full h-full mx-auto">
               <Card className="p-6 rounded-2xl shadow-md bg-cyan-50 dark:bg-gray-800 h-full">
                 <h3 className="text-lg font-semibold text-center text-gray-700 dark:text-gray-200 mb-4">
@@ -577,57 +430,181 @@ const Dashboard = () => {
           </div>
         </div>
       )}
-
-      {/* Charts Loading Skeleton */}
-      {loading && (
-        <div className="mt-10">
-          <h2 className="text-xl font-semibold mb-4 animate-pulse bg-gray-200 dark:bg-gray-700 rounded w-48 h-7"></h2>
-          <div className="flex flex-col md:flex-row gap-8">
-            <div className="md:w-3/5 w-full max-w-[700px] mx-auto h-[300px] bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
-            <div className="md:w-2/5 w-full max-w-[400px] mx-auto h-[300px] bg-gray-200 dark:bg-gray-700 animate-pulse rounded"></div>
-          </div>
-        </div>
-      )}
     </div>
   );
 };
 
+// ====================== Reusable Dashboard Cards Component
+interface DashboardStatsProps {
+  cards: {
+    admins: IAdmin[];
+    leads: ILead[];
+    resources: IResource[];
+    courses: ICourse[];
+    downloads: IDownload[];
+    eventCalendars: IEventCalendar[];
+    profiles: IProfile[];
+    promotions: IPromotion[];
+    services: IServices[];
+    users: IUser[];
+  };
+  adminStatus: boolean;
+  myProfile: IProfile | null;
+  subAgentCount: number;
+}
+
+const DashboardStats = ({
+  cards,
+  adminStatus,
+  myProfile,
+  subAgentCount,
+}: DashboardStatsProps) => {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold mb-6 dark:text-gray-100">
+        Dashboard Stats
+      </h1>
+      <div className="grid w-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pb-6">
+        {adminStatus && (
+          <a href={`/admins`}>
+            <DashboardCard
+              icon={<UserCog className="text-3xl text-blue-500" />}
+              title="Admins"
+              value={cards.admins.length}
+              bg={cardBgColors["Admins"]}
+            />
+          </a>
+        )}
+        <a href={`/leads`}>
+          <DashboardCard
+            icon={<PhoneCall className="text-3xl text-pink-500" />}
+            title="Leads"
+            value={cards.leads.length}
+            bg={cardBgColors["Leads"]}
+          />
+        </a>
+        <a href={`/resources`}>
+          <DashboardCard
+            icon={<FileText className="text-3xl text-purple-500" />}
+            title="Resources"
+            value={cards.resources.length}
+            bg={cardBgColors["Resources"]}
+          />
+        </a>
+        {adminStatus && (
+          <a href={`/courses`}>
+            <DashboardCard
+              icon={<BookOpen className="text-3xl text-orange-500" />}
+              title="Courses"
+              value={cards.courses.length}
+              bg={cardBgColors["Courses"]}
+            />
+          </a>
+        )}
+        <a href={`/downloads`}>
+          <DashboardCard
+            icon={<Download className="text-3xl text-yellow-500" />}
+            title="Documents"
+            value={cards.downloads.length}
+            bg={cardBgColors["Documents"]}
+          />
+        </a>
+        <a href={`/events`}>
+          <DashboardCard
+            icon={<CalendarClock className="text-3xl text-cyan-500" />}
+            title="Events"
+            value={cards.eventCalendars.length}
+            bg={cardBgColors["Events"]}
+          />
+        </a>
+        {adminStatus && (
+          <a href={`/profiles`}>
+            <DashboardCard
+              icon={<User className="text-3xl text-indigo-500" />}
+              title="Agency"
+              value={cards.profiles.length}
+              bg={cardBgColors["Agency"]}
+            />
+          </a>
+        )}
+        <a href={`/promotions`}>
+          <DashboardCard
+            icon={<Megaphone className="text-3xl text-fuchsia-500" />}
+            title="Promotions"
+            value={cards.promotions.length}
+            bg={cardBgColors["Promotions"]}
+          />
+        </a>
+        {adminStatus && (
+          <a href={`/services`}>
+            <DashboardCard
+              icon={<Wrench className="text-3xl text-teal-500" />}
+              title="Services"
+              value={cards.services.length}
+              bg={cardBgColors["Services"]}
+            />
+          </a>
+        )}
+        {adminStatus && (
+          <a href={`/users`}>
+            <DashboardCard
+              icon={<Users className="text-3xl text-gray-600" />}
+              title="Users"
+              value={cards.users.length}
+              bg={cardBgColors["Users"]}
+            />
+          </a>
+        )}
+        {adminStatus && myProfile?.role === "Agent" && (
+          <a href={`/profile`}>
+            <DashboardCard
+              icon={<Users className="text-3xl text-emerald-600" />}
+              title="Sub Agents"
+              value={subAgentCount}
+              bg={cardBgColors["Sub Agents"]}
+            />
+          </a>
+        )}
+      </div>
+    </div>
+  );
+};
+
+// ====================== Dashboard Card Component
 interface DashboardCardProps {
   icon: React.ReactNode;
   title: string;
   value: string | number;
   bg?: string;
 }
-
-const DashboardCard = ({ icon, title, value, bg }: DashboardCardProps) => {
-  return (
-    <Card
-      className={`rounded-2xl shadow-md ${bg} px-5 py-6 flex flex-col justify-between transition hover:shadow-xl`}
-    >
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">
-          {title}
-        </p>
-        {icon && <div className="text-xl">{icon}</div>}
+const DashboardCard = ({ icon, title, value, bg }: DashboardCardProps) => (
+  <Card
+    className={`rounded-2xl shadow-md ${bg} px-5 py-6 flex flex-col justify-between transition hover:shadow-xl`}
+  >
+    <div className="flex items-center justify-between">
+      <p className="text-sm text-gray-600 dark:text-gray-300 font-semibold">
+        {title}
+      </p>
+      {icon && <div className="text-xl">{icon}</div>}
+    </div>
+    <div className="mt-4 flex items-center justify-between">
+      <div className="w-12 h-12">
+        <CircularProgressbar
+          value={Number(value)}
+          text={value.toString()}
+          styles={buildStyles({
+            textColor: "#6C63FF",
+            pathColor: "#6C63FF",
+            trailColor: "#eee",
+            textSize: "28px",
+          })}
+        />
       </div>
-      <div className="mt-4 flex items-center justify-between">
-        <div className="w-12 h-12">
-          <CircularProgressbar
-            value={Number(value)}
-            text={value.toString()}
-            styles={buildStyles({
-              textColor: "#6C63FF",
-              pathColor: "#6C63FF",
-              trailColor: "#eee",
-              textSize: "28px",
-            })}
-          />
-        </div>
-      </div>
-    </Card>
-  );
-};
+    </div>
+  </Card>
+);
 
+// ====================== Skeleton Loader
 const SkeletonCard = () => (
   <div className="flex flex-col justify-between border border-gray-200 dark:border-gray-700 shadow p-6 rounded-2xl animate-pulse bg-gray-100 dark:bg-gray-800 h-[140px]">
     <div className="flex justify-between">
@@ -639,6 +616,3 @@ const SkeletonCard = () => (
 );
 
 export default Dashboard;
-function fetchInitialData() {
-  throw new Error("Function not implemented.");
-}

@@ -3,48 +3,40 @@
 import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 
-import Admin from "../database/models/admin.model";
-import Resource from "../database/models/resource.model";
-import Course from "../database/models/course.model";
-import Download from "../database/models/download.model";
-import Lead from "../database/models/lead.model";
-import Profile from "../database/models/profile.model";
-import Promotion from "../database/models/promotion.model";
-import Service from "../database/models/service.model";
-import User from "../database/models/user.model";
-import EventCalendar from "../database/models/eventCalender.model";
+import Admin, { IAdmin } from "../database/models/admin.model";
+import Resource, { IResource } from "../database/models/resource.model";
+import Course, { ICourse } from "../database/models/course.model";
+import Download, { IDownload } from "../database/models/download.model";
+import Lead, { ILead } from "../database/models/lead.model";
+import Profile, { IProfile } from "../database/models/profile.model";
+import Promotion, { IPromotion } from "../database/models/promotion.model";
+import Service, { IServices } from "../database/models/service.model";
+import User, { IUser } from "../database/models/user.model";
+import EventCalendar, {
+  IEventCalendar,
+} from "../database/models/eventCalender.model";
 
-// ====== GET DASHBOARD SUMMARY
-export const getDashboardSummary = async () => {
-  try {
-    await connectToDatabase();
+// ===== TypeScript interface for summary
+export interface DashboardSummary {
+  admins: IAdmin[];
+  resources: IResource[];
+  courses: ICourse[];
+  downloads: IDownload[];
+  eventCalendars: IEventCalendar[];
+  leads: ILead[];
+  profiles: IProfile[];
+  promotions: IPromotion[];
+  services: IServices[];
+  users: IUser[];
+}
 
-    const [
-      admins,
-      resources,
-      courses,
-      downloads,
-      eventCalendars,
-      leads,
-      profiles,
-      promotions,
-      services,
-      users,
-    ] = await Promise.all([
-      Admin.find().lean(),
-      Resource.find().lean(),
-      Course.find().lean(),
-      Download.find().lean(),
-      EventCalendar.find().lean(),
-      Lead.find().lean(),
-      Profile.find().lean(),
-      Promotion.find().lean(),
-      Service.find().lean(),
-      User.find().lean(),
-    ]);
+// ===== GET DASHBOARD SUMMARY
+export const getDashboardSummary =
+  async (): Promise<DashboardSummary | null> => {
+    try {
+      await connectToDatabase();
 
-    return JSON.parse(
-      JSON.stringify({
+      const [
         admins,
         resources,
         courses,
@@ -55,9 +47,33 @@ export const getDashboardSummary = async () => {
         promotions,
         services,
         users,
-      })
-    );
-  } catch (error) {
-    handleError(error);
-  }
-};
+      ] = await Promise.all([
+        Admin.find().lean<IAdmin[]>(),
+        Resource.find().lean<IResource[]>(),
+        Course.find().lean<ICourse[]>(),
+        Download.find().lean<IDownload[]>(),
+        EventCalendar.find().lean<IEventCalendar[]>(),
+        Lead.find().lean<ILead[]>(),
+        Profile.find().lean<IProfile[]>(),
+        Promotion.find().lean<IPromotion[]>(),
+        Service.find().lean<IServices[]>(),
+        User.find().lean<IUser[]>(),
+      ]);
+
+      return {
+        admins,
+        resources,
+        courses,
+        downloads,
+        eventCalendars,
+        leads,
+        profiles,
+        promotions,
+        services,
+        users,
+      };
+    } catch (error) {
+      handleError(error);
+      return null;
+    }
+  };
