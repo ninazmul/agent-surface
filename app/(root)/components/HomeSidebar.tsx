@@ -198,7 +198,7 @@ const HomeSidebar = ({
     }`;
 
   return (
-    <Sidebar className="font-sans bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-none">
+    <Sidebar className="font-[var(--font-space-grotesk)] bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-none">
       <SidebarContent>
         <SidebarGroup className="flex items-center justify-center space-y-6">
           <SidebarGroupLabel className="flex items-center justify-items-center">
