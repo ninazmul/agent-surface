@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { Home, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 
 export default function Breadcrumbs() {
   const pathname = usePathname();
@@ -18,16 +18,15 @@ export default function Breadcrumbs() {
       .replace(/\b\w/g, (char) => char.toUpperCase());
 
   return (
-    <nav className="text-sm text-primary-500 dark:text-gray-300 px-1 no-print" aria-label="Breadcrumb">
+    <nav className="text-md text-gray-500 font-semibold dark:text-gray-300 px-1 no-print" aria-label="Breadcrumb">
       <div className="w-full overflow-hidden">
         <ol className="flex items-center space-x-1 text-ellipsis whitespace-nowrap overflow-hidden min-w-0">
           {/* Home link */}
           <li className="flex items-center shrink-0">
             <a
               href={"/"}
-              className="flex items-center text-primary-500 dark:text-gray-300 hover:text-purple-500 transition-colors"
+              className="flex items-center text-gray-500 dark:text-gray-300 hover:text-gray-600 transition-colors"
             >
-              <Home size={16} className="mr-1" />
               <span className="hidden sm:inline">Home</span>
             </a>
           </li>
@@ -42,15 +41,15 @@ export default function Breadcrumbs() {
                 key={href}
                 className="flex items-center shrink-0 text-ellipsis overflow-hidden"
               >
-                <ChevronRight size={16} className="mx-1 text-primary-500 dark:text-gray-300" />
+                <ChevronRight size={16} className="mx-1 text-gray-500 dark:text-gray-300" />
                 {isLast ? (
-                  <span className="text-primary-500 dark:text-gray-300 truncate">
+                  <span className="text-gray-500 dark:text-gray-300 truncate">
                     {createBreadcrumbLabel(segment)}
                   </span>
                 ) : (
                   <a
                     href={href}
-                    className="text-primary-500 dark:text-gray-300 hover:text-purple-500 transition-colors truncate"
+                    className="text-gray-500 dark:text-gray-300 hover:text-gray-600 transition-colors truncate"
                   >
                     {createBreadcrumbLabel(segment)}
                   </a>

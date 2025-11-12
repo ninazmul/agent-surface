@@ -1,12 +1,12 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
 import HomeSidebar from "./components/HomeSidebar";
 import MessageCount from "./components/MessageCount";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import {
+  getAdminByEmail,
   getAdminRolePermissionsByEmail,
   isAdmin,
 } from "@/lib/actions/admin.actions";
@@ -25,20 +25,21 @@ export default async function AdminLayout({
   const userId = sessionClaims?.userId as string;
   const email = await getUserEmailById(userId);
   const adminStatus = await isAdmin(email);
+  const admin = await getAdminByEmail(email);
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
-  if (!userId) {
-    redirect("/sign-in");
-  }
+  // if (!userId) {
+  //   redirect("/sign-in");
+  // }
 
-  if (!userId) {
-    redirect("/sign-in");
-  }
+  // if (!userId) {
+  //   redirect("/sign-in");
+  // }
 
-  if (!adminStatus && myProfile?.status === "Pending") {
-    redirect("/profile");
-  }
+  // if (!adminStatus && myProfile?.status === "Pending") {
+  //   redirect("/profile");
+  // }
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -47,15 +48,22 @@ export default async function AdminLayout({
         isAdmin={adminStatus}
         role={myProfile?.role}
         profile={myProfile}
+        admin={admin}
       />
       <Toaster />
       <main className="flex-1 h-screen mx-auto overflow-y-auto">
         <div
-          className={`flex justify-between items-center p-4 w-full-10 rounded-2xl m-1 text-white no-print ${
-            adminStatus ? "bg-purple-900" : "bg-primary-900"
-          }`}
+          className={`flex justify-between items-center p-4 w-full-10 text-white no-print bg-gray-50 border`}
         >
-          <SidebarTrigger />
+          <div className="flex items-center justify-start">
+            <SidebarTrigger />
+            <div>
+              <Breadcrumbs />
+              <p className="text-xs text-gray-500">
+                &quot;Track everything from here for your recommendations&quot;
+              </p>
+            </div>
+          </div>
           <div className="flex justify-end items-center gap-4">
             <div className="flex items-center gap-2">
               <ThemeToggle />
@@ -67,9 +75,7 @@ export default async function AdminLayout({
             </SignedIn>
           </div>
         </div>
-        <div className="p-2">
-          <Breadcrumbs />
-        </div>
+        <div className="p-2"></div>
         <div className="p-2">
           <DashboardProvider>{children}</DashboardProvider>
         </div>

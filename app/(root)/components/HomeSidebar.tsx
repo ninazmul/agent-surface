@@ -9,6 +9,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { IAdmin } from "@/lib/database/models/admin.model";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { UserButton } from "@clerk/nextjs";
 import {
@@ -58,7 +59,12 @@ const sidebarItems = [
       },
     ],
   },
-  { key: "quotations", title: "Quotes", url: "/quotations", icon: MessageSquareQuote },
+  {
+    key: "quotations",
+    title: "Quotes",
+    url: "/quotations",
+    icon: MessageSquareQuote,
+  },
   { key: "invoices", title: "Invoices", url: "/invoices", icon: FileText },
   {
     key: "commissions",
@@ -132,6 +138,7 @@ type HomeSidebarProps = {
   isAdmin: boolean;
   role?: string;
   profile?: IProfile;
+  admin?: IAdmin;
 };
 
 const HomeSidebar = ({
@@ -139,6 +146,7 @@ const HomeSidebar = ({
   isAdmin,
   role,
   profile,
+  admin,
 }: HomeSidebarProps) => {
   const currentPath = usePathname();
   const { theme } = useTheme();
@@ -198,7 +206,7 @@ const HomeSidebar = ({
     }`;
 
   return (
-    <Sidebar className="font-[var(--font-space-grotesk)] bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-none">
+    <Sidebar className="font-[var(--font-space-grotesk)] bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-200">
       <SidebarContent>
         <SidebarGroup className="flex items-center justify-center space-y-6">
           <SidebarGroupLabel className="flex items-center justify-items-center">
@@ -227,11 +235,11 @@ const HomeSidebar = ({
             />
             <div>
               <h1 className="text-sm font-semibold">
-                {profile?.name || "User Name"}
+                {profile?.name || admin?.name || "User Name"}
               </h1>
-              <p className="text-xs text-gray-500">{`${
-                profile?.role || "User"
-              } Profile`}</p>
+              <p className="text-xs text-gray-500">
+                {profile?.role || (admin ? "Admin" : "User")}&apos;s Profile
+              </p>
             </div>
           </div>
           <SidebarGroupContent>
