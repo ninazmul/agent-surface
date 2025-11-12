@@ -60,7 +60,7 @@ export default async function AdminLayout({
             <SidebarTrigger />
             <div>
               <Breadcrumbs />
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 hidden md:flex">
                 &quot;Track everything from here for your recommendations&quot;
               </p>
             </div>
