@@ -15,6 +15,7 @@ import NotificationsCount from "./components/Notifications";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import ThemeToggle from "@/components/shared/ThemeToggle";
 import { DashboardProvider } from "@/components/shared/DashboardProvider";
+import { redirect } from "next/navigation";
 
 export default async function AdminLayout({
   children,
@@ -29,17 +30,17 @@ export default async function AdminLayout({
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
-  // if (!userId) {
-  //   redirect("/sign-in");
-  // }
+  if (!userId) {
+    redirect("/sign-in");
+  }
 
-  // if (!userId) {
-  //   redirect("/sign-in");
-  // }
+  if (!userId) {
+    redirect("/sign-in");
+  }
 
-  // if (!adminStatus && myProfile?.status === "Pending") {
-  //   redirect("/profile");
-  // }
+  if (!adminStatus && myProfile?.status === "Pending") {
+    redirect("/profile");
+  }
 
   return (
     <SidebarProvider defaultOpen={true}>
