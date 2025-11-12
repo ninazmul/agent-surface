@@ -182,7 +182,7 @@ const HomeSidebar = ({
   }, [currentPath, filteredSidebarItems]);
 
   const menuItemClasses = (active: boolean) =>
-    `flex items-center justify-between px-3 py-2 rounded-lg transition-colors px-10 ${
+    `flex items-center justify-between px-10 py-2 rounded-lg transition-colors px-10 ${
       active
         ? isAdmin
           ? "text-purple-500"
