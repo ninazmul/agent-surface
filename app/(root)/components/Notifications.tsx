@@ -150,12 +150,12 @@ export default function NotificationsDropdown() {
     <div className="relative" ref={dropdownRef} tabIndex={-1}>
       <Button
         size="icon"
-        variant="outline"
+        variant="ghost"
         onClick={() => setOpen((prev) => !prev)}
         aria-label="Toggle notifications dropdown"
-        className="rounded-full bg-white w-7 h-7 relative shadow-sm hover:shadow-md transition"
+        className="w-9 h-9 text-gray-500 rounded-full relative transition"
       >
-        <Bell className="text-primary w-5 h-5" />
+        <Bell className="text-gray-500" />
         {unreadCount > 0 && (
           <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
             {unreadCount > 99 ? "99+" : unreadCount}

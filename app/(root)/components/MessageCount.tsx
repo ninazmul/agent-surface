@@ -34,10 +34,10 @@ export default function MessageCount() {
       <a href={"/messages"}>
         <Button
           size="icon"
-          variant="outline"
-          className="rounded-full bg-white w-7 h-7"
+          variant="ghost"
+          className="w-9 h-9 text-gray-500 rounded-full"
         >
-          <MessageCircle className="text-primary-500" />
+          <MessageCircle className="text-gray-500" />
         </Button>
 
         {unreadCount > 0 && (
