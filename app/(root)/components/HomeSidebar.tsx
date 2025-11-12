@@ -9,6 +9,8 @@ import {
   SidebarMenu,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { IProfile } from "@/lib/database/models/profile.model";
+import { UserButton } from "@clerk/nextjs";
 import {
   LayoutDashboard,
   Grid,
@@ -47,7 +49,12 @@ const sidebarItems = [
     icon: Grid,
     children: [
       { key: "leads", title: "All Leads", url: "/leads", icon: Grid2x2Icon },
-      { key: "assigned", title: "Assigned Leads", url: "/leads/assigned", icon: Grid2X2PlusIcon },
+      {
+        key: "assigned",
+        title: "Assigned Leads",
+        url: "/leads/assigned",
+        icon: Grid2X2PlusIcon,
+      },
     ],
   },
   { key: "quotations", title: "Quotes", url: "/quotations", icon: FileEdit },
@@ -58,9 +65,24 @@ const sidebarItems = [
     url: "/commissions",
     icon: ListOrderedIcon,
     children: [
-      { key: "commissions", title: "Account Receivable", url: "/commissions", icon: Euro },
-      { key: "commissions-received", title: "Account Received", url: "/commissions/received", icon: Euro },
-      { key: "payment", title: "Commission", url: "/commissions/payment", icon: Wallet },
+      {
+        key: "commissions",
+        title: "Account Receivable",
+        url: "/commissions",
+        icon: Euro,
+      },
+      {
+        key: "commissions-received",
+        title: "Account Received",
+        url: "/commissions/received",
+        icon: Euro,
+      },
+      {
+        key: "payment",
+        title: "Commission",
+        url: "/commissions/payment",
+        icon: Wallet,
+      },
     ],
   },
   { key: "downloads", title: "Documents", url: "/downloads", icon: FilesIcon },
@@ -71,13 +93,33 @@ const sidebarItems = [
     url: "/events",
     icon: CalendarDays,
     children: [
-      { key: "events-all", title: "All Events", url: "/events", icon: Calendar1 },
-      { key: "our-event", title: "Our Event", url: "/events/event", icon: CalendarDays },
+      {
+        key: "events-all",
+        title: "All Events",
+        url: "/events",
+        icon: Calendar1,
+      },
+      {
+        key: "our-event",
+        title: "Our Event",
+        url: "/events/event",
+        icon: CalendarDays,
+      },
     ],
   },
-  { key: "promotions", title: "Promotions", url: "/promotions", icon: Megaphone },
+  {
+    key: "promotions",
+    title: "Promotions",
+    url: "/promotions",
+    icon: Megaphone,
+  },
   { key: "messages", title: "Messages", url: "/messages", icon: MessageSquare },
-  { key: "notifications", title: "Notifications", url: "/notifications", icon: Bell },
+  {
+    key: "notifications",
+    title: "Notifications",
+    url: "/notifications",
+    icon: Bell,
+  },
   { key: "profile", title: "Profile", url: "/profile", icon: UserRoundIcon },
   { key: "courses", title: "Courses", url: "/courses", icon: Book },
   { key: "services", title: "Services", url: "/services", icon: Wrench },
@@ -88,9 +130,15 @@ type HomeSidebarProps = {
   rolePermissions: string[];
   isAdmin: boolean;
   role?: string;
+  profile?: IProfile;
 };
 
-const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
+const HomeSidebar = ({
+  rolePermissions,
+  isAdmin,
+  role,
+  profile,
+}: HomeSidebarProps) => {
   const currentPath = usePathname();
   const { theme } = useTheme();
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
@@ -117,7 +165,9 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
         : allowedForNonAdmins.includes(item.key);
     }
     if (role === "Student") {
-      return ["profile", "messages", "resources", "downloads"].includes(item.key);
+      return ["profile", "messages", "resources", "downloads"].includes(
+        item.key
+      );
     }
     return allowedForNonAdmins.includes(item.key);
   });
@@ -134,9 +184,9 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
     `flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
       active
         ? isAdmin
-          ? "bg-purple-200 text-purple-900"
-          : "bg-primary-200 text-primary-900"
-        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200"
+          ? "text-purple-500"
+          : "text-primary-500"
+        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-500 dark:text-gray-200"
     }`;
 
   const childItemClasses = (active: boolean) =>
@@ -151,9 +201,16 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
       <SidebarContent>
         <SidebarGroup className="space-y-6">
           <SidebarGroupLabel>
-            <a href={role === "Student" ? "/profile" : "/"}>
+            <a
+              href={role === "Student" ? "/profile" : "/"}
+              className="flex items-center justify-items-center"
+            >
               <Image
-                src={theme === "dark" ? "/assets/images/logo-white.png" : "/assets/images/logo.png"}
+                src={
+                  theme === "dark"
+                    ? "/assets/images/logo-white.png"
+                    : "/assets/images/logo.png"
+                }
                 width={100}
                 height={100}
                 alt="Logo"
@@ -161,10 +218,30 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
               />
             </a>
           </SidebarGroupLabel>
+          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white rounded-xl">
+            <UserButton
+              appearance={{
+                elements: {
+                  userButtonAvatarBox: "w-10 h-10",
+                  userButtonBox: "h-auto px-0 py-0",
+                },
+              }}
+            />
+            <div>
+              <h1 className="text-sm font-semibold">
+                {profile?.name || "User Name"}
+              </h1>
+              <p className="text-xs text-gray-500">{`${
+                profile?.role || "User"
+              } Profile`}</p>
+            </div>
+          </div>
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {filteredSidebarItems.map((item) => {
-                const isActive = currentPath === item.url || currentPath.startsWith(`${item.url}/`);
+                const isActive =
+                  currentPath === item.url ||
+                  currentPath.startsWith(`${item.url}/`);
                 const hasChildren = item.children && item.children.length > 0;
 
                 return (
@@ -174,7 +251,10 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
                         <button
                           type="button"
                           onClick={() =>
-                            setOpenMenus((prev) => ({ ...prev, [item.key]: !prev[item.key] }))
+                            setOpenMenus((prev) => ({
+                              ...prev,
+                              [item.key]: !prev[item.key],
+                            }))
                           }
                           className="flex items-center space-x-3 flex-1 text-left"
                         >
@@ -182,7 +262,10 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
                           <span className="font-medium">{item.title}</span>
                         </button>
                       ) : (
-                        <a href={item.url} className="flex items-center space-x-3 flex-1">
+                        <a
+                          href={item.url}
+                          className="flex items-center space-x-3 flex-1"
+                        >
                           <item.icon className="w-5 h-5" />
                           <span className="font-medium">{item.title}</span>
                         </a>
@@ -194,11 +277,18 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            setOpenMenus((prev) => ({ ...prev, [item.key]: !prev[item.key] }));
+                            setOpenMenus((prev) => ({
+                              ...prev,
+                              [item.key]: !prev[item.key],
+                            }));
                           }}
                           className="ml-2 text-gray-500 hover:text-gray-900 transition"
                         >
-                          {openMenus[item.key] ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                          {openMenus[item.key] ? (
+                            <ChevronDown className="w-4 h-4" />
+                          ) : (
+                            <ChevronRight className="w-4 h-4" />
+                          )}
                         </button>
                       )}
                     </div>
@@ -206,10 +296,17 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
                     {hasChildren && openMenus[item.key] && (
                       <div className="ml-6 mt-2 space-y-1 border-l border-gray-200 pl-2">
                         {item.children.map((child) => {
-                          const normalizePath = (path: string) => path.replace(/\/+$/, "");
-                          const isChildActive = normalizePath(currentPath) === normalizePath(child.url);
+                          const normalizePath = (path: string) =>
+                            path.replace(/\/+$/, "");
+                          const isChildActive =
+                            normalizePath(currentPath) ===
+                            normalizePath(child.url);
                           return (
-                            <a key={child.key} href={child.url} className={childItemClasses(isChildActive)}>
+                            <a
+                              key={child.key}
+                              href={child.url}
+                              className={childItemClasses(isChildActive)}
+                            >
                               <child.icon className="w-4 h-4" />
                               <span>{child.title}</span>
                             </a>

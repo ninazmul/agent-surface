@@ -46,6 +46,7 @@ export default async function AdminLayout({
         rolePermissions={rolePermissions}
         isAdmin={adminStatus}
         role={myProfile?.role}
+        profile={myProfile}
       />
       <Toaster />
       <main className="flex-1 h-screen mx-auto overflow-y-auto">
