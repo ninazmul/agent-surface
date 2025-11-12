@@ -12,28 +12,29 @@ import {
 import { IProfile } from "@/lib/database/models/profile.model";
 import { UserButton } from "@clerk/nextjs";
 import {
-  Grid,
-  ListOrderedIcon,
-  FilesIcon,
-  MessageSquare,
-  BookOpen,
   Bell,
   FileText,
   Shield,
   UserRoundIcon,
-  Book,
   Megaphone,
-  Wrench,
   Wallet,
   CalendarDays,
   ChevronDown,
-  ChevronRight,
-  FileEdit,
   Calendar1,
   Euro,
-  Grid2x2Icon,
-  Grid2X2PlusIcon,
   Home,
+  UserRoundCogIcon,
+  UserRoundPlus,
+  UsersRoundIcon,
+  MessageSquareQuote,
+  CircleDollarSign,
+  FileIcon,
+  Database,
+  ChevronUp,
+  BadgePercent,
+  MessageCircle,
+  LibraryBig,
+  ChevronRight,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -46,24 +47,24 @@ const sidebarItems = [
     key: "leads",
     title: "Leads",
     url: "/leads",
-    icon: Grid,
+    icon: UserRoundCogIcon,
     children: [
-      { key: "leads", title: "All Leads", url: "/leads", icon: Grid2x2Icon },
+      { key: "leads", title: "All Leads", url: "/leads", icon: UsersRoundIcon },
       {
         key: "assigned",
         title: "Assigned Leads",
         url: "/leads/assigned",
-        icon: Grid2X2PlusIcon,
+        icon: UserRoundPlus,
       },
     ],
   },
-  { key: "quotations", title: "Quotes", url: "/quotations", icon: FileEdit },
+  { key: "quotations", title: "Quotes", url: "/quotations", icon: MessageSquareQuote },
   { key: "invoices", title: "Invoices", url: "/invoices", icon: FileText },
   {
     key: "commissions",
     title: "Finance",
     url: "/commissions",
-    icon: ListOrderedIcon,
+    icon: CircleDollarSign,
     children: [
       {
         key: "commissions",
@@ -85,8 +86,8 @@ const sidebarItems = [
       },
     ],
   },
-  { key: "downloads", title: "Documents", url: "/downloads", icon: FilesIcon },
-  { key: "resources", title: "Resources", url: "/resources", icon: BookOpen },
+  { key: "downloads", title: "Documents", url: "/downloads", icon: FileIcon },
+  { key: "resources", title: "Resources", url: "/resources", icon: Database },
   {
     key: "events",
     title: "Events",
@@ -111,9 +112,9 @@ const sidebarItems = [
     key: "promotions",
     title: "Promotions",
     url: "/promotions",
-    icon: Megaphone,
+    icon: BadgePercent,
   },
-  { key: "messages", title: "Messages", url: "/messages", icon: MessageSquare },
+  { key: "messages", title: "Messages", url: "/messages", icon: MessageCircle },
   {
     key: "notifications",
     title: "Notifications",
@@ -121,8 +122,8 @@ const sidebarItems = [
     icon: Bell,
   },
   { key: "profile", title: "Profile", url: "/profile", icon: UserRoundIcon },
-  { key: "courses", title: "Courses", url: "/courses", icon: Book },
-  { key: "services", title: "Services", url: "/services", icon: Wrench },
+  { key: "courses", title: "Courses", url: "/courses", icon: LibraryBig },
+  { key: "services", title: "Services", url: "/services", icon: Megaphone },
   { key: "admins", title: "Admins", url: "/admins", icon: Shield },
 ];
 
@@ -181,7 +182,7 @@ const HomeSidebar = ({
   }, [currentPath, filteredSidebarItems]);
 
   const menuItemClasses = (active: boolean) =>
-    `flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+    `flex items-center justify-between px-3 py-2 rounded-lg transition-colors px-10 ${
       active
         ? isAdmin
           ? "text-purple-500"
@@ -190,7 +191,7 @@ const HomeSidebar = ({
     }`;
 
   const childItemClasses = (active: boolean) =>
-    `flex items-center space-x-2 px-4 py-1.5 rounded-lg text-sm transition-colors ${
+    `flex items-center space-x-2  py-1.5 rounded-lg text-sm transition-colors ${
       active
         ? "bg-indigo-500 text-white"
         : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
@@ -234,7 +235,7 @@ const HomeSidebar = ({
             </div>
           </div>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1 px-6">
+            <SidebarMenu className="space-y-1">
               {filteredSidebarItems.map((item) => {
                 const isActive =
                   currentPath === item.url ||
@@ -282,16 +283,16 @@ const HomeSidebar = ({
                           className="ml-2 text-gray-500 hover:text-gray-900 transition"
                         >
                           {openMenus[item.key] ? (
-                            <ChevronDown className="w-4 h-4" />
+                            <ChevronUp className="w-4 h-4" />
                           ) : (
-                            <ChevronRight className="w-4 h-4" />
+                            <ChevronDown className="w-4 h-4" />
                           )}
                         </button>
                       )}
                     </div>
 
                     {hasChildren && openMenus[item.key] && (
-                      <div className="ml-6 mt-2 space-y-1 border-l border-gray-200 pl-2">
+                      <div className="ml-14 mt-2 space-y-1 border-l-2 border-gray-400 pl-2">
                         {item.children.map((child) => {
                           const normalizePath = (path: string) =>
                             path.replace(/\/+$/, "");
@@ -304,7 +305,7 @@ const HomeSidebar = ({
                               href={child.url}
                               className={childItemClasses(isChildActive)}
                             >
-                              <child.icon className="w-4 h-4" />
+                              <ChevronRight className="w-4 h-4" />
                               <span>{child.title}</span>
                             </a>
                           );
