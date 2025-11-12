@@ -11,8 +11,6 @@ import {
 } from "@/components/ui/sidebar";
 import {
   LayoutDashboard,
-  // Users,
-  Calendar,
   Grid,
   ListOrderedIcon,
   FilesIcon,
@@ -48,26 +46,11 @@ const sidebarItems = [
     url: "/leads",
     icon: Grid,
     children: [
-      {
-        key: "leads",
-        title: "All Leads",
-        url: "/leads",
-        icon: Grid2x2Icon,
-      },
-      {
-        key: "assigned",
-        title: "Assigned Leads",
-        url: "/leads/assigned",
-        icon: Grid2X2PlusIcon,
-      },
+      { key: "leads", title: "All Leads", url: "/leads", icon: Grid2x2Icon },
+      { key: "assigned", title: "Assigned Leads", url: "/leads/assigned", icon: Grid2X2PlusIcon },
     ],
   },
-  {
-    key: "quotations",
-    title: "Quotes",
-    url: "/quotations",
-    icon: FileEdit,
-  },
+  { key: "quotations", title: "Quotes", url: "/quotations", icon: FileEdit },
   { key: "invoices", title: "Invoices", url: "/invoices", icon: FileText },
   {
     key: "commissions",
@@ -75,24 +58,9 @@ const sidebarItems = [
     url: "/commissions",
     icon: ListOrderedIcon,
     children: [
-      {
-        key: "commissions",
-        title: "Account Receivable",
-        url: "/commissions",
-        icon: Euro,
-      },
-      {
-        key: "commissions",
-        title: "Account Received",
-        url: "/commissions/received",
-        icon: Euro,
-      },
-      {
-        key: "payment",
-        title: "Commission",
-        url: "/commissions/payment",
-        icon: Wallet,
-      },
+      { key: "commissions", title: "Account Receivable", url: "/commissions", icon: Euro },
+      { key: "commissions-received", title: "Account Received", url: "/commissions/received", icon: Euro },
+      { key: "payment", title: "Commission", url: "/commissions/payment", icon: Wallet },
     ],
   },
   { key: "downloads", title: "Documents", url: "/downloads", icon: FilesIcon },
@@ -101,34 +69,18 @@ const sidebarItems = [
     key: "events",
     title: "Events",
     url: "/events",
-    icon: Calendar,
+    icon: CalendarDays,
     children: [
-      { key: "events", title: "Events", url: "/events", icon: Calendar1 },
-      {
-        key: "event",
-        title: "Our Event",
-        url: "/events/event",
-        icon: CalendarDays,
-      },
+      { key: "events-all", title: "All Events", url: "/events", icon: Calendar1 },
+      { key: "our-event", title: "Our Event", url: "/events/event", icon: CalendarDays },
     ],
   },
-  {
-    key: "promotions",
-    title: "Promotions",
-    url: "/promotions",
-    icon: Megaphone,
-  },
+  { key: "promotions", title: "Promotions", url: "/promotions", icon: Megaphone },
   { key: "messages", title: "Messages", url: "/messages", icon: MessageSquare },
-  {
-    key: "notifications",
-    title: "Notifications",
-    url: "/notifications",
-    icon: Bell,
-  },
+  { key: "notifications", title: "Notifications", url: "/notifications", icon: Bell },
   { key: "profile", title: "Profile", url: "/profile", icon: UserRoundIcon },
   { key: "courses", title: "Courses", url: "/courses", icon: Book },
   { key: "services", title: "Services", url: "/services", icon: Wrench },
-  // { key: "users", title: "Users", url: "/users", icon: Users },
   { key: "admins", title: "Admins", url: "/admins", icon: Shield },
 ];
 
@@ -164,17 +116,12 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
         ? rolePermissions.includes(item.key) || item.key === "profile"
         : allowedForNonAdmins.includes(item.key);
     }
-
     if (role === "Student") {
-      return ["profile", "messages", "resources", "downloads"].includes(
-        item.key
-      );
+      return ["profile", "messages", "resources", "downloads"].includes(item.key);
     }
-
     return allowedForNonAdmins.includes(item.key);
   });
 
-  // Auto-open menu if currentPath matches child
   useEffect(() => {
     filteredSidebarItems.forEach((item) => {
       if (item.children?.some((child) => currentPath.startsWith(child.url))) {
@@ -183,45 +130,33 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
     });
   }, [currentPath, filteredSidebarItems]);
 
-  const getMenuItemClasses = (active: boolean) => {
-    if (active) {
-      return `flex items-center justify-between px-[6px] py-2 rounded-2xl transition-colors group ${
-        isAdmin ? "bg-purple-900 text-white" : "bg-primary-900 text-white"
-      }`;
-    }
-    return "flex items-center justify-between px-[6px] py-2 rounded-2xl transition-colors group hover:bg-gray-100 dark:hover:bg-gray-800 text-primary-900 dark:text-gray-100";
-  };
+  const menuItemClasses = (active: boolean) =>
+    `flex items-center justify-between px-3 py-2 rounded-lg transition-colors ${
+      active
+        ? isAdmin
+          ? "bg-purple-200 text-purple-900"
+          : "bg-primary-200 text-primary-900"
+        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-700 dark:text-gray-200"
+    }`;
 
-  const getChildItemClasses = (active: boolean) => {
-    if (active) {
-      return `flex items-center space-x-2 px-3 py-1.5 rounded-2xl text-sm transition-colors ${
-        isAdmin ? "bg-purple-900 text-white" : "bg-primary-900 text-white"
-      }`;
-    }
-    return "flex items-center space-x-2 px-3 py-1.5 rounded-2xl text-sm transition-colors hover:bg-gray-100 dark:hover:bg-gray-800 text-primary-900 dark:text-gray-100";
-  };
+  const childItemClasses = (active: boolean) =>
+    `flex items-center space-x-2 px-4 py-1.5 rounded-lg text-sm transition-colors ${
+      active
+        ? "bg-indigo-500 text-white"
+        : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
+    }`;
 
   return (
-    <Sidebar
-      className="text-primary-900 dark:text-gray-100 font-serif no-print rounded-2xl border-none bg-white dark:bg-gray-900"
-      collapsible="icon"
-    >
+    <Sidebar className="font-sans bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-none">
       <SidebarContent>
-        <SidebarGroup className="space-y-4">
+        <SidebarGroup className="space-y-6">
           <SidebarGroupLabel>
-            <a
-              href={role === "Student" ? "/profile" : "/"}
-              className="px-4 py-3"
-            >
+            <a href={role === "Student" ? "/profile" : "/"}>
               <Image
-                src={
-                  theme === "dark"
-                    ? "/assets/images/logo-white.png"
-                    : "/assets/images/logo.png"
-                }
+                src={theme === "dark" ? "/assets/images/logo-white.png" : "/assets/images/logo.png"}
                 width={100}
                 height={100}
-                alt="Agent Surface logo"
+                alt="Logo"
                 className="w-full h-auto"
               />
             </a>
@@ -229,40 +164,27 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {filteredSidebarItems.map((item) => {
-                const isActive =
-                  currentPath === item.url ||
-                  currentPath.startsWith(`${item.url}/`);
-                const hasChildren =
-                  Array.isArray(item.children) && item.children.length > 0;
+                const isActive = currentPath === item.url || currentPath.startsWith(`${item.url}/`);
+                const hasChildren = item.children && item.children.length > 0;
 
                 return (
                   <SidebarMenuItem key={item.key}>
-                    <div className={getMenuItemClasses(isActive)}>
+                    <div className={menuItemClasses(isActive)}>
                       {hasChildren ? (
                         <button
                           type="button"
                           onClick={() =>
-                            setOpenMenus((prev) => ({
-                              ...prev,
-                              [item.key]: !prev[item.key],
-                            }))
+                            setOpenMenus((prev) => ({ ...prev, [item.key]: !prev[item.key] }))
                           }
-                          className="flex items-center space-x-4 flex-1 text-left"
+                          className="flex items-center space-x-3 flex-1 text-left"
                         >
                           <item.icon className="w-5 h-5" />
-                          <span className="text-sm font-medium">
-                            {item.title}
-                          </span>
+                          <span className="font-medium">{item.title}</span>
                         </button>
                       ) : (
-                        <a
-                          href={item.url}
-                          className="flex items-center space-x-4 flex-1"
-                        >
+                        <a href={item.url} className="flex items-center space-x-3 flex-1">
                           <item.icon className="w-5 h-5" />
-                          <span className="text-sm font-medium">
-                            {item.title}
-                          </span>
+                          <span className="font-medium">{item.title}</span>
                         </a>
                       )}
 
@@ -272,42 +194,27 @@ const HomeSidebar = ({ rolePermissions, isAdmin, role }: HomeSidebarProps) => {
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            setOpenMenus((prev) => ({
-                              ...prev,
-                              [item.key]: !prev[item.key],
-                            }));
+                            setOpenMenus((prev) => ({ ...prev, [item.key]: !prev[item.key] }));
                           }}
-                          className="ml-2 text-gray-500 hover:text-black transition"
+                          className="ml-2 text-gray-500 hover:text-gray-900 transition"
                         >
-                          {openMenus[item.key] ? (
-                            <ChevronDown className="w-4 h-4" />
-                          ) : (
-                            <ChevronRight className="w-4 h-4" />
-                          )}
+                          {openMenus[item.key] ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
                         </button>
                       )}
                     </div>
 
                     {hasChildren && openMenus[item.key] && (
-                      <div className="ml-7 mt-1 space-y-1 border-l border-gray-200 pl-3">
-                        {Array.isArray(item.children) &&
-                          item.children.map((child) => {
-                            const normalizePath = (path: string) =>
-                              path.replace(/\/+$/, "");
-                            const isChildActive =
-                              normalizePath(currentPath) ===
-                              normalizePath(child.url);
-                            return (
-                              <a
-                                key={child.key}
-                                href={child.url}
-                                className={getChildItemClasses(isChildActive)}
-                              >
-                                <child.icon className="w-4 h-4" />
-                                <span>{child.title}</span>
-                              </a>
-                            );
-                          })}
+                      <div className="ml-6 mt-2 space-y-1 border-l border-gray-200 pl-2">
+                        {item.children.map((child) => {
+                          const normalizePath = (path: string) => path.replace(/\/+$/, "");
+                          const isChildActive = normalizePath(currentPath) === normalizePath(child.url);
+                          return (
+                            <a key={child.key} href={child.url} className={childItemClasses(isChildActive)}>
+                              <child.icon className="w-4 h-4" />
+                              <span>{child.title}</span>
+                            </a>
+                          );
+                        })}
                       </div>
                     )}
                   </SidebarMenuItem>
