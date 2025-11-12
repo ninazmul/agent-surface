@@ -13,17 +13,17 @@ import { IUser } from "@/lib/database/models/user.model";
 import { IAdmin } from "@/lib/database/models/admin.model";
 
 type DashboardData = {
-  admins: IAdmin[];
-  resources: IResource[];
-  courses: ICourse[];
-  downloads: IDownload[];
-  eventCalendars: IEventCalendar[];
-  leads: ILead[];
-  profiles: IProfile[];
-  promotions: IPromotion[];
-  services: IServices[];
-  users: IUser[];
-  myProfile: IProfile | null;
+  admins?: IAdmin[];
+  resources?: IResource[];
+  courses?: ICourse[];
+  downloads?: IDownload[];
+  eventCalendars?: IEventCalendar[];
+  leads?: ILead[];
+  profiles?: IProfile[];
+  promotions?: IPromotion[];
+  services?: IServices[];
+  users?: IUser[];
+  myProfile?: IProfile | null;
 };
 
 type DashboardContextType = {
