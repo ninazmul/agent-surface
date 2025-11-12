@@ -12,7 +12,6 @@ import {
 import { IProfile } from "@/lib/database/models/profile.model";
 import { UserButton } from "@clerk/nextjs";
 import {
-  LayoutDashboard,
   Grid,
   ListOrderedIcon,
   FilesIcon,
@@ -34,6 +33,7 @@ import {
   Euro,
   Grid2x2Icon,
   Grid2X2PlusIcon,
+  Home,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -41,7 +41,7 @@ import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const sidebarItems = [
-  { key: "dashboard", title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { key: "dashboard", title: "Dashboard", url: "/", icon: Home },
   {
     key: "leads",
     title: "Leads",
@@ -199,12 +199,9 @@ const HomeSidebar = ({
   return (
     <Sidebar className="font-sans bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-200 border-none">
       <SidebarContent>
-        <SidebarGroup className="space-y-6">
-          <SidebarGroupLabel>
-            <a
-              href={role === "Student" ? "/profile" : "/"}
-              className="flex items-center justify-items-center"
-            >
+        <SidebarGroup className="flex items-center justify-center space-y-6">
+          <SidebarGroupLabel className="flex items-center justify-items-center">
+            <a href={role === "Student" ? "/profile" : "/"}>
               <Image
                 src={
                   theme === "dark"
@@ -218,7 +215,7 @@ const HomeSidebar = ({
               />
             </a>
           </SidebarGroupLabel>
-          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white rounded-xl">
+          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white rounded-xl w-5/6">
             <UserButton
               appearance={{
                 elements: {
@@ -237,7 +234,7 @@ const HomeSidebar = ({
             </div>
           </div>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-1">
+            <SidebarMenu className="space-y-1 px-6">
               {filteredSidebarItems.map((item) => {
                 const isActive =
                   currentPath === item.url ||
