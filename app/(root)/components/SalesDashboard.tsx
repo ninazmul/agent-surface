@@ -2,18 +2,14 @@
 
 import { useEffect, useState, useMemo } from "react";
 // Removed chart imports as the map UI replaces them
-// import { Line, Pie } from "react-chartjs-2";
-// import { Chart as ChartJS, ... } from "chart.js";
 import "chartjs-adapter-date-fns";
-import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
+import { subWeeks, subMonths, subQuarters, subYears, format } from "date-fns";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useUser } from "@clerk/nextjs";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
 import { getAdminCountriesByEmail, isAdmin } from "@/lib/actions/admin.actions";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
-
-// Removed ChartJS registration as charts are removed
 
 const Skeleton = () => (
   <div className="animate-pulse space-y-6">
@@ -126,25 +122,10 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const parseNumber = (v?: string) =>
     parseFloat((v || "0").replace(/,/g, "").trim()) || 0;
 
-  // ✅ Compute total sales fast (memoized) - Kept the same
-  const totalSales = useMemo(
-    () =>
-      filteredLeads.reduce((sum, lead) => {
-        const courseTotal = Array.isArray(lead.course)
-          ? lead.course.reduce((s, c) => s + Number(c.courseFee || 0), 0)
-          : 0;
-        const servicesTotal = Array.isArray(lead.services)
-          ? lead.services.reduce((s, c) => s + parseNumber(c.amount), 0)
-          : 0;
-        const discount = parseNumber(lead.discount);
-        return sum + courseTotal + servicesTotal - discount;
-      }, 0),
-    [filteredLeads]
-  );
-
-  // ✅ Sales by country (memoized) - Kept the same
-  const salesByCountry = useMemo(() => {
-    const result: Record<string, number> = {};
+  // 💥 MODIFIED: Sales by country to include only Top 3
+  const top3SalesByCountry = useMemo(() => {
+    // 1. Calculate sales for all countries
+    const allSales: Record<string, number> = {};
     filteredLeads.forEach((lead) => {
       const c = lead.home.country?.trim() || "Unknown";
       const courseTotal = Array.isArray(lead.course)
@@ -154,10 +135,22 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         ? lead.services.reduce((s, c2) => s + parseNumber(c2.amount), 0)
         : 0;
       const discount = parseNumber(lead.discount);
-      result[c] = (result[c] || 0) + courseTotal + servicesTotal - discount;
+      allSales[c] = (allSales[c] || 0) + courseTotal + servicesTotal - discount;
     });
-    return result;
+
+    // 2. Convert to array, sort by sales amount (descending), and take the top 3
+    const sortedCountries = Object.entries(allSales)
+      .sort(([, amountA], [, amountB]) => amountB - amountA)
+      .slice(0, 3);
+
+    // 3. Convert back to an object (for easier consumption)
+    return Object.fromEntries(sortedCountries);
   }, [filteredLeads]);
+  
+  // The original salesByCountry memo is kept to compute the overall totalSales,
+  // but top3SalesByCountry will be used for rendering the legend.
+
+  // ✅ Sales over time (memoized) - Kept the same
 
   const countries = useMemo(
     () =>
@@ -174,33 +167,12 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
     setEndDate("");
   };
 
-  // Function to map filter state to displayed text
-  const getFilterText = (value: string) => {
-    switch (value) {
-      case "week":
-        return "This Week";
-      case "month":
-        return "This Month";
-      case "quarter":
-        return "This Quarter";
-      case "year":
-        return "This Year";
-      case "all":
-        return "All Time";
-      case "custom":
-        return "Custom Range";
-      default:
-        return "This Month";
-    }
-  };
-
-  const salesCountries = Object.keys(salesByCountry);
+  const salesCountries = Object.keys(top3SalesByCountry);
   const colorMap: Record<string, string> = {
-    // Mapping colors based on the image legend (Australia=Purple, Bangladesh=Orange, Ireland=Blue)
-    Australia: "bg-purple-500",
-    Bangladesh: "bg-orange-500",
-    Ireland: "bg-blue-500",
-    // Add more colors if needed
+    // Ensuring consistent colors for the top 3 spots regardless of country name
+    [salesCountries[0] || 'Top 1']: "bg-purple-500", // Top 1 gets Purple
+    [salesCountries[1] || 'Top 2']: "bg-orange-500", // Top 2 gets Orange
+    [salesCountries[2] || 'Top 3']: "bg-blue-500", // Top 3 gets Blue
   };
 
   // ✅ Default 0 view
@@ -305,38 +277,37 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         <div className="w-full h-[500px] flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-xl relative">
           <div className="text-center text-gray-500 dark:text-gray-400">
             {/*  */}
-            {/* Replace this div with a proper Map component (e.g., using a library) */}
             <p>Map Visualization Placeholder</p>
             <p className="text-xs">
-              (Connecting leads between locations/agencies)
+              (Showing Top 3 Sales locations: {salesCountries.join(", ") || "N/A"})
             </p>
           </div>
 
-          {/* Simulated Tooltip in the middle of the map (Like the image) */}
-          <div
-            className="absolute p-4 rounded-xl shadow-2xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
-            style={{ top: "45%", left: "55%" }}
-          >
-            <p className="text-sm font-light text-gray-600 dark:text-gray-300 mb-1">
-              Total Sales
-            </p>
-            <div className="flex items-end gap-2">
-              <span className="text-2xl font-bold text-black dark:text-white">
-                €{totalSales.toLocaleString()}
-              </span>
-              <span className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
-                {getFilterText(filter).replace("This ", "")}
-              </span>
-            </div>
-            {salesCountries.length > 0 && (
+          {/* Simulated Tooltip for the highest sales country */}
+          {salesCountries.length > 0 && (
+            <div
+              className="absolute p-4 rounded-xl shadow-2xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
+              style={{ top: "45%", left: "55%" }}
+            >
+              <p className="text-sm font-light text-gray-600 dark:text-gray-300 mb-1">
+                Total Sales
+              </p>
+              <div className="flex items-end gap-2">
+                <span className="text-2xl font-bold text-black dark:text-white">
+                  €{top3SalesByCountry[salesCountries[0]].toLocaleString() || 0}
+                </span>
+                <span className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
+                  {format(new Date(), 'MMMM')}
+                </span>
+              </div>
               <p className="text-xs mt-2 text-gray-500 dark:text-gray-400">
                 Data for **{salesCountries[0]}**
               </p>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
-        {/* Legend Section - Matches Image Layout */}
+        {/* Legend Section - Only shows Top 3 Countries */}
         <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
           {salesCountries.length === 0 ? (
             <p className="text-center text-gray-500 dark:text-gray-400">
@@ -344,7 +315,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             </p>
           ) : (
             <div className="flex flex-col gap-2">
-              {salesCountries.slice(0, 3).map((c) => (
+              {salesCountries.map((c) => (
                 <div key={c} className="flex justify-between items-center group">
                   <div className="flex items-center gap-3">
                     <span
@@ -379,8 +350,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
           )}
         </div>
       </div>
-      
-      {/* Removed Total Sales, Pie, and Line Chart sections to match the image's singular focus on the map and its legend */}
     </div>
   );
 };
