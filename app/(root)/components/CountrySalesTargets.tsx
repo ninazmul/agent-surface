@@ -16,7 +16,6 @@ interface CountrySalesTargetsProps {
   profiles: IProfile[];
   leads: ILead[];
   myProfile?: IProfile | null;
-  loading?: boolean;
 }
 
 const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
@@ -24,7 +23,6 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   profiles,
   leads,
   myProfile,
-  loading = false,
 }) => {
   const [filter, setFilter] = useState("month");
   const [startDate, setStartDate] = useState("");
@@ -196,22 +194,6 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     setSelectedCountry("All");
     setSelectedAgency("All");
   };
-
-  if (loading || salesTargetEntries.length === 0) {
-    return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-8 w-1/3 bg-gray-300 dark:bg-gray-700 rounded"></div>
-        <div className="space-y-4">
-          {[...Array(6)].map((_, i) => (
-            <div
-              key={i}
-              className="h-6 bg-gray-300 dark:bg-gray-700 rounded-full"
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   return (
     <section className="">

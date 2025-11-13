@@ -1,9 +1,6 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-// Removed chart imports as the map UI replaces them
-// import { Line, Pie } from "react-chartjs-2";
-// import { Chart as ChartJS, ... } from "chart.js";
 import "chartjs-adapter-date-fns";
 import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -13,26 +10,6 @@ import { getAdminCountriesByEmail, isAdmin } from "@/lib/actions/admin.actions";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
 import Image from "next/image";
-
-// Removed ChartJS registration as charts are removed
-
-const Skeleton = () => (
-  <div className="animate-pulse space-y-6">
-    <div className="h-8 w-1/3 bg-gray-300 dark:bg-gray-800 rounded"></div>
-    <div className="flex flex-wrap gap-4 bg-blue-50 dark:bg-gray-800 p-4 rounded-2xl shadow">
-      {[...Array(3)].map((_, i) => (
-        <div
-          key={i}
-          className="h-10 w-32 bg-gray-300 dark:bg-gray-500 rounded"
-        ></div>
-      ))}
-    </div>
-    <div className="bg-green-50 dark:bg-gray-800 shadow rounded-2xl p-6">
-      <div className="h-6 w-32 bg-gray-300 dark:bg-gray-500 rounded mb-4"></div>
-      <div className="h-10 w-24 bg-gray-300 dark:bg-gray-500 rounded"></div>
-    </div>
-  </div>
-);
 
 interface SalesDashboardProps {
   leads: ILead[];
@@ -45,7 +22,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const [country, setCountry] = useState("All");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [loading, setLoading] = useState(true);
   const { dashboardData, setDashboardData } = useDashboardData();
 
   // ✅ Fetch leads only once (kept the same)
@@ -88,13 +64,10 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         });
       } catch (err) {
         console.error("Sales data load error:", err);
-      } finally {
-        setLoading(false);
       }
     };
 
     if (!dashboardData?.leads?.length) fetchData();
-    else setLoading(false);
   }, [dashboardData, setDashboardData, userId]);
 
   // ✅ Date filter logic (memoized) - Kept the same
@@ -203,9 +176,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
     Ireland: "bg-blue-500",
     // Add more colors if needed
   };
-
-  // ✅ Default 0 view
-  if (loading) return <Skeleton />;
 
   return (
     <div className="p-4">
