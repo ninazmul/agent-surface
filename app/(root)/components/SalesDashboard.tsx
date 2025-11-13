@@ -3,8 +3,13 @@
 import { useEffect, useState, useMemo } from "react";
 import "chartjs-adapter-date-fns";
 import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
+import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
+import { Tooltip } from "react-tooltip";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
+
+const geoUrl =
+  "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
 
 const Skeleton = () => (
   <div className="animate-pulse space-y-6">
@@ -34,18 +39,15 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const [endDate, setEndDate] = useState("");
   const [loading, setLoading] = useState(true);
 
-  // ✅ Prefer context data, fallback to props
   const allLeads = useMemo(
-    () => dashboardData?.leads?.length ? dashboardData.leads : leads,
+    () => (dashboardData?.leads?.length ? dashboardData.leads : leads),
     [dashboardData?.leads, leads]
   );
 
-  // ✅ Stop loading only after we have leads
   useEffect(() => {
     if (allLeads?.length > 0) setLoading(false);
   }, [allLeads]);
 
-  // ✅ Memoized filter logic
   const filteredLeads = useMemo(() => {
     const now = new Date();
     const rangeStart =
@@ -74,21 +76,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const parseNumber = (v?: string) =>
     parseFloat((v || "0").replace(/,/g, "").trim()) || 0;
 
-  const totalSales = useMemo(
-    () =>
-      filteredLeads.reduce((sum, lead) => {
-        const courseTotal = Array.isArray(lead.course)
-          ? lead.course.reduce((s, c) => s + Number(c.courseFee || 0), 0)
-          : 0;
-        const servicesTotal = Array.isArray(lead.services)
-          ? lead.services.reduce((s, c) => s + parseNumber(c.amount), 0)
-          : 0;
-        const discount = parseNumber(lead.discount);
-        return sum + courseTotal + servicesTotal - discount;
-      }, 0),
-    [filteredLeads]
-  );
-
   const salesByCountry = useMemo(() => {
     const result: Record<string, number> = {};
     filteredLeads.forEach((lead) => {
@@ -107,9 +94,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
 
   const countries = useMemo(
     () =>
-      Array.from(
-        new Set((allLeads || []).map((l) => l.home.country || "Unknown"))
-      ),
+      Array.from(new Set((allLeads || []).map((l) => l.home.country || "Unknown"))),
     [allLeads]
   );
 
@@ -120,23 +105,16 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
     setEndDate("");
   };
 
-  const getFilterText = (value: string) => {
-    switch (value) {
-      case "week": return "This Week";
-      case "month": return "This Month";
-      case "quarter": return "This Quarter";
-      case "year": return "This Year";
-      case "all": return "All Time";
-      case "custom": return "Custom Range";
-      default: return "This Month";
-    }
+  const colorMap: Record<string, string> = {
+    Australia: "#9b59b6",
+    Bangladesh: "#e67e22",
+    Ireland: "#3498db",
   };
 
-  const salesCountries = Object.keys(salesByCountry);
-  const colorMap: Record<string, string> = {
-    Australia: "bg-purple-500",
-    Bangladesh: "bg-orange-500",
-    Ireland: "bg-blue-500",
+  const coords: Record<string, [number, number]> = {
+    Bangladesh: [90.3563, 23.685],
+    Australia: [133.7751, -25.2744],
+    Ireland: [-8.2439, 53.4129],
   };
 
   if (loading) return <Skeleton />;
@@ -199,7 +177,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         </div>
       </div>
 
-      {/* Custom range */}
+      {/* Custom date range */}
       {filter === "custom" && (
         <div className="flex gap-4 mb-6 items-center bg-gray-50 dark:bg-gray-900 p-4 rounded-xl shadow">
           <label className="text-gray-700 dark:text-gray-300">From:</label>
@@ -225,60 +203,51 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         </div>
       )}
 
-      {/* Map placeholder */}
+      {/* Map Visualization */}
       <div className="relative bg-white dark:bg-gray-900 shadow-xl rounded-2xl p-4 mb-6 overflow-hidden">
-        <div className="w-full h-[500px] flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-xl relative">
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            <p>Map Visualization Placeholder</p>
-            <p className="text-xs">(Connecting leads between locations/agencies)</p>
-          </div>
+        <ComposableMap
+          projectionConfig={{ scale: 150 }}
+          className="w-full h-[500px]"
+        >
+          <ZoomableGroup>
+            <Geographies geography={geoUrl}>
+              {({ geographies }) =>
+                geographies.map((geo) => (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill="#EAEAEC"
+                    stroke="#D6D6DA"
+                    className="dark:fill-gray-800 dark:stroke-gray-700"
+                  />
+                ))
+              }
+            </Geographies>
 
-          <div
-            className="absolute p-4 rounded-xl shadow-2xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
-            style={{ top: "45%", left: "55%" }}
-          >
-            <p className="text-sm font-light text-gray-600 dark:text-gray-300 mb-1">
-              Total Sales
-            </p>
-            <div className="flex items-end gap-2">
-              <span className="text-2xl font-bold text-black dark:text-white">
-                €{totalSales.toLocaleString()}
-              </span>
-              <span className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
-                {getFilterText(filter).replace("This ", "")}
-              </span>
-            </div>
-            {salesCountries.length > 0 && (
-              <p className="text-xs mt-2 text-gray-500 dark:text-gray-400">
-                Data for {salesCountries[0]}
-              </p>
-            )}
-          </div>
-        </div>
+            {Object.keys(salesByCountry).map((country) => {
+              const [lon, lat] = coords[country] || [0, 0];
+              const total = salesByCountry[country];
+              const color = colorMap[country] || "#6b7280";
+              const radius = Math.min(20, Math.max(5, total / 2000)); // scalable dot size
 
-        {/* Legend */}
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-          {salesCountries.length === 0 ? (
-            <p className="text-center text-gray-500 dark:text-gray-400">
-              No sales data for the current filters.
-            </p>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {salesCountries.slice(0, 3).map((c) => (
-                <div key={c} className="flex justify-between items-center">
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`h-4 w-4 rounded-full ${colorMap[c] || "bg-gray-500"}`}
-                    ></span>
-                    <span className="font-semibold text-gray-800 dark:text-gray-200">
-                      {c}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+              return (
+                <Marker key={country} coordinates={[lon, lat]}>
+                  <circle
+                    data-tooltip-id="map-tooltip"
+                    data-tooltip-content={`${country}: €${total.toLocaleString()}`}
+                    r={radius}
+                    fill={color}
+                    stroke="#fff"
+                    strokeWidth={1.5}
+                    className="cursor-pointer transition-transform hover:scale-125"
+                  />
+                </Marker>
+              );
+            })}
+          </ZoomableGroup>
+        </ComposableMap>
+
+        <Tooltip id="map-tooltip" place="top" />
       </div>
     </div>
   );
