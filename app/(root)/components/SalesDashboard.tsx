@@ -292,7 +292,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
       )}
 
       {/* Map Simulation Section - Replaces Pie and Line Charts */}
-      <div className="relative bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden">
+      <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden">
         {/* Placeholder for the Map (using the image as a conceptual guide) */}
         <div className="relative w-full h-[300px] rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
           <Image
@@ -371,7 +371,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         )}
       </div>
 
-      {/* Removed Total Sales, Pie, and Line Chart sections to match the image's singular focus on the map and its legend */}
     </div>
   );
 };
