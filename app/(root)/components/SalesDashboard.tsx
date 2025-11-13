@@ -12,6 +12,7 @@ import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
 import { getAdminCountriesByEmail, isAdmin } from "@/lib/actions/admin.actions";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
+import Image from "next/image";
 
 // Removed ChartJS registration as charts are removed
 
@@ -304,12 +305,13 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         {/* Placeholder for the Map (using the image as a conceptual guide) */}
         <div className="w-full h-[500px] flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-xl relative">
           <div className="text-center text-gray-500 dark:text-gray-400">
-            {/*  */}
-            {/* Replace this div with a proper Map component (e.g., using a library) */}
-            <p>Map Visualization Placeholder</p>
-            <p className="text-xs">
-              (Connecting leads between locations/agencies)
-            </p>
+            <Image
+              src={"/assets/map.jpg"}
+              alt="Map"
+              width={500}
+              height={500}
+              className="w-full object-cover"
+            />
           </div>
 
           {/* Simulated Tooltip in the middle of the map (Like the image) */}
@@ -345,7 +347,10 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
           ) : (
             <div className="flex flex-col gap-2">
               {salesCountries.slice(0, 3).map((c) => (
-                <div key={c} className="flex justify-between items-center group">
+                <div
+                  key={c}
+                  className="flex justify-between items-center group"
+                >
                   <div className="flex items-center gap-3">
                     <span
                       className={`h-4 w-4 rounded-full ${
@@ -379,7 +384,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
           )}
         </div>
       </div>
-      
+
       {/* Removed Total Sales, Pie, and Line Chart sections to match the image's singular focus on the map and its legend */}
     </div>
   );

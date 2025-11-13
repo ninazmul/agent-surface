@@ -40,7 +40,7 @@ export default async function Layout({
       <Toaster />
       <main className="flex-1 h-screen mx-auto overflow-y-auto">
         <div
-          className={`flex justify-between items-center p-4 w-full-10 text-white no-print bg-gray-50 border`}
+          className={`flex justify-between items-center text-white no-print bg-gray-50 border`}
         >
           <div className="flex items-center justify-start">
             <SidebarTrigger />
@@ -62,7 +62,7 @@ export default async function Layout({
             </SignedIn>
           </div>
         </div>
-        <div className="p-2">{children}</div>
+        <div>{children}</div>
       </main>
     </SidebarProvider>
   );
