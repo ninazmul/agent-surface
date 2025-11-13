@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  useState,
-  useMemo,
-  useCallback,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useState, useMemo, useCallback } from "react";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { ILead } from "@/lib/database/models/lead.model";
 import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
@@ -29,36 +23,6 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   const [endDate, setEndDate] = useState("");
   const [selectedCountry, setSelectedCountry] = useState("All");
   const [selectedAgency, setSelectedAgency] = useState("All");
-
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Auto scroll effect
-  useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    let scrollInterval: NodeJS.Timeout;
-    let scrollDirection = 1; // 1 = down, -1 = up
-
-    const startAutoScroll = () => {
-      scrollInterval = setInterval(() => {
-        if (!container) return;
-        container.scrollTop += scrollDirection * 0.7; // adjust speed here
-        // Reverse scroll when reaching edges
-        if (
-          container.scrollTop + container.clientHeight >=
-          container.scrollHeight - 1
-        ) {
-          scrollDirection = -1;
-        } else if (container.scrollTop <= 0) {
-          scrollDirection = 1;
-        }
-      }, 20);
-    };
-
-    startAutoScroll();
-    return () => clearInterval(scrollInterval);
-  }, []);
 
   const parseNumber = (value: string | number | undefined) =>
     parseFloat((value || 0).toString().replace(/,/g, "").trim()) || 0;
@@ -196,7 +160,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   };
 
   return (
-    <section className="">
+    <section>
       <div className="flex flex-wrap justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Sales Target by Country
@@ -270,10 +234,8 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
         )}
       </div>
 
-      <div
-        ref={scrollRef}
-        className="relative bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden divide-y divide-gray-100 dark:divide-gray-700 h-[460px] overflow-y-auto scroll-smooth"
-      >
+      {/* Scrollable Section */}
+      <div className="relative bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden divide-y divide-gray-100 dark:divide-gray-700 h-[460px] overflow-y-auto scroll-smooth">
         {salesTargetEntries.map(([country, target]) => {
           const targetNum = parseNumber(target);
           const sales = salesByCountry[country] || 0;
