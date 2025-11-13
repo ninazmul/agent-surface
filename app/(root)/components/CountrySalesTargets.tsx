@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { Card } from "@/components/ui/card";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { ILead } from "@/lib/database/models/lead.model";
 import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
@@ -70,7 +69,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     [filter, startDate, endDate]
   );
 
-  // Memoized filtered leads to improve performance
+  // Filtered leads
   const filteredLeads = useMemo(() => {
     const acceptedLeads = leads.filter((l) => l.paymentStatus === "Accepted");
     const dateFiltered = adminStatus
@@ -97,7 +96,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     myProfile?.country,
   ]);
 
-  // Memoized sales target calculation
+  // Sales target by country
   const salesTargetByCountry = useMemo(() => {
     const relevantProfiles = adminStatus
       ? profiles
@@ -113,7 +112,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     }, {});
   }, [profiles, adminStatus, myProfile]);
 
-  // Memoized actual sales calculation
+  // Actual sales by country
   const salesByCountry = useMemo(() => {
     return filteredLeads.reduce<Record<string, number>>((acc, lead) => {
       if (!lead.home.country) return acc;
@@ -131,6 +130,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     }, {});
   }, [filteredLeads]);
 
+  // Build entries
   const salesTargetEntries = adminStatus
     ? Object.entries(salesTargetByCountry)
     : myProfile
@@ -169,12 +169,9 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     return (
       <div className="space-y-6 animate-pulse">
         <div className="h-8 w-1/3 bg-gray-300 dark:bg-gray-700 rounded"></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="space-y-4">
           {[...Array(6)].map((_, i) => (
-            <Card
-              key={i}
-              className="p-4 bg-gray-300 dark:bg-gray-700 rounded-2xl h-24"
-            />
+            <div key={i} className="h-6 bg-gray-300 dark:bg-gray-700 rounded-full" />
           ))}
         </div>
       </div>
@@ -189,96 +186,98 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     );
   }
 
+  // ==================== UI SECTION ====================
   return (
-    <section>
-      <h2 className="text-2xl font-bold mb-6 flex items-center gap-2 text-gray-800 dark:text-gray-100">
-        Sales Target <span>{adminStatus && " by Country"}</span>
-      </h2>
+    <section className="bg-gray-50 dark:bg-gray-900 p-6 rounded-2xl shadow-sm">
+      <div className="flex flex-wrap justify-between items-center mb-6">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          Sales Target by Country
+        </h2>
 
-      {adminStatus && (
-        <div className="flex flex-wrap gap-4 mb-6 items-center bg-lime-50 dark:bg-gray-800 p-4 rounded-2xl shadow">
-          <select
-            className="border px-4 py-2 rounded-2xl bg-lime-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-            onChange={(e) => setFilter(e.target.value)}
-            value={filter}
-          >
-            <option value="week">This Week</option>
-            <option value="month">This Month</option>
-            <option value="quarter">This Quarter</option>
-            <option value="year">This Year</option>
-            <option value="all">All Time</option>
-            <option value="custom">Custom Range</option>
-          </select>
+        {adminStatus && (
+          <div className="flex flex-wrap gap-2 items-center bg-white dark:bg-gray-800 p-3 rounded-full shadow-sm">
+            <select
+              className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              onChange={(e) => setFilter(e.target.value)}
+              value={filter}
+            >
+              <option value="week">This Week</option>
+              <option value="month">This Month</option>
+              <option value="quarter">This Quarter</option>
+              <option value="year">This Year</option>
+              <option value="all">All Time</option>
+              <option value="custom">Custom Range</option>
+            </select>
 
-          {filter === "custom" && (
-            <>
-              <input
-                type="date"
-                className="border px-4 py-2 rounded-2xl bg-lime-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-              />
-              <input
-                type="date"
-                className="border px-4 py-2 rounded-2xl bg-lime-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-              />
-            </>
-          )}
+            {filter === "custom" && (
+              <>
+                <input
+                  type="date"
+                  className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                />
+                <input
+                  type="date"
+                  className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                />
+              </>
+            )}
 
-          <select
-            className="border px-4 py-2 rounded-2xl bg-lime-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-            onChange={(e) => setSelectedCountry(e.target.value)}
-            value={selectedCountry}
-          >
-            <option value="All">All Countries</option>
-            {countriesList.map((c) => (
-              <option key={c} value={c}>
-                {c}
-              </option>
-            ))}
-          </select>
+            <select
+              className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              onChange={(e) => setSelectedCountry(e.target.value)}
+              value={selectedCountry}
+            >
+              <option value="All">All Countries</option>
+              {countriesList.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
 
-          <select
-            className="border px-4 py-2 rounded-2xl bg-lime-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-            onChange={(e) => setSelectedAgency(e.target.value)}
-            value={selectedAgency}
-          >
-            <option value="All">All Agencies</option>
-            {agenciesList.map((a) => (
-              <option key={a.email} value={a.email}>
-                {a.name}
-              </option>
-            ))}
-          </select>
+            <select
+              className="px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              onChange={(e) => setSelectedAgency(e.target.value)}
+              value={selectedAgency}
+            >
+              <option value="All">All Agencies</option>
+              {agenciesList.map((a) => (
+                <option key={a.email} value={a.email}>
+                  {a.name}
+                </option>
+              ))}
+            </select>
 
-          <button
-            className="bg-red-500 dark:bg-red-600 text-white px-4 py-2 rounded-2xl hover:bg-red-600 dark:hover:bg-red-700 transition"
-            onClick={handleResetFilters}
-          >
-            Reset Filters
-          </button>
-        </div>
-      )}
+            <button
+              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-full transition"
+              onClick={handleResetFilters}
+            >
+              Reset Filters
+            </button>
+          </div>
+        )}
+      </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* Sales Target List */}
+      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm divide-y divide-gray-100 dark:divide-gray-700">
         {salesTargetEntries.map(([country, target]) => {
           const targetNum = parseNumber(target);
           const sales = salesByCountry[country] || 0;
           const progress =
             targetNum > 0 ? Math.min((sales / targetNum) * 100, 100) : 0;
+          const barColor = progress > 0 ? "bg-orange-400" : "bg-gray-300";
 
           return (
-            <Card
-              key={country}
-              className="p-4 bg-lime-50 dark:bg-gray-800 rounded-2xl shadow"
-              role="region"
-              aria-label={`Sales progress for ${country}`}
-            >
-              <div className="flex justify-between mb-1 text-gray-800 dark:text-gray-200">
-                <span className="font-semibold">{country}</span>
-                <span>
+            <div key={country} className="py-4">
+              <div className="flex justify-between items-center mb-1">
+                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                  {country}
+                </span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">
                   {sales.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -291,21 +290,22 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
                   €
                 </span>
               </div>
-              <div className="w-full bg-lime-300 dark:bg-gray-500 rounded-full h-4">
+
+              <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
                 <div
-                  className="bg-green-500 dark:bg-lime-500 h-4 rounded-full transition-all duration-500"
+                  className={`${barColor} h-4 rounded-full transition-all duration-500`}
                   style={{ width: `${progress}%` }}
-                  aria-valuenow={progress}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  role="progressbar"
-                  aria-label={`${progress.toFixed(1)} percent achieved`}
                 />
               </div>
-              <div className="text-xs text-gray-600 dark:text-gray-300 mt-1">
+
+              <div
+                className={`text-xs mt-1 ${
+                  progress > 0 ? "text-orange-500" : "text-blue-500"
+                }`}
+              >
                 {progress.toFixed(1)}% achieved
               </div>
-            </Card>
+            </div>
           );
         })}
       </div>
