@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, {
+  useState,
+  useMemo,
+  useCallback,
+  useEffect,
+  useRef,
+} from "react";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { ILead } from "@/lib/database/models/lead.model";
 import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
@@ -26,10 +32,40 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   const [selectedCountry, setSelectedCountry] = useState("All");
   const [selectedAgency, setSelectedAgency] = useState("All");
 
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto scroll effect
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    let scrollInterval: NodeJS.Timeout;
+    let scrollDirection = 1; // 1 = down, -1 = up
+
+    const startAutoScroll = () => {
+      scrollInterval = setInterval(() => {
+        if (!container) return;
+        container.scrollTop += scrollDirection * 0.7; // adjust speed here
+        // Reverse scroll when reaching edges
+        if (
+          container.scrollTop + container.clientHeight >=
+          container.scrollHeight - 1
+        ) {
+          scrollDirection = -1;
+        } else if (container.scrollTop <= 0) {
+          scrollDirection = 1;
+        }
+      }, 20);
+    };
+
+    startAutoScroll();
+    return () => clearInterval(scrollInterval);
+  }, []);
+
   const parseNumber = (value: string | number | undefined) =>
     parseFloat((value || 0).toString().replace(/,/g, "").trim()) || 0;
 
-  const filterByDateRange = React.useCallback(
+  const filterByDateRange = useCallback(
     (data: ILead[]) => {
       if (filter === "custom" && startDate && endDate) {
         const start = new Date(startDate);
@@ -69,7 +105,6 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     [filter, startDate, endDate]
   );
 
-  // Filtered leads
   const filteredLeads = useMemo(() => {
     const acceptedLeads = leads.filter((l) => l.paymentStatus === "Accepted");
     const dateFiltered = adminStatus
@@ -96,7 +131,6 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     myProfile?.country,
   ]);
 
-  // Sales target by country
   const salesTargetByCountry = useMemo(() => {
     const relevantProfiles = adminStatus
       ? profiles
@@ -112,7 +146,6 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     }, {});
   }, [profiles, adminStatus, myProfile]);
 
-  // Actual sales by country
   const salesByCountry = useMemo(() => {
     return filteredLeads.reduce<Record<string, number>>((acc, lead) => {
       if (!lead.home.country) return acc;
@@ -130,7 +163,6 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     }, {});
   }, [filteredLeads]);
 
-  // Build entries
   const salesTargetEntries = adminStatus
     ? Object.entries(salesTargetByCountry)
     : myProfile
@@ -165,7 +197,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     setSelectedAgency("All");
   };
 
-  if (loading) {
+  if (loading || salesTargetEntries.length === 0) {
     return (
       <div className="space-y-6 animate-pulse">
         <div className="h-8 w-1/3 bg-gray-300 dark:bg-gray-700 rounded"></div>
@@ -181,17 +213,8 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     );
   }
 
-  if (salesTargetEntries.length === 0) {
-    return (
-      <p className="text-center text-gray-600 dark:text-gray-300 mt-4">
-        No sales data available.
-      </p>
-    );
-  }
-
-  // ==================== UI SECTION ====================
   return (
-    <section className="h-[500px] overflow-y-hidden scroll-auto">
+    <section className="h-[500px] overflow-hidden relative">
       <div className="flex flex-wrap justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Sales Target by Country
@@ -265,8 +288,10 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
         )}
       </div>
 
-      {/* Sales Target List */}
-      <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm divide-y divide-gray-100 dark:divide-gray-700">
+      <div
+        ref={scrollRef}
+        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm divide-y divide-gray-100 dark:divide-gray-700 h-[400px] overflow-y-auto scroll-smooth"
+      >
         {salesTargetEntries.map(([country, target]) => {
           const targetNum = parseNumber(target);
           const sales = salesByCountry[country] || 0;
