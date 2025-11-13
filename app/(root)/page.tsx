@@ -370,7 +370,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="space-y-10 bg-gray-50 dark:bg-gray-900">
+    <div className="space-y-10 bg-gray-50 dark:bg-gray-900 p-2">
       <div className="grid grid-cols-1 md:grid-cols-2 h-[550px]">
         {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
         {myProfile?.role !== "Student" && (
