@@ -290,7 +290,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
 
       <div
         ref={scrollRef}
-        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm divide-y divide-gray-100 dark:divide-gray-700 h-[400px] overflow-y-auto scroll-smooth"
+        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm divide-y divide-gray-100 dark:divide-gray-700 h-full overflow-y-auto scroll-smooth"
       >
         {salesTargetEntries.map(([country, target]) => {
           const targetNum = parseNumber(target);
