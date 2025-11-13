@@ -1,54 +1,51 @@
 import { Button } from "@/components/ui/button";
 import JsonToExcel from "../components/JsonToExcel";
 import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { File, Plus } from "lucide-react";
-
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
+import LeadTable from "../components/LeadTable";
 import {
   getAdminCountriesByEmail,
   getAdminRolePermissionsByEmail,
   isAdmin,
 } from "@/lib/actions/admin.actions";
-
-import LeadTable from "../components/LeadTable";
-import SendRemindersButton from "@/components/shared/SendRemindersButton";
+import { redirect } from "next/navigation";
 import { ILead } from "@/lib/database/models/lead.model";
+import { File, Plus } from "lucide-react";
+import SendRemindersButton from "@/components/shared/SendRemindersButton";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
   const userId = sessionClaims?.userId as string;
+  const email = await getUserEmailById(userId);
+  const adminStatus = await isAdmin(email);
+  const adminCountry = await getAdminCountriesByEmail(email);
+  const rolePermissions = await getAdminRolePermissionsByEmail(email);
+  const myProfile = await getProfileByEmail(email);
 
-  // Parallel fetch for better performance
-  const [email, adminStatus, adminCountry, rolePermissions, myProfile] =
-    await Promise.all([
-      getUserEmailById(userId),
-      isAdmin(userId),
-      getAdminCountriesByEmail(userId),
-      getAdminRolePermissionsByEmail(userId),
-      getProfileByEmail(userId),
-    ]);
+  if (!adminStatus && myProfile?.role === "Student") {
+    redirect("/profile");
+  }
 
-  // Redirect logic (unchanged)
-  if (!adminStatus && myProfile?.role === "Student") redirect("/profile");
-  if (adminStatus && !rolePermissions.includes("leads")) redirect("/");
+  if (adminStatus && !rolePermissions.includes("leads")) {
+    redirect("/");
+  }
 
   let leads: ILead[] = [];
 
   if (adminStatus) {
-    // ✅ Keep logic same: fetch all then filter by adminCountry if defined
     const allLeads = await getAllLeads();
+
     leads =
       adminCountry.length === 0
         ? allLeads
-        : allLeads.filter((lead: ILead) =>
-            adminCountry.includes(lead.home.country)
+        : allLeads.filter((r: ILead) =>
+            adminCountry.includes(r.home.country)
           );
   } else {
-    // ✅ Same logic, but avoid re-fetching profile redundantly
-    const agentEmails = [email, ...(myProfile?.subAgents || [])];
+    const profile = await getProfileByEmail(email);
+    const agentEmails = [email, ...(profile?.subAgents || [])];
 
     const allLeads = await Promise.all(
       agentEmails.map((agent) => getLeadsByAgency(agent))
@@ -58,47 +55,47 @@ const Page = async () => {
   }
 
   return (
-    <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
-      {/* Header + Actions */}
-      <div className="flex justify-between items-center gap-4">
-        {/* Title and Export */}
-        <div className="flex items-center gap-2">
-          <h3 className="h3-bold text-center sm:text-left">All Leads</h3>
-          <JsonToExcel data={leads} fileName="leads.xlsx" />
+    <>
+      <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
+        {/* Header + Actions */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
+          {/* Title and Export */}
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+            <h3 className="h3-bold text-center sm:text-left">All Leads</h3>
+            <JsonToExcel data={leads} fileName="leads.xlsx" />
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+            <a href={"/leads/create"} className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                className="rounded-full w-full flex items-center gap-2 justify-center"
+              >
+                <Plus /> Add Lead
+              </Button>
+            </a>
+
+            <a href={"/leads/create/bulk-import"} className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                className="rounded-full w-full flex items-center gap-2 justify-center"
+              >
+                <File /> Import Leads
+              </Button>
+            </a>
+
+            {/* Daily Reminder Button */}
+            {adminStatus && <SendRemindersButton />}
+          </div>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2">
-          <a href={"/leads/create"}>
-            <Button
-              size="sm"
-              className="rounded-full flex items-center gap-2 justify-center"
-            >
-              <Plus className="h-4 w-4" />
-              <span className="hidden lg:inline">Add Lead</span>
-            </Button>
-          </a>
-
-          <a href={"/leads/create/bulk-import"}>
-            <Button
-              size="sm"
-              className="rounded-full flex items-center gap-2 justify-center"
-            >
-              <File className="h-4 w-4" />
-              <span className="hidden lg:inline">Import Leads</span>
-            </Button>
-          </a>
-
-          {/* Daily Reminder Button */}
-          {adminStatus && <SendRemindersButton />}
+        {/* Table */}
+        <div className="overflow-x-auto my-8">
+          <LeadTable leads={leads} isAdmin={adminStatus} email={email} />
         </div>
-      </div>
-
-      {/* Table */}
-      <div className="overflow-x-auto my-8">
-        <LeadTable leads={leads} isAdmin={adminStatus} email={email} />
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 

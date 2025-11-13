@@ -422,7 +422,7 @@ const LeadTable = ({
   return (
     <div className="space-y-6">
       {/* --- Filters --- */}
-      <div className="flex flex-col lg:flex-row gap-3 items-center">
+      <div className="flex flex-col sm:flex-row gap-3 items-center">
         <Input
           placeholder="Search leads..."
           value={searchQuery}
@@ -430,38 +430,36 @@ const LeadTable = ({
           className="w-full sm:max-w-md rounded-2xl"
         />
 
-        <div className="flex items-center justify-between gap-2">
-          {/* Promotion Type Filter */}
-          <select
-            value={promotionFilter}
-            onChange={(e) =>
-              setPromotionFilter(
-                e.target.value as "all" | "promotion" | "general"
-              )
-            }
-            className="border rounded-2xl px-1 md:px-3 py-2 text-sm"
-          >
-            <option value="all">All Leads</option>
-            <option value="promotion">Promotion Leads</option>
-            <option value="general">General Leads</option>
-          </select>
+        {/* Promotion Type Filter */}
+        <select
+          value={promotionFilter}
+          onChange={(e) =>
+            setPromotionFilter(
+              e.target.value as "all" | "promotion" | "general"
+            )
+          }
+          className="border rounded-2xl px-3 py-2 text-sm"
+        >
+          <option value="all">All Leads</option>
+          <option value="promotion">Promotion Leads</option>
+          <option value="general">General Leads</option>
+        </select>
 
-          {/* --- NEW: Promotion SKU Filter --- */}
-          {isAdmin && (
-            <select
-              value={promotionSkuFilter}
-              onChange={(e) => setPromotionSkuFilter(e.target.value)}
-              className="border rounded-2xl px-1 md:px-3 py-2 text-sm"
-            >
-              <option value="all">All Promotions</option>
-              {promotions.map((promo) => (
-                <option key={promo.sku} value={promo.sku}>
-                  {promo.title}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
+        {/* --- NEW: Promotion SKU Filter --- */}
+        {isAdmin && (
+          <select
+            value={promotionSkuFilter}
+            onChange={(e) => setPromotionSkuFilter(e.target.value)}
+            className="border rounded-2xl px-3 py-2 text-sm"
+          >
+            <option value="all">All Promotions</option>
+            {promotions.map((promo) => (
+              <option key={promo.sku} value={promo.sku}>
+                {promo.title}
+              </option>
+            ))}
+          </select>
+        )}
       </div>
 
       <div

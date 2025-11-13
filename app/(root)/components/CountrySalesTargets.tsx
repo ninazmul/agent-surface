@@ -191,7 +191,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
 
   // ==================== UI SECTION ====================
   return (
-    <section className="bg-gray-50 dark:bg-gray-900 p-6 rounded-2xl shadow-sm h-[450px] overflow-y-hidden scroll-auto">
+    <section className="h-[500px] overflow-y-hidden scroll-auto">
       <div className="flex flex-wrap justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Sales Target by Country
