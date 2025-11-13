@@ -6,6 +6,7 @@ import { SignedIn, UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import {
+  getAdminByEmail,
   getAdminRolePermissionsByEmail,
   isAdmin,
 } from "@/lib/actions/admin.actions";
@@ -23,6 +24,7 @@ export default async function Layout({
   const userId = sessionClaims?.userId as string;
   const email = await getUserEmailById(userId);
   const adminStatus = await isAdmin(email);
+  const admin = await getAdminByEmail(email);
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
@@ -32,6 +34,8 @@ export default async function Layout({
         rolePermissions={rolePermissions}
         isAdmin={adminStatus}
         role={myProfile?.role}
+        profile={myProfile}
+        admin={admin}
       />
       <Toaster />
       <main className="flex-1 h-screen mx-auto overflow-y-auto">
