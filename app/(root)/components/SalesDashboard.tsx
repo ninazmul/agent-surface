@@ -1,15 +1,14 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import "chartjs-adapter-date-fns";
-import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
 import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
 import { Tooltip } from "react-tooltip";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
+import countriesData from "world-countries"; // npm install world-countries
+import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
 
-const geoUrl =
-  "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
+const geoUrl = "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
 
 const Skeleton = () => (
   <div className="animate-pulse space-y-6">
@@ -27,12 +26,11 @@ const Skeleton = () => (
 );
 
 interface SalesDashboardProps {
-  leads?: ILead[];
+  leads: ILead[];
 }
 
 const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const { dashboardData } = useDashboardData();
-
   const [filter, setFilter] = useState("month");
   const [country, setCountry] = useState("All");
   const [startDate, setStartDate] = useState("");
@@ -92,30 +90,26 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
     return result;
   }, [filteredLeads]);
 
+  const countryCoords = useMemo(() => {
+    const map: Record<string, [number, number]> = {};
+    Object.keys(salesByCountry).forEach((c) => {
+      const countryInfo = countriesData.find(
+        (cd) => cd.name.common.toLowerCase() === c.toLowerCase()
+      );
+      if (countryInfo) {
+        const [lat, lon] = countryInfo.latlng;
+        map[c] = [lon, lat];
+      } else {
+        map[c] = [0, 0];
+      }
+    });
+    return map;
+  }, [salesByCountry]);
+
   const countries = useMemo(
-    () =>
-      Array.from(new Set((allLeads || []).map((l) => l.home.country || "Unknown"))),
+    () => Array.from(new Set(allLeads.map((l) => l.home.country || "Unknown"))),
     [allLeads]
   );
-
-  const handleResetFilters = () => {
-    setFilter("month");
-    setCountry("All");
-    setStartDate("");
-    setEndDate("");
-  };
-
-  const colorMap: Record<string, string> = {
-    Australia: "#9b59b6",
-    Bangladesh: "#e67e22",
-    Ireland: "#3498db",
-  };
-
-  const coords: Record<string, [number, number]> = {
-    Bangladesh: [90.3563, 23.685],
-    Australia: [133.7751, -25.2744],
-    Ireland: [-8.2439, 53.4129],
-  };
 
   if (loading) return <Skeleton />;
 
@@ -127,57 +121,44 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
           Sales & Performance Analytics
         </h1>
         <div className="flex items-center gap-2">
-          {/* Filter dropdown */}
-          <div className="relative">
-            <select
-              className="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-4 pr-8 text-sm font-semibold focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              onChange={(e) => setFilter(e.target.value)}
-              value={filter}
-            >
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="quarter">This Quarter</option>
-              <option value="year">This Year</option>
-              <option value="all">All Time</option>
-              <option value="custom">Custom Range</option>
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
-              <svg
-                className="fill-current h-4 w-4 text-gray-700 dark:text-gray-300"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
-          </div>
+          <select
+            className="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-4 pr-8 text-sm font-semibold focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            onChange={(e) => setFilter(e.target.value)}
+            value={filter}
+          >
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="quarter">This Quarter</option>
+            <option value="year">This Year</option>
+            <option value="all">All Time</option>
+            <option value="custom">Custom Range</option>
+          </select>
 
-          {/* Country dropdown */}
-          <div className="relative">
-            <select
-              className="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-4 pr-8 text-sm font-semibold focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              onChange={(e) => setCountry(e.target.value)}
-              value={country}
-            >
-              <option value="All">All Locations</option>
-              {countries.map((c) => (
-                <option key={c}>{c}</option>
-              ))}
-            </select>
-            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2">
-              <svg
-                className="fill-current h-4 w-4 text-gray-700 dark:text-gray-300"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-              >
-                <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-              </svg>
-            </div>
-          </div>
+          <select
+            className="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-4 pr-8 text-sm font-semibold focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            onChange={(e) => setCountry(e.target.value)}
+            value={country}
+          >
+            <option value="All">All Locations</option>
+            {countries.map((c) => (
+              <option key={c}>{c}</option>
+            ))}
+          </select>
+
+          <button
+            onClick={() => {
+              setFilter("month");
+              setCountry("All");
+              setStartDate("");
+              setEndDate("");
+            }}
+            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+          >
+            Reset
+          </button>
         </div>
       </div>
 
-      {/* Custom date range */}
       {filter === "custom" && (
         <div className="flex gap-4 mb-6 items-center bg-gray-50 dark:bg-gray-900 p-4 rounded-xl shadow">
           <label className="text-gray-700 dark:text-gray-300">From:</label>
@@ -194,21 +175,12 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             onChange={(e) => setEndDate(e.target.value)}
             className="border px-4 py-2 rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
           />
-          <button
-            onClick={handleResetFilters}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
-          >
-            Reset
-          </button>
         </div>
       )}
 
-      {/* Map Visualization */}
+      {/* Map */}
       <div className="relative bg-white dark:bg-gray-900 shadow-xl rounded-2xl p-4 mb-6 overflow-hidden">
-        <ComposableMap
-          projectionConfig={{ scale: 150 }}
-          className="w-full h-[500px]"
-        >
+        <ComposableMap projectionConfig={{ scale: 150 }} className="w-full h-[500px]">
           <ZoomableGroup>
             <Geographies geography={geoUrl}>
               {({ geographies }) =>
@@ -224,19 +196,17 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
               }
             </Geographies>
 
-            {Object.keys(salesByCountry).map((country) => {
-              const [lon, lat] = coords[country] || [0, 0];
-              const total = salesByCountry[country];
-              const color = colorMap[country] || "#6b7280";
-              const radius = Math.min(20, Math.max(5, total / 2000)); // scalable dot size
-
+            {Object.keys(salesByCountry).map((c) => {
+              const coords = countryCoords[c] || [0, 0];
+              const total = salesByCountry[c];
+              const radius = Math.min(20, Math.max(5, total / 2000));
               return (
-                <Marker key={country} coordinates={[lon, lat]}>
+                <Marker key={c} coordinates={coords}>
                   <circle
                     data-tooltip-id="map-tooltip"
-                    data-tooltip-content={`${country}: €${total.toLocaleString()}`}
+                    data-tooltip-content={`${c}: €${total.toLocaleString()}`}
                     r={radius}
-                    fill={color}
+                    fill="#FF5733"
                     stroke="#fff"
                     strokeWidth={1.5}
                     className="cursor-pointer transition-transform hover:scale-125"
@@ -248,6 +218,21 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         </ComposableMap>
 
         <Tooltip id="map-tooltip" place="top" />
+
+        {/* Top Countries Legend */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {Object.entries(salesByCountry)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([c, total]) => (
+              <div
+                key={c}
+                className="px-3 py-1 bg-blue-100 dark:bg-gray-700 rounded-lg text-sm font-semibold"
+              >
+                {c}: €{total.toLocaleString()}
+              </div>
+            ))}
+        </div>
       </div>
     </div>
   );
