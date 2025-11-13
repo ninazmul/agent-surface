@@ -3723,7 +3723,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/d3-geo@npm:^3":
+"@types/d3-geo@npm:^3, @types/d3-geo@npm:^3.1.0":
   version: 3.1.0
   resolution: "@types/d3-geo@npm:3.1.0"
   dependencies:
@@ -3754,6 +3754,13 @@ __metadata:
   version: 3.1.1
   resolution: "@types/d3-path@npm:3.1.1"
   checksum: 10c0/2c36eb31ebaf2ce4712e793fd88087117976f7c4ed69cc2431825f999c8c77cca5cea286f3326432b770739ac6ccd5d04d851eb65e7a4dbcc10c982b49ad2c02
+  languageName: node
+  linkType: hard
+
+"@types/d3-scale-chromatic@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "@types/d3-scale-chromatic@npm:3.1.0"
+  checksum: 10c0/93c564e02d2e97a048e18fe8054e4a935335da6ab75a56c3df197beaa87e69122eef0dfbeb7794d4a444a00e52e3123514ee27cec084bd21f6425b7037828cc2
   languageName: node
   linkType: hard
 
@@ -4033,6 +4040,58 @@ __metadata:
     "@types/react": "npm:*"
     csstype: "npm:^3.0.2"
   checksum: 10c0/829d2d03c2e687f3079bbb6512b298ba8427c8371f9575c5ce1ec2abbbbe92d4455a731049b2b217168272ac6b507d8797fe754549801d94ec2fcdbce1a1aced
+  languageName: node
+  linkType: hard
+
+"@types/topojson-client@npm:*, @types/topojson-client@npm:^3.1.5":
+  version: 3.1.5
+  resolution: "@types/topojson-client@npm:3.1.5"
+  dependencies:
+    "@types/geojson": "npm:*"
+    "@types/topojson-specification": "npm:*"
+  checksum: 10c0/f60c71a79ec2d6387a9437a2d3d61d1a39928211c8b26e6a4572e4e65ff6d9ad283caa2207c447fe67cb20259c72f53ce21e222cd5c7af6f31b18cce0ab79b5d
+  languageName: node
+  linkType: hard
+
+"@types/topojson-server@npm:*":
+  version: 3.0.4
+  resolution: "@types/topojson-server@npm:3.0.4"
+  dependencies:
+    "@types/geojson": "npm:*"
+    "@types/topojson-specification": "npm:*"
+  checksum: 10c0/671aae8b56b93e7f80c1dfcae78b6afe8a3d1d0c3753c2264d8502a2a2cdc677728e228219cb9ed4818a5c209e02d665778e6c57baf966e4da4292f998ea6f80
+  languageName: node
+  linkType: hard
+
+"@types/topojson-simplify@npm:*":
+  version: 3.0.3
+  resolution: "@types/topojson-simplify@npm:3.0.3"
+  dependencies:
+    "@types/geojson": "npm:*"
+    "@types/topojson-specification": "npm:*"
+  checksum: 10c0/0eb6a3b6be0e324e668edf5af03c9813c031ff04f97ab957d35e7ef1b1b464d2cc61a323d89a70895a675473eb560436265815d9bccf8372f75253c27b0954f8
+  languageName: node
+  linkType: hard
+
+"@types/topojson-specification@npm:*":
+  version: 1.0.5
+  resolution: "@types/topojson-specification@npm:1.0.5"
+  dependencies:
+    "@types/geojson": "npm:*"
+  checksum: 10c0/015f5470b210cb2a4b9cc3fb5b411b2f774189663bdf70855a7ab8e56d55f2b23124d1f8bf345356407691f4a70a85e87d05512b0ffc90d4f5ee81ab96af180b
+  languageName: node
+  linkType: hard
+
+"@types/topojson@npm:^3":
+  version: 3.2.6
+  resolution: "@types/topojson@npm:3.2.6"
+  dependencies:
+    "@types/geojson": "npm:*"
+    "@types/topojson-client": "npm:*"
+    "@types/topojson-server": "npm:*"
+    "@types/topojson-simplify": "npm:*"
+    "@types/topojson-specification": "npm:*"
+  checksum: 10c0/98c42d89bfd3ac3d4b37dbf01113a2880389dba1e82237762d4dc12922afc923daf184c0a7c8554eff0ed72c98b46ea3219d0335107dc304caba203ca825f156
   languageName: node
   linkType: hard
 
@@ -4500,12 +4559,14 @@ __metadata:
     "@types/reactour": "npm:^1"
     "@types/stripe": "npm:^8.0.417"
     "@types/styled-components": "npm:^5.1.34"
+    "@types/topojson": "npm:^3"
     "@uploadthing/react": "npm:^7.1.3"
     "@vercel/analytics": "npm:^1.5.0"
     "@vercel/speed-insights": "npm:^1.2.0"
     axios: "npm:^1.11.0"
-    chart.js: "npm:^4.4.7"
+    chart.js: "npm:^4.5.1"
     chartjs-adapter-date-fns: "npm:^3.0.0"
+    chartjs-chart-geo: "npm:^4.3.6"
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
     d3-geo: "npm:^3.1.1"
@@ -4573,6 +4634,7 @@ __metadata:
     tailwind-merge: "npm:^2.5.5"
     tailwindcss: "npm:^3.4.1"
     tailwindcss-animate: "npm:^1.0.7"
+    topojson: "npm:^3.0.2"
     twilio: "npm:^5.9.0"
     typescript: "npm:^5"
     uploadthing: "npm:^7.4.1"
@@ -5359,7 +5421,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chart.js@npm:^4.4.7":
+"chart.js@npm:^4.5.1":
   version: 4.5.1
   resolution: "chart.js@npm:4.5.1"
   dependencies:
@@ -5375,6 +5437,25 @@ __metadata:
     chart.js: ">=2.8.0"
     date-fns: ">=2.0.0"
   checksum: 10c0/bc785632da9e6253a969c84f5d382e39944246de8410285f060d6715b3ed681cee80142bb2c410329b4c21094efc6d54f9c289200463dce865f736a01a76de4b
+  languageName: node
+  linkType: hard
+
+"chartjs-chart-geo@npm:^4.3.6":
+  version: 4.3.6
+  resolution: "chartjs-chart-geo@npm:4.3.6"
+  dependencies:
+    "@types/d3-geo": "npm:^3.1.0"
+    "@types/d3-scale-chromatic": "npm:^3.1.0"
+    "@types/topojson-client": "npm:^3.1.5"
+    d3-array: "npm:^3.2.4"
+    d3-color: "npm:^3.1.0"
+    d3-geo: "npm:^3.1.1"
+    d3-interpolate: "npm:^3.0.1"
+    d3-scale-chromatic: "npm:^3.1.0"
+    topojson-client: "npm:^3.1.0"
+  peerDependencies:
+    chart.js: ^4.1.0
+  checksum: 10c0/54e88beb9565a590a92e62b18cb3761c39b95b3159310ef4235e543f7cc414fc77b1690de66cffe35e61b673159ce6480c020a6ff634d4d6d647ce8f82c9ff25
   languageName: node
   linkType: hard
 
@@ -5715,7 +5796,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"d3-array@npm:2 - 3, d3-array@npm:2.10.0 - 3, d3-array@npm:2.5.0 - 3, d3-array@npm:^3.1.6":
+"d3-array@npm:2 - 3, d3-array@npm:2.10.0 - 3, d3-array@npm:2.5.0 - 3, d3-array@npm:^3.1.6, d3-array@npm:^3.2.4":
   version: 3.2.4
   resolution: "d3-array@npm:3.2.4"
   dependencies:
@@ -5740,7 +5821,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"d3-color@npm:1 - 3":
+"d3-color@npm:1 - 3, d3-color@npm:^3.1.0":
   version: 3.1.0
   resolution: "d3-color@npm:3.1.0"
   checksum: 10c0/a4e20e1115fa696fce041fbe13fbc80dc4c19150fa72027a7c128ade980bc0eeeba4bcf28c9e21f0bce0e0dbfe7ca5869ef67746541dcfda053e4802ad19783c
@@ -5812,7 +5893,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"d3-interpolate@npm:1.2.0 - 3, d3-interpolate@npm:^3.0.1":
+"d3-interpolate@npm:1 - 3, d3-interpolate@npm:1.2.0 - 3, d3-interpolate@npm:^3.0.1":
   version: 3.0.1
   resolution: "d3-interpolate@npm:3.0.1"
   dependencies:
@@ -5825,6 +5906,16 @@ __metadata:
   version: 3.1.0
   resolution: "d3-path@npm:3.1.0"
   checksum: 10c0/dc1d58ec87fa8319bd240cf7689995111a124b141428354e9637aa83059eb12e681f77187e0ada5dedfce346f7e3d1f903467ceb41b379bfd01cd8e31721f5da
+  languageName: node
+  linkType: hard
+
+"d3-scale-chromatic@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "d3-scale-chromatic@npm:3.1.0"
+  dependencies:
+    d3-color: "npm:1 - 3"
+    d3-interpolate: "npm:1 - 3"
+  checksum: 10c0/9a3f4671ab0b971f4a411b42180d7cf92bfe8e8584e637ce7e698d705e18d6d38efbd20ec64f60cc0dfe966c20d40fc172565bc28aaa2990c0a006360eed91af
   languageName: node
   linkType: hard
 
@@ -12124,7 +12215,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"topojson-client@npm:^3.1.0":
+"topojson-client@npm:3, topojson-client@npm:^3.1.0":
   version: 3.1.0
   resolution: "topojson-client@npm:3.1.0"
   dependencies:
@@ -12134,6 +12225,59 @@ __metadata:
     topomerge: bin/topomerge
     topoquantize: bin/topoquantize
   checksum: 10c0/da2acba268cbf4d002483d5d81452e0d797b2fff6041fafb1d420e58973fa780a6f42041ce4c2677376ab977e5e1732b89c42a2db3c334a34f6c47f4d94b3eaa
+  languageName: node
+  linkType: hard
+
+"topojson-client@npm:3.0.0":
+  version: 3.0.0
+  resolution: "topojson-client@npm:3.0.0"
+  dependencies:
+    commander: "npm:2"
+  bin:
+    topo2geo: bin/topo2geo
+    topomerge: bin/topomerge
+    topoquantize: bin/topoquantize
+  checksum: 10c0/692dc2bf27d72ccd1b61c02f3107092e7a21c91d2e5e451b9a73433b912cf397b12ebdbf9ffb186df4df2dbc45b769536a0c320362701414fcc0075dabab0b05
+  languageName: node
+  linkType: hard
+
+"topojson-server@npm:3.0.0":
+  version: 3.0.0
+  resolution: "topojson-server@npm:3.0.0"
+  dependencies:
+    commander: "npm:2"
+  bin:
+    geo2topo: bin/geo2topo
+  checksum: 10c0/98557fb5b70cb97602407cbfc04c99b1de6842a366440fe5037c7de9456a05d470957fc388b2c5802f6077ff615d49f085f134ff4edd77428a43151409049006
+  languageName: node
+  linkType: hard
+
+"topojson-simplify@npm:3.0.2":
+  version: 3.0.2
+  resolution: "topojson-simplify@npm:3.0.2"
+  dependencies:
+    commander: "npm:2"
+    topojson-client: "npm:3"
+  bin:
+    toposimplify: bin/toposimplify
+  checksum: 10c0/ca2330195ad98587236a470de3a115642237864de59d3221453ae2e598b8da7805b56a71ad4c8989acdf2a243d58723a0beea74e73fab7efa2216f5b5bd7e916
+  languageName: node
+  linkType: hard
+
+"topojson@npm:^3.0.2":
+  version: 3.0.2
+  resolution: "topojson@npm:3.0.2"
+  dependencies:
+    topojson-client: "npm:3.0.0"
+    topojson-server: "npm:3.0.0"
+    topojson-simplify: "npm:3.0.2"
+  bin:
+    geo2topo: node_modules/topojson-server/bin/geo2topo
+    topo2geo: node_modules/topojson-client/bin/topo2geo
+    topomerge: node_modules/topojson-client/bin/topomerge
+    topoquantize: node_modules/topojson-client/bin/topoquantize
+    toposimplify: node_modules/topojson-simplify/bin/toposimplify
+  checksum: 10c0/ae1f8e6eb02b164bff582b0697b09ab61559d49aaf7dca19182ecdf24d57b3196af9e715087d3589ea1162f7aaf4604f85d6ac6fa8cd67663c721d0c1e9fa464
   languageName: node
   linkType: hard
 

@@ -1,21 +1,30 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  Marker,
-  ZoomableGroup,
-} from "react-simple-maps";
-import { Tooltip } from "react-tooltip";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
-import countriesData from "world-countries"; // npm install world-countries
 import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
 
-const geoUrl =
-  "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
+import { Chart, registerables } from "chart.js";
+import { ChoroplethController, GeoFeature, ColorScale } from "chartjs-chart-geo";
+import * as topojson from "topojson-client";
+import type { FeatureCollection, Geometry, Feature } from "geojson";
+
+Chart.register(...registerables, ChoroplethController, GeoFeature, ColorScale);
+
+interface SalesDashboardProps {
+  leads: ILead[];
+}
+
+interface SalesByCountry {
+  [country: string]: number;
+}
+
+// Define a proper type for country properties
+interface CountryProperties {
+  name: string;
+  [key: string]: unknown; // any extra fields from topojson
+}
 
 const Skeleton = () => (
   <div className="animate-pulse space-y-6">
@@ -35,28 +44,29 @@ const Skeleton = () => (
   </div>
 );
 
-interface SalesDashboardProps {
-  leads: ILead[];
-}
-
 const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const { dashboardData } = useDashboardData();
-  const [filter, setFilter] = useState("month");
-  const [country, setCountry] = useState("All");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<string>("month");
+  const [country, setCountry] = useState<string>("All");
+  const [startDate, setStartDate] = useState<string>("");
+  const [endDate, setEndDate] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(true);
 
-  const allLeads = useMemo(
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const allLeads = useMemo<ILead[]>(
     () => (dashboardData?.leads?.length ? dashboardData.leads : leads),
     [dashboardData?.leads, leads]
   );
 
   useEffect(() => {
-    if (allLeads?.length > 0) setLoading(false);
+    if (allLeads.length > 0) setLoading(false);
   }, [allLeads]);
 
-  const filteredLeads = useMemo(() => {
+  const parseNumber = (v?: string): number =>
+    parseFloat((v || "0").replace(/,/g, "").trim()) || 0;
+
+  const filteredLeads = useMemo<ILead[]>(() => {
     const now = new Date();
     const rangeStart =
       filter === "week"
@@ -69,7 +79,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         ? subYears(now, 1)
         : null;
 
-    return (allLeads || [])
+    return allLeads
       .filter((l) => l.paymentStatus === "Accepted")
       .filter((l) => {
         const date = new Date(l.updatedAt || l.createdAt);
@@ -81,11 +91,8 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
       .filter((l) => (country === "All" ? true : l.home.country === country));
   }, [allLeads, filter, startDate, endDate, country]);
 
-  const parseNumber = (v?: string) =>
-    parseFloat((v || "0").replace(/,/g, "").trim()) || 0;
-
-  const salesByCountry = useMemo(() => {
-    const result: Record<string, number> = {};
+  const salesByCountry = useMemo<SalesByCountry>(() => {
+    const result: SalesByCountry = {};
     filteredLeads.forEach((lead) => {
       const c = lead.home.country?.trim() || "Unknown";
       const courseTotal = Array.isArray(lead.course)
@@ -100,26 +107,68 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
     return result;
   }, [filteredLeads]);
 
-  const countryCoords = useMemo(() => {
-    const map: Record<string, [number, number]> = {};
-    Object.keys(salesByCountry).forEach((c) => {
-      const countryInfo = countriesData.find(
-        (cd) => cd.name.common.toLowerCase() === c.toLowerCase()
-      );
-      if (countryInfo) {
-        const [lat, lon] = countryInfo.latlng;
-        map[c] = [lon, lat];
-      } else {
-        map[c] = [0, 0];
-      }
-    });
-    return map;
-  }, [salesByCountry]);
-
-  const countries = useMemo(
+  const countriesList = useMemo<string[]>(
     () => Array.from(new Set(allLeads.map((l) => l.home.country || "Unknown"))),
     [allLeads]
   );
+
+  // Render Chart.js choropleth map
+  useEffect(() => {
+    if (!canvasRef.current) return;
+
+    fetch("https://unpkg.com/world-atlas/countries-50m.json")
+      .then((res) => res.json())
+      .then((data) => {
+        const geoData = topojson.feature(
+          data,
+          data.objects.countries
+        ) as unknown as FeatureCollection<Geometry, CountryProperties>;
+
+        const features: Feature<Geometry, CountryProperties>[] = geoData.features;
+
+        const ctx = canvasRef.current?.getContext("2d");
+        if (!ctx) return;
+
+        const existingChart = Chart.getChart(ctx);
+        if (existingChart) existingChart.destroy();
+
+        new Chart(ctx, {
+          type: "choropleth",
+          data: {
+            labels: features.map((f) => f.properties.name),
+            datasets: [
+              {
+                label: "Sales",
+                outline: features,
+                data: features.map((f) => ({
+                  feature: f,
+                  value: salesByCountry[f.properties.name] || 0,
+                })),
+              },
+            ],
+          },
+          options: {
+            showOutline: true,
+            showGraticule: true,
+            plugins: {
+              legend: { display: false },
+              tooltip: {
+                callbacks: {
+                  label: function (ctx) {
+                    const country = ctx.label;
+                    const value = (ctx.raw as { value: number }).value;
+                    return `${country}: €${value.toLocaleString()}`;
+                  },
+                },
+              },
+            },
+            scales: {
+              xy: { projection: "equalEarth" },
+            },
+          },
+        });
+      });
+  }, [salesByCountry]);
 
   if (loading) return <Skeleton />;
 
@@ -150,7 +199,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             value={country}
           >
             <option value="All">All Locations</option>
-            {countries.map((c) => (
+            {countriesList.map((c) => (
               <option key={c}>{c}</option>
             ))}
           </select>
@@ -190,49 +239,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
 
       {/* Map */}
       <div className="relative bg-white dark:bg-gray-900 shadow-xl rounded-2xl p-4 mb-6 overflow-hidden">
-        <ComposableMap
-          projectionConfig={{ scale: 160 }}
-          width={980}
-          height={500}
-          className="w-full h-[500px]"
-        >
-          <ZoomableGroup center={[0, 20]} zoom={1}>
-            <Geographies geography={geoUrl}>
-              {({ geographies }) =>
-                geographies.map((geo) => (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill="#EAEAEC"
-                    stroke="#D6D6DA"
-                    className="dark:fill-gray-800 dark:stroke-gray-700"
-                  />
-                ))
-              }
-            </Geographies>
-
-            {Object.keys(salesByCountry).map((c) => {
-              const coords = countryCoords[c] || [0, 0];
-              const total = salesByCountry[c];
-              const radius = Math.min(20, Math.max(5, total / 2000));
-              return (
-                <Marker key={c} coordinates={coords}>
-                  <circle
-                    data-tooltip-id="map-tooltip"
-                    data-tooltip-content={`${c}: €${total.toLocaleString()}`}
-                    r={radius}
-                    fill="#FF5733"
-                    stroke="#fff"
-                    strokeWidth={1.5}
-                    className="cursor-pointer transition-transform hover:scale-125"
-                  />
-                </Marker>
-              );
-            })}
-          </ZoomableGroup>
-        </ComposableMap>
-
-        <Tooltip id="map-tooltip" place="top" />
+        <canvas ref={canvasRef} style={{ width: "100%", height: "500px" }} />
 
         {/* Top Countries Legend */}
         <div className="mt-4 flex flex-wrap gap-2">
