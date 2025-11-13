@@ -294,18 +294,17 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
       {/* Map Simulation Section - Replaces Pie and Line Charts */}
       <div className="relative bg-white dark:bg-gray-900 shadow-xl rounded-2xl p-4 mb-6 overflow-hidden">
         {/* Placeholder for the Map (using the image as a conceptual guide) */}
-        <div className="w-full h-[500px] flex items-center justify-center bg-gray-100 dark:bg-gray-800 rounded-xl relative">
-          <div className="text-center text-gray-500 dark:text-gray-400">
-            <Image
-              src={"/assets/map.jpg"}
-              alt="Map"
-              width={500}
-              height={500}
-              className="w-full object-fit"
-            />
-          </div>
+        <div className="relative w-full h-[500px] rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+          <Image
+            src="/assets/map.jpg"
+            alt="Map"
+            fill
+            style={{ objectFit: "cover" }}
+            className="rounded-xl"
+            priority
+          />
 
-          {/* Simulated Tooltip in the middle of the map (Like the image) */}
+          {/* Tooltip overlay */}
           <div
             className="absolute p-4 rounded-xl shadow-2xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
             style={{ top: "45%", left: "55%" }}
