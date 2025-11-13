@@ -214,7 +214,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   }
 
   return (
-    <section className="h-full overflow-hidden">
+    <section className="">
       <div className="flex flex-wrap justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Sales Target by Country
@@ -290,7 +290,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
 
       <div
         ref={scrollRef}
-        className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm divide-y divide-gray-100 dark:divide-gray-700 h-[460px] overflow-y-auto scroll-smooth"
+        className="relative bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden divide-y divide-gray-100 dark:divide-gray-700 h-[460px] overflow-y-auto scroll-smooth"
       >
         {salesTargetEntries.map(([country, target]) => {
           const targetNum = parseNumber(target);
