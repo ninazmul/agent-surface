@@ -262,15 +262,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
               </svg>
             </div>
           </div>
-
-          <button
-            onClick={() => {
-              // Apply logic here, or just keep it as a visual button
-            }}
-            className="bg-black text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-800 dark:bg-gray-800 dark:hover:bg-gray-600"
-          >
-            Apply
-          </button>
         </div>
       </div>
 
@@ -310,7 +301,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
               alt="Map"
               width={500}
               height={500}
-              className="w-full object-cover"
+              className="w-full object-fit"
             />
           </div>
 
