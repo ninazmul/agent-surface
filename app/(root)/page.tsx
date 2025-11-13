@@ -371,15 +371,17 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-10 bg-gray-50 dark:bg-gray-900">
-      {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
-      {myProfile?.role !== "Student" && (
-        <CountrySalesTargets
-          adminStatus={adminStatus}
-          profiles={profiles}
-          leads={leads}
-          myProfile={myProfile}
-        />
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-2">
+        {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
+        {myProfile?.role !== "Student" && (
+          <CountrySalesTargets
+            adminStatus={adminStatus}
+            profiles={profiles}
+            leads={leads}
+            myProfile={myProfile}
+          />
+        )}
+      </div>
       {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
       {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
       <div className="overflow-x-auto">

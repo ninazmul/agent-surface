@@ -218,7 +218,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
           {/* Custom Dropdown Styling for Filter */}
           <div className="relative">
             <select
-              className="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-4 pr-8 text-sm font-semibold focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="appearance-none bg-white border border-gray-300 rounded-2xl py-2 pl-4 pr-8 text-sm font-semibold focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               onChange={(e) => setFilter(e.target.value)}
               value={filter}
             >
@@ -243,7 +243,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
           {/* Custom Dropdown Styling for Location */}
           <div className="relative">
             <select
-              className="appearance-none bg-white border border-gray-300 rounded-lg py-2 pl-4 pr-8 text-sm font-semibold focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="appearance-none bg-white border border-gray-300 rounded-2xl py-2 pl-4 pr-8 text-sm font-semibold focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               onChange={(e) => setCountry(e.target.value)}
               value={country}
             >
@@ -273,18 +273,18 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="border px-4 py-2 rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
+            className="border px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 dark:border-gray-600"
           />
           <label className="text-gray-700 dark:text-gray-300">To:</label>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="border px-4 py-2 rounded-lg bg-white dark:bg-gray-700 dark:border-gray-600"
+            className="border px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 dark:border-gray-600"
           />
           <button
             onClick={handleResetFilters}
-            className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+            className="bg-red-500 text-white px-4 py-2 rounded-2xl hover:bg-red-600"
           >
             Reset
           </button>
@@ -292,9 +292,9 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
       )}
 
       {/* Map Simulation Section - Replaces Pie and Line Charts */}
-      <div className="relative bg-white dark:bg-gray-900 shadow-xl rounded-2xl p-4 mb-6 overflow-hidden">
+      <div className="relative bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden">
         {/* Placeholder for the Map (using the image as a conceptual guide) */}
-        <div className="relative w-full h-[500px] rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+        <div className="relative w-full h-[300px] rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
           <Image
             src="/assets/map.jpg"
             alt="Map"
@@ -327,52 +327,48 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             )}
           </div>
         </div>
-
-        {/* Legend Section - Matches Image Layout */}
-        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-          {salesCountries.length === 0 ? (
-            <p className="text-center text-gray-500 dark:text-gray-400">
-              No sales data for the current filters.
-            </p>
-          ) : (
-            <div className="flex flex-col gap-2">
-              {salesCountries.slice(0, 3).map((c) => (
-                <div
-                  key={c}
-                  className="flex justify-between items-center group"
-                >
-                  <div className="flex items-center gap-3">
-                    <span
-                      className={`h-4 w-4 rounded-full ${
-                        colorMap[c] || "bg-gray-500"
-                      }`}
-                    ></span>
-                    <span className="font-semibold text-gray-800 dark:text-gray-200">
-                      {c}
-                    </span>
-                  </div>
-                  {/* Info Icon (simulated) */}
-                  <button className="text-gray-400 hover:text-gray-600">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      strokeWidth={1.5}
-                      stroke="currentColor"
-                      className="w-5 h-5"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.784 1.764a.75.75 0 01-1.332-.303l.784-1.764a.75.75 0 01.27-.549zm1.062-7.5a.75.75 0 10-1.062 1.062 7.5 7.5 0 011.062-1.062z"
-                      />
-                    </svg>
-                  </button>
+      </div>
+      {/* Legend Section - Matches Image Layout */}
+      <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4">
+        {salesCountries.length === 0 ? (
+          <p className="text-center text-gray-500 dark:text-gray-400">
+            No sales data for the current filters.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {salesCountries.slice(0, 3).map((c) => (
+              <div key={c} className="flex justify-between items-center group">
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`h-4 w-4 rounded-full ${
+                      colorMap[c] || "bg-gray-500"
+                    }`}
+                  ></span>
+                  <span className="font-semibold text-gray-800 dark:text-gray-200">
+                    {c}
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                {/* Info Icon (simulated) */}
+                <button className="text-gray-400 hover:text-gray-600">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth={1.5}
+                    stroke="currentColor"
+                    className="w-5 h-5"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M11.25 11.25l.041-.02a.75.75 0 011.063.852l-.784 1.764a.75.75 0 01-1.332-.303l.784-1.764a.75.75 0 01.27-.549zm1.062-7.5a.75.75 0 10-1.062 1.062 7.5 7.5 0 011.062-1.062z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Removed Total Sales, Pie, and Line Chart sections to match the image's singular focus on the map and its legend */}
