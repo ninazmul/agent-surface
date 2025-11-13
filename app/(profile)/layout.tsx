@@ -25,7 +25,7 @@ export default async function Layout({
   const adminStatus = await isAdmin(email);
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
-  
+
   return (
     <SidebarProvider defaultOpen={true}>
       <HomeSidebar
@@ -36,11 +36,17 @@ export default async function Layout({
       <Toaster />
       <main className="flex-1 h-screen mx-auto overflow-y-auto">
         <div
-          className={`flex justify-between items-center p-4 w-full-10 rounded-2xl m-1 text-white no-print ${
-            adminStatus ? "bg-purple-900" : "bg-primary-900"
-          }`}
+          className={`flex justify-between items-center p-4 w-full-10 text-white no-print bg-gray-50 border`}
         >
-          <SidebarTrigger />
+          <div className="flex items-center justify-start">
+            <SidebarTrigger />
+            <div>
+              <Breadcrumbs />
+              <p className="text-xs text-gray-500 hidden md:flex">
+                &quot;Track everything from here for your recommendations&quot;
+              </p>
+            </div>
+          </div>
           <div className="flex justify-end items-center gap-4">
             <div className="flex items-center gap-2">
               <ThemeToggle />
@@ -51,9 +57,6 @@ export default async function Layout({
               <UserButton afterSwitchSessionUrl="/" />
             </SignedIn>
           </div>
-        </div>
-        <div className="p-2">
-          <Breadcrumbs />
         </div>
         <div className="p-2">{children}</div>
       </main>

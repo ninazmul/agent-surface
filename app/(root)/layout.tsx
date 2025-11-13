@@ -76,7 +76,6 @@ export default async function AdminLayout({
             </SignedIn>
           </div>
         </div>
-        <div className="p-2"></div>
         <div className="p-2">
           <DashboardProvider>{children}</DashboardProvider>
         </div>
