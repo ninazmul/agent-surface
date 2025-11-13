@@ -370,7 +370,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="container mx-auto space-y-10 bg-white dark:bg-gray-900">
+    <div className="space-y-10 bg-gray-50 dark:bg-gray-900">
       {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
       {myProfile?.role !== "Student" && (
         <CountrySalesTargets

@@ -54,7 +54,7 @@ export default async function AdminLayout({
       <Toaster />
       <main className="flex-1 h-screen mx-auto overflow-y-auto">
         <div
-          className={`flex justify-between items-center text-white no-print bg-gray-50 border`}
+          className={`flex justify-between items-center p-4 w-full text-white no-print bg-gray-50 border`}
         >
           <div className="flex items-center justify-start">
             <SidebarTrigger />
@@ -76,7 +76,7 @@ export default async function AdminLayout({
             </SignedIn>
           </div>
         </div>
-        <div>
+        <div className="p-2">
           <DashboardProvider>{children}</DashboardProvider>
         </div>
       </main>
