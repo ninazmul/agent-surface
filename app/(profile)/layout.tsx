@@ -62,7 +62,7 @@ export default async function Layout({
             </SignedIn>
           </div>
         </div>
-        <div className="p-2">{children}</div>
+        <div>{children}</div>
       </main>
     </SidebarProvider>
   );
