@@ -30,20 +30,18 @@ export default function MessageCount() {
   }, [fetchUnreadCount]);
 
   return (
-    <div className="relative">
-      <a href={"/messages"}>
+    <div>
+      <a href="/messages" className="relative inline-block">
         <Button
           size="icon"
           variant="ghost"
           className="w-9 h-9 text-gray-500 rounded-full"
         >
-          <MessageCircle className="text-gray-500" />
+          <MessageCircle className="w-5 h-5 text-gray-500" />
         </Button>
 
         {unreadCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
-            {unreadCount > 99 ? "99+" : unreadCount}
-          </span>
+          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border border-white"></span>
         )}
       </a>
     </div>
