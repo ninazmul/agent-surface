@@ -1,21 +1,31 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from "react-simple-maps";
+import {
+  ComposableMap,
+  Geographies,
+  Geography,
+  Marker,
+  ZoomableGroup,
+} from "react-simple-maps";
 import { Tooltip } from "react-tooltip";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
 import countriesData from "world-countries"; // npm install world-countries
 import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
 
-const geoUrl = "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
+const geoUrl =
+  "https://raw.githubusercontent.com/deldersveld/topojson/master/world-countries.json";
 
 const Skeleton = () => (
   <div className="animate-pulse space-y-6">
     <div className="h-8 w-1/3 bg-gray-300 dark:bg-gray-800 rounded"></div>
     <div className="flex flex-wrap gap-4 bg-blue-50 dark:bg-gray-800 p-4 rounded-2xl shadow">
       {[...Array(3)].map((_, i) => (
-        <div key={i} className="h-10 w-32 bg-gray-300 dark:bg-gray-500 rounded"></div>
+        <div
+          key={i}
+          className="h-10 w-32 bg-gray-300 dark:bg-gray-500 rounded"
+        ></div>
       ))}
     </div>
     <div className="bg-green-50 dark:bg-gray-800 shadow rounded-2xl p-6">
@@ -180,8 +190,13 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
 
       {/* Map */}
       <div className="relative bg-white dark:bg-gray-900 shadow-xl rounded-2xl p-4 mb-6 overflow-hidden">
-        <ComposableMap projectionConfig={{ scale: 150 }} className="w-full h-[500px]">
-          <ZoomableGroup>
+        <ComposableMap
+          projectionConfig={{ scale: 160 }}
+          width={980}
+          height={500}
+          className="w-full h-[500px]"
+        >
+          <ZoomableGroup center={[0, 20]} zoom={1}>
             <Geographies geography={geoUrl}>
               {({ geographies }) =>
                 geographies.map((geo) => (
