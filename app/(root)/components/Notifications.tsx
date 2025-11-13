@@ -8,7 +8,7 @@ import {
 } from "@/lib/actions/notification.actions";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
 import { useUser } from "@clerk/nextjs";
-import { Bell, Circle } from "lucide-react";
+import { Bell, Circle, Dot } from "lucide-react";
 import React, { useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
 
@@ -157,9 +157,7 @@ export default function NotificationsDropdown() {
       >
         <Bell className="text-gray-500" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 bg-red-600 text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center shadow-md">
-            {unreadCount > 99 ? "99+" : unreadCount}
-          </span>
+          <Dot className="absolute -top-1 -right-1 text-red-600 font-bold" />
         )}
       </Button>
 
