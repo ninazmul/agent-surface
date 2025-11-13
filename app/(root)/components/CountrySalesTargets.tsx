@@ -191,8 +191,8 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
 
   // ==================== UI SECTION ====================
   return (
-    <section className="bg-gray-50 dark:bg-gray-900 p-6 rounded-2xl shadow-sm h-[4050px] overflow-y-hidden scroll-auto">
-      <div className="flex justify-between items-center mb-6">
+    <section className="bg-gray-50 dark:bg-gray-900 p-6 rounded-2xl shadow-sm h-[450px] overflow-y-hidden scroll-auto">
+      <div className="flex flex-wrap justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Sales Target by Country
         </h2>
@@ -200,7 +200,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
         {adminStatus && (
           <div className="flex flex-wrap gap-2 items-center">
             <select
-              className="px-4 py-2 rounded-2xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
               onChange={(e) => setFilter(e.target.value)}
               value={filter}
             >
@@ -216,13 +216,13 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
               <>
                 <input
                   type="date"
-                  className="px-4 py-2 rounded-2xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+                  className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
                   value={startDate}
                   onChange={(e) => setStartDate(e.target.value)}
                 />
                 <input
                   type="date"
-                  className="px-4 py-2 rounded-2xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+                  className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
                   value={endDate}
                   onChange={(e) => setEndDate(e.target.value)}
                 />
@@ -230,7 +230,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
             )}
 
             <select
-              className="px-4 py-2 rounded-2xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
               onChange={(e) => setSelectedCountry(e.target.value)}
               value={selectedCountry}
             >
@@ -243,7 +243,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
             </select>
 
             <select
-              className="px-4 py-2 rounded-2xl bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
               onChange={(e) => setSelectedAgency(e.target.value)}
               value={selectedAgency}
             >
@@ -256,7 +256,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
             </select>
 
             <button
-              className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-2xl transition"
+              className="bg-black text-white px-4 py-2 rounded-2xl transition"
               onClick={handleResetFilters}
             >
               Reset Filters
