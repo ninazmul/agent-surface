@@ -210,7 +210,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   return (
     <div className="p-4">
       {/* Header and Filters Bar - Matches Image Layout */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-wrap justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-black dark:text-white">
           Sales & Performance Analytics
         </h1>
