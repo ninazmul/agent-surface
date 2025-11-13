@@ -153,12 +153,11 @@ export default function NotificationsDropdown() {
         variant="ghost"
         onClick={() => setOpen((prev) => !prev)}
         aria-label="Toggle notifications dropdown"
-        className="w-9 h-9 text-gray-500 rounded-full relative transition"
+        className="w-9 h-9 text-gray-500 rounded-full transition"
       >
-        <Bell className="text-gray-500" />
+        <Bell className="relative text-gray-500" />
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 bg-red-600 text-red-500 rounded-full w-2 h-2">
-          </span>
+          <span className="absolute top-0 right-0 bg-red-600 text-red-500 rounded-full w-2 h-2"></span>
         )}
       </Button>
 
