@@ -157,7 +157,7 @@ export default function NotificationsDropdown() {
       >
         <Bell className="text-gray-500" />
         {unreadCount > 0 && (
-          <span className="absolute -top-1.5 -right-1.5 bg-red-600 text-red-500 text-[10px] font-bold rounded-full w-2 h-2 flex items-center justify-center shadow-md">
+          <span className="absolute top-0 right-0 bg-red-600 text-red-500 rounded-full w-2 h-2">
           </span>
         )}
       </Button>
