@@ -69,7 +69,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${spaceGrotesk.variable} font-sans bg-[hsl(var(--background))] text-[hsl(var(--foreground))]`}
+        className={`${spaceGrotesk.variable} font-sans bg-gray-50 text-[hsl(var(--foreground))]`}
       >
         <ClerkProvider>
           <ThemeProvider attribute="class" defaultTheme="system">

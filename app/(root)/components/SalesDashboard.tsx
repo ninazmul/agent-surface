@@ -175,7 +175,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   });
 
   return (
-    <div className="p-4">
+    <div className="">
       {/* Header & Filters */}
       <div className="flex flex-wrap justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-black dark:text-white">
