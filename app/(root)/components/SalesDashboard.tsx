@@ -30,6 +30,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const [endDate, setEndDate] = useState("");
   const { dashboardData, setDashboardData } = useDashboardData();
 
+  // Fetch leads data
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -64,6 +65,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
     if (!dashboardData?.leads?.length) fetchData();
   }, [dashboardData, setDashboardData, userId]);
 
+  // Filtered leads based on date and country
   const filteredLeads = useMemo(() => {
     const now = new Date();
     const rangeStart =
@@ -92,6 +94,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const parseNumber = (v?: string) =>
     parseFloat((v || "0").replace(/,/g, "").trim()) || 0;
 
+  // Total sales calculation
   const totalSales = useMemo(
     () =>
       filteredLeads.reduce((sum, lead) => {
@@ -107,6 +110,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
     [filteredLeads]
   );
 
+  // Sales by country
   const salesByCountry = useMemo(() => {
     const result: Record<string, number> = {};
     filteredLeads.forEach((lead) => {
@@ -232,54 +236,52 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
       )}
 
       {/* Interactive World Map */}
-      <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden">
-        <div className="relative w-full h-[400px] rounded-xl overflow-hidden">
-          <ComposableMap projectionConfig={{ scale: 160 }}>
-            <Geographies geography={geoUrl}>
-              {({ geographies }) =>
-                geographies.map((geo) => {
-                  const countryName = geo.properties.NAME;
-                  const sales = salesByCountry[countryName] || 0;
-                  return (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      fill={colorMap[countryName] || "#E5E7EB"}
-                      stroke="#fff"
-                      strokeWidth={0.5}
-                      style={{
-                        default: { outline: "none" },
-                        hover: { outline: "none", opacity: 0.8, cursor: "pointer" },
-                        pressed: { outline: "none" },
-                      }}
-                      data-tooltip-id="world-map-tooltip"
-                      data-tooltip-content={`${countryName}: €${sales.toLocaleString()}`}
-                    />
-                  );
-                })
-              }
-            </Geographies>
-          </ComposableMap>
+      <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-visible relative">
+        <ComposableMap projectionConfig={{ scale: 160 }}>
+          <Geographies geography={geoUrl}>
+            {({ geographies }) =>
+              geographies.map((geo) => {
+                const countryName = geo.properties.NAME;
+                const sales = salesByCountry[countryName] || 0;
+                return (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill={colorMap[countryName] || "#E5E7EB"}
+                    stroke="#fff"
+                    strokeWidth={0.5}
+                    style={{
+                      default: { outline: "none" },
+                      hover: { outline: "none", opacity: 0.8, cursor: "pointer" },
+                      pressed: { outline: "none" },
+                    }}
+                    data-tooltip-id="world-map-tooltip"
+                    data-tooltip-content={`${countryName}: €${sales.toLocaleString()}`}
+                  />
+                );
+              })
+            }
+          </Geographies>
+        </ComposableMap>
 
-          {/* Total Sales Overlay */}
-          <div
-            className="absolute p-4 rounded-xl shadow-xl bg-white dark:bg-gray-700"
-            style={{ top: "10%", left: "70%" }}
-          >
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
-              Total Sales
-            </p>
-            <div className="flex items-end gap-2">
-              <span className="text-2xl font-bold">
-                €{totalSales.toLocaleString()}
-              </span>
-              <span className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
-                {getFilterText(filter).replace("This ", "")}
-              </span>
-            </div>
+        {/* Total Sales Overlay */}
+        <div
+          className="absolute p-4 rounded-xl shadow-xl bg-white dark:bg-gray-700"
+          style={{ top: "10%", left: "70%" }}
+        >
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+            Total Sales
+          </p>
+          <div className="flex items-end gap-2">
+            <span className="text-2xl font-bold">
+              €{totalSales.toLocaleString()}
+            </span>
+            <span className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
+              {getFilterText(filter).replace("This ", "")}
+            </span>
           </div>
-          <Tooltip id="world-map-tooltip" place="top" />
         </div>
+        <Tooltip id="world-map-tooltip" place="top" className="z-50" />
       </div>
 
       {/* Legend */}
@@ -294,9 +296,8 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
               <div key={c} className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <span
-                    className={`h-4 w-4 rounded-full ${
-                      colorMap[c] ? `bg-[${colorMap[c]}]` : "bg-gray-500"
-                    }`}
+                    className="h-4 w-4 rounded-full"
+                    style={{ backgroundColor: colorMap[c] || "#6B7280" }}
                   ></span>
                   <span className="font-semibold">{c}</span>
                 </div>
@@ -307,7 +308,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
                 >
                   <Info className="text-black h-4 w-4" />
                 </button>
-                <Tooltip id={`tooltip-${c}`} place="top" />
+                <Tooltip id={`tooltip-${c}`} place="top" className="z-50" />
               </div>
             ))}
           </div>
