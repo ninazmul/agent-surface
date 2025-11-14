@@ -40,13 +40,13 @@ export default async function Layout({
       <Toaster />
       <main className="flex-1 h-screen mx-auto overflow-y-auto">
         <div
-          className={`flex justify-between items-center p-4 w-full text-white no-print bg-gray-50 border`}
+          className={`flex justify-between items-center p-4 w-full text-white no-print bg-gray-50 dark:bg-gray-900 border`}
         >
           <div className="flex items-center justify-start">
             <SidebarTrigger />
             <div>
               <Breadcrumbs />
-              <p className="text-xs text-gray-500 hidden md:flex">
+              <p className="text-xs text-gray-500 dark:text-gray-400 hidden md:flex">
                 &quot;Track everything from here for your recommendations&quot;
               </p>
             </div>

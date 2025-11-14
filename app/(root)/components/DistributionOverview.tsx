@@ -107,7 +107,7 @@ const DistributionOverview = ({
   }));
 
   return (
-    <div className="bg-white dark:bg-gray-800 p-6 rounded-xl shadow h-full flex flex-col">
+    <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-bold dark:text-gray-100">
           Distribution Overview

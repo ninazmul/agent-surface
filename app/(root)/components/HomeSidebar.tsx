@@ -224,7 +224,7 @@ const HomeSidebar = ({
               />
             </a>
           </SidebarGroupLabel>
-          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white rounded-xl w-5/6">
+          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:text-gray-800 rounded-xl w-5/6">
             <UserButton
               appearance={{
                 elements: {
@@ -237,7 +237,7 @@ const HomeSidebar = ({
               <h1 className="text-sm font-semibold">
                 {profile?.name || admin?.name || "User Name"}
               </h1>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-gray-500 dark:text-gray-400">
                 {profile?.role || (admin ? "Admin" : "User")}&apos;s Profile
               </p>
             </div>
