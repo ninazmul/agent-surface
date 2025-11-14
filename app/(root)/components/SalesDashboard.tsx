@@ -255,7 +255,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
           {/* Tooltip overlay */}
           <div
             className="absolute p-4 rounded-xl shadow-2xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
-            style={{ top: "45%", left: "40%" }}
+            style={{ top: "40%", left: "40%" }}
           >
             <p className="text-sm font-light text-gray-600 dark:text-gray-300 mb-1">
               Total Sales
