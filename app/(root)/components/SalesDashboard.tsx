@@ -9,12 +9,10 @@ import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
 import { getAdminCountriesByEmail, isAdmin } from "@/lib/actions/admin.actions";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
-import { ComposableMap, Geographies, Geography } from "react-simple-maps";
 import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 import { Info } from "lucide-react";
-
-const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+import Image from "next/image";
 
 interface SalesDashboardProps {
   leads?: ILead[];
@@ -241,70 +239,42 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         </div>
       )}
 
-      {/* Interactive World Map */}
-      <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-visible relative h-[300px]">
-        <ComposableMap projectionConfig={{ scale: 160 }}>
-          <Geographies geography={geoUrl}>
-            {({ geographies }) =>
-              geographies.map((geo) => {
-                const geoName = geo.properties?.NAME || "Unknown";
+      {/* Map Simulation Section - Replaces Pie and Line Charts */}
+      <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden">
+        {/* Placeholder for the Map (using the image as a conceptual guide) */}
+        <div className="relative w-full h-[300px] rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+          <Image
+            src="/assets/map.jpg"
+            alt="Map"
+            fill
+            style={{ objectFit: "cover" }}
+            className="rounded-xl"
+            priority
+          />
 
-                const leadCountry = Object.keys(salesByCountry)
-                  .filter(Boolean)
-                  .find(
-                    (c) =>
-                      c?.toLowerCase().trim() === geoName?.toLowerCase().trim()
-                  );
-
-                const sales = leadCountry ? salesByCountry[leadCountry] : 0;
-
-                return (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    fill={
-                      leadCountry
-                        ? colorMap[leadCountry] || "#E5E7EB"
-                        : "#E5E7EB"
-                    }
-                    stroke="#fff"
-                    strokeWidth={0.5}
-                    style={{
-                      default: { outline: "none" },
-                      hover: {
-                        outline: "none",
-                        opacity: 0.8,
-                        cursor: "pointer",
-                      },
-                      pressed: { outline: "none" },
-                    }}
-                    data-tooltip-id="world-map-tooltip"
-                    data-tooltip-content={`${geoName}: €${sales.toLocaleString()}`}
-                  />
-                );
-              })
-            }
-          </Geographies>
-        </ComposableMap>
-
-        {/* Total Sales Overlay */}
-        <div
-          className="absolute p-4 rounded-xl shadow-xl bg-white dark:bg-gray-700"
-          style={{ top: "10%", left: "70%" }}
-        >
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
-            Total Sales
-          </p>
-          <div className="flex items-end gap-2">
-            <span className="text-2xl font-bold">
-              €{totalSales.toLocaleString()}
-            </span>
-            <span className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
-              {getFilterText(filter).replace("This ", "")}
-            </span>
+          {/* Tooltip overlay */}
+          <div
+            className="absolute p-4 rounded-xl shadow-2xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
+            style={{ top: "45%", left: "55%" }}
+          >
+            <p className="text-sm font-light text-gray-600 dark:text-gray-300 mb-1">
+              Total Sales
+            </p>
+            <div className="flex items-end gap-2">
+              <span className="text-2xl font-bold text-black dark:text-white">
+                €{totalSales.toLocaleString()}
+              </span>
+              <span className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
+                {getFilterText(filter).replace("This ", "")}
+              </span>
+            </div>
+            {salesCountries.length > 0 && (
+              <p className="text-xs mt-2 text-gray-500 dark:text-gray-400">
+                Data for **{salesCountries[0]}**
+              </p>
+            )}
           </div>
         </div>
-        <Tooltip id="world-map-tooltip" place="top" className="z-50" />
       </div>
 
       {/* Legend */}
