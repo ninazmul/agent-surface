@@ -12,7 +12,7 @@ export default function ThemeToggle() {
       size="icon"
       variant="ghost"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="w-9 h-9 text-gray-500 rounded-full"
+      className="w-9 h-9 text-gray-500 dark:text-gray-100 rounded-full"
     >
       {theme === "dark" ? <Moon /> : <Sun />}
     </Button>

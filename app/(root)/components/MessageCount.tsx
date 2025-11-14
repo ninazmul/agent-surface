@@ -35,9 +35,9 @@ export default function MessageCount() {
         <Button
           size="icon"
           variant="ghost"
-          className="w-9 h-9 text-gray-500 rounded-full"
+          className="w-9 h-9 text-gray-500 dark:text-gray-100 rounded-full"
         >
-          <MessageCircle className="w-5 h-5 text-gray-500" />
+          <MessageCircle className="w-5 h-5 text-gray-500 dark:text-gray-100" />
         </Button>
 
         {unreadCount > 0 && (
