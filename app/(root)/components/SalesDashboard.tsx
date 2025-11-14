@@ -221,18 +221,18 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             type="date"
             value={startDate}
             onChange={(e) => setStartDate(e.target.value)}
-            className="border px-4 py-2 rounded-2xl"
+            className="border px-4 py-2 rounded-2xl dark:bg-gray-700"
           />
           <label>To:</label>
           <input
             type="date"
             value={endDate}
             onChange={(e) => setEndDate(e.target.value)}
-            className="border px-4 py-2 rounded-2xl"
+            className="border px-4 py-2 rounded-2xl dark:bg-gray-700"
           />
           <button
             onClick={handleResetFilters}
-            className="bg-black text-white px-4 py-2 rounded-2xl"
+            className="bg-black dark:bg-gray-700 text-white px-4 py-2 rounded-2xl"
           >
             Reset
           </button>

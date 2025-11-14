@@ -224,7 +224,7 @@ const HomeSidebar = ({
               />
             </a>
           </SidebarGroupLabel>
-          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:text-gray-800 rounded-xl w-5/6">
+          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 dark:text-gray-800 rounded-xl w-5/6">
             <UserButton
               appearance={{
                 elements: {

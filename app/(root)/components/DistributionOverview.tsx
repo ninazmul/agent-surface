@@ -116,7 +116,7 @@ const DistributionOverview = ({
         <select
           value={dateFilter}
           onChange={(e) => setDateFilter(e.target.value as DateFilterOption)}
-          className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer border border-gray-300 dark:border-gray-700 rounded px-2 py-1"
+          className="text-sm text-gray-500 dark:text-gray-100 dark:bg-gray-700 cursor-pointer border border-gray-300 dark:border-gray-700 rounded-2xl px-2 py-1"
         >
           <option value="7days">Last 7 days</option>
           <option value="30days">Last 30 days</option>

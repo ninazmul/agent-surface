@@ -225,7 +225,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
             </select>
 
             <button
-              className="bg-black text-white px-4 py-2 rounded-2xl transition"
+              className="bg-black dark:bg-gray-700 text-white px-4 py-2 rounded-2xl transition"
               onClick={handleResetFilters}
             >
               Reset Filters
