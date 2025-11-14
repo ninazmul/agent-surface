@@ -6,6 +6,8 @@ import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
 import { ILead } from "@/lib/database/models/lead.model";
 import Image from "next/image";
 import { Info } from "lucide-react";
+import { Tooltip } from "react-tooltip";
+import "react-tooltip/dist/react-tooltip.css"; // import styles
 
 interface SalesDashboardProps {
   leads: ILead[];
@@ -17,9 +19,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
-  // -----------------------------
-  // DATE FILTER LOGIC
-  // -----------------------------
   const filteredLeads = useMemo(() => {
     const now = new Date();
     const rangeStart =
@@ -37,19 +36,14 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
       .filter((l) => l.paymentStatus === "Accepted")
       .filter((l) => {
         const date = new Date(l.updatedAt || l.createdAt);
-
         if (filter === "custom" && startDate && endDate) {
           return date >= new Date(startDate) && date <= new Date(endDate);
         }
-
         return !rangeStart || date >= rangeStart;
       })
       .filter((l) => (country === "All" ? true : l.home.country === country));
   }, [leads, filter, startDate, endDate, country]);
 
-  // -----------------------------
-  // HELPERS
-  // -----------------------------
   const parseNumber = (v?: string) =>
     parseFloat((v || "0").replace(/,/g, "").trim()) || 0;
 
@@ -59,13 +53,10 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         const courseTotal = Array.isArray(lead.course)
           ? lead.course.reduce((s, c) => s + Number(c.courseFee || 0), 0)
           : 0;
-
         const servicesTotal = Array.isArray(lead.services)
           ? lead.services.reduce((s, c) => s + parseNumber(c.amount), 0)
           : 0;
-
         const discount = parseNumber(lead.discount);
-
         return sum + courseTotal + servicesTotal - discount;
       }, 0),
     [filteredLeads]
@@ -73,23 +64,17 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
 
   const salesByCountry = useMemo(() => {
     const result: Record<string, number> = {};
-
     filteredLeads.forEach((lead) => {
       const c = lead.home.country?.trim() || "Unknown";
-
       const courseTotal = Array.isArray(lead.course)
         ? lead.course.reduce((s, c2) => s + Number(c2.courseFee || 0), 0)
         : 0;
-
       const servicesTotal = Array.isArray(lead.services)
         ? lead.services.reduce((s, c2) => s + parseNumber(c2.amount), 0)
         : 0;
-
       const discount = parseNumber(lead.discount);
-
       result[c] = (result[c] || 0) + courseTotal + servicesTotal - discount;
     });
-
     return result;
   }, [filteredLeads]);
 
@@ -140,12 +125,10 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
       {/* Header */}
       <div className="flex flex-wrap justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Sales & Performance Analytics</h1>
-
         <div className="flex items-center gap-2">
           <div className="relative">
             <select
-              className="appearance-none bg-white border border-gray-300 rounded-2xl py-2 pl-4 pr-8 text-sm font-semibold 
-              dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="appearance-none bg-white border border-gray-300 rounded-2xl py-2 pl-4 pr-8 text-sm font-semibold dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               onChange={(e) => setFilter(e.target.value)}
               value={filter}
             >
@@ -160,8 +143,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
 
           <div className="relative">
             <select
-              className="appearance-none bg-white border border-gray-300 rounded-2xl py-2 pl-4 pr-8 text-sm font-semibold
-              dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="appearance-none bg-white border border-gray-300 rounded-2xl py-2 pl-4 pr-8 text-sm font-semibold dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               onChange={(e) => setCountry(e.target.value)}
               value={country}
             >
@@ -184,7 +166,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             onChange={(e) => setStartDate(e.target.value)}
             className="border px-4 py-2 rounded-2xl"
           />
-
           <label>To:</label>
           <input
             type="date"
@@ -192,7 +173,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             onChange={(e) => setEndDate(e.target.value)}
             className="border px-4 py-2 rounded-2xl"
           />
-
           <button
             onClick={handleResetFilters}
             className="bg-red-500 text-white px-4 py-2 rounded-2xl"
@@ -212,7 +192,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             style={{ objectFit: "cover" }}
             className="rounded-xl"
           />
-
           <div
             className="absolute p-4 rounded-xl shadow-xl bg-white dark:bg-gray-700"
             style={{ top: "45%", left: "55%" }}
@@ -228,7 +207,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
                 {getFilterText(filter).replace("This ", "")}
               </span>
             </div>
-
             {salesCountries.length > 0 && (
               <p className="text-xs mt-2 text-gray-500">
                 Data for **{salesCountries[0]}**
@@ -257,9 +235,17 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
                   <span className="font-semibold">{c}</span>
                 </div>
 
-                <button className="bg-black p-1 rounded">
-                  <Info className="text-white h-4 w-4" />
+                <button
+                  data-tooltip-id={`tooltip-${c}`}
+                  data-tooltip-content={`Total sales in ${c}: €${salesByCountry[
+                    c
+                  ].toLocaleString()}`}
+                  className="p-1"
+                >
+                  <Info className="text-black rounded-full h-4 w-4" />
                 </button>
+
+                <Tooltip id={`tooltip-${c}`} place="top" />
               </div>
             ))}
           </div>
