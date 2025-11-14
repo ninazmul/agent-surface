@@ -14,8 +14,7 @@ import { Tooltip } from "react-tooltip";
 import "react-tooltip/dist/react-tooltip.css";
 import { Info } from "lucide-react";
 
-const geoUrl =
-  "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
+const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 interface SalesDashboardProps {
   leads: ILead[];
@@ -168,7 +167,9 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const top3Countries = salesCountries.slice(0, 3);
   const colors = ["#7C3AED", "#F97316", "#3B82F6"];
   const colorMap: Record<string, string> = {};
-  top3Countries.forEach((c, idx) => (colorMap[c] = colors[idx % colors.length]));
+  top3Countries.forEach(
+    (c, idx) => (colorMap[c] = colors[idx % colors.length])
+  );
 
   return (
     <div className="p-4">
@@ -237,26 +238,41 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
 
       {/* Interactive World Map */}
       <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-visible relative">
-        <ComposableMap projectionConfig={{ scale: 160 }}>
+        <ComposableMap projectionConfig={{ scale: 160 }} className="h-[300px]">
           <Geographies geography={geoUrl}>
             {({ geographies }) =>
               geographies.map((geo) => {
-                const countryName = geo.properties.NAME;
-                const sales = salesByCountry[countryName] || 0;
+                const geoName = geo.properties.NAME;
+
+                // Find matching lead country (case-insensitive trim match)
+                const leadCountry = Object.keys(salesByCountry).find(
+                  (c) => c.toLowerCase().trim() === geoName.toLowerCase().trim()
+                );
+
+                const sales = leadCountry ? salesByCountry[leadCountry] : 0;
+
                 return (
                   <Geography
                     key={geo.rsmKey}
                     geography={geo}
-                    fill={colorMap[countryName] || "#E5E7EB"}
+                    fill={
+                      leadCountry
+                        ? colorMap[leadCountry] || "#E5E7EB"
+                        : "#E5E7EB"
+                    }
                     stroke="#fff"
                     strokeWidth={0.5}
                     style={{
                       default: { outline: "none" },
-                      hover: { outline: "none", opacity: 0.8, cursor: "pointer" },
+                      hover: {
+                        outline: "none",
+                        opacity: 0.8,
+                        cursor: "pointer",
+                      },
                       pressed: { outline: "none" },
                     }}
                     data-tooltip-id="world-map-tooltip"
-                    data-tooltip-content={`${countryName}: €${sales.toLocaleString()}`}
+                    data-tooltip-content={`${geoName}: €${sales.toLocaleString()}`}
                   />
                 );
               })
@@ -303,7 +319,9 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
                 </div>
                 <button
                   data-tooltip-id={`tooltip-${c}`}
-                  data-tooltip-content={`Total sales in ${c}: €${salesByCountry[c].toLocaleString()}`}
+                  data-tooltip-content={`Total sales in ${c}: €${salesByCountry[
+                    c
+                  ].toLocaleString()}`}
                   className="p-1"
                 >
                   <Info className="text-black h-4 w-4" />
