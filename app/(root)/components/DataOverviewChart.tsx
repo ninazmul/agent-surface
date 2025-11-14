@@ -75,6 +75,8 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
     count: item.value,
   }));
 
+  const maxCount = Math.max(...chartData.map((d) => d.count)) || 1;
+
   // Optional: Colors for bars
   const barColors = [
     "#1D1D1D",
@@ -106,6 +108,16 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
               tick={{ fontSize: 14, fill: "#6B7280" }}
             />
             <Tooltip />
+
+            {/* Background bars (full height reference) */}
+            <Bar
+              dataKey={() => maxCount} // static max reference
+              fill="#E5E7EB" // light gray background
+              radius={[4, 4, 0, 0]}
+              isAnimationActive={false}
+            />
+
+            {/* Actual bars */}
             <Bar
               dataKey="count"
               fillOpacity={1}
@@ -113,7 +125,7 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
               radius={[4, 4, 0, 0]}
               isAnimationActive={false}
             >
-              {chartData.map((entry, index) => (
+              {chartData.map((_, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={barColors[index % barColors.length]}
