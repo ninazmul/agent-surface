@@ -238,7 +238,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
 
       {/* Interactive World Map */}
       <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-visible relative">
-        <ComposableMap projectionConfig={{ scale: 160 }} className="h-[300px]">
+        <ComposableMap projectionConfig={{ scale: 160 }}>
           <Geographies geography={geoUrl}>
             {({ geographies }) =>
               geographies.map((geo) => {
