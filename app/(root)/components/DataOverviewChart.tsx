@@ -7,6 +7,7 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
+
 import {
   BarChart,
   Bar,
@@ -14,7 +15,9 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  RectangleProps,
 } from "recharts";
+
 import { IAdmin } from "@/lib/database/models/admin.model";
 import { IResource } from "@/lib/database/models/resource.model";
 import { ICourse } from "@/lib/database/models/course.model";
@@ -40,6 +43,63 @@ interface DataOverviewChartProps {
   users: IUser[];
 }
 
+/* -------------------------------------------------------
+   STRICTLY TYPED CUSTOM SHAPE
+------------------------------------------------------- */
+type RechartsBarShapeProps = RectangleProps & {
+  value?: number;
+  fill?: string;
+};
+
+interface CombinedBarProps extends RectangleProps {
+  value: number;
+  maxValue: number;
+  fill: string;
+}
+
+const CombinedBar: React.FC<CombinedBarProps> = ({
+  x = 0,
+  y = 0,
+  width = 0,
+  height = 0,
+  fill,
+  value,
+  maxValue,
+}) => {
+  const fullHeight = Math.max(height, 0);
+  const filledHeight = (value / maxValue) * fullHeight;
+  const filledY = y + (fullHeight - filledHeight);
+
+  return (
+    <g>
+      {/* empty background track */}
+      <rect
+        x={x}
+        y={y}
+        width={width}
+        height={fullHeight}
+        fill="#E5E7EB"
+        rx={4}
+        ry={4}
+      />
+
+      {/* filled bar */}
+      <rect
+        x={x}
+        y={filledY}
+        width={width}
+        height={filledHeight}
+        fill={fill}
+        rx={4}
+        ry={4}
+      />
+    </g>
+  );
+};
+
+/* -------------------------------------------------------
+   MAIN CHART COMPONENT
+------------------------------------------------------- */
 export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
   adminStatus,
   admins,
@@ -53,7 +113,7 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
   services,
   users,
 }) => {
-  // Filter labels based on admin status
+  // Filter labels based on adminStatus
   const labels = [
     { key: "Admins", value: admins.length },
     { key: "Leads", value: leads.length },
@@ -69,7 +129,7 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
     (item) => adminStatus || !["Admins", "Profiles", "Users"].includes(item.key)
   );
 
-  // Prepare data for Recharts
+  // Chart data
   const chartData = labels.map((item) => ({
     category: item.key,
     count: item.value,
@@ -77,7 +137,6 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
 
   const maxCount = Math.max(...chartData.map((d) => d.count)) || 1;
 
-  // Optional: Colors for bars
   const barColors = [
     "#1D1D1D",
     "#AE8BCA",
@@ -97,6 +156,7 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
         <CardTitle>Data Overview</CardTitle>
         <CardDescription>Total Entries by Category</CardDescription>
       </CardHeader>
+
       <CardContent className="h-[450px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
@@ -109,39 +169,38 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
             />
             <Tooltip />
 
-            {/* Background bars (full height reference) */}
-            <Bar
-              dataKey={() => maxCount} // static max reference
-              fill="#E5E7EB" // light gray background
-              radius={[4, 4, 0, 0]}
-              isAnimationActive={false}
-            />
-
-            {/* Actual bars */}
             <Bar
               dataKey="count"
               isAnimationActive={false}
-              radius={[4, 4, 0, 0]} // actual filled bar (works)
-              label={{ position: "top", fill: "#6B7280" }}
-              background={{
-                fill: "#E5E7EB",
-                radius: 4, // MUST be a single number
+              shape={(props: unknown) => {
+                const p = props as RechartsBarShapeProps;
+                return (
+                  <CombinedBar
+                    {...p}
+                    value={p.value ?? 0}
+                    fill={p.fill ?? "#000"}
+                    maxValue={maxCount}
+                  />
+                );
               }}
+              label={{ position: "top", fill: "#6B7280" }}
             >
-              {chartData.map((entry, index) => (
+              {chartData.map((_, index) => (
                 <Cell key={index} fill={barColors[index % barColors.length]} />
               ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
 
-        {/* Legend below chart */}
+        {/* LEGEND */}
         <div className="flex flex-wrap mt-6 gap-4 justify-start">
           {labels.map((item, index) => (
             <div key={index} className="flex items-center gap-2">
               <div
                 className="w-4 h-4 rounded-sm"
-                style={{ backgroundColor: barColors[index % barColors.length] }}
+                style={{
+                  backgroundColor: barColors[index % barColors.length],
+                }}
               />
               <span className="text-sm font-medium text-gray-700">
                 {item.key}
