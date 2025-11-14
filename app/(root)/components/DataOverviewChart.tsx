@@ -1,7 +1,20 @@
 "use client";
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { BarChart, Bar, XAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  Tooltip,
+  ResponsiveContainer,
+  Cell,
+} from "recharts";
 import { IAdmin } from "@/lib/database/models/admin.model";
 import { IResource } from "@/lib/database/models/resource.model";
 import { ICourse } from "@/lib/database/models/course.model";
@@ -52,7 +65,9 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
     { key: "Promotions", value: promotions.length },
     { key: "Services", value: services.length },
     { key: "Users", value: users.length },
-  ].filter(item => adminStatus || !["Admins", "Profiles", "Users"].includes(item.key));
+  ].filter(
+    (item) => adminStatus || !["Admins", "Profiles", "Users"].includes(item.key)
+  );
 
   // Prepare data for Recharts
   const chartData = labels.map((item) => ({
@@ -82,8 +97,14 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
       </CardHeader>
       <CardContent className="h-[400px]">
         <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 20, right: 20, left: 0, bottom: 20 }}>
-            <XAxis dataKey="category" tick={{ fontSize: 14, fill: "#6B7280" }} />
+          <BarChart
+            data={chartData}
+            margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
+          >
+            <XAxis
+              dataKey="category"
+              tick={{ fontSize: 14, fill: "#6B7280" }}
+            />
             <Tooltip />
             <Bar
               dataKey="count"
@@ -93,11 +114,26 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
               isAnimationActive={false}
             >
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={barColors[index % barColors.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={barColors[index % barColors.length]}
+                />
               ))}
             </Bar>
           </BarChart>
         </ResponsiveContainer>
+        {/* Legend row below the chart */}
+        <div className="flex flex-wrap mt-4 gap-4 justify-start">
+          {chartData.map((item, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <div
+                className="w-4 h-4 rounded-sm"
+                style={{ backgroundColor: barColors[index % barColors.length] }}
+              />
+              <span className="text-sm text-gray-700">{item.category}</span>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
