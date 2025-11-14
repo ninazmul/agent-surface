@@ -190,7 +190,7 @@ const Dashboard = () => {
 
   return (
     <div className="bg-gray-50 dark:bg-gray-900 p-4">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[550px]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 h-[500px]">
         {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
         {myProfile?.role !== "Student" && (
           <CountrySalesTargets
@@ -228,7 +228,7 @@ const Dashboard = () => {
           users={users}
         />
       </div>
-      
+
       {/* {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />} */}
       {/* {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />} */}
     </div>
