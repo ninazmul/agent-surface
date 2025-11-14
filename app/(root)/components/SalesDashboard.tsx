@@ -17,7 +17,7 @@ import { Info } from "lucide-react";
 const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 interface SalesDashboardProps {
-  leads: ILead[];
+  leads?: ILead[];
 }
 
 const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
@@ -33,6 +33,8 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        if (!userId) return;
+
         const userID = await getUserByClerkId(userId);
         const email = await getUserEmailById(userID);
         const adminStatus = await isAdmin(email);
@@ -46,7 +48,9 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             adminCountries.length === 0
               ? fetchedLeads
               : fetchedLeads.filter((l: ILead) =>
-                  adminCountries.includes(l.home.country)
+                  l.home?.country
+                    ? adminCountries.includes(l.home.country)
+                    : false
                 );
         } else {
           allLeads = await getLeadsByAgency(email);
@@ -64,7 +68,10 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
     if (!dashboardData?.leads?.length) fetchData();
   }, [dashboardData, setDashboardData, userId]);
 
-  // Filtered leads based on date and country
+  const allLeads = useMemo(() => {
+    return leads.length ? leads : dashboardData?.leads || [];
+  }, [leads, dashboardData?.leads]);
+
   const filteredLeads = useMemo(() => {
     const now = new Date();
     const rangeStart =
@@ -78,7 +85,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         ? subYears(now, 1)
         : null;
 
-    return (leads || [])
+    return allLeads
       .filter((l) => l.paymentStatus === "Accepted")
       .filter((l) => {
         const date = new Date(l.updatedAt || l.createdAt);
@@ -87,8 +94,8 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         }
         return !rangeStart || date >= rangeStart;
       })
-      .filter((l) => (country === "All" ? true : l.home.country === country));
-  }, [leads, filter, startDate, endDate, country]);
+      .filter((l) => (country === "All" ? true : l.home?.country === country));
+  }, [allLeads, filter, startDate, endDate, country]);
 
   const parseNumber = (v?: string) =>
     parseFloat((v || "0").replace(/,/g, "").trim()) || 0;
@@ -113,7 +120,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const salesByCountry = useMemo(() => {
     const result: Record<string, number> = {};
     filteredLeads.forEach((lead) => {
-      const c = lead.home.country?.trim() || "Unknown";
+      const c = lead.home?.country?.trim() || "Unknown";
       const courseTotal = Array.isArray(lead.course)
         ? lead.course.reduce((s, c2) => s + Number(c2.courseFee || 0), 0)
         : 0;
@@ -128,10 +135,8 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
 
   const countries = useMemo(
     () =>
-      Array.from(
-        new Set((leads || []).map((l) => l.home.country || "Unknown"))
-      ),
-    [leads]
+      Array.from(new Set(allLeads.map((l) => l.home?.country || "Unknown"))),
+    [allLeads]
   );
 
   const handleResetFilters = () => {
@@ -167,9 +172,9 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const top3Countries = salesCountries.slice(0, 3);
   const colors = ["#7C3AED", "#F97316", "#3B82F6"];
   const colorMap: Record<string, string> = {};
-  top3Countries.forEach(
-    (c, idx) => (colorMap[c] = colors[idx % colors.length])
-  );
+  top3Countries.forEach((c, idx) => {
+    if (c) colorMap[c] = colors[idx % colors.length];
+  });
 
   return (
     <div className="p-4">
@@ -237,17 +242,19 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
       )}
 
       {/* Interactive World Map */}
-      <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-visible relative">
+      <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-visible relative h-[300px]">
         <ComposableMap projectionConfig={{ scale: 160 }}>
           <Geographies geography={geoUrl}>
             {({ geographies }) =>
               geographies.map((geo) => {
-                const geoName = geo.properties.NAME;
+                const geoName = geo.properties?.NAME || "Unknown";
 
-                // Find matching lead country (case-insensitive trim match)
-                const leadCountry = Object.keys(salesByCountry).find(
-                  (c) => c.toLowerCase().trim() === geoName.toLowerCase().trim()
-                );
+                const leadCountry = Object.keys(salesByCountry)
+                  .filter(Boolean)
+                  .find(
+                    (c) =>
+                      c?.toLowerCase().trim() === geoName?.toLowerCase().trim()
+                  );
 
                 const sales = leadCountry ? salesByCountry[leadCountry] : 0;
 
