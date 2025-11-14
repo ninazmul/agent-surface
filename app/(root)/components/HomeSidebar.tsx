@@ -234,7 +234,7 @@ const HomeSidebar = ({
               }}
             />
             <div>
-              <h1 className="text-sm font-semibold">
+              <h1 className="text-sm font-semibold dark:text-gray-100">
                 {profile?.name || admin?.name || "User Name"}
               </h1>
               <p className="text-xs text-gray-500 dark:text-gray-100">

@@ -197,7 +197,7 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
                   backgroundColor: barColors[index % barColors.length],
                 }}
               />
-              <span className="text-sm font-medium text-gray-700">
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-100">
                 {item.key}
               </span>
             </div>
