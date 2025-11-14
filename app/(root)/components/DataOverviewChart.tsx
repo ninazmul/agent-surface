@@ -122,15 +122,18 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
             </Bar>
           </BarChart>
         </ResponsiveContainer>
-        {/* Legend row below the chart */}
-        <div className="flex flex-wrap mt-4 gap-4 justify-start">
-          {chartData.map((item, index) => (
+
+        {/* Legend below chart */}
+        <div className="flex flex-wrap mt-6 gap-4 justify-start">
+          {labels.map((item, index) => (
             <div key={index} className="flex items-center gap-2">
               <div
                 className="w-4 h-4 rounded-sm"
                 style={{ backgroundColor: barColors[index % barColors.length] }}
               />
-              <span className="text-sm text-gray-700">{item.category}</span>
+              <span className="text-sm font-medium text-gray-700">
+                {item.key}
+              </span>
             </div>
           ))}
         </div>
