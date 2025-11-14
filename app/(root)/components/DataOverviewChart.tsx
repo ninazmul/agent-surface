@@ -95,7 +95,7 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
         <CardTitle>Data Overview</CardTitle>
         <CardDescription>Total Entries by Category</CardDescription>
       </CardHeader>
-      <CardContent className="h-[400px]">
+      <CardContent className="h-[450px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
