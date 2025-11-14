@@ -77,16 +77,16 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
 
   // Optional: Colors for bars
   const barColors = [
-    "#1E90FF",
-    "#28A745",
-    "#6F42C1",
-    "#FFC107",
-    "#FD7E14",
-    "#6610F2",
-    "#20C997",
-    "#DC3545",
-    "#17A2B8",
-    "#E83E8C",
+    "#1D1D1D",
+    "#AE8BCA",
+    "#428BF6",
+    "#A866FD",
+    "#DD992B",
+    "#1670F3",
+    "#3A3A3A",
+    "#7D24F0",
+    "#DD992B",
+    "#69A6FF",
   ];
 
   return (
