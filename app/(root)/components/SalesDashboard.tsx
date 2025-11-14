@@ -7,7 +7,7 @@ import { ILead } from "@/lib/database/models/lead.model";
 import Image from "next/image";
 import { Info } from "lucide-react";
 import { Tooltip } from "react-tooltip";
-import "react-tooltip/dist/react-tooltip.css"; // import styles
+import "react-tooltip/dist/react-tooltip.css";
 
 interface SalesDashboardProps {
   leads: ILead[];
@@ -19,6 +19,9 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
+  // -----------------------------
+  // FILTER LEADS
+  // -----------------------------
   const filteredLeads = useMemo(() => {
     const now = new Date();
     const rangeStart =
@@ -44,6 +47,9 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
       .filter((l) => (country === "All" ? true : l.home.country === country));
   }, [leads, filter, startDate, endDate, country]);
 
+  // -----------------------------
+  // HELPER FUNCTIONS
+  // -----------------------------
   const parseNumber = (v?: string) =>
     parseFloat((v || "0").replace(/,/g, "").trim()) || 0;
 
@@ -112,17 +118,22 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
     }
   };
 
-  const salesCountries = Object.keys(salesByCountry);
-
-  const colorMap: Record<string, string> = {
-    Australia: "bg-purple-500",
-    Bangladesh: "bg-orange-500",
-    Ireland: "bg-blue-500",
-  };
+  // -----------------------------
+  // DYNAMIC COLORS FOR TOP 3 COUNTRIES
+  // -----------------------------
+  const salesCountries = Object.keys(salesByCountry).sort(
+    (a, b) => (salesByCountry[b] || 0) - (salesByCountry[a] || 0)
+  );
+  const top3Countries = salesCountries.slice(0, 3);
+  const dynamicColors = ["bg-purple-500", "bg-orange-500", "bg-blue-500"];
+  const colorMap: Record<string, string> = {};
+  top3Countries.forEach((country, idx) => {
+    colorMap[country] = dynamicColors[idx % dynamicColors.length];
+  });
 
   return (
     <div className="p-4">
-      {/* Header */}
+      {/* Header & Filters */}
       <div className="flex flex-wrap justify-between items-center mb-6">
         <h1 className="text-2xl font-bold">Sales & Performance Analytics</h1>
         <div className="flex items-center gap-2">
@@ -140,7 +151,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
               <option value="custom">Custom Range</option>
             </select>
           </div>
-
           <div className="relative">
             <select
               className="appearance-none bg-white border border-gray-300 rounded-2xl py-2 pl-4 pr-8 text-sm font-semibold dark:bg-gray-700 dark:border-gray-600 dark:text-white"
@@ -209,7 +219,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             </div>
             {salesCountries.length > 0 && (
               <p className="text-xs mt-2 text-gray-500">
-                Data for **{salesCountries[0]}**
+                Data for **{top3Countries[0]}**
               </p>
             )}
           </div>
@@ -224,7 +234,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
           </p>
         ) : (
           <div className="flex flex-col gap-2">
-            {salesCountries.slice(0, 3).map((c) => (
+            {top3Countries.map((c) => (
               <div key={c} className="flex justify-between items-center">
                 <div className="flex items-center gap-3">
                   <span
@@ -234,7 +244,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
                   ></span>
                   <span className="font-semibold">{c}</span>
                 </div>
-
                 <button
                   data-tooltip-id={`tooltip-${c}`}
                   data-tooltip-content={`Total sales in ${c}: €${salesByCountry[
@@ -244,7 +253,6 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
                 >
                   <Info className="text-black rounded-full h-4 w-4" />
                 </button>
-
                 <Tooltip id={`tooltip-${c}`} place="top" />
               </div>
             ))}
