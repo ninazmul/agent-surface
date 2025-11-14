@@ -235,7 +235,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
       </div>
 
       {/* Scrollable Section */}
-      <div className="relative bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden divide-y divide-gray-100 dark:divide-gray-700 h-[450px] overflow-y-auto scroll-smooth">
+      <div className="relative bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden divide-y divide-gray-100 dark:divide-gray-700 h-[445px] overflow-y-auto scroll-smooth">
         {salesTargetEntries.map(([country, target]) => {
           const targetNum = parseNumber(target);
           const sales = salesByCountry[country] || 0;
