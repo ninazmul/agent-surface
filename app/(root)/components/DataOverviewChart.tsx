@@ -143,7 +143,6 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
     "#3A3A3A",
     "#7D24F0",
     "#DD992B",
-    "#69A6FF",
   ];
 
   return (

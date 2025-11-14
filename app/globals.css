@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --background: 210 95% 97%;
+    --background: 210 20% 98%;
     --foreground: 222.2 84% 4.9%;
 
     --card: 0 0% 100%;
@@ -542,13 +542,13 @@ body {
 /* ================= Dark Mode Input Fix ================= */
 .dark .react-select__control input,
 .dark .react-select__control input:focus {
-  color: #f3f4f6 !important;       /* typed text */
+  color: #f3f4f6 !important; /* typed text */
   background-color: transparent !important;
 }
 
 .dark .react-select__control input::placeholder {
-  color: #d1d5db !important;       /* placeholder text */
-  opacity: 1;                       /* ensure placeholder is fully visible */
+  color: #d1d5db !important; /* placeholder text */
+  opacity: 1; /* ensure placeholder is fully visible */
 }
 
 /* Hide scrollbar but keep scrolling */
