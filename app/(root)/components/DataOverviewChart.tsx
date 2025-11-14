@@ -120,16 +120,16 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
             {/* Actual bars */}
             <Bar
               dataKey="count"
-              fillOpacity={1}
-              label={{ position: "top", fill: "#6B7280" }}
-              radius={[4, 4, 0, 0]}
               isAnimationActive={false}
+              radius={[4, 4, 0, 0]} // actual filled bar (works)
+              label={{ position: "top", fill: "#6B7280" }}
+              background={{
+                fill: "#E5E7EB",
+                radius: 4, // MUST be a single number
+              }}
             >
-              {chartData.map((_, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={barColors[index % barColors.length]}
-                />
+              {chartData.map((entry, index) => (
+                <Cell key={index} fill={barColors[index % barColors.length]} />
               ))}
             </Bar>
           </BarChart>
