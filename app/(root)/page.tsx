@@ -371,7 +371,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-10 bg-gray-50 dark:bg-gray-900 p-2">
-      <div className="grid grid-cols-1 md:grid-cols-2 h-[550px]">
+      <div className="grid grid-cols-1 lg:grid-cols-2 h-[550px]">
         {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
         {myProfile?.role !== "Student" && (
           <CountrySalesTargets
@@ -379,31 +379,6 @@ const Dashboard = () => {
             profiles={profiles}
             leads={leads}
             myProfile={myProfile}
-          />
-        )}
-      </div>
-      {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
-      {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
-      <div className="overflow-x-auto">
-        {loading ? (
-          Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
-        ) : (
-          <DashboardStats
-            cards={{
-              admins,
-              leads,
-              resources,
-              courses,
-              downloads,
-              eventCalendars,
-              profiles,
-              promotions,
-              services,
-              users,
-            }}
-            adminStatus={adminStatus}
-            myProfile={myProfile}
-            subAgentCount={subAgentCount}
           />
         )}
       </div>
@@ -432,6 +407,31 @@ const Dashboard = () => {
           </div>
         </div>
       )}
+      {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
+      {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
+      <div className="overflow-x-auto">
+        {loading ? (
+          Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)
+        ) : (
+          <DashboardStats
+            cards={{
+              admins,
+              leads,
+              resources,
+              courses,
+              downloads,
+              eventCalendars,
+              profiles,
+              promotions,
+              services,
+              users,
+            }}
+            adminStatus={adminStatus}
+            myProfile={myProfile}
+            subAgentCount={subAgentCount}
+          />
+        )}
+      </div>
     </div>
   );
 };

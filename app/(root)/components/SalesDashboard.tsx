@@ -242,7 +242,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
       {/* Map Simulation Section - Replaces Pie and Line Charts */}
       <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden">
         {/* Placeholder for the Map (using the image as a conceptual guide) */}
-        <div className="relative w-full h-[300px] rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
+        <div className="relative w-full h-44 md:h-72 lg:h-[300px] rounded-xl overflow-hidden bg-gray-100 dark:bg-gray-800">
           <Image
             src="/assets/map.jpg"
             alt="Map"
@@ -255,7 +255,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
           {/* Tooltip overlay */}
           <div
             className="absolute p-4 rounded-xl shadow-2xl bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600"
-            style={{ top: "45%", left: "55%" }}
+            style={{ top: "45%", left: "40%" }}
           >
             <p className="text-sm font-light text-gray-600 dark:text-gray-300 mb-1">
               Total Sales
