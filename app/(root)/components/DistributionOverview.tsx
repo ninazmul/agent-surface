@@ -1,7 +1,8 @@
-// components/dashboard/DistributionOverview.tsx
+"use client";
 
-import React from "react";
+import React, { useState, useMemo } from "react";
 import DistributionListItem from "./DistributionListItem";
+import { ChartLineDots } from "./ChartLineDots";
 
 import { IAdmin } from "@/lib/database/models/admin.model";
 import { IResource } from "@/lib/database/models/resource.model";
@@ -9,14 +10,11 @@ import { ICourse } from "@/lib/database/models/course.model";
 import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { IServices } from "@/lib/database/models/service.model";
-import { IUser } from "@/lib/database/models/user.model";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { IDownload } from "@/lib/database/models/download.model";
 import { ILead } from "@/lib/database/models/lead.model";
-import { ChartLineDots } from "./ChartLineDots";
 
 interface DistributionOverviewProps {
-  adminStatus: boolean;
   admins: IAdmin[];
   leads: ILead[];
   resources: IResource[];
@@ -26,8 +24,36 @@ interface DistributionOverviewProps {
   profiles: IProfile[];
   promotions: IPromotion[];
   services: IServices[];
-  users: IUser[];
 }
+
+type DateFilterOption = "30days" | "7days" | "all";
+
+// Move filterByDate outside component to satisfy useMemo
+const filterByDate = <T extends { createdAt?: string | Date }>(
+  data: T[],
+  dateFilter: DateFilterOption
+) => {
+  if (dateFilter === "all") return data;
+
+  const now = new Date();
+  let cutoff: Date;
+
+  if (dateFilter === "30days") {
+    cutoff = new Date();
+    cutoff.setDate(now.getDate() - 30);
+  } else if (dateFilter === "7days") {
+    cutoff = new Date();
+    cutoff.setDate(now.getDate() - 7);
+  } else {
+    return data;
+  }
+
+  return data.filter((item) => {
+    if (!item.createdAt) return false;
+    const itemDate = new Date(item.createdAt);
+    return itemDate >= cutoff;
+  });
+};
 
 const DistributionOverview = ({
   admins,
@@ -39,37 +65,45 @@ const DistributionOverview = ({
   profiles,
   promotions,
   services,
-  users,
 }: DistributionOverviewProps) => {
+  const [dateFilter, setDateFilter] = useState<DateFilterOption>("30days");
+
+  // Filtered datasets
+  const filteredAdmins = useMemo(() => filterByDate(admins, dateFilter), [admins, dateFilter]);
+  const filteredLeads = useMemo(() => filterByDate(leads, dateFilter), [leads, dateFilter]);
+  const filteredResources = useMemo(() => filterByDate(resources, dateFilter), [resources, dateFilter]);
+  const filteredCourses = useMemo(() => filterByDate(courses, dateFilter), [courses, dateFilter]);
+  const filteredDownloads = useMemo(() => filterByDate(downloads, dateFilter), [downloads, dateFilter]);
+  const filteredEventCalendars = useMemo(() => filterByDate(eventCalendars, dateFilter), [eventCalendars, dateFilter]);
+  const filteredProfiles = useMemo(() => filterByDate(profiles, dateFilter), [profiles, dateFilter]);
+  const filteredPromotions = useMemo(() => filterByDate(promotions, dateFilter), [promotions, dateFilter]);
+  const filteredServices = useMemo(() => filterByDate(services, dateFilter), [services, dateFilter]);
+
   const totalCount =
-    admins.length +
-    leads.length +
-    resources.length +
-    courses.length +
-    downloads.length +
-    eventCalendars.length +
-    profiles.length +
-    promotions.length +
-    services.length +
-    users.length;
+    filteredAdmins.length +
+    filteredLeads.length +
+    filteredResources.length +
+    filteredCourses.length +
+    filteredDownloads.length +
+    filteredEventCalendars.length +
+    filteredProfiles.length +
+    filteredPromotions.length +
+    filteredServices.length;
 
   const distributionData = [
-    { label: "Admins", count: admins.length },
-    { label: "Leads", count: leads.length },
-    { label: "Resources", count: resources.length },
-    { label: "Courses", count: courses.length },
-    { label: "Downloads", count: downloads.length },
-    { label: "Event Calendars", count: eventCalendars.length },
-    { label: "Profiles", count: profiles.length },
-    { label: "Promotions", count: promotions.length },
-    { label: "Services", count: services.length },
-    { label: "Users", count: users.length },
+    { label: "Admins", count: filteredAdmins.length },
+    { label: "Leads", count: filteredLeads.length },
+    { label: "Resources", count: filteredResources.length },
+    { label: "Courses", count: filteredCourses.length },
+    { label: "Downloads", count: filteredDownloads.length },
+    { label: "Event Calendars", count: filteredEventCalendars.length },
+    { label: "Profiles", count: filteredProfiles.length },
+    { label: "Promotions", count: filteredPromotions.length },
+    { label: "Services", count: filteredServices.length },
   ].map((item) => ({
     ...item,
     percentage:
-      totalCount > 0
-        ? ((item.count / totalCount) * 100).toFixed(2) + "%"
-        : "0%",
+      totalCount > 0 ? ((item.count / totalCount) * 100).toFixed(2) + "%" : "0%",
   }));
 
   return (
@@ -78,24 +112,29 @@ const DistributionOverview = ({
         <h2 className="text-xl font-bold dark:text-gray-100">
           Distribution Overview
         </h2>
-        <div className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer">
-          Last 30 days ▼
-        </div>
+
+        <select
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value as DateFilterOption)}
+          className="text-sm text-gray-500 dark:text-gray-400 cursor-pointer border border-gray-300 dark:border-gray-700 rounded px-2 py-1"
+        >
+          <option value="7days">Last 7 days</option>
+          <option value="30days">Last 30 days</option>
+          <option value="all">All time</option>
+        </select>
       </div>
 
-      {/* Replacing DataOverviewChart with ChartLineDots */}
       <div className="flex-shrink-0">
         <ChartLineDots
-          admins={admins}
-          leads={leads}
-          resources={resources}
-          courses={courses}
-          downloads={downloads}
-          eventCalendars={eventCalendars}
-          profiles={profiles}
-          promotions={promotions}
-          services={services}
-          users={users}
+          admins={filteredAdmins}
+          leads={filteredLeads}
+          resources={filteredResources}
+          courses={filteredCourses}
+          downloads={filteredDownloads}
+          eventCalendars={filteredEventCalendars}
+          profiles={filteredProfiles}
+          promotions={filteredPromotions}
+          services={filteredServices}
         />
       </div>
 

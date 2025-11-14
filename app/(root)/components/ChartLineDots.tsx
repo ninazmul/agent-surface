@@ -20,7 +20,6 @@ import { ICourse } from "@/lib/database/models/course.model";
 import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { IServices } from "@/lib/database/models/service.model";
-import { IUser } from "@/lib/database/models/user.model";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { IDownload } from "@/lib/database/models/download.model";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -35,7 +34,6 @@ interface ChartLineDotsProps {
   profiles: IProfile[];
   promotions: IPromotion[];
   services: IServices[];
-  users: IUser[];
 }
 
 export function ChartLineDots({
@@ -48,7 +46,6 @@ export function ChartLineDots({
   profiles,
   promotions,
   services,
-  users,
 }: ChartLineDotsProps) {
   // Convert each data category into an array for the chart
   const chartData = [
@@ -61,7 +58,6 @@ export function ChartLineDots({
     { category: "Profiles", count: profiles.length },
     { category: "Promotions", count: promotions.length },
     { category: "Services", count: services.length },
-    { category: "Users", count: users.length },
   ];
 
   return (

@@ -24,7 +24,6 @@ import { ICourse } from "@/lib/database/models/course.model";
 import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { IServices } from "@/lib/database/models/service.model";
-import { IUser } from "@/lib/database/models/user.model";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { IDownload } from "@/lib/database/models/download.model";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -40,7 +39,6 @@ interface DataOverviewChartProps {
   profiles: IProfile[];
   promotions: IPromotion[];
   services: IServices[];
-  users: IUser[];
 }
 
 /* -------------------------------------------------------
@@ -111,7 +109,6 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
   profiles,
   promotions,
   services,
-  users,
 }) => {
   // Filter labels based on adminStatus
   const labels = [
@@ -124,7 +121,6 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
     { key: "Profiles", value: profiles.length },
     { key: "Promotions", value: promotions.length },
     { key: "Services", value: services.length },
-    { key: "Users", value: users.length },
   ].filter(
     (item) => adminStatus || !["Admins", "Profiles", "Users"].includes(item.key)
   );

@@ -31,7 +31,6 @@ import { ICourse } from "@/lib/database/models/course.model";
 import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { IServices } from "@/lib/database/models/service.model";
-import { IUser } from "@/lib/database/models/user.model";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { IDownload } from "@/lib/database/models/download.model";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -70,7 +69,6 @@ const Dashboard = () => {
   const [profiles, setProfiles] = useState<IProfile[]>([]);
   const [promotions, setPromotions] = useState<IPromotion[]>([]);
   const [services, setServices] = useState<IServices[]>([]);
-  const [users, setUsers] = useState<IUser[]>([]);
 
   // ===== Load cached dashboardData
   useEffect(() => {
@@ -105,7 +103,6 @@ const Dashboard = () => {
       setProfiles(summary.profiles);
       setPromotions(summary.promotions);
       setServices(summary.services);
-      setUsers(summary.users);
       setMyProfile(profile);
 
       // Redirect student
@@ -211,11 +208,9 @@ const Dashboard = () => {
           profiles={profiles}
           promotions={promotions}
           services={services}
-          users={users}
         />
 
         <DistributionOverview
-          adminStatus={adminStatus}
           admins={admins}
           leads={leads}
           resources={resources}
@@ -225,7 +220,6 @@ const Dashboard = () => {
           profiles={profiles}
           promotions={promotions}
           services={services}
-          users={users}
         />
       </div>
 

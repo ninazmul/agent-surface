@@ -9,7 +9,6 @@ import { ICourse } from "@/lib/database/models/course.model";
 import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { IServices } from "@/lib/database/models/service.model";
-import { IUser } from "@/lib/database/models/user.model";
 import { IAdmin } from "@/lib/database/models/admin.model";
 
 type DashboardData = {
@@ -22,7 +21,6 @@ type DashboardData = {
   profiles?: IProfile[];
   promotions?: IPromotion[];
   services?: IServices[];
-  users?: IUser[];
   myProfile?: IProfile | null;
 };
 
