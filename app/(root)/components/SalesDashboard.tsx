@@ -178,14 +178,14 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
     <div className="">
       {/* Header & Filters */}
       <div className="flex flex-wrap justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-black dark:text-white">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Sales & Performance Analytics
         </h1>
         <div className="flex items-center gap-2">
           {/* Filter */}
           <div className="relative">
             <select
-              className="appearance-none bg-white border border-gray-300 rounded-2xl py-2 pl-4 pr-8 text-sm font-semibold dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
               onChange={(e) => setFilter(e.target.value)}
               value={filter}
             >
@@ -200,7 +200,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
           {/* Country */}
           <div className="relative">
             <select
-              className="appearance-none bg-white border border-gray-300 rounded-2xl py-2 pl-4 pr-8 text-sm font-semibold dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+              className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
               onChange={(e) => setCountry(e.target.value)}
               value={country}
             >

@@ -109,14 +109,14 @@ const DistributionOverview = ({
   return (
     <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 h-full flex flex-col">
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold dark:text-gray-100">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Distribution Overview
         </h2>
 
         <select
           value={dateFilter}
           onChange={(e) => setDateFilter(e.target.value as DateFilterOption)}
-          className="text-sm text-gray-500 dark:text-gray-100 dark:bg-gray-700 cursor-pointer border border-gray-300 dark:border-gray-700 rounded-2xl px-2 py-1"
+          className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
         >
           <option value="7days">Last 7 days</option>
           <option value="30days">Last 30 days</option>

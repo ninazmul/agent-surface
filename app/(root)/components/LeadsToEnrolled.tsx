@@ -92,7 +92,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Leads Progress
         </h2>
 

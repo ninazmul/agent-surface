@@ -148,7 +148,9 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
   return (
     <Card className="h-full bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
       <CardHeader>
-        <CardTitle>Data Overview</CardTitle>
+        <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
+          Data Overview
+        </CardTitle>
         <CardDescription>Total Entries by Category</CardDescription>
       </CardHeader>
 
