@@ -27,6 +27,8 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
   const [endDate, setEndDate] = useState("");
   const [showMore, setShowMore] = useState(false);
 
+  const [selectedAgent, setSelectedAgent] = useState("all"); // ✅ NEW
+
   const filterByDateRange = React.useCallback(
     <T extends { createdAt: string | Date }>(data: T[]) => {
       const now = new Date();
@@ -37,7 +39,8 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
         const end = new Date(endDate);
         return data.filter(
           (item) =>
-            new Date(item.createdAt) >= start && new Date(item.createdAt) <= end
+            new Date(item.createdAt) >= start &&
+            new Date(item.createdAt) <= end
         );
       }
 
@@ -65,17 +68,26 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
     [filter, startDate, endDate]
   );
 
+  // STEP 1 — Date filter
   const filteredLeads = useMemo(
     () => filterByDateRange(leads),
     [filterByDateRange, leads]
   );
 
+  // STEP 2 — Agent filter (NEW)
+  const agentFilteredLeads = useMemo(() => {
+    if (selectedAgent === "all") return filteredLeads;
+    return filteredLeads.filter((l) => l.author === selectedAgent);
+  }, [filteredLeads, selectedAgent]);
+
+  // STEP 3 — Aggregation per agent
   const agentsData: AgentProgress[] = useMemo(() => {
     return profiles
       .map((agent) => {
-        const agentLeads = filteredLeads.filter(
+        const agentLeads = agentFilteredLeads.filter(
           (l) => l.author === agent.email
         );
+
         const counts: Record<string, number> = {};
         leadStages.forEach((stage) => {
           counts[stage] =
@@ -86,7 +98,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
         return total > 0 ? { agentName: agent.name, ...counts } : null;
       })
       .filter((a): a is AgentProgress => a !== null);
-  }, [profiles, filteredLeads]);
+  }, [profiles, agentFilteredLeads]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
@@ -98,6 +110,8 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
 
         {/* Filter Section */}
         <div className="flex items-center gap-3">
+
+          {/* Date Filter */}
           <select
             className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
             onChange={(e) => setFilter(e.target.value)}
@@ -128,6 +142,20 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
             </>
           )}
 
+          {/* NEW — Agency Filter */}
+          <select
+            className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+            value={selectedAgent}
+            onChange={(e) => setSelectedAgent(e.target.value)}
+          >
+            <option value="all">All Agencies</option>
+            {profiles.map((agent) => (
+              <option key={agent.email} value={agent.email}>
+                {agent.name}
+              </option>
+            ))}
+          </select>
+
           {/* Reset Button */}
           <button
             className="bg-black dark:bg-gray-700 text-white px-4 py-2 rounded-2xl transition"
@@ -135,6 +163,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
               setFilter("month");
               setStartDate("");
               setEndDate("");
+              setSelectedAgent("all"); // reset agency
             }}
           >
             Reset Filter
