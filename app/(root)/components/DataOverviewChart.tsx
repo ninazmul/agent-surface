@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
+  CardFooter,
 } from "@/components/ui/card";
 
 import {
@@ -154,7 +155,7 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
         <CardDescription>Total Entries by Category</CardDescription>
       </CardHeader>
 
-      <CardContent className="h-[500px] lg:h-[450px]">
+      <CardContent className="h-[300px] lg:h-[450px]">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
@@ -189,22 +190,24 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
           </BarChart>
         </ResponsiveContainer>
 
-        {/* LEGEND */}
-        <div className="flex flex-wrap mt-6 gap-4 justify-start">
-          {labels.map((item, index) => (
-            <div key={index} className="flex items-center gap-2">
-              <div
-                className="w-4 h-4 rounded-sm"
-                style={{
-                  backgroundColor: barColors[index % barColors.length],
-                }}
-              />
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-100">
-                {item.key}
-              </span>
-            </div>
-          ))}
-        </div>
+        <CardFooter>
+          {/* LEGEND */}
+          <div className="flex flex-wrap mt-6 gap-4 justify-start">
+            {labels.map((item, index) => (
+              <div key={index} className="flex items-center gap-2">
+                <div
+                  className="w-4 h-4 rounded-sm"
+                  style={{
+                    backgroundColor: barColors[index % barColors.length],
+                  }}
+                />
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-100">
+                  {item.key}
+                </span>
+              </div>
+            ))}
+          </div>
+        </CardFooter>
       </CardContent>
     </Card>
   );
