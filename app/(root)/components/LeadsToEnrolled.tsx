@@ -89,7 +89,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
   }, [profiles, filteredLeads]);
 
   return (
-    <section className="p-4">
+    <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -130,14 +130,14 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
 
           {/* Reset Button */}
           <button
-            className="px-5 py-2 rounded-2xl bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition"
+            className="bg-black dark:bg-gray-700 text-white px-4 py-2 rounded-2xl transition"
             onClick={() => {
               setFilter("month");
               setStartDate("");
               setEndDate("");
             }}
           >
-            Reset
+            Reset Filter
           </button>
         </div>
       </div>
@@ -153,7 +153,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
           return (
             <Card
               key={agent.agentName}
-              className="p-6 bg-white dark:bg-gray-800 shadow-sm rounded-3xl border border-gray-100"
+              className="p-6 bg-gray-100 dark:bg-gray-800 shadow-sm rounded-3xl border border-gray-100"
             >
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 {agent.agentName}
@@ -203,7 +203,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
         <div className="flex justify-center mt-10">
           <button
             onClick={() => setShowMore(true)}
-            className="bg-black text-white px-10 py-3 rounded-full text-lg font-medium hover:bg-gray-900 transition"
+            className="bg-black dark:bg-gray-700 text-white px-4 py-2 rounded-full w-full transition"
           >
             See More
           </button>
