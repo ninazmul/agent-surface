@@ -153,7 +153,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
           return (
             <Card
               key={agent.agentName}
-              className="p-6 bg-gray-100 dark:bg-gray-800 shadow-sm rounded-3xl border border-gray-100"
+              className="p-6 bg-gray-100 dark:bg-gray-800 shadow-sm rounded-2xl border border-gray-100"
             >
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 {agent.agentName}
