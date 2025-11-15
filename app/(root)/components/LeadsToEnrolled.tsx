@@ -16,23 +16,16 @@ interface LeadsToEnrolledProps {
   loading?: boolean;
 }
 
-const stageColors: Record<string, string> = {
-  Open: "bg-gray-400 dark:bg-gray-600",
-  Contacted: "bg-yellow-400 dark:bg-yellow-600",
-  Converted: "bg-green-400 dark:bg-green-600",
-  Closed: "bg-red-400 dark:bg-red-600",
-};
-
 const leadStages = ["Open", "Contacted", "Converted", "Closed"];
 
 const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
   profiles,
   leads,
-  loading = false,
 }) => {
   const [filter, setFilter] = useState("month");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
+  const [showMore, setShowMore] = useState(false);
 
   const filterByDateRange = React.useCallback(
     <T extends { createdAt: string | Date }>(data: T[]) => {
@@ -95,84 +88,62 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
       .filter((a): a is AgentProgress => a !== null);
   }, [profiles, filteredLeads]);
 
-  // Loading skeleton
-  if (loading) {
-    return (
-      <div className="space-y-6 animate-pulse">
-        <div className="h-8 w-1/3 bg-gray-300 dark:bg-gray-700 rounded"></div>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {[...Array(6)].map((_, i) => (
-            <Card
-              key={i}
-              className="p-4 bg-gray-300 dark:bg-gray-700 rounded-2xl h-48"
-            />
-          ))}
+  return (
+    <section className="p-4">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Leads Progress
+        </h2>
+
+        {/* Filter Section */}
+        <div className="flex items-center gap-3">
+          <select
+            className="px-4 py-2 rounded-full border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+            onChange={(e) => setFilter(e.target.value)}
+            value={filter}
+          >
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="quarter">This Quarter</option>
+            <option value="year">This Year</option>
+            <option value="all">All Time</option>
+            <option value="custom">Custom Range</option>
+          </select>
+
+          {filter === "custom" && (
+            <>
+              <input
+                type="date"
+                className="px-4 py-2 rounded-full border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              <input
+                type="date"
+                className="px-4 py-2 rounded-full border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </>
+          )}
+
+          <button
+            className="px-5 py-2 rounded-full bg-black text-white hover:bg-gray-900 transition"
+            onClick={() => {
+              setFilter("month");
+              setStartDate("");
+              setEndDate("");
+            }}
+          >
+            Apply
+          </button>
         </div>
       </div>
-    );
-  }
 
-  if (agentsData.length === 0) {
-    return (
-      <p className="text-center text-gray-600 dark:text-gray-300 mt-4">
-        No lead data available.
-      </p>
-    );
-  }
-
-  return (
-    <section>
-      <h2 className="text-2xl font-bold mb-6 text-gray-800 dark:text-gray-100">
-        Leads Progress
-      </h2>
-
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-6 items-center bg-blue-50 dark:bg-gray-800 p-4 rounded-2xl shadow">
-        <select
-          className="border px-4 py-2 rounded-2xl bg-blue-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-          onChange={(e) => setFilter(e.target.value)}
-          value={filter}
-        >
-          <option value="week">This Week</option>
-          <option value="month">This Month</option>
-          <option value="quarter">This Quarter</option>
-          <option value="year">This Year</option>
-          <option value="all">All Time</option>
-          <option value="custom">Custom Range</option>
-        </select>
-
-        {filter === "custom" && (
-          <>
-            <input
-              type="date"
-              className="border px-4 py-2 rounded-2xl bg-blue-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-              value={startDate}
-              onChange={(e) => setStartDate(e.target.value)}
-            />
-            <input
-              type="date"
-              className="border px-4 py-2 rounded-2xl bg-blue-200 dark:bg-gray-600 text-gray-800 dark:text-gray-200"
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-            />
-          </>
-        )}
-
-        <button
-          className="bg-red-500 dark:bg-red-600 text-white px-4 py-2 rounded-2xl hover:bg-red-600 dark:hover:bg-red-700 transition"
-          onClick={() => {
-            setFilter("month");
-            setStartDate("");
-            setEndDate("");
-          }}
-        >
-          Reset Filters
-        </button>
-      </div>
-
-      {/* Agent cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {agentsData.map((agent) => {
+      {/* Agent Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        {(showMore ? agentsData : agentsData.slice(0, 3)).map((agent) => {
           const maxCount = Math.max(
             ...leadStages.map((stage) => agent[stage] || 0),
             1
@@ -181,11 +152,9 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
           return (
             <Card
               key={agent.agentName}
-              className="p-4 bg-blue-50 dark:bg-gray-800 rounded-2xl shadow"
-              role="region"
-              aria-label={`Progress for ${agent.agentName}`}
+              className="p-6 bg-white dark:bg-gray-800 shadow-sm rounded-3xl border border-gray-100"
             >
-              <h3 className="font-semibold mb-3 text-gray-800 dark:text-gray-200">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 {agent.agentName}
               </h3>
 
@@ -193,15 +162,30 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
                 const count = agent[stage] || 0;
                 const progress = (count / maxCount) * 100;
 
+                const stageColor = {
+                  Open: "bg-black",
+                  Contacted: "bg-black",
+                  Converted: "bg-black",
+                  Closed: "bg-red-500",
+                }[stage];
+
+                const trackColor = {
+                  Open: "bg-gray-200",
+                  Contacted: "bg-gray-200",
+                  Converted: "bg-gray-200",
+                  Closed: "bg-red-200",
+                }[stage];
+
                 return (
-                  <div key={stage} className="mb-2">
+                  <div key={stage} className="mb-4">
                     <div className="flex justify-between text-sm mb-1 text-gray-700 dark:text-gray-300">
                       <span>{stage}</span>
-                      <span>{count}</span>
+                      <span>{count.toString().padStart(2, "0")}</span>
                     </div>
-                    <div className="w-full bg-gray-300 dark:bg-gray-500 rounded-full h-3">
+
+                    <div className={`w-full h-2 rounded-full ${trackColor}`}>
                       <div
-                        className={`${stageColors[stage]} h-3 rounded-full transition-all duration-500`}
+                        className={`h-2 rounded-full ${stageColor}`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -212,6 +196,18 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
           );
         })}
       </div>
+
+      {/* See More Button */}
+      {agentsData.length > 3 && !showMore && (
+        <div className="flex justify-center mt-10">
+          <button
+            onClick={() => setShowMore(true)}
+            className="bg-black text-white px-10 py-3 rounded-full text-lg font-medium hover:bg-gray-900 transition"
+          >
+            See More
+          </button>
+        </div>
+      )}
     </section>
   );
 };
