@@ -99,7 +99,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
         {/* Filter Section */}
         <div className="flex items-center gap-3">
           <select
-            className="px-4 py-2 rounded-full border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+            className="px-4 py-2 rounded-2xl border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
             onChange={(e) => setFilter(e.target.value)}
             value={filter}
           >
@@ -115,28 +115,29 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
             <>
               <input
                 type="date"
-                className="px-4 py-2 rounded-full border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                className="px-4 py-2 rounded-2xl border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
               <input
                 type="date"
-                className="px-4 py-2 rounded-full border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                className="px-4 py-2 rounded-2xl border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
             </>
           )}
 
+          {/* Reset Button */}
           <button
-            className="px-5 py-2 rounded-full bg-black text-white hover:bg-gray-900 transition"
+            className="px-5 py-2 rounded-2xl bg-gray-200 text-gray-800 hover:bg-gray-300 dark:bg-gray-700 dark:text-gray-200 dark:hover:bg-gray-600 transition"
             onClick={() => {
               setFilter("month");
               setStartDate("");
               setEndDate("");
             }}
           >
-            Apply
+            Reset
           </button>
         </div>
       </div>
