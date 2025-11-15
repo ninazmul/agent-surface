@@ -191,31 +191,28 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
       </div>
 
       {/* CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
         {(showMore ? data : data.slice(0, 6)).map((s) => {
           const percent = s.totalAmount
             ? Math.round((s.paid / s.totalAmount) * 100)
             : 0;
 
           return (
-            <Card
-              key={s.studentName}
-              className="p-4"
-            >
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 border-b mb-4">
+            <Card key={s.studentName} className="p-4">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-900 dark:border-gray-100 mb-4 col-span-1">
                 {s.studentName}
               </h3>
 
-              <div className="space-y-1.5 text-gray-700 dark:text-gray-300">
-                <p>
+              <div className="space-y-1 text-gray-700 dark:text-gray-300">
+                <p className="flex items-center justify-between">
                   <span className="font-medium">Total:</span> €
                   {s.totalAmount.toLocaleString()}
                 </p>
-                <p>
+                <p className="flex items-center justify-between">
                   <span className="font-medium">Paid:</span> €
                   {s.paid.toLocaleString()}
                 </p>
-                <p>
+                <p className="flex items-center justify-between">
                   <span className="font-medium">Due:</span> €
                   {s.due.toLocaleString()}
                 </p>
@@ -235,7 +232,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
       </div>
 
       {/* SEE MORE BUTTON */}
-      {data.length > 3 && !showMore && (
+      {data.length > 6 && !showMore && (
         <div className="flex justify-center mt-10">
           <button
             onClick={() => setShowMore(true)}
