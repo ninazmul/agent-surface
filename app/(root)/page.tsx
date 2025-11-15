@@ -186,7 +186,7 @@ const Dashboard = () => {
   }, [loadDashboardData, user]);
 
   return (
-    <div className="p-4">
+    <div className="p-4 mb-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-[450px]">
         {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
         {myProfile?.role !== "Student" && (
