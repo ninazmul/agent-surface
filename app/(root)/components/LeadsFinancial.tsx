@@ -147,8 +147,8 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
   ]);
 
   useEffect(() => {
-    if (data.length <= 6) setShowMore(false);
-  }, [data]);
+    setShowMore(false);
+  }, [version]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
