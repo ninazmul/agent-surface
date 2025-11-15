@@ -216,7 +216,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
             : 0;
 
           return (
-            <Card key={s.studentName} className="p-4">
+            <Card key={s.studentName} className="p-2">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-900 dark:border-gray-100 mb-4 col-span-1">
                 {s.studentName}
               </h3>
