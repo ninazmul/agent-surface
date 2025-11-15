@@ -28,7 +28,6 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
   const [data, setData] = useState<FinancialData[]>([]);
   const [showMore, setShowMore] = useState(false);
 
-  // ✅ DATE FILTER LOGIC LIKE LeadsToEnrolled
   const filterByDateRange = useCallback(
     <T extends { createdAt: string | Date }>(items: T[]) => {
       const now = new Date();
@@ -67,30 +66,28 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
     [filter, startDate, endDate]
   );
 
-  // STEP 1 — Date filtered leads
   const filteredLeads = useMemo(
     () => filterByDateRange(leads),
     [leads, filterByDateRange]
   );
 
-  // STEP 2 — Agent filtered leads
   const agentFilteredLeads = useMemo(() => {
     if (selectedAgent === "all") return filteredLeads;
     return filteredLeads.filter((l) => l.author === selectedAgent);
   }, [filteredLeads, selectedAgent]);
 
-  // ✅ RESET BUTTON LIKE LeadsToEnrolled
   const handleReset = () => {
-    setFilter("month"); // Option 1: match LeadsToEnrolled
+    setFilter("month");
     setSelectedAgent("all");
     setStartDate("");
     setEndDate("");
     setShowMore(false);
+    setData([]);
   };
 
-  // STEP 3 — Aggregate financial data
   useEffect(() => {
     const fetchFinancialData = async () => {
+      setData([]);
       try {
         const result: FinancialData[] = [];
 
@@ -101,7 +98,6 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
 
         for (const lead of agentFilteredLeads) {
           let source: ILead | IQuotation = lead;
-
           if (lead.isVoid) {
             const q = voidQuotes.find((x) => x?.email === lead.email);
             if (q) source = q;
@@ -113,21 +109,17 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
                 0
               )
             : 0;
-
           const serviceAmount = Array.isArray(source.services)
             ? source.services.reduce((sum, s) => sum + Number(s.amount || 0), 0)
             : 0;
-
           const discount = Number(source.discount || 0);
           const total = courseAmount + serviceAmount - discount;
-
           const paid = Array.isArray(source.transcript)
             ? source.transcript.reduce(
                 (sum, t) => sum + Number(t.amount || 0),
                 0
               )
             : 0;
-
           const due = total - paid;
 
           if (total || paid || due) {
@@ -147,7 +139,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
     };
 
     fetchFinancialData();
-  }, [agentFilteredLeads]);
+  }, [leads, filter, startDate, endDate, selectedAgent, agentFilteredLeads]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
