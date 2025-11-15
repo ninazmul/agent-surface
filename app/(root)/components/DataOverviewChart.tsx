@@ -6,7 +6,6 @@ import {
   CardHeader,
   CardTitle,
   CardDescription,
-  CardFooter,
 } from "@/components/ui/card";
 
 import {
@@ -147,7 +146,7 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
   ];
 
   return (
-    <Card className="h-full bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
+    <Card className="h-auto bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Data Overview
@@ -155,59 +154,60 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
         <CardDescription>Total Entries by Category</CardDescription>
       </CardHeader>
 
-      <CardContent className="h-[300px] lg:h-[450px]">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={chartData}
-            margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
-          >
-            <XAxis
-              dataKey="category"
-              tick={{ fontSize: 14, fill: "#6B7280" }}
-            />
-            <Tooltip />
-
-            <Bar
-              dataKey="count"
-              isAnimationActive={false}
-              shape={(props: unknown) => {
-                const p = props as RechartsBarShapeProps;
-                return (
-                  <CombinedBar
-                    {...p}
-                    value={p.value ?? 0}
-                    fill={p.fill ?? "#000"}
-                    maxValue={maxCount}
-                  />
-                );
-              }}
-              label={{ position: "top", fill: "#6B7280" }}
+      <CardContent className="flex flex-col">
+        {/* Chart */}
+        <div className="w-full h-[350px] lg:h-[450px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart
+              data={chartData}
+              margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
             >
-              {chartData.map((_, index) => (
-                <Cell key={index} fill={barColors[index % barColors.length]} />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
+              <XAxis
+                dataKey="category"
+                tick={{ fontSize: 14, fill: "#6B7280" }}
+              />
+              <Tooltip />
+              <Bar
+                dataKey="count"
+                isAnimationActive={false}
+                shape={(props: unknown) => {
+                  const p = props as RechartsBarShapeProps;
+                  return (
+                    <CombinedBar
+                      {...p}
+                      value={p.value ?? 0}
+                      fill={p.fill ?? "#000"}
+                      maxValue={maxCount}
+                    />
+                  );
+                }}
+                label={{ position: "top", fill: "#6B7280" }}
+              >
+                {chartData.map((_, index) => (
+                  <Cell
+                    key={index}
+                    fill={barColors[index % barColors.length]}
+                  />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
 
-        <CardFooter>
-          {/* LEGEND */}
-          <div className="flex flex-wrap mt-6 gap-4 justify-start">
-            {labels.map((item, index) => (
-              <div key={index} className="flex items-center gap-2">
-                <div
-                  className="w-4 h-4 rounded-sm"
-                  style={{
-                    backgroundColor: barColors[index % barColors.length],
-                  }}
-                />
-                <span className="text-sm font-medium text-gray-700 dark:text-gray-100">
-                  {item.key}
-                </span>
-              </div>
-            ))}
-          </div>
-        </CardFooter>
+        {/* Legend */}
+        <div className="mt-6 flex flex-wrap gap-4">
+          {labels.map((item, index) => (
+            <div key={index} className="flex items-center gap-2">
+              <div
+                className="w-4 h-4 rounded-sm"
+                style={{ backgroundColor: barColors[index % barColors.length] }}
+              />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-100">
+                {item.key}
+              </span>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   );
