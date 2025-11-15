@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ILead } from "@/lib/database/models/lead.model";
 import { IProfile } from "@/lib/database/models/profile.model";
@@ -28,75 +28,62 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
   const [data, setData] = useState<FinancialData[]>([]);
   const [showMore, setShowMore] = useState(false);
 
-  const filterByDateRange = useCallback(
-    <T extends { createdAt: string | Date }>(items: T[]) => {
-      const now = new Date();
-      let from: Date | null = null;
-
-      if (filter === "custom" && startDate && endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return items.filter(
-          (item) =>
-            new Date(item.createdAt) >= start && new Date(item.createdAt) <= end
-        );
-      }
-
-      switch (filter) {
-        case "week":
-          from = subWeeks(now, 1);
-          break;
-        case "month":
-          from = subMonths(now, 1);
-          break;
-        case "quarter":
-          from = subQuarters(now, 1);
-          break;
-        case "year":
-          from = subYears(now, 1);
-          break;
-        case "all":
-          return items;
-      }
-
-      return from
-        ? items.filter((item) => new Date(item.createdAt) >= from)
-        : items;
-    },
-    [filter, startDate, endDate]
-  );
-
-  const filteredLeads = useMemo(
-    () => filterByDateRange(leads),
-    [leads, filterByDateRange]
-  );
-
-  const agentFilteredLeads = useMemo(() => {
-    if (selectedAgent === "all") return filteredLeads;
-    return filteredLeads.filter((l) => l.author === selectedAgent);
-  }, [filteredLeads, selectedAgent]);
-
   const handleReset = () => {
-    setFilter("month");
-    setSelectedAgent("all");
+    setFilter("week"); // default to last 7 days
     setStartDate("");
     setEndDate("");
+    setSelectedAgent("all");
     setShowMore(false);
-    setData([]);
+    setData([]); // clear old data immediately
   };
 
   useEffect(() => {
     const fetchFinancialData = async () => {
-      setData([]);
+      setData([]); // clear data before fetching new
       try {
-        const result: FinancialData[] = [];
+        const now = new Date();
+        let fromDate: Date | null = null;
 
-        const voidLeads = agentFilteredLeads.filter((l) => l.isVoid);
+        if (filter === "custom" && startDate && endDate) {
+          fromDate = new Date(startDate);
+        } else {
+          switch (filter) {
+            case "week":
+              fromDate = subWeeks(now, 1);
+              break;
+            case "month":
+              fromDate = subMonths(now, 1);
+              break;
+            case "quarter":
+              fromDate = subQuarters(now, 1);
+              break;
+            case "year":
+              fromDate = subYears(now, 1);
+              break;
+            case "all":
+              fromDate = null;
+              break;
+          }
+        }
+
+        // Filter leads by date and agent
+        const filteredLeads = leads.filter((l) => {
+          const created = new Date(l.createdAt);
+          const dateCheck = fromDate ? created >= fromDate : true;
+          const agentCheck =
+            selectedAgent === "all" ? true : l.author === selectedAgent;
+          return dateCheck && agentCheck;
+        });
+
+        // Handle void leads
+        const voidLeads = filteredLeads.filter((l) => l.isVoid);
         const voidQuotes = await Promise.all(
           voidLeads.map((l) => getQuotationByEmail(l.email))
         );
 
-        for (const lead of agentFilteredLeads) {
+        const result: FinancialData[] = [];
+
+        for (const lead of filteredLeads) {
           let source: ILead | IQuotation = lead;
           if (lead.isVoid) {
             const q = voidQuotes.find((x) => x?.email === lead.email);
@@ -109,17 +96,21 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
                 0
               )
             : 0;
+
           const serviceAmount = Array.isArray(source.services)
             ? source.services.reduce((sum, s) => sum + Number(s.amount || 0), 0)
             : 0;
+
           const discount = Number(source.discount || 0);
           const total = courseAmount + serviceAmount - discount;
+
           const paid = Array.isArray(source.transcript)
             ? source.transcript.reduce(
                 (sum, t) => sum + Number(t.amount || 0),
                 0
               )
             : 0;
+
           const due = total - paid;
 
           if (total || paid || due) {
@@ -139,7 +130,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
     };
 
     fetchFinancialData();
-  }, [leads, filter, startDate, endDate, selectedAgent, agentFilteredLeads]);
+  }, [leads, filter, startDate, endDate, selectedAgent]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
@@ -217,7 +208,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
                 {s.studentName}
               </h3>
 
-              <div className=" text-gray-700 dark:text-gray-300">
+              <div className="text-gray-700 dark:text-gray-300">
                 <p className="flex items-center justify-between">
                   <span className="font-medium">Total:</span> €
                   {s.totalAmount.toLocaleString()}
