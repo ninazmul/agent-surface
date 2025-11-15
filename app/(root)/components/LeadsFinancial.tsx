@@ -27,7 +27,6 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
   const [selectedAgent, setSelectedAgent] = useState<string>("all");
   const [data, setData] = useState<FinancialData[]>([]);
   const [showMore, setShowMore] = useState(false);
-  const [version, setVersion] = useState(0); // 🔥 Forces proper refetch
 
   const filterByDateRange = useCallback(
     <T extends { createdAt: string | Date }>(data: T[]) => {
@@ -65,17 +64,13 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
     [filter, startDate, endDate]
   );
 
-  const resetFilters = () => {
-    setFilter("month");
+  // ✅ FIXED: TRUE RESET FUNCTION
+  const handleReset = () => {
+    setFilter("week"); // Show this week
+    setSelectedAgent("all"); // All agencies
     setStartDate("");
     setEndDate("");
-    setSelectedAgent("all");
-  };
-
-  const handleReset = () => {
-    resetFilters();
     setShowMore(false);
-    setVersion((v) => v + 1);
   };
 
   useEffect(() => {
@@ -136,19 +131,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
     };
 
     fetchFinancial();
-  }, [
-    leads,
-    filter,
-    startDate,
-    endDate,
-    selectedAgent,
-    filterByDateRange,
-    version, // 🔥 ensures reset triggers fresh fetch
-  ]);
-
-  useEffect(() => {
-    setShowMore(false);
-  }, [version]);
+  }, [leads, filter, startDate, endDate, selectedAgent, filterByDateRange]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
