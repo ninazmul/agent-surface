@@ -99,7 +99,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
         {/* Filter Section */}
         <div className="flex items-center gap-3">
           <select
-            className="px-4 py-2 rounded-2xl border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+            className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
             onChange={(e) => setFilter(e.target.value)}
             value={filter}
           >
@@ -115,13 +115,13 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
             <>
               <input
                 type="date"
-                className="px-4 py-2 rounded-2xl border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
                 value={startDate}
                 onChange={(e) => setStartDate(e.target.value)}
               />
               <input
                 type="date"
-                className="px-4 py-2 rounded-2xl border bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200"
+                className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
                 value={endDate}
                 onChange={(e) => setEndDate(e.target.value)}
               />
