@@ -156,7 +156,7 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
 
       <CardContent className="flex flex-col">
         {/* Chart */}
-        <div className="w-full h-[350px] lg:h-[450px]">
+        <div className="w-full h-[400px] lg:h-[500px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
