@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -39,8 +39,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
         const end = new Date(endDate);
         return data.filter(
           (item) =>
-            new Date(item.createdAt) >= start &&
-            new Date(item.createdAt) <= end
+            new Date(item.createdAt) >= start && new Date(item.createdAt) <= end
         );
       }
 
@@ -100,17 +99,20 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
       .filter((a): a is AgentProgress => a !== null);
   }, [profiles, agentFilteredLeads]);
 
+  useEffect(() => {
+    if (agentsData.length <= 6) setShowMore(false);
+  }, [agentsData]);
+
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
       {/* Header */}
-      <div className="flex flex-wrap justify-between items-center mb-6">
+      <div className="flex flex-wrap justify-between items-center gap-4 mb-6 ">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Leads Progress
         </h2>
 
         {/* Filter Section */}
         <div className="flex items-center gap-3">
-
           {/* Date Filter */}
           <select
             className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
@@ -163,6 +165,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
               setFilter("month");
               setStartDate("");
               setEndDate("");
+              setShowMore(false);
               setSelectedAgent("all"); // reset agency
             }}
           >

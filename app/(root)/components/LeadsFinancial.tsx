@@ -74,7 +74,8 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
 
   const handleReset = () => {
     resetFilters();
-    setVersion((v) => v + 1); // 🔥 Guarantee refetch even if filter already "month"
+    setShowMore(false);
+    setVersion((v) => v + 1);
   };
 
   useEffect(() => {
@@ -144,6 +145,10 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
     filterByDateRange,
     version, // 🔥 ensures reset triggers fresh fetch
   ]);
+
+  useEffect(() => {
+    if (data.length <= 6) setShowMore(false);
+  }, [data]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
