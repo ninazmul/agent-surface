@@ -27,6 +27,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
   const [selectedAgent, setSelectedAgent] = useState<string>("all");
   const [data, setData] = useState<FinancialData[]>([]);
   const [showMore, setShowMore] = useState(false);
+  const [version, setVersion] = useState(0); // 🔥 Forces proper refetch
 
   const filterByDateRange = useCallback(
     <T extends { createdAt: string | Date }>(data: T[]) => {
@@ -63,6 +64,18 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
     },
     [filter, startDate, endDate]
   );
+
+  const resetFilters = () => {
+    setFilter("month");
+    setStartDate("");
+    setEndDate("");
+    setSelectedAgent("all");
+  };
+
+  const handleReset = () => {
+    resetFilters();
+    setVersion((v) => v + 1); // 🔥 Guarantee refetch even if filter already "month"
+  };
 
   useEffect(() => {
     const fetchFinancial = async () => {
@@ -116,11 +129,21 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
         }
 
         setData(result);
-      } catch {}
+      } catch (err) {
+        console.error("Failed to fetch financial data", err);
+      }
     };
 
     fetchFinancial();
-  }, [leads, filter, startDate, endDate, selectedAgent, filterByDateRange]);
+  }, [
+    leads,
+    filter,
+    startDate,
+    endDate,
+    selectedAgent,
+    filterByDateRange,
+    version, // 🔥 ensures reset triggers fresh fetch
+  ]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
@@ -177,12 +200,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
           )}
 
           <button
-            onClick={() => {
-              setFilter("month");
-              setStartDate("");
-              setEndDate("");
-              setSelectedAgent("all");
-            }}
+            onClick={handleReset}
             className="bg-black dark:bg-gray-700 text-white px-4 py-2 rounded-2xl transition"
           >
             Reset Filters
@@ -203,7 +221,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
                 {s.studentName}
               </h3>
 
-              <div className="space-y-1 text-gray-700 dark:text-gray-300">
+              <div className=" text-gray-700 dark:text-gray-300">
                 <p className="flex items-center justify-between">
                   <span className="font-medium">Total:</span> €
                   {s.totalAmount.toLocaleString()}
