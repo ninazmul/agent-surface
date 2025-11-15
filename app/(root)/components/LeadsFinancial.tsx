@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { ILead } from "@/lib/database/models/lead.model";
 import { IProfile } from "@/lib/database/models/profile.model";
-import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
 import { getQuotationByEmail } from "@/lib/actions/quotation.actions";
 import { IQuotation } from "@/lib/database/models/quotation.model";
 
@@ -28,60 +27,64 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
   const [data, setData] = useState<FinancialData[]>([]);
   const [showMore, setShowMore] = useState(false);
 
-  const filterByDateRange = useCallback(
-    <T extends { createdAt: string | Date }>(data: T[]) => {
-      const now = new Date();
-      let from: Date | null = null;
-
-      if (filter === "custom" && startDate && endDate) {
-        const s = new Date(startDate);
-        const e = new Date(endDate);
-        return data.filter((i) => {
-          const c = new Date(i.createdAt);
-          return c >= s && c <= e;
-        });
-      }
-
-      switch (filter) {
-        case "week":
-          from = subWeeks(now, 1);
-          break;
-        case "month":
-          from = subMonths(now, 1);
-          break;
-        case "quarter":
-          from = subQuarters(now, 1);
-          break;
-        case "year":
-          from = subYears(now, 1);
-          break;
-        case "all":
-          return data;
-      }
-
-      return from ? data.filter((i) => new Date(i.createdAt) >= from) : data;
-    },
-    [filter, startDate, endDate]
-  );
-
-  // ✅ FIXED: TRUE RESET FUNCTION
+  // RESET EVERYTHING
   const handleReset = () => {
-    setFilter("week"); // Show this week
-    setSelectedAgent("all"); // All agencies
+    setFilter("week"); // Week = last 7 days from today
+    setSelectedAgent("all");
     setStartDate("");
     setEndDate("");
     setShowMore(false);
   };
 
+  // **Unified "count from today" helper**
+  const todayRange = (days: number) =>
+    new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+
   useEffect(() => {
     const fetchFinancial = async () => {
       try {
-        let filtered = filterByDateRange(leads);
+        let filtered: ILead[] = [...leads];
+        // DATE FILTERING
+        if (filter === "custom" && startDate && endDate) {
+          const s = new Date(startDate);
+          const e = new Date(endDate);
 
+          filtered = filtered.filter((l) => {
+            const created = new Date(l.createdAt);
+            return created >= s && created <= e;
+          });
+        } else {
+          let from: Date | null = null;
+
+          switch (filter) {
+            case "week":
+              from = todayRange(7);
+              break;
+            case "month":
+              from = todayRange(30);
+              break;
+            case "quarter":
+              from = todayRange(90);
+              break;
+            case "year":
+              from = todayRange(365);
+              break;
+            case "all":
+              from = null;
+              break;
+          }
+
+          if (from) {
+            filtered = filtered.filter((l) => new Date(l.createdAt) >= from);
+          }
+        }
+
+        // AGENT FILTER
         if (selectedAgent !== "all") {
           filtered = filtered.filter((l) => l.author === selectedAgent);
         }
 
+        // VOID LEAD LOGIC
         const voidLeads = filtered.filter((l) => l.isVoid);
         const voidQuotes = await Promise.all(
           voidLeads.map((l) => getQuotationByEmail(l.email))
@@ -131,7 +134,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
     };
 
     fetchFinancial();
-  }, [leads, filter, startDate, endDate, selectedAgent, filterByDateRange]);
+  }, [leads, filter, startDate, endDate, selectedAgent]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
@@ -237,7 +240,6 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
         })}
       </div>
 
-      {/* SEE MORE BUTTON */}
       {data.length > 6 && !showMore && (
         <div className="flex justify-center mt-10">
           <button
