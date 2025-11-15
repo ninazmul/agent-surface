@@ -124,7 +124,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-wrap justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Leads Financial Overview
         </h2>
@@ -191,8 +191,8 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
       </div>
 
       {/* CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {(showMore ? data : data.slice(0, 3)).map((s) => {
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        {(showMore ? data : data.slice(0, 6)).map((s) => {
           const percent = s.totalAmount
             ? Math.round((s.paid / s.totalAmount) * 100)
             : 0;
@@ -200,9 +200,9 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
           return (
             <Card
               key={s.studentName}
-              className="p-6 bg-gray-100 dark:bg-gray-800 shadow-sm rounded-3xl border border-gray-100"
+              className="p-4"
             >
-              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 border-b mb-4">
                 {s.studentName}
               </h3>
 

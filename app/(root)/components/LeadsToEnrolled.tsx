@@ -91,7 +91,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
       {/* Header */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-wrap justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Leads Progress
         </h2>
@@ -143,7 +143,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
       </div>
 
       {/* Agent Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {(showMore ? agentsData : agentsData.slice(0, 3)).map((agent) => {
           const maxCount = Math.max(
             ...leadStages.map((stage) => agent[stage] || 0),
@@ -153,7 +153,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
           return (
             <Card
               key={agent.agentName}
-              className="p-6 bg-gray-100 dark:bg-gray-800 shadow-sm rounded-2xl border border-gray-100"
+              className="p-4 bg-gray-100 dark:bg-gray-800 shadow-sm rounded-2xl border border-gray-100"
             >
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
                 {agent.agentName}
