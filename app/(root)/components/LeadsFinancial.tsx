@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { Card } from "@/components/ui/card";
 import { ILead } from "@/lib/database/models/lead.model";
 import { IProfile } from "@/lib/database/models/profile.model";
+import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
 import { getQuotationByEmail } from "@/lib/actions/quotation.actions";
 import { IQuotation } from "@/lib/database/models/quotation.model";
 
@@ -27,72 +28,78 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
   const [data, setData] = useState<FinancialData[]>([]);
   const [showMore, setShowMore] = useState(false);
 
-  // RESET EVERYTHING
+  // ✅ DATE FILTER LOGIC LIKE LeadsToEnrolled
+  const filterByDateRange = useCallback(
+    <T extends { createdAt: string | Date }>(items: T[]) => {
+      const now = new Date();
+      let from: Date | null = null;
+
+      if (filter === "custom" && startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        return items.filter(
+          (item) =>
+            new Date(item.createdAt) >= start && new Date(item.createdAt) <= end
+        );
+      }
+
+      switch (filter) {
+        case "week":
+          from = subWeeks(now, 1);
+          break;
+        case "month":
+          from = subMonths(now, 1);
+          break;
+        case "quarter":
+          from = subQuarters(now, 1);
+          break;
+        case "year":
+          from = subYears(now, 1);
+          break;
+        case "all":
+          return items;
+      }
+
+      return from
+        ? items.filter((item) => new Date(item.createdAt) >= from)
+        : items;
+    },
+    [filter, startDate, endDate]
+  );
+
+  // STEP 1 — Date filtered leads
+  const filteredLeads = useMemo(
+    () => filterByDateRange(leads),
+    [leads, filterByDateRange]
+  );
+
+  // STEP 2 — Agent filtered leads
+  const agentFilteredLeads = useMemo(() => {
+    if (selectedAgent === "all") return filteredLeads;
+    return filteredLeads.filter((l) => l.author === selectedAgent);
+  }, [filteredLeads, selectedAgent]);
+
+  // ✅ RESET BUTTON LIKE LeadsToEnrolled
   const handleReset = () => {
-    setFilter("week"); // Week = last 7 days from today
+    setFilter("month"); // Option 1: match LeadsToEnrolled
     setSelectedAgent("all");
     setStartDate("");
     setEndDate("");
     setShowMore(false);
   };
 
-  // **Unified "count from today" helper**
-  const todayRange = (days: number) =>
-    new Date(Date.now() - days * 24 * 60 * 60 * 1000);
-
+  // STEP 3 — Aggregate financial data
   useEffect(() => {
-    const fetchFinancial = async () => {
+    const fetchFinancialData = async () => {
       try {
-        let filtered: ILead[] = [...leads];
-        // DATE FILTERING
-        if (filter === "custom" && startDate && endDate) {
-          const s = new Date(startDate);
-          const e = new Date(endDate);
+        const result: FinancialData[] = [];
 
-          filtered = filtered.filter((l) => {
-            const created = new Date(l.createdAt);
-            return created >= s && created <= e;
-          });
-        } else {
-          let from: Date | null = null;
-
-          switch (filter) {
-            case "week":
-              from = todayRange(7);
-              break;
-            case "month":
-              from = todayRange(30);
-              break;
-            case "quarter":
-              from = todayRange(90);
-              break;
-            case "year":
-              from = todayRange(365);
-              break;
-            case "all":
-              from = null;
-              break;
-          }
-
-          if (from) {
-            filtered = filtered.filter((l) => new Date(l.createdAt) >= from);
-          }
-        }
-
-        // AGENT FILTER
-        if (selectedAgent !== "all") {
-          filtered = filtered.filter((l) => l.author === selectedAgent);
-        }
-
-        // VOID LEAD LOGIC
-        const voidLeads = filtered.filter((l) => l.isVoid);
+        const voidLeads = agentFilteredLeads.filter((l) => l.isVoid);
         const voidQuotes = await Promise.all(
           voidLeads.map((l) => getQuotationByEmail(l.email))
         );
 
-        const result: FinancialData[] = [];
-
-        for (const lead of filtered) {
+        for (const lead of agentFilteredLeads) {
           let source: ILead | IQuotation = lead;
 
           if (lead.isVoid) {
@@ -101,18 +108,24 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
           }
 
           const courseAmount = Array.isArray(source.course)
-            ? source.course.reduce((s, c) => s + Number(c.courseFee || 0), 0)
+            ? source.course.reduce(
+                (sum, c) => sum + Number(c.courseFee || 0),
+                0
+              )
             : 0;
 
           const serviceAmount = Array.isArray(source.services)
-            ? source.services.reduce((s, svc) => s + Number(svc.amount || 0), 0)
+            ? source.services.reduce((sum, s) => sum + Number(s.amount || 0), 0)
             : 0;
 
           const discount = Number(source.discount || 0);
           const total = courseAmount + serviceAmount - discount;
 
           const paid = Array.isArray(source.transcript)
-            ? source.transcript.reduce((s, t) => s + Number(t.amount || 0), 0)
+            ? source.transcript.reduce(
+                (sum, t) => sum + Number(t.amount || 0),
+                0
+              )
             : 0;
 
           const due = total - paid;
@@ -133,8 +146,8 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
       }
     };
 
-    fetchFinancial();
-  }, [leads, filter, startDate, endDate, selectedAgent]);
+    fetchFinancialData();
+  }, [agentFilteredLeads]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
@@ -200,7 +213,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
       </div>
 
       {/* CARDS */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {(showMore ? data : data.slice(0, 6)).map((s) => {
           const percent = s.totalAmount
             ? Math.round((s.paid / s.totalAmount) * 100)
