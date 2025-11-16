@@ -421,16 +421,18 @@ const LeadTable = ({
   return (
     <div className="space-y-6">
       {/* --- Filters --- */}
-      <div className="flex flex-wrap gap-3 items-center">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-start sm:items-center">
+        {/* Search */}
         <Input
           placeholder="Search leads..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full sm:max-w-md rounded-2xl"
+          className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
         />
 
-        <div className="flex items-center justify-between gap-2">
-          {/* Promotion Type Filter */}
+        {/* Filters Container */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          {/* Promotion Type */}
           <select
             value={promotionFilter}
             onChange={(e) =>
@@ -438,19 +440,19 @@ const LeadTable = ({
                 e.target.value as "all" | "promotion" | "general"
               )
             }
-            className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+            className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
           >
             <option value="all">All Leads</option>
             <option value="promotion">Promotion Leads</option>
             <option value="general">General Leads</option>
           </select>
 
-          {/* --- NEW: Promotion SKU Filter --- */}
+          {/* Promotion SKU (Admin Only) */}
           {isAdmin && (
             <select
               value={promotionSkuFilter}
               onChange={(e) => setPromotionSkuFilter(e.target.value)}
-              className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
             >
               <option value="all">All Promotions</option>
               {promotions.map((promo) => (
