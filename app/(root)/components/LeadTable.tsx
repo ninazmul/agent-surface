@@ -590,7 +590,10 @@ const LeadTable = ({
 
                     {/* Name & Email */}
                     <TableCell>
-                      <a href={`/leads/${lead._id}`} className="flex flex-col space-y-1">
+                      <a
+                        href={`/leads/${lead._id}`}
+                        className="flex flex-col space-y-1"
+                      >
                         <span className="font-semibold flex items-center gap-2">
                           <span className="line-clamp-1">{lead.name}</span>
                           {lead.isPromotion ? (
@@ -1038,20 +1041,20 @@ const LeadTable = ({
         </span>
         <div className="flex gap-2">
           <Button
-            size="sm"
+            size="lg"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p - 1)}
             disabled={currentPage === 1}
-            className="rounded-2xl"
           >
             Previous
           </Button>
           <Button
-            size="sm"
+            size="lg"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage === Math.ceil(filteredLeads.length / itemsPerPage)
             }
-            className="rounded-2xl"
           >
             Next
           </Button>
