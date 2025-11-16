@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import JsonToExcel from "../components/JsonToExcel";
+// import JsonToExcel from "../components/JsonToExcel";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
@@ -12,7 +12,7 @@ import {
 } from "@/lib/actions/admin.actions";
 import { redirect } from "next/navigation";
 import { ILead } from "@/lib/database/models/lead.model";
-import { File, Plus } from "lucide-react";
+import { Download, Plus } from "lucide-react";
 import SendRemindersButton from "@/components/shared/SendRemindersButton";
 
 const Page = async () => {
@@ -40,9 +40,7 @@ const Page = async () => {
     leads =
       adminCountry.length === 0
         ? allLeads
-        : allLeads.filter((r: ILead) =>
-            adminCountry.includes(r.home.country)
-          );
+        : allLeads.filter((r: ILead) => adminCountry.includes(r.home.country));
   } else {
     const profile = await getProfileByEmail(email);
     const agentEmails = [email, ...(profile?.subAgents || [])];
@@ -62,26 +60,25 @@ const Page = async () => {
           {/* Title and Export */}
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
             <h3 className="h3-bold text-center sm:text-left">All Leads</h3>
-            <JsonToExcel data={leads} fileName="leads.xlsx" />
+            {/* <JsonToExcel data={leads} fileName="leads.xlsx" /> */}
           </div>
 
           {/* Action Buttons */}
           <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <a href={"/leads/create"} className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                className="rounded-full w-full flex items-center gap-2 justify-center"
-              >
-                <Plus /> Add Lead
-              </Button>
-            </a>
-
             <a href={"/leads/create/bulk-import"} className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="rounded-full w-full flex items-center gap-2 justify-center"
+                className="rounded-2xl bg-white dark:bg-gray-700 text-black dark:text-gray-100 w-full flex items-center gap-2 justify-center"
               >
-                <File /> Import Leads
+                Import File <Download />
+              </Button>
+            </a>
+            <a href={"/leads/create"} className="w-full sm:w-auto">
+              <Button
+                size="lg"
+                className="rounded-2xl bg-black dark:bg-gray-700 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+              >
+                Add Leads <Plus />
               </Button>
             </a>
 

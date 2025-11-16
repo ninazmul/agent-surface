@@ -29,10 +29,9 @@ export default function SendRemindersButton() {
       onClick={handleReminderClick}
       size="sm"
       variant="outline"
-      className="rounded-full flex items-center gap-2 text-blue-600"
+      className="rounded-full flex items-center gap-2 text-black dark:text-gray-100"
     >
       <Bell className="h-4 w-4" />
-      <span className="hidden lg:inline">Send Reminders</span>
     </Button>
   );
 }

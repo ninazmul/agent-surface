@@ -438,7 +438,7 @@ const LeadTable = ({
               e.target.value as "all" | "promotion" | "general"
             )
           }
-          className="border rounded-2xl px-3 py-2 text-sm"
+          className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
         >
           <option value="all">All Leads</option>
           <option value="promotion">Promotion Leads</option>
@@ -450,7 +450,7 @@ const LeadTable = ({
           <select
             value={promotionSkuFilter}
             onChange={(e) => setPromotionSkuFilter(e.target.value)}
-            className="border rounded-2xl px-3 py-2 text-sm"
+            className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
           >
             <option value="all">All Promotions</option>
             {promotions.map((promo) => (
