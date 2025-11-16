@@ -488,7 +488,7 @@ const LeadTable = ({
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900 text-white">
             <TableRow>
               <TableHead>
                 <input
@@ -501,7 +501,6 @@ const LeadTable = ({
                   }}
                 />
               </TableHead>
-              <TableHead>#</TableHead>
               <TableHead
                 className="cursor-pointer"
                 onClick={() => handleSort("name")}
