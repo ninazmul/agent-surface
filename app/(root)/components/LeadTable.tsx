@@ -835,35 +835,37 @@ const LeadTable = ({
                     </TableCell>
 
                     {/* Social icons */}
-                    <TableCell className="flex items-center gap-2">
-                      <a
-                        href={lead.social?.facebook}
-                        target="_blank"
-                        className="text-blue-600 hover:text-blue-800 transition"
-                      >
-                        <ImFacebook size={18} />
-                      </a>
-                      <a
-                        href={lead.social?.instagram}
-                        target="_blank"
-                        className="text-pink-600 hover:text-pink-800 transition"
-                      >
-                        <ImInstagram size={18} />
-                      </a>
-                      <a
-                        href={lead.social?.skype}
-                        target="_blank"
-                        className="text-sky-600 hover:text-sky-800 transition"
-                      >
-                        <ImSkype size={18} />
-                      </a>
-                      <a
-                        href={lead.social?.twitter}
-                        target="_blank"
-                        className="text-blue-400 hover:text-blue-600 transition"
-                      >
-                        <ImTwitter size={18} />
-                      </a>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={lead.social?.facebook}
+                          target="_blank"
+                          className="text-blue-600 hover:text-blue-800 transition"
+                        >
+                          <ImFacebook size={18} />
+                        </a>
+                        <a
+                          href={lead.social?.instagram}
+                          target="_blank"
+                          className="text-pink-600 hover:text-pink-800 transition"
+                        >
+                          <ImInstagram size={18} />
+                        </a>
+                        <a
+                          href={lead.social?.skype}
+                          target="_blank"
+                          className="text-sky-600 hover:text-sky-800 transition"
+                        >
+                          <ImSkype size={18} />
+                        </a>
+                        <a
+                          href={lead.social?.twitter}
+                          target="_blank"
+                          className="text-blue-400 hover:text-blue-600 transition"
+                        >
+                          <ImTwitter size={18} />
+                        </a>
+                      </div>
                     </TableCell>
 
                     {/* Actions */}
