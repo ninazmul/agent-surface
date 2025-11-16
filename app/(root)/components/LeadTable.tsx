@@ -463,7 +463,7 @@ const LeadTable = ({
       </div>
 
       <div
-        className="overflow-x-auto rounded-2xl bg-pink-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -574,7 +574,7 @@ const LeadTable = ({
                 <>
                   <TableRow
                     key={idx}
-                    className={`hover:bg-pink-100 dark:hover:bg-gray-800 border-b-0 ${
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0 ${
                       lead.isPinned
                         ? "bg-yellow-200 hover:bg-yellow-300 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
                         : ""
