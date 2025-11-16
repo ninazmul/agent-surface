@@ -56,7 +56,7 @@ const Page = async () => {
     <>
       <section className="p-4">
         {/* Header + Actions */}
-        <div className="px-2 sm:px-4 flex flex-col gap-3">
+        <div className="px-2 sm:px-4 flex flex-col md:flex-row gap-3">
           {/* Title */}
           <h3 className="h3-bold text-center sm:text-left">All Leads</h3>
 
