@@ -56,34 +56,35 @@ const Page = async () => {
     <>
       <section className="p-4">
         {/* Header + Actions */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
-          {/* Title and Export */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-            <h3 className="h3-bold text-center sm:text-left">All Leads</h3>
-            {/* <JsonToExcel data={leads} fileName="leads.xlsx" /> */}
-          </div>
+        <div className="px-2 sm:px-4 flex flex-col gap-3">
+          {/* Title */}
+          <h3 className="h3-bold text-center sm:text-left">All Leads</h3>
 
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-            <a href={"/leads/create/bulk-import"} className="w-full sm:w-auto">
+          {/* Actions: tight, compact, auto-wrap cluster */}
+          <div className="flex flex-wrap gap-2">
+            <a href={"/leads/create/bulk-import"}>
               <Button
-                size="lg"
-                className="rounded-2xl bg-white hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-500 text-black dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+                size="sm"
+                className="rounded-xl bg-white hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-black dark:text-white flex items-center gap-1"
               >
-                Import File <Download />
-              </Button>
-            </a>
-            <a href={"/leads/create"} className="w-full sm:w-auto">
-              <Button
-                size="lg"
-                className="rounded-2xl bg-black hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
-              >
-                Add Leads <Plus />
+                <Download size={16} /> Import
               </Button>
             </a>
 
-            {/* Daily Reminder Button */}
-            {adminStatus && <SendRemindersButton />}
+            <a href={"/leads/create"}>
+              <Button
+                size="sm"
+                className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+              >
+                <Plus size={16} /> Add Lead
+              </Button>
+            </a>
+
+            {adminStatus && (
+              <div>
+                <SendRemindersButton />
+              </div>
+            )}
           </div>
         </div>
 
