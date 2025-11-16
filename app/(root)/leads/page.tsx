@@ -54,7 +54,7 @@ const Page = async () => {
 
   return (
     <>
-      <section className="">
+      <section className="p-4">
         {/* Header + Actions */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
           {/* Title and Export */}
