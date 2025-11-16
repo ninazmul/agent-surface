@@ -535,6 +535,7 @@ const LeadTable = ({
                 {sortKey === "date" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
+              <TableHead>Social Media</TableHead>
               <TableHead>Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -624,6 +625,31 @@ const LeadTable = ({
                         >
                           {lead.number}
                         </span>
+                        <span className="flex items-center justify-around">
+                          <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold border">
+                            {flagEmoji} {lead.home.country}
+                          </span>
+                          <span
+                            className={`inline-block px-3 py-1 w-full rounded-full text-center text-xs font-semibold border
+                          ${
+                            lead.status === "Perception" &&
+                            "bg-gray-100 text-gray-700"
+                          }
+                          ${
+                            lead.status === "Cold" &&
+                            "bg-blue-100 text-blue-700"
+                          }
+                          ${
+                            lead.status === "Warm" &&
+                            "bg-yellow-100 text-yellow-700"
+                          }
+                          ${lead.status === "Hot" && "bg-red-100 text-red-700"}
+                          ${lead.status === "" && "bg-gray-100 text-gray-700"}
+                        `}
+                          >
+                            {lead.status || "Perception"}
+                          </span>
+                        </span>
                       </a>
                     </TableCell>
 
@@ -669,31 +695,6 @@ const LeadTable = ({
                           ) : (
                             "Phone: N/A"
                           )}
-                        </span>
-                        <span>
-                          <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold">
-                            {flagEmoji} {lead.home.country}
-                          </span>
-                          <span
-                            className={`inline-block px-3 py-1 w-full rounded-full text-center text-xs font-semibold
-                          ${
-                            lead.status === "Perception" &&
-                            "bg-gray-100 text-gray-700"
-                          }
-                          ${
-                            lead.status === "Cold" &&
-                            "bg-blue-100 text-blue-700"
-                          }
-                          ${
-                            lead.status === "Warm" &&
-                            "bg-yellow-100 text-yellow-700"
-                          }
-                          ${lead.status === "Hot" && "bg-red-100 text-red-700"}
-                          ${lead.status === "" && "bg-gray-100 text-gray-700"}
-                        `}
-                          >
-                            {lead.status || "Perception"}
-                          </span>
                         </span>
                       </div>
                     </TableCell>
