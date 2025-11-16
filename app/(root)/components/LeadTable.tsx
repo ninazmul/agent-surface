@@ -57,7 +57,6 @@ import { IPromotion } from "@/lib/database/models/promotion.model";
 import { createTrack, getTracksByStudent } from "@/lib/actions/track.actions";
 import { IStudentEvent, ITrack } from "@/lib/database/models/track.model";
 import { ImFacebook, ImInstagram, ImSkype, ImTwitter } from "react-icons/im";
-import countries from "world-countries";
 import { getAllAdmins } from "@/lib/actions/admin.actions";
 
 type PinUnpinStatus = ILead & { isPinned: "pinned" | "unpinned" };
@@ -563,13 +562,6 @@ const LeadTable = ({
                   ? 100
                   : 0;
 
-              const countryData = countries.find(
-                (c) =>
-                  c.name.common.toLowerCase() ===
-                  lead.home.country.toLowerCase()
-              );
-              const flagEmoji = countryData?.flag; // 🏳️‍🌈 style emoji
-
               return (
                 <>
                   <TableRow
@@ -627,7 +619,7 @@ const LeadTable = ({
                         </span>
                         <span className="flex items-center justify-around gap-2">
                           <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold border">
-                            {flagEmoji} {lead.home.country}
+                            {lead.home.country}
                           </span>
                           <span
                             className={`inline-block px-3 py-1 w-full rounded-full text-center text-xs font-semibold border
