@@ -572,7 +572,7 @@ const LeadTable = ({
               return (
                 <>
                   <TableRow
-                    key={lead._id}
+                    key={idx}
                     className={`hover:bg-pink-100 dark:hover:bg-gray-800 border-b-0 ${
                       lead.isPinned
                         ? "bg-yellow-200 hover:bg-yellow-300 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
@@ -593,71 +593,6 @@ const LeadTable = ({
                           }
                         }}
                       />
-                    </TableCell>
-                    <TableCell>
-                      <div className="space-y-2">
-                        {/* Country with flag + serial */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{flagEmoji}</span>
-                          <span className="text-sm font-medium">
-                            Serial: {(currentPage - 1) * itemsPerPage + idx + 1}
-                          </span>
-                        </div>
-
-                        {/* Social icons */}
-                        <div className="flex items-center gap-2">
-                          <a
-                            href={lead.social?.facebook}
-                            target="_blank"
-                            className="text-blue-600 hover:text-blue-800 transition"
-                          >
-                            <ImFacebook size={18} />
-                          </a>
-                          <a
-                            href={lead.social?.instagram}
-                            target="_blank"
-                            className="text-pink-600 hover:text-pink-800 transition"
-                          >
-                            <ImInstagram size={18} />
-                          </a>
-                          <a
-                            href={lead.social?.skype}
-                            target="_blank"
-                            className="text-sky-600 hover:text-sky-800 transition"
-                          >
-                            <ImSkype size={18} />
-                          </a>
-                          <a
-                            href={lead.social?.twitter}
-                            target="_blank"
-                            className="text-blue-400 hover:text-blue-600 transition"
-                          >
-                            <ImTwitter size={18} />
-                          </a>
-                        </div>
-
-                        {/* Status badge */}
-                        <div
-                          className={`inline-block px-3 py-1 w-full rounded-full text-center text-xs font-semibold
-                          ${
-                            lead.status === "Perception" &&
-                            "bg-gray-100 text-gray-700"
-                          }
-                          ${
-                            lead.status === "Cold" &&
-                            "bg-blue-100 text-blue-700"
-                          }
-                          ${
-                            lead.status === "Warm" &&
-                            "bg-yellow-100 text-yellow-700"
-                          }
-                          ${lead.status === "Hot" && "bg-red-100 text-red-700"}
-                          ${lead.status === "" && "bg-gray-100 text-gray-700"}
-                        `}
-                        >
-                          {lead.status || "Perception"}
-                        </div>
-                      </div>
                     </TableCell>
 
                     {/* Name & Email */}
@@ -734,6 +669,31 @@ const LeadTable = ({
                           ) : (
                             "Phone: N/A"
                           )}
+                        </span>
+                        <span>
+                          <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold">
+                            {flagEmoji} {lead.home.country}
+                          </span>
+                          <span
+                            className={`inline-block px-3 py-1 w-full rounded-full text-center text-xs font-semibold
+                          ${
+                            lead.status === "Perception" &&
+                            "bg-gray-100 text-gray-700"
+                          }
+                          ${
+                            lead.status === "Cold" &&
+                            "bg-blue-100 text-blue-700"
+                          }
+                          ${
+                            lead.status === "Warm" &&
+                            "bg-yellow-100 text-yellow-700"
+                          }
+                          ${lead.status === "Hot" && "bg-red-100 text-red-700"}
+                          ${lead.status === "" && "bg-gray-100 text-gray-700"}
+                        `}
+                          >
+                            {lead.status || "Perception"}
+                          </span>
                         </span>
                       </div>
                     </TableCell>
@@ -871,6 +831,38 @@ const LeadTable = ({
                             : "N/A"}
                         </span>
                       </div>
+                    </TableCell>
+
+                    {/* Social icons */}
+                    <TableCell className="flex items-center gap-2">
+                      <a
+                        href={lead.social?.facebook}
+                        target="_blank"
+                        className="text-blue-600 hover:text-blue-800 transition"
+                      >
+                        <ImFacebook size={18} />
+                      </a>
+                      <a
+                        href={lead.social?.instagram}
+                        target="_blank"
+                        className="text-pink-600 hover:text-pink-800 transition"
+                      >
+                        <ImInstagram size={18} />
+                      </a>
+                      <a
+                        href={lead.social?.skype}
+                        target="_blank"
+                        className="text-sky-600 hover:text-sky-800 transition"
+                      >
+                        <ImSkype size={18} />
+                      </a>
+                      <a
+                        href={lead.social?.twitter}
+                        target="_blank"
+                        className="text-blue-400 hover:text-blue-600 transition"
+                      >
+                        <ImTwitter size={18} />
+                      </a>
                     </TableCell>
 
                     {/* Actions */}
