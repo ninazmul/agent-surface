@@ -625,7 +625,7 @@ const LeadTable = ({
                         >
                           {lead.number}
                         </span>
-                        <span className="flex items-center justify-around">
+                        <span className="flex items-center justify-around gap-2">
                           <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold border">
                             {flagEmoji} {lead.home.country}
                           </span>
