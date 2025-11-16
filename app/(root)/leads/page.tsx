@@ -68,7 +68,7 @@ const Page = async () => {
             <a href={"/leads/create/bulk-import"} className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="rounded-2xl bg-white dark:bg-gray-700 text-black dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+                className="rounded-2xl bg-white hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-500 text-black dark:text-gray-100 w-full flex items-center gap-2 justify-center"
               >
                 Import File <Download />
               </Button>
@@ -76,7 +76,7 @@ const Page = async () => {
             <a href={"/leads/create"} className="w-full sm:w-auto">
               <Button
                 size="lg"
-                className="rounded-2xl bg-black dark:bg-gray-700 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+                className="rounded-2xl bg-black hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
               >
                 Add Leads <Plus />
               </Button>
