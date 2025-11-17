@@ -27,65 +27,67 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   const parseNumber = (value: string | number | undefined) =>
     parseFloat((value || 0).toString().replace(/,/g, "").trim()) || 0;
 
+  // SAFETY CLEANUP: remove invalid leads
+  const safeLeads = useMemo(() => {
+    return (leads || [])
+      .filter((l) => l && typeof l === "object")
+      .filter((l) => l.createdAt || l.updatedAt)
+      .filter((l) => l.home && l.home.country);
+  }, [leads]);
+
+  // DATE FILTERING
   const filterByDateRange = useCallback(
     (data: ILead[]) => {
-      if (filter === "custom" && startDate && endDate) {
-        const start = new Date(startDate);
-        const end = new Date(endDate);
-        return data.filter((lead) => {
-          const date = new Date(lead.updatedAt || lead.createdAt);
+      return data.filter((lead) => {
+        const ts = lead.updatedAt || lead.createdAt;
+        if (!ts) return false;
+
+        const date = new Date(ts);
+        if (isNaN(date.getTime())) return false;
+
+        if (filter === "custom" && startDate && endDate) {
+          const start = new Date(startDate);
+          const end = new Date(endDate);
           return date >= start && date <= end;
-        });
-      }
+        }
 
-      const now = new Date();
-      let from: Date | null = null;
+        const now = new Date();
+        const ranges: Record<string, Date> = {
+          week: subWeeks(now, 1),
+          month: subMonths(now, 1),
+          quarter: subQuarters(now, 1),
+          year: subYears(now, 1),
+        };
 
-      switch (filter) {
-        case "week":
-          from = subWeeks(now, 1);
-          break;
-        case "month":
-          from = subMonths(now, 1);
-          break;
-        case "quarter":
-          from = subQuarters(now, 1);
-          break;
-        case "year":
-          from = subYears(now, 1);
-          break;
-        case "all":
-          return data;
-      }
-
-      return from
-        ? data.filter(
-            (lead) => new Date(lead.updatedAt || lead.createdAt) >= from
-          )
-        : data;
+        const from = ranges[filter];
+        return from ? date >= from : true;
+      });
     },
     [filter, startDate, endDate]
   );
 
+  // FILTERED LEADS
   const filteredLeads = useMemo(() => {
-    const acceptedLeads = leads.filter((l) => l.paymentStatus === "Accepted");
-    const dateFiltered = adminStatus
-      ? filterByDateRange(acceptedLeads)
-      : acceptedLeads;
+    const accepted = safeLeads.filter((l) => l.paymentStatus === "Accepted");
+
+    const dateFiltered = adminStatus ? filterByDateRange(accepted) : accepted;
 
     return dateFiltered.filter((l) => {
+      const country = l.home?.country?.trim();
+      if (!country) return false;
+
       const countryMatch =
-        selectedCountry === "All"
-          ? true
-          : l.home.country?.trim() === selectedCountry;
+        selectedCountry === "All" ? true : country === selectedCountry;
+
       const agencyMatch =
         selectedAgency === "All" ? true : l.author === selectedAgency;
+
       return adminStatus
         ? countryMatch && agencyMatch
-        : l.home.country === myProfile?.country;
+        : country === myProfile?.country;
     });
   }, [
-    leads,
+    safeLeads,
     adminStatus,
     filterByDateRange,
     selectedCountry,
@@ -93,25 +95,25 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     myProfile?.country,
   ]);
 
+  // TARGET PER COUNTRY
   const salesTargetByCountry = useMemo(() => {
-    const relevantProfiles = adminStatus
-      ? profiles
-      : myProfile
-      ? [myProfile]
-      : [];
-    return relevantProfiles.reduce<Record<string, number>>((acc, p) => {
+    const relevant = adminStatus ? profiles : myProfile ? [myProfile] : [];
+
+    return relevant.reduce<Record<string, number>>((acc, p) => {
       if (p.country) {
-        const countryKey = p.country.trim();
-        acc[countryKey] = (acc[countryKey] || 0) + parseNumber(p.salesTarget);
+        const key = p.country.trim();
+        acc[key] = (acc[key] || 0) + parseNumber(p.salesTarget);
       }
       return acc;
     }, {});
   }, [profiles, adminStatus, myProfile]);
 
+  // SALES PER COUNTRY
   const salesByCountry = useMemo(() => {
     return filteredLeads.reduce<Record<string, number>>((acc, lead) => {
       if (!lead.home.country) return acc;
-      const countryKey = lead.home.country.trim();
+
+      const key = lead.home.country.trim();
       const courseAmount = Array.isArray(lead.course)
         ? lead.course.reduce((sum, c) => sum + parseNumber(c.courseFee), 0)
         : 0;
@@ -119,18 +121,33 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
         ? lead.services.reduce((sum, s) => sum + parseNumber(s.amount), 0)
         : 0;
       const discount = parseNumber(lead.discount);
-      acc[countryKey] =
-        (acc[countryKey] || 0) + courseAmount + servicesTotal - discount;
+
+      acc[key] = (acc[key] || 0) + courseAmount + servicesTotal - discount;
+
       return acc;
     }, {});
   }, [filteredLeads]);
 
-  const salesTargetEntries = adminStatus
-    ? Object.entries(salesTargetByCountry)
-    : myProfile
-    ? [[myProfile.country, salesTargetByCountry[myProfile.country] || 0]]
-    : [];
+  // SORTED ENTRIES (IMPORTANT FIX)
+  const sortedEntries = useMemo(() => {
+    const raw = adminStatus
+      ? Object.entries(salesTargetByCountry)
+      : myProfile
+      ? [[myProfile.country, salesTargetByCountry[myProfile.country] || 0]]
+      : [];
 
+    const computed = raw.map(([country, target]) => {
+      const t = parseNumber(target);
+      const s = salesByCountry[country] || 0;
+      const progress = t > 0 ? (s / t) * 100 : 0;
+
+      return { country, target: t, sales: s, progress };
+    });
+
+    return computed.sort((a, b) => b.progress - a.progress);
+  }, [adminStatus, myProfile, salesTargetByCountry, salesByCountry]);
+
+  // OPTIONS LIST
   const countriesList = useMemo(
     () =>
       Array.from(
@@ -159,8 +176,9 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     setSelectedAgency("All");
   };
 
+  // UI (UNCHANGED)
   return (
-    <section className="">
+    <section>
       <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Sales Target by Country
@@ -234,28 +252,23 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
         )}
       </div>
 
-      {/* Scrollable Section */}
+      {/* SCROLL AREA */}
       <div className="relative bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden divide-y divide-gray-100 dark:divide-gray-700 h-[445px] overflow-y-auto scroll-smooth">
-        {salesTargetEntries.map(([country, target]) => {
-          const targetNum = parseNumber(target);
-          const sales = salesByCountry[country] || 0;
-          const progress =
-            targetNum > 0 ? Math.min((sales / targetNum) * 100, 100) : 0;
-          const barColor = progress > 0 ? "bg-orange-400" : "bg-gray-300";
-
+        {sortedEntries.map(({ country, target, sales, progress }) => {
           return (
             <div key={country} className="py-4">
               <div className="flex justify-between items-center mb-1">
                 <span className="font-semibold text-gray-900 dark:text-gray-100">
                   {country}
                 </span>
+
                 <span className="text-sm text-gray-700 dark:text-gray-300">
                   {sales.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
                   /{" "}
-                  {targetNum.toLocaleString(undefined, {
+                  {target.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}{" "}
@@ -265,8 +278,10 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
 
               <div className="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
                 <div
-                  className={`${barColor} h-4 rounded-full transition-all duration-500`}
-                  style={{ width: `${progress}%` }}
+                  className={`${
+                    progress > 0 ? "bg-orange-400" : "bg-gray-300"
+                  } h-4 rounded-full transition-all duration-500`}
+                  style={{ width: `${Math.min(progress, 100)}%` }}
                 />
               </div>
 
