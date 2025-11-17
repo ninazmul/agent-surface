@@ -110,17 +110,30 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
   promotions,
   services,
 }) => {
+  // normalize all incoming lists to avoid null crashes
+  const safeAdmins = Array.isArray(admins) ? admins : [];
+  const safeLeads = Array.isArray(leads) ? leads : [];
+  const safeResources = Array.isArray(resources) ? resources : [];
+  const safeCourses = Array.isArray(courses) ? courses : [];
+  const safeDownloads = Array.isArray(downloads) ? downloads : [];
+  const safeEventCalendars = Array.isArray(eventCalendars)
+    ? eventCalendars
+    : [];
+  const safeProfiles = Array.isArray(profiles) ? profiles : [];
+  const safePromotions = Array.isArray(promotions) ? promotions : [];
+  const safeServices = Array.isArray(services) ? services : [];
+
   // Filter labels based on adminStatus
   const labels = [
-    { key: "Admins", value: admins.length },
-    { key: "Leads", value: leads.length },
-    { key: "Resources", value: resources.length },
-    { key: "Courses", value: courses.length },
-    { key: "Downloads", value: downloads.length },
-    { key: "Calendars", value: eventCalendars.length },
-    { key: "Profiles", value: profiles.length },
-    { key: "Promotions", value: promotions.length },
-    { key: "Services", value: services.length },
+    { key: "Admins", value: safeAdmins.length },
+    { key: "Leads", value: safeLeads.length },
+    { key: "Resources", value: safeResources.length },
+    { key: "Courses", value: safeCourses.length },
+    { key: "Downloads", value: safeDownloads.length },
+    { key: "Calendars", value: safeEventCalendars.length },
+    { key: "Profiles", value: safeProfiles.length },
+    { key: "Promotions", value: safePromotions.length },
+    { key: "Services", value: safeServices.length },
   ].filter(
     (item) => adminStatus || !["Admins", "Profiles", "Users"].includes(item.key)
   );
@@ -131,7 +144,8 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
     count: item.value,
   }));
 
-  const maxCount = Math.max(...chartData.map((d) => d.count)) || 1;
+  const validCounts = chartData.map((d) => Number(d.count) || 0);
+  const maxCount = validCounts.length ? Math.max(...validCounts) : 1;
 
   const barColors = [
     "#1D1D1D",
