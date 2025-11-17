@@ -612,8 +612,9 @@ const LeadTable = ({
                       >
                         <span className="font-semibold flex items-center gap-2">
                           <span className="line-clamp-1">{lead.name}</span>
-                          <span
-                            className={`
+                          {lead.status && (
+                            <span
+                              className={`
                             inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-semibold border
                             ${
                               lead.status === "Perception" &&
@@ -631,20 +632,21 @@ const LeadTable = ({
                               lead.status === "Hot" && "bg-red-100 text-red-700"
                             }
                           `}
-                          >
-                            {lead.status === "Perception" && (
-                              <Eye className="w-4 h-4" />
-                            )}
-                            {lead.status === "Cold" && (
-                              <Snowflake className="w-4 h-4" />
-                            )}
-                            {lead.status === "Warm" && (
-                              <Flame className="w-4 h-4" />
-                            )}
-                            {lead.status === "Hot" && (
-                              <Zap className="w-4 h-4" />
-                            )}
-                          </span>
+                            >
+                              {lead.status === "Perception" && (
+                                <Eye className="w-4 h-4" />
+                              )}
+                              {lead.status === "Cold" && (
+                                <Snowflake className="w-4 h-4" />
+                              )}
+                              {lead.status === "Warm" && (
+                                <Flame className="w-4 h-4" />
+                              )}
+                              {lead.status === "Hot" && (
+                                <Zap className="w-4 h-4" />
+                              )}
+                            </span>
+                          )}
                         </span>
 
                         <span
