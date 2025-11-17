@@ -17,10 +17,7 @@ import { getDownloadsByAgency } from "@/lib/actions/download.actions";
 import { getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getDashboardSummary,
-  DashboardSummary,
-} from "@/lib/actions/summary.actions";
+import { getDashboardSummary } from "@/lib/actions/summary.actions";
 
 import SalesDashboard from "./components/SalesDashboard";
 import CountrySalesTargets from "./components/CountrySalesTargets";
@@ -60,7 +57,7 @@ const Dashboard = () => {
   const searchParams = useSearchParams();
   const { dashboardData, setDashboardData } = useDashboardData();
 
-  const [adminStatus, setAdminStatus] = useState<boolean>(false);
+  const [adminStatus, setAdminStatus] = useState(false);
   const [myProfile, setMyProfile] = useState<IProfile | null>(null);
 
   const [admins, setAdmins] = useState<IAdmin[]>([]);
@@ -76,99 +73,73 @@ const Dashboard = () => {
   // ===== Load cached dashboardData
   useEffect(() => {
     const cached = localStorage.getItem("dashboardData");
-    if (cached && !dashboardData) {
-      try {
-        setDashboardData(JSON.parse(cached));
-      } catch (err) {
-        console.warn("Failed to parse cached dashboard data", err);
-      }
-    }
+    if (cached && !dashboardData) setDashboardData(JSON.parse(cached));
   }, [dashboardData, setDashboardData]);
 
   // ===== Main fetch function
+
   const loadDashboardData = useCallback(async () => {
     if (!user?.id) return;
 
     try {
-      const [userDetails, profile, summaryRaw] = await Promise.all([
+      const [userDetails, profile, summary] = await Promise.all([
         getUserByClerkId(user.id),
         getProfileByEmail(user.emailAddresses?.[0]?.emailAddress || ""),
         getDashboardSummary(),
       ]);
 
-      const summary: DashboardSummary = summaryRaw || {
-        admins: [] as IAdmin[],
-        resources: [] as IResource[],
-        courses: [] as ICourse[],
-        downloads: [] as IDownload[],
-        eventCalendars: [] as IEventCalendar[],
-        leads: [] as ILead[],
-        profiles: [] as IProfile[],
-        promotions: [] as IPromotion[],
-        services: [] as IServices[],
-      };
+      if (!summary) throw new Error("Failed to load dashboard summary");
 
-      const safeProfile: IProfile | null = profile || null;
-
-      setDashboardData({ ...summary, myProfile: safeProfile });
+      // Save context
+      setDashboardData({ ...summary, myProfile: profile });
 
       // Update local state
-      setAdmins(summary.admins || []);
-      setResources(summary.resources || []);
-      setCourses(summary.courses || []);
-      setDownloads(summary.downloads || []);
-      setEventCalendars(summary.eventCalendars || []);
-      setLeads(summary.leads || []);
-      setProfiles(summary.profiles || []);
-      setPromotions(summary.promotions || []);
-      setServices(summary.services || []);
-      setMyProfile(safeProfile);
+      setAdmins(summary.admins);
+      setResources(summary.resources);
+      setCourses(summary.courses);
+      setDownloads(summary.downloads);
+      setEventCalendars(summary.eventCalendars);
+      setLeads(summary.leads);
+      setProfiles(summary.profiles);
+      setPromotions(summary.promotions);
+      setServices(summary.services);
+      setMyProfile(profile);
 
       // Redirect student
-      if (safeProfile?.role === "Student") {
+      if (profile?.role === "Student") {
         router.replace("/profile");
         return;
       }
 
       // Admin validation
-      const email: string =
-        (await getUserEmailById(userDetails)) ||
-        user.emailAddresses?.[0]?.emailAddress ||
-        "";
+      const email = await getUserEmailById(userDetails);
       const [isAdminStatus, adminCountry] = await Promise.all([
         isAdmin(email),
         getAdminCountriesByEmail(email),
       ]);
-
       setAdminStatus(isAdminStatus);
 
       if (isAdminStatus) {
         const filterByCountry = <T,>(
-          data: T[] | null,
+          data: T[],
           getCountry: (item: T) => string | undefined
         ): T[] =>
-          (data || []).filter((item) => {
-            const country = getCountry(item);
-            return country && adminCountry?.includes(country);
-          });
+          adminCountry.length
+            ? data.filter((item) => {
+                const country = getCountry(item);
+                return country && adminCountry.includes(country);
+              })
+            : data;
 
         setDownloads(
-          filterByCountry(
-            summary.downloads,
-            (d) => (d as IDownload)?.country
-          ) as IDownload[]
+          filterByCountry(summary.downloads, (d) => d.country) as IDownload[]
         );
         setLeads(
-          filterByCountry(
-            summary.leads,
-            (l) => (l as ILead)?.home?.country
-          ) as ILead[]
+          filterByCountry(summary.leads, (l) => l.home?.country) as ILead[]
         );
       } else {
-        const agentEmails: string[] = [
-          email,
-          ...(safeProfile?.subAgents || []),
-        ];
+        const agentEmails = [email, ...(profile?.subAgents || [])];
+        // setSubAgentCount(profile?.subAgents?.length || 0);
 
         const [downloadResults, leadResults] = await Promise.all([
           Promise.allSettled(
@@ -179,19 +150,13 @@ const Dashboard = () => {
           ),
         ]);
 
-        const filteredDownloads: IDownload[] = downloadResults
+        const filteredDownloads = downloadResults
           .filter((res) => res.status === "fulfilled")
-          .flatMap(
-            (res) => (res as PromiseFulfilledResult<IDownload[]>).value || []
-          );
+          .flatMap((res) => (res as PromiseFulfilledResult<IDownload[]>).value);
 
-        const filteredLeads: ILead[] = leadResults
-          .filter(
-            (res): res is PromiseFulfilledResult<ILead[]> =>
-              res.status === "fulfilled"
-          )
-          .flatMap((res) => res.value || [])
-          .filter((l): l is ILead => !!l);
+        const filteredLeads = leadResults
+          .filter((res) => res.status === "fulfilled")
+          .flatMap((res) => (res as PromiseFulfilledResult<ILead[]>).value);
 
         setDownloads(filteredDownloads);
         setLeads(filteredLeads);
@@ -200,7 +165,7 @@ const Dashboard = () => {
       // Cache in localStorage
       localStorage.setItem(
         "dashboardData",
-        JSON.stringify({ ...summary, myProfile: safeProfile })
+        JSON.stringify({ ...summary, myProfile: profile })
       );
     } catch (error) {
       console.error("Dashboard load failed:", error);
@@ -216,7 +181,6 @@ const Dashboard = () => {
     }
   }, [searchParams, router, setDashboardData, loadDashboardData]);
 
-  // ===== Initial load
   useEffect(() => {
     loadDashboardData();
   }, [loadDashboardData, user]);
@@ -224,10 +188,8 @@ const Dashboard = () => {
   return (
     <div className="p-4 mb-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-[450px]">
-        {myProfile && myProfile.role !== "Student" && (
-          <SalesDashboard leads={leads} />
-        )}
-        {myProfile && myProfile.role !== "Student" && (
+        {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
+        {myProfile?.role !== "Student" && (
           <CountrySalesTargets
             adminStatus={adminStatus}
             profiles={profiles}
@@ -235,7 +197,6 @@ const Dashboard = () => {
             myProfile={myProfile}
           />
         )}
-
         <DataOverviewChart
           adminStatus={adminStatus}
           admins={admins}
@@ -260,10 +221,11 @@ const Dashboard = () => {
           promotions={promotions}
           services={services}
         />
-
         {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
         {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
       </div>
+
+      
     </div>
   );
 };
