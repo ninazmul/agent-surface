@@ -19,10 +19,10 @@ import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
 import { getDashboardSummary } from "@/lib/actions/summary.actions";
 
-import SalesDashboard from "./components/SalesDashboard";
-import CountrySalesTargets from "./components/CountrySalesTargets";
-import LeadsToEnrolled from "./components/LeadsToEnrolled";
-import LeadsFinancial from "./components/LeadsFinancial";
+// import SalesDashboard from "./components/SalesDashboard";
+// import CountrySalesTargets from "./components/CountrySalesTargets";
+// import LeadsToEnrolled from "./components/LeadsToEnrolled";
+// import LeadsFinancial from "./components/LeadsFinancial";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
 
 import { IAdmin } from "@/lib/database/models/admin.model";
@@ -58,7 +58,7 @@ const Dashboard = () => {
   const { dashboardData, setDashboardData } = useDashboardData();
 
   const [adminStatus, setAdminStatus] = useState(false);
-  const [myProfile, setMyProfile] = useState<IProfile | null>(null);
+  // const [myProfile, setMyProfile] = useState<IProfile | null>(null);
 
   const [admins, setAdmins] = useState<IAdmin[]>([]);
   const [resources, setResources] = useState<IResource[]>([]);
@@ -103,7 +103,7 @@ const Dashboard = () => {
       setProfiles(summary.profiles);
       setPromotions(summary.promotions);
       setServices(summary.services);
-      setMyProfile(profile);
+      // setMyProfile(profile);
 
       // Redirect student
       if (profile?.role === "Student") {
@@ -192,7 +192,7 @@ const Dashboard = () => {
   return (
     <div className="p-4 mb-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-[450px]">
-        {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
+        {/* {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
         {myProfile?.role !== "Student" && (
           <CountrySalesTargets
             adminStatus={adminStatus}
@@ -200,7 +200,7 @@ const Dashboard = () => {
             leads={leads}
             myProfile={myProfile}
           />
-        )}
+        )} */}
         <DataOverviewChart
           adminStatus={adminStatus}
           admins={admins}
@@ -225,8 +225,8 @@ const Dashboard = () => {
           promotions={promotions}
           services={services}
         />
-        {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
-        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
+        {/* {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
+        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />} */}
       </div>
     </div>
   );
