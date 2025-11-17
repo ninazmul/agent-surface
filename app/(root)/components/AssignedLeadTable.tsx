@@ -26,7 +26,11 @@ import {
   FileText,
   Copy,
   TrainTrackIcon,
-  Users,
+  Eye,
+  Snowflake,
+  Flame,
+  Zap,
+  UserCheck,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -50,7 +54,6 @@ import { IPromotion } from "@/lib/database/models/promotion.model";
 import { createTrack, getTracksByStudent } from "@/lib/actions/track.actions";
 import { IStudentEvent, ITrack } from "@/lib/database/models/track.model";
 import { ImFacebook, ImInstagram, ImSkype, ImTwitter } from "react-icons/im";
-import countries from "world-countries";
 
 type PinUnpinStatus = ILead & { isPinned: "pinned" | "unpinned" };
 
@@ -344,48 +347,52 @@ const AssignedLeadTable = ({
   return (
     <div className="space-y-6">
       {/* --- Filters --- */}
-      <div className="flex flex-col sm:flex-row gap-3 items-center">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-start sm:items-center">
+        {/* Search */}
         <Input
           placeholder="Search leads..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full sm:max-w-md rounded-2xl"
+          className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
         />
 
-        {/* Promotion Type Filter */}
-        <select
-          value={promotionFilter}
-          onChange={(e) =>
-            setPromotionFilter(
-              e.target.value as "all" | "promotion" | "general"
-            )
-          }
-          className="border rounded-2xl px-3 py-2 text-sm"
-        >
-          <option value="all">All Leads</option>
-          <option value="promotion">Promotion Leads</option>
-          <option value="general">General Leads</option>
-        </select>
-
-        {/* --- NEW: Promotion SKU Filter --- */}
-        {isAdmin && (
+        {/* Filters Container */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          {/* Promotion Type */}
           <select
-            value={promotionSkuFilter}
-            onChange={(e) => setPromotionSkuFilter(e.target.value)}
-            className="border rounded-2xl px-3 py-2 text-sm"
+            value={promotionFilter}
+            onChange={(e) =>
+              setPromotionFilter(
+                e.target.value as "all" | "promotion" | "general"
+              )
+            }
+            className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
           >
-            <option value="all">All Promotions</option>
-            {promotions.map((promo) => (
-              <option key={promo.sku} value={promo.sku}>
-                {promo.title}
-              </option>
-            ))}
+            <option value="all">All Leads</option>
+            <option value="promotion">Promotion Leads</option>
+            <option value="general">General Leads</option>
           </select>
-        )}
+
+          {/* Promotion SKU (Admin Only) */}
+          {isAdmin && (
+            <select
+              value={promotionSkuFilter}
+              onChange={(e) => setPromotionSkuFilter(e.target.value)}
+              className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+            >
+              <option value="all">All Promotions</option>
+              {promotions.map((promo) => (
+                <option key={promo.sku} value={promo.sku}>
+                  {promo.title}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
       </div>
 
       <div
-        className="overflow-x-auto rounded-2xl bg-pink-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -410,9 +417,9 @@ const AssignedLeadTable = ({
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <input
                   type="checkbox"
                   checked={selectedLeads.length === paginatedLeads.length}
@@ -423,19 +430,22 @@ const AssignedLeadTable = ({
                   }}
                 />
               </TableHead>
-              <TableHead>#</TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
                 {sortKey === "name" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Agency</TableHead>
-              <TableHead>Course & Services</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Agency
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Course & Services
+              </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("progress")}
               >
                 Progress{" "}
@@ -443,7 +453,7 @@ const AssignedLeadTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("status")}
               >
                 Status{" "}
@@ -451,14 +461,19 @@ const AssignedLeadTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}
                 {sortKey === "date" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Social Media
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -485,18 +500,11 @@ const AssignedLeadTable = ({
                   ? 100
                   : 0;
 
-              const countryData = countries.find(
-                (c) =>
-                  c.name.common.toLowerCase() ===
-                  lead.home.country.toLowerCase()
-              );
-              const flagEmoji = countryData?.flag; // 🏳️‍🌈 style emoji
-
               return (
                 <>
                   <TableRow
-                    key={lead._id}
-                    className={`hover:bg-pink-100 dark:hover:bg-gray-800 border-b-0 ${
+                    key={idx}
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0 ${
                       lead.isPinned
                         ? "bg-yellow-200 hover:bg-yellow-300 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
                         : ""
@@ -517,87 +525,51 @@ const AssignedLeadTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell>
-                      <div className="space-y-2">
-                        {/* Country with flag + serial */}
-                        <div className="flex items-center gap-2">
-                          <span className="text-lg">{flagEmoji}</span>
-                          <span className="text-sm font-medium">
-                            Serial: {(currentPage - 1) * itemsPerPage + idx + 1}
-                          </span>
-                        </div>
-
-                        {/* Social icons */}
-                        <div className="flex items-center gap-2">
-                          <a
-                            href={lead.social?.facebook}
-                            target="_blank"
-                            className="text-blue-600 hover:text-blue-800 transition"
-                          >
-                            <ImFacebook size={18} />
-                          </a>
-                          <a
-                            href={lead.social?.instagram}
-                            target="_blank"
-                            className="text-pink-600 hover:text-pink-800 transition"
-                          >
-                            <ImInstagram size={18} />
-                          </a>
-                          <a
-                            href={lead.social?.skype}
-                            target="_blank"
-                            className="text-sky-600 hover:text-sky-800 transition"
-                          >
-                            <ImSkype size={18} />
-                          </a>
-                          <a
-                            href={lead.social?.twitter}
-                            target="_blank"
-                            className="text-blue-400 hover:text-blue-600 transition"
-                          >
-                            <ImTwitter size={18} />
-                          </a>
-                        </div>
-
-                        {/* Status badge */}
-                        <div
-                          className={`inline-block px-3 py-1 w-full rounded-full text-center text-xs font-semibold
-                          ${
-                            lead.status === "Perception" &&
-                            "bg-gray-100 text-gray-700"
-                          }
-                          ${
-                            lead.status === "Cold" &&
-                            "bg-blue-100 text-blue-700"
-                          }
-                          ${
-                            lead.status === "Warm" &&
-                            "bg-yellow-100 text-yellow-700"
-                          }
-                          ${lead.status === "Hot" && "bg-red-100 text-red-700"}
-                          ${lead.status === "" && "bg-gray-100 text-gray-700"}
-                        `}
-                        >
-                          {lead.status || "Perception"}
-                        </div>
-                      </div>
-                    </TableCell>
-
                     {/* Name & Email */}
                     <TableCell>
-                      <a href={`/leads/${lead._id}`} className="flex flex-col">
+                      <a
+                        href={`/leads/${lead._id}`}
+                        className="flex flex-col space-y-1"
+                      >
                         <span className="font-semibold flex items-center gap-2">
                           <span className="line-clamp-1">{lead.name}</span>
-                          {lead.isPromotion ? (
-                            <span className="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700 border border-purple-300">
-                              Promotion
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700 border border-gray-300">
-                              General
+                          {lead.status && (
+                            <span
+                              className={`
+                            inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-semibold border
+                            ${
+                              lead.status === "Perception" &&
+                              "bg-gray-100 text-gray-700"
+                            }
+                            ${
+                              lead.status === "Cold" &&
+                              "bg-blue-100 text-blue-700"
+                            }
+                            ${
+                              lead.status === "Warm" &&
+                              "bg-yellow-100 text-yellow-700"
+                            }
+                            ${
+                              lead.status === "Hot" && "bg-red-100 text-red-700"
+                            }
+                          `}
+                            >
+                              {lead.status === "Perception" && (
+                                <Eye className="w-4 h-4" />
+                              )}
+                              {lead.status === "Cold" && (
+                                <Snowflake className="w-4 h-4" />
+                              )}
+                              {lead.status === "Warm" && (
+                                <Flame className="w-4 h-4" />
+                              )}
+                              {lead.status === "Hot" && (
+                                <Zap className="w-4 h-4" />
+                              )}
                             </span>
                           )}
                         </span>
+
                         <span
                           className={`text-sm text-gray-500 dark:text-gray-300 flex items-center gap-1 ${
                             lead.isPinned ? "dark:text-gray-500" : ""
@@ -606,43 +578,27 @@ const AssignedLeadTable = ({
                           {lead.email}
                         </span>
                         <span
-                          className={`text-sm text-gray-500 dark:text-gray-300 ${
+                          className={`text-sm text-gray-500 dark:text-gray-300  ${
                             lead.isPinned ? "dark:text-gray-500" : ""
                           }`}
                         >
                           {lead.number}
                         </span>
+                        <span className="flex items-center justify-around gap-2">
+                          <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold border">
+                            {lead.home.country}
+                          </span>
+                          {lead.isPromotion ? (
+                            <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold bg-purple-100 text-purple-700 border border-purple-300">
+                              Promotion
+                            </span>
+                          ) : (
+                            <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-300">
+                              General
+                            </span>
+                          )}
+                        </span>
                       </a>
-                      {lead.assignedTo && lead.assignedTo.length > 0 && (
-                        <Popover>
-                          <PopoverTrigger asChild>
-                            <button
-                              className="text-sm text-blue-600 dark:text-blue-400 underline flex items-center gap-1"
-                              type="button"
-                            >
-                              <Users size={14} />
-                              <span>{lead.assignedTo.length} assigned</span>
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-56 bg-white dark:bg-gray-900 shadow-lg rounded-md p-2">
-                            <p className="text-sm font-semibold mb-2">
-                              Assigned To:
-                            </p>
-                            <ul className="space-y-1">
-                              {lead.assignedTo.map(
-                                (user: string, idx: number) => (
-                                  <li
-                                    key={idx}
-                                    className="text-sm text-gray-700 dark:text-gray-300 border-b last:border-0 py-1"
-                                  >
-                                    {user}
-                                  </li>
-                                )
-                              )}
-                            </ul>
-                          </PopoverContent>
-                        </Popover>
-                      )}
                     </TableCell>
 
                     <TableCell>
@@ -688,6 +644,33 @@ const AssignedLeadTable = ({
                             "Phone: N/A"
                           )}
                         </span>
+                        {lead.assignedTo && lead.assignedTo.length > 0 && (
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold bg-green-100 text-green-700 border border-green-300">
+                                <UserCheck size={14} />
+                                <span>{lead.assignedTo.length} Assigned</span>
+                              </span>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-56 bg-white dark:bg-gray-900 shadow-lg rounded-md p-2">
+                              <p className="text-sm font-semibold mb-2">
+                                Assigned To:
+                              </p>
+                              <ul className="space-y-1">
+                                {lead.assignedTo.map(
+                                  (user: string, idx: number) => (
+                                    <li
+                                      key={idx}
+                                      className="text-sm text-gray-700 dark:text-gray-300 border-b last:border-0 py-1"
+                                    >
+                                      {user}
+                                    </li>
+                                  )
+                                )}
+                              </ul>
+                            </PopoverContent>
+                          </Popover>
+                        )}
                       </div>
                     </TableCell>
 
@@ -823,6 +806,40 @@ const AssignedLeadTable = ({
                               })
                             : "N/A"}
                         </span>
+                      </div>
+                    </TableCell>
+
+                    {/* Social icons */}
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <a
+                          href={lead.social?.facebook}
+                          target="_blank"
+                          className="text-blue-600 hover:text-blue-800 transition"
+                        >
+                          <ImFacebook size={18} />
+                        </a>
+                        <a
+                          href={lead.social?.instagram}
+                          target="_blank"
+                          className="text-pink-600 hover:text-pink-800 transition"
+                        >
+                          <ImInstagram size={18} />
+                        </a>
+                        <a
+                          href={lead.social?.skype}
+                          target="_blank"
+                          className="text-sky-600 hover:text-sky-800 transition"
+                        >
+                          <ImSkype size={18} />
+                        </a>
+                        <a
+                          href={lead.social?.twitter}
+                          target="_blank"
+                          className="text-blue-400 hover:text-blue-600 transition"
+                        >
+                          <ImTwitter size={18} />
+                        </a>
                       </div>
                     </TableCell>
 
@@ -989,19 +1006,19 @@ const AssignedLeadTable = ({
         <div className="flex gap-2">
           <Button
             size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p - 1)}
             disabled={currentPage === 1}
-            className="rounded-2xl"
           >
             Previous
           </Button>
           <Button
             size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage === Math.ceil(filteredLeads.length / itemsPerPage)
             }
-            className="rounded-2xl"
           >
             Next
           </Button>
