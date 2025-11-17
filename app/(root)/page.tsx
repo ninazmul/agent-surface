@@ -21,8 +21,8 @@ import { getDashboardSummary } from "@/lib/actions/summary.actions";
 
 import SalesDashboard from "./components/SalesDashboard";
 import CountrySalesTargets from "./components/CountrySalesTargets";
-import LeadsToEnrolled from "./components/LeadsToEnrolled";
-import LeadsFinancial from "./components/LeadsFinancial";
+// import LeadsToEnrolled from "./components/LeadsToEnrolled";
+// import LeadsFinancial from "./components/LeadsFinancial";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
 
 import { IAdmin } from "@/lib/database/models/admin.model";
@@ -225,8 +225,8 @@ const Dashboard = () => {
           promotions={promotions}
           services={services}
         />
-        {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
-        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
+        {/* {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
+        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />} */}
       </div>
     </div>
   );
