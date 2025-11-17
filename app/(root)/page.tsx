@@ -21,8 +21,8 @@ import { getDashboardSummary } from "@/lib/actions/summary.actions";
 
 import SalesDashboard from "./components/SalesDashboard";
 import CountrySalesTargets from "./components/CountrySalesTargets";
-// import LeadsToEnrolled from "./components/LeadsToEnrolled";
-// import LeadsFinancial from "./components/LeadsFinancial";
+import LeadsToEnrolled from "./components/LeadsToEnrolled";
+import LeadsFinancial from "./components/LeadsFinancial";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
 
 import { IAdmin } from "@/lib/database/models/admin.model";
@@ -154,13 +154,13 @@ const Dashboard = () => {
           .filter((res) => res.status === "fulfilled")
           .flatMap((res) => (res as PromiseFulfilledResult<IDownload[]>).value);
 
-        const filteredLeads = leadResults
-          .filter((res) => res.status === "fulfilled")
-          .flatMap((res) => (res as PromiseFulfilledResult<ILead[]>).value)
+        const filteredLeads: ILead[] = leadResults
           .filter(
-            (l): l is ILead =>
-              l !== null && l !== undefined && l.createdAt !== undefined
-          );
+            (res): res is PromiseFulfilledResult<ILead[]> =>
+              res.status === "fulfilled"
+          )
+          .flatMap((res) => res.value)
+          .filter((l): l is ILead => l !== null && l !== undefined);
 
         setDownloads(filteredDownloads);
         setLeads(filteredLeads);
@@ -225,8 +225,8 @@ const Dashboard = () => {
           promotions={promotions}
           services={services}
         />
-        {/* {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
-        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />} */}
+        {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
+        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
       </div>
     </div>
   );
