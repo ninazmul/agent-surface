@@ -15,20 +15,20 @@ import { IDownload } from "@/lib/database/models/download.model";
 import { ILead } from "@/lib/database/models/lead.model";
 
 interface DistributionOverviewProps {
-  admins: IAdmin[];
-  leads: ILead[];
-  resources: IResource[];
-  courses: ICourse[];
-  downloads: IDownload[];
-  eventCalendars: IEventCalendar[];
-  profiles: IProfile[];
-  promotions: IPromotion[];
-  services: IServices[];
+  admins: IAdmin[] | null;
+  leads: ILead[] | null;
+  resources: IResource[] | null;
+  courses: ICourse[] | null;
+  downloads: IDownload[] | null;
+  eventCalendars: IEventCalendar[] | null;
+  profiles: IProfile[] | null;
+  promotions: IPromotion[] | null;
+  services: IServices[] | null;
 }
 
 type DateFilterOption = "30days" | "7days" | "all";
 
-// Move filterByDate outside component to satisfy useMemo
+// Filter function
 const filterByDate = <T extends { createdAt?: string | Date }>(
   data: T[],
   dateFilter: DateFilterOption
@@ -69,15 +69,52 @@ const DistributionOverview = ({
   const [dateFilter, setDateFilter] = useState<DateFilterOption>("30days");
 
   // Filtered datasets
-  const filteredAdmins = useMemo(() => filterByDate(admins, dateFilter), [admins, dateFilter]);
-  const filteredLeads = useMemo(() => filterByDate(leads, dateFilter), [leads, dateFilter]);
-  const filteredResources = useMemo(() => filterByDate(resources, dateFilter), [resources, dateFilter]);
-  const filteredCourses = useMemo(() => filterByDate(courses, dateFilter), [courses, dateFilter]);
-  const filteredDownloads = useMemo(() => filterByDate(downloads, dateFilter), [downloads, dateFilter]);
-  const filteredEventCalendars = useMemo(() => filterByDate(eventCalendars, dateFilter), [eventCalendars, dateFilter]);
-  const filteredProfiles = useMemo(() => filterByDate(profiles, dateFilter), [profiles, dateFilter]);
-  const filteredPromotions = useMemo(() => filterByDate(promotions, dateFilter), [promotions, dateFilter]);
-  const filteredServices = useMemo(() => filterByDate(services, dateFilter), [services, dateFilter]);
+  const filteredAdmins = useMemo(() => {
+    const safeAdmins = Array.isArray(admins) ? admins : [];
+    return filterByDate(safeAdmins, dateFilter);
+  }, [admins, dateFilter]);
+
+  const filteredLeads = useMemo(() => {
+    const safeLeads = Array.isArray(leads) ? leads : [];
+    return filterByDate(safeLeads, dateFilter);
+  }, [leads, dateFilter]);
+
+  const filteredResources = useMemo(() => {
+    const safeResources = Array.isArray(resources) ? resources : [];
+    return filterByDate(safeResources, dateFilter);
+  }, [resources, dateFilter]);
+
+  const filteredCourses = useMemo(() => {
+    const safeCourses = Array.isArray(courses) ? courses : [];
+    return filterByDate(safeCourses, dateFilter);
+  }, [courses, dateFilter]);
+
+  const filteredDownloads = useMemo(() => {
+    const safeDownloads = Array.isArray(downloads) ? downloads : [];
+    return filterByDate(safeDownloads, dateFilter);
+  }, [downloads, dateFilter]);
+
+  const filteredEventCalendars = useMemo(() => {
+    const safeEventCalendars = Array.isArray(eventCalendars)
+      ? eventCalendars
+      : [];
+    return filterByDate(safeEventCalendars, dateFilter);
+  }, [eventCalendars, dateFilter]);
+
+  const filteredProfiles = useMemo(() => {
+    const safeProfiles = Array.isArray(profiles) ? profiles : [];
+    return filterByDate(safeProfiles, dateFilter);
+  }, [profiles, dateFilter]);
+
+  const filteredPromotions = useMemo(() => {
+    const safePromotions = Array.isArray(promotions) ? promotions : [];
+    return filterByDate(safePromotions, dateFilter);
+  }, [promotions, dateFilter]);
+
+  const filteredServices = useMemo(() => {
+    const safeServices = Array.isArray(services) ? services : [];
+    return filterByDate(safeServices, dateFilter);
+  }, [services, dateFilter]);
 
   const totalCount =
     filteredAdmins.length +
@@ -100,11 +137,16 @@ const DistributionOverview = ({
     { label: "Profiles", count: filteredProfiles.length },
     { label: "Promotions", count: filteredPromotions.length },
     { label: "Services", count: filteredServices.length },
-  ].map((item) => ({
-    ...item,
-    percentage:
-      totalCount > 0 ? ((item.count / totalCount) * 100).toFixed(2) + "%" : "0%",
-  }));
+  ]
+    .map((item) => ({
+      ...item,
+      percentage:
+        totalCount > 0
+          ? ((item.count / totalCount) * 100).toFixed(2) + "%"
+          : "0%",
+    }))
+    // Sort descending by count (highest first)
+    .sort((a, b) => b.count - a.count);
 
   return (
     <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 h-full flex flex-col">
