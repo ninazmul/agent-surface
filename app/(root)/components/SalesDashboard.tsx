@@ -67,7 +67,8 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   }, [dashboardData, setDashboardData, userId]);
 
   const allLeads = useMemo(() => {
-    return leads.length ? leads : dashboardData?.leads || [];
+    const raw = leads.length ? leads : dashboardData?.leads || [];
+    return raw.filter(Boolean).filter((l) => l.createdAt || l.updatedAt);
   }, [leads, dashboardData?.leads]);
 
   const filteredLeads = useMemo(() => {
@@ -84,9 +85,14 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         : null;
 
     return allLeads
-      .filter((l) => l.paymentStatus === "Accepted")
+      .filter((l) => l?.paymentStatus === "Accepted")
       .filter((l) => {
-        const date = new Date(l.updatedAt || l.createdAt);
+        const ts = l.updatedAt || l.createdAt;
+        if (!ts) return false; // critical line: skip dirty data
+
+        const date = new Date(ts);
+        if (isNaN(date.getTime())) return false; // invalid date protection
+
         if (filter === "custom" && startDate && endDate) {
           return date >= new Date(startDate) && date <= new Date(endDate);
         }
