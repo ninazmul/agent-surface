@@ -11,38 +11,40 @@ type AgentProgress = {
 } & Record<string, number>;
 
 interface LeadsToEnrolledProps {
-  profiles: IProfile[];
-  leads: ILead[];
+  profiles?: IProfile[] | null;
+  leads?: ILead[] | null;
   loading?: boolean;
 }
 
 const leadStages = ["Open", "Contacted", "Converted", "Closed"];
 
 const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
-  profiles,
-  leads,
+  profiles = [],
+  leads = [],
 }) => {
   const [filter, setFilter] = useState("month");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [showMore, setShowMore] = useState(false);
-
-  const [selectedAgent, setSelectedAgent] = useState("all"); // ✅ NEW
+  const [selectedAgent, setSelectedAgent] = useState("all");
 
   const filterByDateRange = React.useCallback(
-    <T extends { createdAt: string | Date }>(data: T[]) => {
-      const now = new Date();
-      let from: Date | null = null;
+    <T extends { createdAt?: string | Date }>(data: T[]) => {
+      if (!Array.isArray(data)) return [];
 
+      const now = new Date();
       if (filter === "custom" && startDate && endDate) {
         const start = new Date(startDate);
         const end = new Date(endDate);
         return data.filter(
           (item) =>
-            new Date(item.createdAt) >= start && new Date(item.createdAt) <= end
+            item.createdAt &&
+            new Date(item.createdAt) >= start &&
+            new Date(item.createdAt) <= end
         );
       }
 
+      let from: Date | null = null;
       switch (filter) {
         case "week":
           from = subWeeks(now, 1);
@@ -57,46 +59,49 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
           from = subYears(now, 1);
           break;
         case "all":
-          return data;
+          return data.filter((item) => item && item.createdAt);
       }
 
       return from
-        ? data.filter((item) => new Date(item.createdAt) >= from)
-        : data;
+        ? data.filter(
+            (item) => item?.createdAt && new Date(item.createdAt) >= from
+          )
+        : [];
     },
     [filter, startDate, endDate]
   );
 
-  // STEP 1 — Date filter
   const filteredLeads = useMemo(
-    () => filterByDateRange(leads),
-    [filterByDateRange, leads]
+    () => filterByDateRange(leads || []),
+    [leads, filterByDateRange]
   );
 
-  // STEP 2 — Agent filter (NEW)
   const agentFilteredLeads = useMemo(() => {
     if (selectedAgent === "all") return filteredLeads;
-    return filteredLeads.filter((l) => l.author === selectedAgent);
+    return filteredLeads.filter((l) => l?.author === selectedAgent);
   }, [filteredLeads, selectedAgent]);
 
-  // STEP 3 — Aggregation per agent
   const agentsData: AgentProgress[] = useMemo(() => {
-    return profiles
+    const safeProfiles = Array.isArray(profiles) ? profiles : [];
+    return safeProfiles
       .map((agent) => {
         const agentLeads = agentFilteredLeads.filter(
-          (l) => l.author === agent.email
+          (l) => l?.author === agent?.email
         );
 
         const counts: Record<string, number> = {};
         leadStages.forEach((stage) => {
           counts[stage] =
-            agentLeads.filter((l) => l.progress === stage).length || 0;
+            agentLeads.filter((l) => l?.progress === stage).length || 0;
         });
 
         const total = Object.values(counts).reduce((sum, v) => sum + v, 0);
-        return total > 0 ? { agentName: agent.name, ...counts } : null;
+        return total > 0
+          ? { agentName: agent?.name || "Unknown", total, ...counts }
+          : null;
       })
-      .filter((a): a is AgentProgress => a !== null);
+      .filter((a): a is AgentProgress & { total: number } => a !== null)
+      .sort((a, b) => (b.total || 0) - (a.total || 0)); // Sort descending by total leads
   }, [profiles, agentFilteredLeads]);
 
   useEffect(() => {
@@ -105,15 +110,12 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
-      {/* Header */}
-      <div className="flex flex-wrap justify-between items-center gap-4 mb-6 ">
+      <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Leads Progress
         </h2>
 
-        {/* Filter Section */}
         <div className="flex items-center gap-3">
-          {/* Date Filter */}
           <select
             className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
             onChange={(e) => setFilter(e.target.value)}
@@ -144,21 +146,19 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
             </>
           )}
 
-          {/* NEW — Agency Filter */}
           <select
             className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
             value={selectedAgent}
             onChange={(e) => setSelectedAgent(e.target.value)}
           >
             <option value="all">All Agencies</option>
-            {profiles.map((agent) => (
-              <option key={agent.email} value={agent.email}>
-                {agent.name}
+            {profiles?.map((agent) => (
+              <option key={agent?.email} value={agent?.email}>
+                {agent?.name || "Unknown"}
               </option>
             ))}
           </select>
 
-          {/* Reset Button */}
           <button
             className="bg-black dark:bg-gray-700 text-white px-4 py-2 rounded-2xl transition"
             onClick={() => {
@@ -166,7 +166,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
               setStartDate("");
               setEndDate("");
               setShowMore(false);
-              setSelectedAgent("all"); // reset agency
+              setSelectedAgent("all");
             }}
           >
             Reset Filter
@@ -174,7 +174,6 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
         </div>
       </div>
 
-      {/* Agent Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {(showMore ? agentsData : agentsData.slice(0, 3)).map((agent) => {
           const maxCount = Math.max(
@@ -230,7 +229,6 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
         })}
       </div>
 
-      {/* See More Button */}
       {agentsData.length > 3 && !showMore && (
         <div className="flex justify-center mt-10">
           <button
