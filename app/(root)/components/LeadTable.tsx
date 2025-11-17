@@ -668,11 +668,11 @@ const LeadTable = ({
                             {lead.home.country}
                           </span>
                           {lead.isPromotion ? (
-                            <span className="px-3 py-1 w-full rounded-full text-center bg-purple-100 text-purple-700 border border-purple-300">
+                            <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold bg-purple-100 text-purple-700 border border-purple-300">
                               Promotion
                             </span>
                           ) : (
-                            <span className="px-3 py-1 w-full rounded-full text-center bg-gray-100 text-gray-700 border border-gray-300">
+                            <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-300">
                               General
                             </span>
                           )}
