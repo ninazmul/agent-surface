@@ -156,7 +156,8 @@ const Dashboard = () => {
 
         const filteredLeads = leadResults
           .filter((res) => res.status === "fulfilled")
-          .flatMap((res) => (res as PromiseFulfilledResult<ILead[]>).value);
+          .flatMap((res) => (res as PromiseFulfilledResult<ILead[]>).value)
+          .filter((l): l is ILead => l !== null && l !== undefined);
 
         setDownloads(filteredDownloads);
         setLeads(filteredLeads);
@@ -189,7 +190,7 @@ const Dashboard = () => {
     <div className="p-4 mb-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-[450px]">
         {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
-        {/* {myProfile?.role !== "Student" && (
+        {myProfile?.role !== "Student" && (
           <CountrySalesTargets
             adminStatus={adminStatus}
             profiles={profiles}
@@ -222,10 +223,8 @@ const Dashboard = () => {
           services={services}
         />
         {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
-        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />} */}
+        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
       </div>
-
-      
     </div>
   );
 };
