@@ -647,7 +647,7 @@ const AssignedLeadTable = ({
                         {lead.assignedTo && lead.assignedTo.length > 0 && (
                           <Popover>
                             <PopoverTrigger asChild>
-                              <span className="flex items-center gap-2 justify-center px-3 py-1 w-full rounded-full text-center text-xs font-semibold bg-green-100 text-green-700 border border-green-300">
+                              <span className="flex items-center gap-2 justify-center px-3 py-1 w-max rounded-full text-center text-xs font-semibold bg-green-100 text-green-700 border border-green-300">
                                 <UserCheck size={14} />
                                 <span>{lead.assignedTo.length} Assigned</span>
                               </span>
