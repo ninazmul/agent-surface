@@ -612,8 +612,6 @@ const LeadTable = ({
                       >
                         <span className="font-semibold flex items-center gap-2">
                           <span className="line-clamp-1">{lead.name}</span>
-
-                          {/* Status Icon */}
                           <span
                             className={`
                             inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-semibold border
