@@ -157,7 +157,10 @@ const Dashboard = () => {
         const filteredLeads = leadResults
           .filter((res) => res.status === "fulfilled")
           .flatMap((res) => (res as PromiseFulfilledResult<ILead[]>).value)
-          .filter((l): l is ILead => l !== null && l !== undefined);
+          .filter(
+            (l): l is ILead =>
+              l !== null && l !== undefined && l.createdAt !== undefined
+          );
 
         setDownloads(filteredDownloads);
         setLeads(filteredLeads);
