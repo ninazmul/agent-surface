@@ -189,7 +189,7 @@ const Dashboard = () => {
     <div className="p-4 mb-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-[450px]">
         {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
-        {myProfile?.role !== "Student" && (
+        {/* {myProfile?.role !== "Student" && (
           <CountrySalesTargets
             adminStatus={adminStatus}
             profiles={profiles}
@@ -222,7 +222,7 @@ const Dashboard = () => {
           services={services}
         />
         {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
-        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
+        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />} */}
       </div>
 
       
