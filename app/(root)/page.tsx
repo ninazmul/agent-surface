@@ -19,26 +19,26 @@ import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
 import { getDashboardSummary } from "@/lib/actions/summary.actions";
 
-// import SalesDashboard from "./components/SalesDashboard";
-// import CountrySalesTargets from "./components/CountrySalesTargets";
-// import LeadsToEnrolled from "./components/LeadsToEnrolled";
-// import LeadsFinancial from "./components/LeadsFinancial";
+import SalesDashboard from "./components/SalesDashboard";
+import CountrySalesTargets from "./components/CountrySalesTargets";
+import LeadsToEnrolled from "./components/LeadsToEnrolled";
+import LeadsFinancial from "./components/LeadsFinancial";
 import { useDashboardData } from "@/components/shared/DashboardProvider";
 
-import { IAdmin } from "@/lib/database/models/admin.model";
-import { IResource } from "@/lib/database/models/resource.model";
-import { ICourse } from "@/lib/database/models/course.model";
-import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
-import { IPromotion } from "@/lib/database/models/promotion.model";
-import { IServices } from "@/lib/database/models/service.model";
+// import { IAdmin } from "@/lib/database/models/admin.model";
+// import { IResource } from "@/lib/database/models/resource.model";
+// import { ICourse } from "@/lib/database/models/course.model";
+// import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
+// import { IPromotion } from "@/lib/database/models/promotion.model";
+// import { IServices } from "@/lib/database/models/service.model";
 import { IProfile } from "@/lib/database/models/profile.model";
-import { IDownload } from "@/lib/database/models/download.model";
+// import { IDownload } from "@/lib/database/models/download.model";
 import { ILead } from "@/lib/database/models/lead.model";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
-import { DataOverviewChart } from "./components/DataOverviewChart";
-import DistributionOverview from "./components/DistributionOverview";
+// import { DataOverviewChart } from "./components/DataOverviewChart";
+// import DistributionOverview from "./components/DistributionOverview";
 
 // Register Chart.js components
 ChartJS.register(
@@ -58,17 +58,17 @@ const Dashboard = () => {
   const { dashboardData, setDashboardData } = useDashboardData();
 
   const [adminStatus, setAdminStatus] = useState(false);
-  // const [myProfile, setMyProfile] = useState<IProfile | null>(null);
+  const [myProfile, setMyProfile] = useState<IProfile | null>(null);
 
-  const [admins, setAdmins] = useState<IAdmin[]>([]);
-  const [resources, setResources] = useState<IResource[]>([]);
-  const [courses, setCourses] = useState<ICourse[]>([]);
-  const [downloads, setDownloads] = useState<IDownload[]>([]);
-  const [eventCalendars, setEventCalendars] = useState<IEventCalendar[]>([]);
+  // const [admins, setAdmins] = useState<IAdmin[]>([]);
+  // const [resources, setResources] = useState<IResource[]>([]);
+  // const [courses, setCourses] = useState<ICourse[]>([]);
+  // const [downloads, setDownloads] = useState<IDownload[]>([]);
+  // const [eventCalendars, setEventCalendars] = useState<IEventCalendar[]>([]);
   const [leads, setLeads] = useState<ILead[]>([]);
   const [profiles, setProfiles] = useState<IProfile[]>([]);
-  const [promotions, setPromotions] = useState<IPromotion[]>([]);
-  const [services, setServices] = useState<IServices[]>([]);
+  // const [promotions, setPromotions] = useState<IPromotion[]>([]);
+  // const [services, setServices] = useState<IServices[]>([]);
 
   // ===== Load cached dashboardData
   useEffect(() => {
@@ -94,16 +94,16 @@ const Dashboard = () => {
       setDashboardData({ ...summary, myProfile: profile });
 
       // Update local state
-      setAdmins(summary.admins);
-      setResources(summary.resources);
-      setCourses(summary.courses);
-      setDownloads(summary.downloads);
-      setEventCalendars(summary.eventCalendars);
+      // setAdmins(summary.admins);
+      // setResources(summary.resources);
+      // setCourses(summary.courses);
+      // setDownloads(summary.downloads);
+      // setEventCalendars(summary.eventCalendars);
       setLeads(summary.leads);
       setProfiles(summary.profiles);
-      setPromotions(summary.promotions);
-      setServices(summary.services);
-      // setMyProfile(profile);
+      // setPromotions(summary.promotions);
+      // setServices(summary.services);
+      setMyProfile(profile);
 
       // Redirect student
       if (profile?.role === "Student") {
@@ -131,9 +131,9 @@ const Dashboard = () => {
               })
             : data;
 
-        setDownloads(
-          filterByCountry(summary.downloads, (d) => d.country) as IDownload[]
-        );
+        // setDownloads(
+        //   filterByCountry(summary.downloads, (d) => d.country) as IDownload[]
+        // );
         setLeads(
           filterByCountry(summary.leads, (l) => l.home?.country) as ILead[]
         );
@@ -141,7 +141,7 @@ const Dashboard = () => {
         const agentEmails = [email, ...(profile?.subAgents || [])];
         // setSubAgentCount(profile?.subAgents?.length || 0);
 
-        const [downloadResults, leadResults] = await Promise.all([
+        const [ leadResults] = await Promise.all([
           Promise.allSettled(
             agentEmails.map((agent) => getDownloadsByAgency(agent))
           ),
@@ -150,9 +150,9 @@ const Dashboard = () => {
           ),
         ]);
 
-        const filteredDownloads = downloadResults
-          .filter((res) => res.status === "fulfilled")
-          .flatMap((res) => (res as PromiseFulfilledResult<IDownload[]>).value);
+        // const filteredDownloads = downloadResults
+        //   .filter((res) => res.status === "fulfilled")
+        //   .flatMap((res) => (res as PromiseFulfilledResult<IDownload[]>).value);
 
         const filteredLeads: ILead[] = leadResults
           .filter(
@@ -162,7 +162,7 @@ const Dashboard = () => {
           .flatMap((res) => res.value)
           .filter((l): l is ILead => l !== null && l !== undefined);
 
-        setDownloads(filteredDownloads);
+        // setDownloads(filteredDownloads);
         setLeads(filteredLeads);
       }
 
@@ -192,7 +192,7 @@ const Dashboard = () => {
   return (
     <div className="p-4 mb-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-[450px]">
-        {/* {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
+        {myProfile?.role !== "Student" && <SalesDashboard leads={leads} />}
         {myProfile?.role !== "Student" && (
           <CountrySalesTargets
             adminStatus={adminStatus}
@@ -200,8 +200,8 @@ const Dashboard = () => {
             leads={leads}
             myProfile={myProfile}
           />
-        )} */}
-        <DataOverviewChart
+        )}
+        {/* <DataOverviewChart
           adminStatus={adminStatus}
           admins={admins}
           leads={leads}
@@ -224,9 +224,9 @@ const Dashboard = () => {
           profiles={profiles}
           promotions={promotions}
           services={services}
-        />
-        {/* {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
-        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />} */}
+        /> */}
+        {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
+        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
       </div>
     </div>
   );
