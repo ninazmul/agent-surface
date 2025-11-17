@@ -31,6 +31,10 @@ import {
   Copy,
   TrainTrackIcon,
   ShieldHalf,
+  Eye,
+  Snowflake,
+  Flame,
+  Zap,
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -491,9 +495,9 @@ const LeadTable = ({
         }}
       >
         <Table>
-          <TableHeader className="bg-gray-900 text-white">
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <input
                   type="checkbox"
                   checked={selectedLeads.length === paginatedLeads.length}
@@ -505,17 +509,21 @@ const LeadTable = ({
                 />
               </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
                 {sortKey === "name" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Agency</TableHead>
-              <TableHead>Course & Services</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Agency
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Course & Services
+              </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("progress")}
               >
                 Progress{" "}
@@ -523,7 +531,7 @@ const LeadTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("status")}
               >
                 Status{" "}
@@ -531,15 +539,19 @@ const LeadTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}
                 {sortKey === "date" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Social Media</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Social Media
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -600,16 +612,43 @@ const LeadTable = ({
                       >
                         <span className="font-semibold flex items-center gap-2">
                           <span className="line-clamp-1">{lead.name}</span>
-                          {lead.isPromotion ? (
-                            <span className="px-2 py-0.5 text-xs rounded-full bg-purple-100 text-purple-700 border border-purple-300">
-                              Promotion
-                            </span>
-                          ) : (
-                            <span className="px-2 py-0.5 text-xs rounded-full bg-gray-100 text-gray-700 border border-gray-300">
-                              General
-                            </span>
-                          )}
+
+                          {/* Status Icon */}
+                          <span
+                            className={`
+                            inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-semibold border
+                            ${
+                              lead.status === "Perception" &&
+                              "bg-gray-100 text-gray-700"
+                            }
+                            ${
+                              lead.status === "Cold" &&
+                              "bg-blue-100 text-blue-700"
+                            }
+                            ${
+                              lead.status === "Warm" &&
+                              "bg-yellow-100 text-yellow-700"
+                            }
+                            ${
+                              lead.status === "Hot" && "bg-red-100 text-red-700"
+                            }
+                          `}
+                          >
+                            {lead.status === "Perception" && (
+                              <Eye className="w-4 h-4" />
+                            )}
+                            {lead.status === "Cold" && (
+                              <Snowflake className="w-4 h-4" />
+                            )}
+                            {lead.status === "Warm" && (
+                              <Flame className="w-4 h-4" />
+                            )}
+                            {lead.status === "Hot" && (
+                              <Zap className="w-4 h-4" />
+                            )}
+                          </span>
                         </span>
+
                         <span
                           className={`text-sm text-gray-500 dark:text-gray-300 flex items-center gap-1 ${
                             lead.isPinned ? "dark:text-gray-500" : ""
@@ -628,26 +667,15 @@ const LeadTable = ({
                           <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold border">
                             {lead.home.country}
                           </span>
-                          <span
-                            className={`inline-block px-3 py-1 w-full rounded-full text-center text-xs font-semibold border
-                          ${
-                            lead.status === "Perception" &&
-                            "bg-gray-100 text-gray-700"
-                          }
-                          ${
-                            lead.status === "Cold" &&
-                            "bg-blue-100 text-blue-700"
-                          }
-                          ${
-                            lead.status === "Warm" &&
-                            "bg-yellow-100 text-yellow-700"
-                          }
-                          ${lead.status === "Hot" && "bg-red-100 text-red-700"}
-                          ${lead.status === "" && "bg-gray-100 text-gray-700"}
-                        `}
-                          >
-                            {lead.status || "Perception"}
-                          </span>
+                          {lead.isPromotion ? (
+                            <span className="px-3 py-1 w-full rounded-full text-center bg-purple-100 text-purple-700 border border-purple-300">
+                              Promotion
+                            </span>
+                          ) : (
+                            <span className="px-3 py-1 w-full rounded-full text-center bg-gray-100 text-gray-700 border border-gray-300">
+                              General
+                            </span>
+                          )}
                         </span>
                       </a>
                     </TableCell>
