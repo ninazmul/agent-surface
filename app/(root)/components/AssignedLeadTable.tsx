@@ -602,7 +602,7 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     <TableCell>
-                      <div className="flex flex-col">
+                      <div className="flex flex-col space-y-1">
                         <span className="font-semibold">
                           {profiles[lead.author] ? (
                             <>
