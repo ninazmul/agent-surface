@@ -16,11 +16,14 @@ type FinancialData = {
 };
 
 interface LeadsFinancialProps {
-  leads: ILead[];
-  profiles: IProfile[];
+  leads: ILead[] | null;
+  profiles: IProfile[] | null;
 }
 
-const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
+const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
+  leads = [],
+  profiles = [],
+}) => {
   const [filter, setFilter] = useState<string>("month");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -29,17 +32,17 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
   const [showMore, setShowMore] = useState(false);
 
   const handleReset = () => {
-    setFilter("week"); // default to last 7 days
+    setFilter("week");
     setStartDate("");
     setEndDate("");
     setSelectedAgent("all");
     setShowMore(false);
-    setData([]); // clear old data immediately
+    setData([]);
   };
 
   useEffect(() => {
     const fetchFinancialData = async () => {
-      setData([]); // clear data before fetching new
+      setData([]);
       try {
         const now = new Date();
         let fromDate: Date | null = null;
@@ -66,47 +69,60 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
           }
         }
 
-        // Filter leads by date and agent
-        const filteredLeads = leads.filter((l) => {
-          const created = new Date(l.createdAt);
-          const dateCheck = fromDate ? created >= fromDate : true;
+        const safeLeads = Array.isArray(leads) ? leads : [];
+
+        const filteredLeads = safeLeads.filter((l) => {
+          if (!l) return false;
+          const created = l.createdAt ? new Date(l.createdAt) : null;
+          const dateCheck = fromDate && created ? created >= fromDate : true;
           const agentCheck =
             selectedAgent === "all" ? true : l.author === selectedAgent;
           return dateCheck && agentCheck;
         });
 
-        // Handle void leads
-        const voidLeads = filteredLeads.filter((l) => l.isVoid);
+        const voidLeads = filteredLeads.filter((l) => l?.isVoid);
         const voidQuotes = await Promise.all(
-          voidLeads.map((l) => getQuotationByEmail(l.email))
+          voidLeads.map(async (l) => {
+            try {
+              const q = await getQuotationByEmail(l.email || "");
+              return q || null;
+            } catch {
+              return null;
+            }
+          })
         );
 
         const result: FinancialData[] = [];
 
         for (const lead of filteredLeads) {
+          if (!lead) continue;
+
           let source: ILead | IQuotation = lead;
           if (lead.isVoid) {
             const q = voidQuotes.find((x) => x?.email === lead.email);
             if (q) source = q;
           }
 
-          const courseAmount = Array.isArray(source.course)
+          const courseAmount = Array.isArray(source?.course)
             ? source.course.reduce(
-                (sum, c) => sum + Number(c.courseFee || 0),
+                (sum, c) => sum + Number(c?.courseFee || 0),
                 0
               )
             : 0;
 
-          const serviceAmount = Array.isArray(source.services)
-            ? source.services.reduce((sum, s) => sum + Number(s.amount || 0), 0)
+          const serviceAmount = Array.isArray(source?.services)
+            ? source.services.reduce(
+                (sum, s) => sum + Number(s?.amount || 0),
+                0
+              )
             : 0;
 
-          const discount = Number(source.discount || 0);
+          const discount = Number(source?.discount || 0);
           const total = courseAmount + serviceAmount - discount;
 
-          const paid = Array.isArray(source.transcript)
+          const paid = Array.isArray(source?.transcript)
             ? source.transcript.reduce(
-                (sum, t) => sum + Number(t.amount || 0),
+                (sum, t) => sum + Number(t?.amount || 0),
                 0
               )
             : 0;
@@ -115,7 +131,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
 
           if (total || paid || due) {
             result.push({
-              studentName: lead.name,
+              studentName: lead?.name || "Unknown",
               totalAmount: total,
               paid,
               due,
@@ -123,14 +139,21 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
           }
         }
 
-        setData(result);
+        // Sort fully paid (due = 0) first
+        const sortedResult = result.sort((a, b) => {
+          if (a.due === 0 && b.due !== 0) return -1;
+          if (a.due !== 0 && b.due === 0) return 1;
+          return 0;
+        });
+
+        setData(sortedResult);
       } catch (err) {
         console.error("Failed to fetch financial data", err);
       }
     };
 
     fetchFinancialData();
-  }, [leads, filter, startDate, endDate, selectedAgent]);
+  }, [leads, profiles, filter, startDate, endDate, selectedAgent]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
@@ -171,7 +194,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
             </>
           )}
 
-          {profiles.length > 0 && (
+          {Array.isArray(profiles) && profiles.length > 0 && (
             <select
               className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
               value={selectedAgent}
@@ -180,7 +203,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
               <option value="all">All Agencies</option>
               {profiles.map((p) => (
                 <option key={p.email} value={p.email}>
-                  {p.name}
+                  {p.name || "Unknown"}
                 </option>
               ))}
             </select>
@@ -205,21 +228,21 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ leads, profiles }) => {
           return (
             <Card key={s.studentName} className="p-2">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-900 dark:border-gray-100 mb-4 col-span-1">
-                {s.studentName}
+                {s.studentName || "Unknown"}
               </h3>
 
               <div className="text-gray-700 dark:text-gray-300">
                 <p className="flex items-center justify-between">
                   <span className="font-medium">Total:</span> €
-                  {s.totalAmount.toLocaleString()}
+                  {s.totalAmount?.toLocaleString() || 0}
                 </p>
                 <p className="flex items-center justify-between">
                   <span className="font-medium">Paid:</span> €
-                  {s.paid.toLocaleString()}
+                  {s.paid?.toLocaleString() || 0}
                 </p>
                 <p className="flex items-center justify-between">
                   <span className="font-medium">Due:</span> €
-                  {s.due.toLocaleString()}
+                  {s.due?.toLocaleString() || 0}
                 </p>
               </div>
 
