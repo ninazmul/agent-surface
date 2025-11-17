@@ -11,7 +11,6 @@ import Lead, { ILead } from "../database/models/lead.model";
 import Profile, { IProfile } from "../database/models/profile.model";
 import Promotion, { IPromotion } from "../database/models/promotion.model";
 import Service, { IServices } from "../database/models/service.model";
-import User, { IUser } from "../database/models/user.model";
 import EventCalendar, {
   IEventCalendar,
 } from "../database/models/eventCalender.model";
@@ -27,7 +26,6 @@ export interface DashboardSummary {
   profiles: IProfile[];
   promotions: IPromotion[];
   services: IServices[];
-  users: IUser[];
 }
 
 // ===== GET DASHBOARD SUMMARY
@@ -46,7 +44,6 @@ export const getDashboardSummary =
         profiles,
         promotions,
         services,
-        users,
       ] = await Promise.all([
         Admin.find().lean<IAdmin[]>(),
         Resource.find().lean<IResource[]>(),
@@ -57,20 +54,18 @@ export const getDashboardSummary =
         Profile.find().lean<IProfile[]>(),
         Promotion.find().lean<IPromotion[]>(),
         Service.find().lean<IServices[]>(),
-        User.find().lean<IUser[]>(),
       ]);
 
       return {
-        admins,
-        resources,
-        courses,
-        downloads,
-        eventCalendars,
-        leads,
-        profiles,
-        promotions,
-        services,
-        users,
+        admins: admins || [],
+        resources: resources || [],
+        courses: courses || [],
+        downloads: downloads || [],
+        eventCalendars: eventCalendars || [],
+        leads: leads || [],
+        profiles: profiles || [],
+        promotions: promotions || [],
+        services: services || [],
       };
     } catch (error) {
       handleError(error);
