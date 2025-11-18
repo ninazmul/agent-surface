@@ -205,12 +205,12 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-start sm:items-center">
         <Input
           placeholder="Search quotations..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full max-w-md rounded-2xl"
+          className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
         />
 
         <select
@@ -220,7 +220,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
               e.target.value as "all" | "additional" | "general"
             )
           }
-          className="rounded-2xl border px-3 py-1 text-sm"
+          className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
         >
           <option value="all">All</option>
           <option value="additional">Additional</option>
@@ -229,7 +229,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
       </div>
 
       <div
-        className="overflow-x-auto rounded-2xl bg-pink-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -254,37 +254,45 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>#</TableHead>
+              <TableHead className="text-white cursor-pointer">#</TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
                 {sortKey === "name" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Course & Campus</TableHead>
-              <TableHead>Course + Services Fees</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Course & Campus
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Course + Services Fees
+              </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("quotationStatus")}
               >
                 Status{" "}
                 {sortKey === "quotationStatus" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Documents</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Documents
+              </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}
                 {sortKey === "date" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -354,7 +362,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="rounded-xl text-xs"
+                              className="rounded-full text-xs bg-gray-100"
                             >
                               View Courses & Services
                             </Button>
@@ -418,11 +426,11 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                     {/* QuotationStatus */}
                     <TableCell>
                       {lead.quotationStatus ? (
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-700">
+                        <span className="px-4 py-2 text-xs font-medium rounded-full bg-green-100 text-green-700 border">
                           Accepted
                         </span>
                       ) : (
-                        <span className="px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700">
+                        <span className="px-4 py-2 text-xs font-medium rounded-full bg-yellow-100 text-yellow-700 border">
                           Pending
                         </span>
                       )}
@@ -655,19 +663,19 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
         <div className="flex gap-2">
           <Button
             size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p - 1)}
             disabled={currentPage === 1}
-            className="rounded-2xl"
           >
             Previous
           </Button>
           <Button
             size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage === Math.ceil(filteredLeads.length / itemsPerPage)
             }
-            className="rounded-2xl"
           >
             Next
           </Button>
