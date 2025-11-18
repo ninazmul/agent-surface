@@ -153,7 +153,7 @@ const AdminTable = ({
           <TableBody>
             {paginatedAdmins.map((admin, index) => (
               <TableRow
-                key={admin._id}
+                key={index}
                 className="hover:bg-blue-100 dark:hover:bg-gray-800"
               >
                 <TableCell>
@@ -210,7 +210,7 @@ const AdminTable = ({
                       </a>
 
                       <Button
-                        onClick={() => setConfirmDeleteId(admin._id)}
+                        onClick={() => setConfirmDeleteId(admin._id.toString())}
                         variant="outline"
                         size="icon"
                         className="text-red-500"
