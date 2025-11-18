@@ -439,8 +439,8 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                         <Popover>
                           <PopoverTrigger asChild>
                             <Button
-                              variant="ghost"
-                              className="justify-start text-gray-500 dark:text-gray-300 gap-2"
+                              variant="outline"
+                              className="w-full justify-start px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
                             >
                               Documents <ChevronDown className="ml-1 w-4 h-4" />
                             </Button>
@@ -451,8 +451,8 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                               target="_blank"
                             >
                               <Button
-                                variant="ghost"
-                                className="w-full justify-start gap-2"
+                                variant="outline"
+                                className="w-full justify-start px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
                               >
                                 <FileText className="w-5 h-5 text-blue-600" />
                                 View Invoice
@@ -463,8 +463,8 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                               target="_blank"
                             >
                               <Button
-                                variant="ghost"
-                                className="w-full justify-start gap-2"
+                                variant="outline"
+                                className="w-full justify-start px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
                               >
                                 <FileCheck className="w-5 h-5 text-green-600" />
                                 View Offer Letter
