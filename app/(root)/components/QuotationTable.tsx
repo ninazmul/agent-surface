@@ -449,6 +449,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             <a
                               href={`/quotation/${lead._id.toString()}/invoice`}
                               target="_blank"
+                              className="w-full"
                             >
                               <Button
                                 variant="outline"
@@ -461,6 +462,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             <a
                               href={`/quotation/${lead._id.toString()}/offer-letter`}
                               target="_blank"
+                              className="w-full"
                             >
                               <Button
                                 variant="outline"
