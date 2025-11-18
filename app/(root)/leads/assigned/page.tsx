@@ -43,7 +43,6 @@ const Page = async () => {
         <h3 className="h3-bold text-center sm:text-left">All Assigned Leads</h3>
       </div>
 
-      {/* Table */}
       <div className="overflow-x-auto my-8">
         <AssignedLeadTable leads={leads} isAdmin={adminStatus} />
       </div>
