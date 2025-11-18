@@ -440,7 +440,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
-                              className="w-full justify-start px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
+                              className="w-full justify-center px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
                             >
                               Documents <ChevronDown className="ml-1 w-4 h-4" />
                             </Button>
