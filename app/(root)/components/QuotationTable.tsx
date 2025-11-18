@@ -317,11 +317,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                 <>
                   <TableRow
                     key={lead._id.toString()}
-                    className={`hover:bg-pink-100 dark:hover:bg-gray-800 border-b-0 ${
-                      lead.isPinned
-                        ? "bg-yellow-200 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
-                        : ""
-                    }`}
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0`}
                   >
                     <TableCell>
                       {(currentPage - 1) * itemsPerPage + idx + 1}
