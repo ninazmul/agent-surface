@@ -438,12 +438,9 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                       {lead.quotationStatus ? (
                         <Popover>
                           <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              className="w-full justify-center px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
-                            >
+                            <span className="w-full justify-center px-4 py-2 text-xs font-medium rounded-full bg-gray-100">
                               Documents <ChevronDown className="ml-1 w-4 h-4" />
-                            </Button>
+                            </span>
                           </PopoverTrigger>
                           <PopoverContent className="p-4 w-52 flex flex-col items-start gap-2">
                             <a
@@ -452,6 +449,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                               className="w-full"
                             >
                               <Button
+                                size={"sm"}
                                 variant="outline"
                                 className="w-full justify-start px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
                               >
@@ -465,6 +463,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                               className="w-full"
                             >
                               <Button
+                                size={"sm"}
                                 variant="outline"
                                 className="w-full justify-start px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
                               >
