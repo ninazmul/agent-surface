@@ -32,16 +32,13 @@ const Page = async () => {
   let leads: ILead[] = [];
 
   if (adminStatus) {
-    // Admin → see all assigned leads
     leads = await getAllAssignedLeads();
   } else if (email) {
-    // Regular user → see only leads where they are in assignedTo array
     leads = await getLeadsByAssignedUser(email);
   }
 
   return (
     <section className="p-4">
-      {/* Header + Actions */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
         <h3 className="h3-bold text-center sm:text-left">All Assigned Leads</h3>
       </div>
