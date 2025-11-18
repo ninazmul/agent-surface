@@ -25,7 +25,7 @@ export default function OfferLetterDownloader({ lead }: { lead: ILead }) {
     const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
     pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
-    pdf.save(`offer_letter_${lead.name || lead._id}.pdf`);
+    pdf.save(`offer_letter_${lead.name || lead._id.toString()}.pdf`);
   };
 
   return (

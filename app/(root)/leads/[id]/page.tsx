@@ -69,7 +69,7 @@ const leadDetails = async ({ params }: PageProps) => {
     <div className="print-container m-4 p-6 bg-white dark:bg-gray-900 rounded-2xl shadow-lg max-w-7xl mx-auto">
       {/* Action Button */}
       <div className="flex justify-end mb-6">
-        <a href={`/leads/${lead._id}/update`}>
+        <a href={`/leads/${lead._id.toString()}/update`}>
           <Button className="bg-green-600 hover:bg-green-700 text-white">
             Update lead
           </Button>

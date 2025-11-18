@@ -1,7 +1,7 @@
-import { Document, Schema, model, models } from "mongoose";
+import { Document, Schema, Types, model, models } from "mongoose";
 
 export interface IPayment extends Document {
-  _id: string;
+  _id: Types.ObjectId;
   agency: string;
   amount: string;
   paymentMethod: string;

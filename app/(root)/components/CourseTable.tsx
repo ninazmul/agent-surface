@@ -160,7 +160,7 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
           <TableBody>
             {paginatedCourses.map((course, index) => (
               <TableRow
-                key={course._id}
+                key={course._id.toString()}
                 className="hover:bg-orange-100 dark:bg-gray-800"
               >
                 <TableCell>
@@ -219,7 +219,7 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
 
                 <TableCell className="space-x-2">
                   {/* Edit */}
-                  <a href={`/courses/${course._id}/update`}>
+                  <a href={`/courses/${course._id.toString()}/update`}>
                     <Button variant="outline" size="icon">
                       <Pencil className="w-4 h-4 text-purple-500" />
                     </Button>
@@ -227,7 +227,7 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
 
                   {/* Delete */}
                   <Button
-                    onClick={() => setConfirmDeleteId(course._id)}
+                    onClick={() => setConfirmDeleteId(course._id.toString())}
                     variant="outline"
                     size="icon"
                     className="text-red-500"

@@ -32,7 +32,7 @@ export default function ReceiptDownloader({
     const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
     pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
-    pdf.save(`receipt_${lead.name || lead._id}.pdf`);
+    pdf.save(`receipt_${lead.name || lead._id.toString()}.pdf`);
   };
 
   return (

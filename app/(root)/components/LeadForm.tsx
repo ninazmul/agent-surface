@@ -27,6 +27,7 @@ import Select from "react-select";
 import { IServices } from "@/lib/database/models/service.model";
 import { courseKey, expandCourses } from "@/lib/course.utils";
 import { createTrack } from "@/lib/actions/track.actions";
+import { Types } from "mongoose";
 
 // ✅ Schema
 const LeadFormSchema = z.object({
@@ -210,7 +211,7 @@ const LeadForm = ({
 
       services:
         Lead?.services?.map((s) => ({
-          _id: s._id,
+          _id: s._id.toString(),
           title: s.title,
           serviceType: s.serviceType,
           amount: s.amount || "0",
@@ -261,7 +262,10 @@ const LeadForm = ({
             file: uploadedArrival || values?.arrival?.file,
           },
           course: values.course || [],
-          services: values.services || [],
+          services: values.services?.map((s) => ({
+            ...s,
+            _id: new Types.ObjectId(s._id),
+          })),
           others: values.others || [],
         });
 
@@ -276,7 +280,7 @@ const LeadForm = ({
           await createTrack({
             student: values.email,
             event: `${values.name}'s Lead Created`,
-            route: `/leads/${created._id}`,
+            route: `/leads/${created._id.toString()}`,
             status: "created",
           });
           router.push("/leads");
@@ -293,7 +297,10 @@ const LeadForm = ({
             file: uploadedArrival || values?.arrival?.file,
           },
           course: values.course || [],
-          services: values.services || [],
+          services: values.services?.map((s) => ({
+            ...s,
+            _id: new Types.ObjectId(s._id),
+          })),
           others: values.others || [],
         });
         if (updated) {
@@ -307,7 +314,7 @@ const LeadForm = ({
           await createTrack({
             student: values.email,
             event: `${values.name}'s Lead Updated`,
-            route: `/leads/${updated._id}`,
+            route: `/leads/${updated._id.toString()}`,
             status: "updated",
           });
           router.push("/leads");
@@ -738,10 +745,10 @@ const LeadForm = ({
               {services?.map((service) => {
                 const isSelected = form
                   .watch("services")
-                  ?.some((s) => s._id === service._id);
+                  ?.some((s) => s._id.toString() === service._id.toString());
                 return (
                   <div
-                    key={service._id}
+                    key={service._id.toString()}
                     className={`flex-shrink-0 rounded-xl border p-4 shadow-md w-[260px]
               ${
                 isSelected
@@ -768,13 +775,15 @@ const LeadForm = ({
                         if (isSelected) {
                           form.setValue(
                             "services",
-                            current.filter((s) => s._id !== service._id)
+                            current.filter(
+                              (s) => s._id.toString() !== service._id.toString()
+                            )
                           );
                         } else {
                           form.setValue("services", [
                             ...current,
                             {
-                              _id: service._id,
+                              _id: service._id.toString(),
                               title: service.title,
                               serviceType: service.serviceType || "",
                               amount: service.amount || "",

@@ -112,26 +112,37 @@ const PromotionLeadsStats: React.FC<PromotionLeadsStatsProps> = ({ leads }) => {
           <tbody>
             {data.map((lead) => {
               const courseAmount = Array.isArray(lead.course)
-                ? lead.course.reduce((sum, c) => sum + Number(c.courseFee || 0), 0)
+                ? lead.course.reduce(
+                    (sum, c) => sum + Number(c.courseFee || 0),
+                    0
+                  )
                 : 0;
 
               const serviceAmount = Array.isArray(lead.services)
-                ? lead.services.reduce((sum, s) => sum + Number(s.amount || 0), 0)
+                ? lead.services.reduce(
+                    (sum, s) => sum + Number(s.amount || 0),
+                    0
+                  )
                 : 0;
 
               const discount = Number(lead.discount || 0);
               const totalAmount = courseAmount + serviceAmount - discount;
 
               const paidAmount = Array.isArray(lead.transcript)
-                ? lead.transcript.reduce((sum, t) => sum + Number(t.amount || 0), 0)
+                ? lead.transcript.reduce(
+                    (sum, t) => sum + Number(t.amount || 0),
+                    0
+                  )
                 : 0;
 
               const dueAmount = totalAmount - paidAmount;
 
               return (
-                <tr key={lead._id}>
+                <tr key={lead._id.toString()}>
                   <td className="p-2">{lead.name}</td>
-                  <td className="p-2">€{courseAmount} + €{serviceAmount}</td>
+                  <td className="p-2">
+                    €{courseAmount} + €{serviceAmount}
+                  </td>
                   <td className="p-2 text-yellow-600">-€{discount}</td>
                   <td className="p-2 font-semibold">€{totalAmount}</td>
                   <td className="p-2 text-green-600">€{paidAmount}</td>

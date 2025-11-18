@@ -25,7 +25,7 @@ const UpdatePage = async ({ params }: PageProps) => {
       <PaymentForm
         agency={myProfile}
         Payment={payment}
-        PaymentId={payment._id}
+        PaymentId={payment._id.toString()}
         type="Update"
       />
     </div>

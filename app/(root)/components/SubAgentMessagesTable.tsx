@@ -90,7 +90,7 @@ const SubAgentMessagesTable: React.FC<SubAgentMessagesTableProps> = ({
           <TableBody>
             {filteredMessages.map((msg, i) => (
               <TableRow
-                key={String(msg._id)}
+                key={String(msg._id.toString())}
                 className="hover:bg-blue-100 dark:hover:bg-gray-800"
               >
                 <TableCell>{i + 1}</TableCell>
@@ -115,7 +115,7 @@ const SubAgentMessagesTable: React.FC<SubAgentMessagesTableProps> = ({
                       msg.messages.length > 0 ? (
                         msg.messages.map((m) => (
                           <div
-                            key={m._id}
+                            key={m._id.toString()}
                             className={`flex ${
                               m.senderRole === "admin"
                                 ? "justify-end"

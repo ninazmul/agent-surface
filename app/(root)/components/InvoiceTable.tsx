@@ -29,9 +29,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Types } from "mongoose";
 
 interface ICombinedItem {
-  _id: string;
+  _id: Types.ObjectId;
   name?: string;
   email?: string;
   number?: string;
@@ -52,7 +53,7 @@ interface ICombinedItem {
     courseFee?: string;
   }[];
   services?: {
-    _id: string;
+    _id: Types.ObjectId;
     serviceType: string;
     title: string;
     amount?: string;
@@ -242,7 +243,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
               return (
                 <>
                   <TableRow
-                    key={lead._id}
+                    key={lead._id.toString()}
                     className={`hover:bg-pink-100 dark:hover:bg-gray-800 border-b-0 ${
                       lead.isPinned
                         ? "bg-yellow-200 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
@@ -255,9 +256,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
 
                     {/* Name & Email */}
                     <TableCell>
-                      <a
-                        className="flex flex-col"
-                      >
+                      <a className="flex flex-col">
                         <span className="font-semibold flex items-center gap-2">
                           <span className="line-clamp-1">{lead.name}</span>
                           {lead.isAdditional ? (
@@ -404,7 +403,9 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             className="w-full justify-start text-purple-500 gap-2"
                             asChild
                           >
-                            <a href={`/quotation/${lead._id}/invoice`}>
+                            <a
+                              href={`/quotation/${lead._id.toString()}/invoice`}
+                            >
                               <FileText className="w-4 h-4" />
                               Generate Invoice
                             </a>
@@ -416,7 +417,9 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             className="w-full justify-start text-blue-500 gap-2"
                             onClick={() => {
                               navigator.clipboard.writeText(
-                                `${window.location.origin}/quotation/${lead._id}/invoice`
+                                `${
+                                  window.location.origin
+                                }/quotation/${lead._id.toString()}/invoice`
                               );
                               toast.success("Quotation link copied!");
                             }}
@@ -430,7 +433,9 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             variant="ghost"
                             className="w-full justify-start text-green-600 gap-2"
                             onClick={() => {
-                              const url = `${window.location.origin}/quotation/${lead._id}/invoice`;
+                              const url = `${
+                                window.location.origin
+                              }/quotation/${lead._id.toString()}/invoice`;
                               const text = encodeURIComponent(
                                 `Check this lead: ${url}`
                               );

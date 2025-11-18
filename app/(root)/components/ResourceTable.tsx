@@ -157,13 +157,16 @@ const ResourceTable = ({
           </TableHeader>
           <TableBody>
             {paginatedResources.map((resource, index) => (
-              <TableRow key={resource._id} className="hover:bg-purple-100">
+              <TableRow
+                key={resource._id.toString()}
+                className="hover:bg-purple-100"
+              >
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
                 <TableCell>
                   <a
-                    href={`/applications/${resource._id}`}
+                    href={`/applications/${resource._id.toString()}`}
                     className="line-clamp-1 w-40 md:w-auto hover:underline"
                   >
                     {resource.fileName}
@@ -187,13 +190,15 @@ const ResourceTable = ({
                 {isAdmin && (
                   <>
                     <TableCell className="flex items-center space-x-2">
-                      <a href={`/resources/${resource._id}/update`}>
+                      <a href={`/resources/${resource._id.toString()}/update`}>
                         <Button variant="outline" size="icon">
                           <Pencil className="w-4 h-4 text-purple-500" />
                         </Button>
                       </a>
                       <Button
-                        onClick={() => setConfirmDeleteId(resource._id)}
+                        onClick={() =>
+                          setConfirmDeleteId(resource._id.toString())
+                        }
                         variant={"outline"}
                         className="text-red-500"
                       >

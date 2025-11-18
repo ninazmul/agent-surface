@@ -15,9 +15,10 @@ import {
   getAllQuotations,
   getQuotationsByAgency,
 } from "@/lib/actions/quotation.actions";
+import { Types } from "mongoose";
 
 interface ICombinedItem {
-  _id: string;
+  _id: Types.ObjectId;
   name?: string;
   email?: string;
   number?: string;
@@ -38,7 +39,7 @@ interface ICombinedItem {
     courseFee?: string;
   }[];
   services?: {
-    _id: string;
+    _id: Types.ObjectId;
     serviceType: string;
     title: string;
     amount?: string;
@@ -121,11 +122,19 @@ const Page = async () => {
   const mapLeadToCombined = (item: ILead): ICombinedItem => ({
     type: "Lead",
     ...item,
+    services: item.services?.map((s) => ({
+      ...s,
+      _id: new Types.ObjectId(s._id),
+    })),
   });
 
   const mapQuotationToCombined = (item: IQuotation): ICombinedItem => ({
     type: "Quotation",
     ...item,
+    services: item.services?.map((s) => ({
+      ...s,
+      _id: new Types.ObjectId(s._id),
+    })),
   });
 
   const combinedData: ICombinedItem[] = [

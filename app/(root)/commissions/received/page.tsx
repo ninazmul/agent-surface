@@ -15,9 +15,10 @@ import {
   getQuotationsByAgency,
 } from "@/lib/actions/quotation.actions";
 import CommissionReceivedTable from "../../components/CommissionReceivedTable";
+import { Types } from "mongoose";
 
 interface ICombinedItem {
-  _id: string;
+  _id: Types.ObjectId;
   name?: string;
   email?: string;
   number?: string;

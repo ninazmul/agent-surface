@@ -66,7 +66,7 @@ const EventCalendar = () => {
             typeColors.default;
 
           return {
-            id: event._id,
+            id: event._id.toString(),
             title: event.title,
             start: event.startDate || new Date(),
             end: event.endDate || event.startDate || new Date(),
@@ -273,7 +273,9 @@ const EventCalendar = () => {
             {selectedDate ? format(selectedDate, "PPP") : "Select a date"}
           </h3>
           {eventsOnSelectedDate.length === 0 ? (
-            <p className="text-gray-500 dark:text-gray-300">No events for this date.</p>
+            <p className="text-gray-500 dark:text-gray-300">
+              No events for this date.
+            </p>
           ) : (
             <ul className="space-y-4">
               {eventsOnSelectedDate.map((evt) => (
@@ -287,7 +289,9 @@ const EventCalendar = () => {
                   }}
                   onClick={() => setSelectedEvent(evt)}
                 >
-                  <h4 className="text-lg font-bold dark:text-black">{evt.title}</h4>
+                  <h4 className="text-lg font-bold dark:text-black">
+                    {evt.title}
+                  </h4>
                   <p className="text-sm capitalize dark:text-black">
                     {evt.extendedProps.type?.replace(/_/g, " ") || "N/A"}
                   </p>

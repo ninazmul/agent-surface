@@ -178,7 +178,7 @@ const DownloadTable = ({
           <TableBody>
             {paginatedDownloads.map((download, index) => (
               <TableRow
-                key={download._id}
+                key={download._id.toString()}
                 className="hover:bg-yellow-100 hover:dark:bg-gray-800"
               >
                 <TableCell>
@@ -186,7 +186,7 @@ const DownloadTable = ({
                 </TableCell>
                 <TableCell>
                   <a
-                    href={`/applications/${download._id}`}
+                    href={`/applications/${download._id.toString()}`}
                     className="line-clamp-1 w-40 md:w-auto hover:underline"
                   >
                     {download.name}
@@ -236,13 +236,15 @@ const DownloadTable = ({
 
                 {isAdmin && (
                   <TableCell className="flex items-center space-x-2">
-                    <a href={`/downloads/${download._id}/update`}>
+                    <a href={`/downloads/${download._id.toString()}/update`}>
                       <Button variant="outline" size="icon">
                         <Pencil className="w-4 h-4 text-purple-500" />
                       </Button>
                     </a>
                     <Button
-                      onClick={() => setConfirmDeleteId(download._id)}
+                      onClick={() =>
+                        setConfirmDeleteId(download._id.toString())
+                      }
                       variant={"outline"}
                       size={"icon"}
                       className="text-red-500"

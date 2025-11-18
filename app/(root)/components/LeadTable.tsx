@@ -248,7 +248,7 @@ const LeadTable = ({
 
         setLocalLeads((prev) =>
           prev.map((lead) =>
-            lead._id === leadId
+            lead._id.toString() === leadId
               ? ({ ...lead, progress: newProgress } as ILead)
               : lead
           )
@@ -280,7 +280,7 @@ const LeadTable = ({
 
         setLocalLeads((prev) =>
           prev.map((lead) =>
-            lead._id === leadId
+            lead._id.toString() === leadId
               ? ({ ...lead, status: newStatus } as ILead)
               : lead
           )
@@ -305,7 +305,7 @@ const LeadTable = ({
 
         setLocalLeads((prev) =>
           prev.map((lead) =>
-            lead._id === leadId
+            lead._id.toString() === leadId
               ? ({
                   ...lead,
                   isPinned: !current,
@@ -389,7 +389,7 @@ const LeadTable = ({
 
       await Promise.all(
         selectedLeads.map(async (leadId) => {
-          const lead = localLeads.find((l) => l._id === leadId);
+          const lead = localLeads.find((l) => l._id.toString() === leadId);
           return createTrack({
             student: lead?.email || "",
             event: `Lead assigned to ${assignedUsers.join(", ")}`,
@@ -405,7 +405,7 @@ const LeadTable = ({
 
       setLocalLeads((prev) =>
         prev.map((lead) => {
-          if (selectedLeads.includes(lead._id)) {
+          if (selectedLeads.includes(lead._id.toString())) {
             lead.assignedTo = [
               ...(lead.assignedTo || []),
               ...assignedUsers.filter(
@@ -503,7 +503,9 @@ const LeadTable = ({
                   checked={selectedLeads.length === paginatedLeads.length}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setSelectedLeads(paginatedLeads.map((r) => r._id));
+                      setSelectedLeads(
+                        paginatedLeads.map((r) => r._id.toString())
+                      );
                     } else setSelectedLeads([]);
                   }}
                 />
@@ -591,13 +593,16 @@ const LeadTable = ({
                     <TableCell>
                       <input
                         type="checkbox"
-                        checked={selectedLeads.includes(lead._id)}
+                        checked={selectedLeads.includes(lead._id.toString())}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            setSelectedLeads((prev) => [...prev, lead._id]);
+                            setSelectedLeads((prev) => [
+                              ...prev,
+                              lead._id.toString(),
+                            ]);
                           } else {
                             setSelectedLeads((prev) =>
-                              prev.filter((id) => id !== lead._id)
+                              prev.filter((id) => id !== lead._id.toString())
                             );
                           }
                         }}
@@ -607,7 +612,7 @@ const LeadTable = ({
                     {/* Name & Email */}
                     <TableCell>
                       <a
-                        href={`/leads/${lead._id}`}
+                        href={`/leads/${lead._id.toString()}`}
                         className="flex flex-col space-y-1"
                       >
                         <span className="font-semibold flex items-center gap-2">
@@ -788,7 +793,10 @@ const LeadTable = ({
                       <select
                         value={lead.progress}
                         onChange={(e) =>
-                          handleProgressChange(lead._id, e.target.value)
+                          handleProgressChange(
+                            lead._id.toString(),
+                            e.target.value
+                          )
                         }
                         className={`border rounded-md px-2 py-1 text-sm font-semibold ${
                           lead.progress === "Open"
@@ -814,7 +822,10 @@ const LeadTable = ({
                       <select
                         value={lead.status}
                         onChange={(e) =>
-                          handleStatusChange(lead._id, e.target.value)
+                          handleStatusChange(
+                            lead._id.toString(),
+                            e.target.value
+                          )
                         }
                         className={`border rounded-md px-2 py-1 text-sm font-semibold ${
                           lead.status === "Perception"
@@ -916,7 +927,10 @@ const LeadTable = ({
                             variant="ghost"
                             className="w-full justify-start text-yellow-600 gap-2"
                             onClick={() =>
-                              handlePinToggle(lead._id, lead.isPinned ?? false)
+                              handlePinToggle(
+                                lead._id.toString(),
+                                lead.isPinned ?? false
+                              )
                             }
                           >
                             {lead.isPinned ? (
@@ -943,7 +957,7 @@ const LeadTable = ({
                             className="w-full justify-start text-purple-500 gap-2"
                             asChild
                           >
-                            <a href={`/quotation/${lead._id}/`}>
+                            <a href={`/quotation/${lead._id.toString()}/`}>
                               <FileText className="w-4 h-4" />
                               Generate Quotation
                             </a>
@@ -954,7 +968,9 @@ const LeadTable = ({
                             variant="ghost"
                             className="w-full justify-start text-blue-500 gap-2"
                             onClick={() => {
-                              const link = `${window.location.origin}/lead/${lead._id}`;
+                              const link = `${
+                                window.location.origin
+                              }/lead/${lead._id.toString()}`;
                               setSelectedLink(link);
                               setLinkModalOpen(true);
                             }}
@@ -976,13 +992,15 @@ const LeadTable = ({
                             </PopoverTrigger>
                             <PopoverContent className="p-4 w-52 flex flex-col items-center">
                               <LeadQRCode
-                                url={`${process.env.NEXT_PUBLIC_APP_URL}/lead/${lead._id}`}
+                                url={`${
+                                  process.env.NEXT_PUBLIC_APP_URL
+                                }/lead/${lead._id.toString()}`}
                               />
                             </PopoverContent>
                           </Popover>
 
                           {/* Edit */}
-                          <a href={`/leads/${lead._id}/update`}>
+                          <a href={`/leads/${lead._id.toString()}/update`}>
                             <Button
                               variant="ghost"
                               className="w-full justify-start text-purple-500 gap-2"
@@ -996,7 +1014,9 @@ const LeadTable = ({
                             onClick={() => {
                               if (selectedLeads.length === 0) {
                                 setSelectedLeads(
-                                  paginatedLeads.map((lead) => lead._id)
+                                  paginatedLeads.map((lead) =>
+                                    lead._id.toString()
+                                  )
                                 );
                               }
                               setAssignModalOpen(true);
@@ -1027,7 +1047,9 @@ const LeadTable = ({
                               </Button>
 
                               <Button
-                                onClick={() => setConfirmDeleteId(lead._id)}
+                                onClick={() =>
+                                  setConfirmDeleteId(lead._id.toString())
+                                }
                                 variant="ghost"
                                 className="w-full justify-start text-red-500 gap-2"
                               >
@@ -1292,7 +1314,7 @@ const LeadTable = ({
 
                 return (
                   <label
-                    key={user._id}
+                    key={user._id.toString()}
                     className="flex items-center gap-2 px-2 py-1 hover:bg-gray-100 rounded cursor-pointer"
                   >
                     <input

@@ -71,7 +71,7 @@ const Page = async () => {
     // Avoid duplicates by _id if necessary
     const uniqueMap = new Map();
     for (const notif of merged) {
-      uniqueMap.set(notif._id.toString(), notif);
+      uniqueMap.set(notif._id.toString().toString(), notif);
     }
 
     notifications = Array.from(uniqueMap.values()).map((n) => {

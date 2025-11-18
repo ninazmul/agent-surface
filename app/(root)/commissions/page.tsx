@@ -15,9 +15,10 @@ import {
   getAllQuotations,
   getQuotationsByAgency,
 } from "@/lib/actions/quotation.actions";
+import { Types } from "mongoose";
 
 interface ICombinedItem {
-  _id: string;
+  _id: Types.ObjectId;
   name?: string;
   email?: string;
   number?: string;

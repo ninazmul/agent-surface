@@ -1,4 +1,4 @@
-import { Document, Schema, model, models } from "mongoose";
+import { Document, Schema, Types, model, models } from "mongoose";
 
 // Interface for shift-based seat availability
 export interface IShiftAvailability {
@@ -8,14 +8,14 @@ export interface IShiftAvailability {
 
 // Campus availability with shift-based seat count
 export interface ICampusAvailability {
-  _id: string;
+  _id: Types.ObjectId;
   campus: string;
   shifts: IShiftAvailability;
 }
 
 // Course interface
 export interface ICourse extends Document {
-  _id: string;
+  _id: Types.ObjectId;
   name: string;
   campuses: ICampusAvailability[];
   courseDuration?: string;

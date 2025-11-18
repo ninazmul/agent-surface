@@ -65,10 +65,12 @@ const NotificationTable = ({
 
           // Merge new notifications with existing ones (avoid duplicates)
           setLocalNotifications((prev) => {
-            const existingIds = prev.map((n) => n._id);
+            const existingIds = prev.map((n) => n._id.toString());
             const merged = [
               ...prev,
-              ...newNotifications.filter((n) => !existingIds.includes(n._id)),
+              ...newNotifications.filter(
+                (n) => !existingIds.includes(n._id.toString())
+              ),
             ];
             return merged;
           });
@@ -114,7 +116,9 @@ const NotificationTable = ({
       if (response) {
         toast.success("Notification deleted successfully");
         setLocalNotifications((prev) =>
-          prev.filter((notification) => notification._id !== notificationId)
+          prev.filter(
+            (notification) => notification._id.toString() !== notificationId
+          )
         );
       }
     } catch (error) {
@@ -139,7 +143,7 @@ const NotificationTable = ({
 
       setLocalNotifications((prev) =>
         prev.map((notification) =>
-          notification._id === id
+          notification._id.toString() === id
             ? ({
                 ...notification,
                 userStatus: newStatus,
@@ -171,7 +175,9 @@ const NotificationTable = ({
         (n) => n.userStatus === "Unread"
       );
       await Promise.all(
-        unread.map((n) => toggleReadStatusForUser(n._id, email, "Unread"))
+        unread.map((n) =>
+          toggleReadStatusForUser(n._id.toString(), email, "Unread")
+        )
       );
 
       toast.success("All notifications marked as Read.");
@@ -196,7 +202,7 @@ const NotificationTable = ({
   const handleDeleteAll = async () => {
     setIsDeletingAll(true);
     try {
-      const idsToDelete = localNotifications.map((n) => n._id);
+      const idsToDelete = localNotifications.map((n) => n._id.toString());
       for (const id of idsToDelete) {
         await deleteNotification(id);
       }
@@ -267,7 +273,7 @@ const NotificationTable = ({
       <div className="grid gap-4">
         {paginatedNotifications.map((notification) => (
           <div
-            key={notification._id}
+            key={notification._id.toString()}
             className={`border border-gray-200 rounded-2xl p-4 shadow-sm space-y-2 transition-opacity ${
               notification.userStatus === "Read"
                 ? "bg-gray-100 dark:bg-gray-900 opacity-70"
@@ -300,7 +306,7 @@ const NotificationTable = ({
                   size="sm"
                   onClick={() =>
                     handleToggleStatus(
-                      notification._id,
+                      notification._id.toString(),
                       notification.userStatus
                     )
                   }
@@ -320,7 +326,9 @@ const NotificationTable = ({
                 <Button
                   size="sm"
                   variant="destructive"
-                  onClick={() => setConfirmDeleteId(notification._id)}
+                  onClick={() =>
+                    setConfirmDeleteId(notification._id.toString())
+                  }
                   className="rounded-2xl"
                 >
                   <Trash className="w-4 h-4 mr-1" />

@@ -4,10 +4,7 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Message, { IChatMessage } from "../database/models/message.model";
 import { MessageParams } from "@/types";
-import {
-  getAdminCountriesByEmail,
-  isAdmin,
-} from "./admin.actions";
+import { getAdminCountriesByEmail, isAdmin } from "./admin.actions";
 import { getProfileByEmail } from "./profile.actions";
 
 // ====== CREATE OR APPEND MESSAGE
@@ -85,7 +82,7 @@ export const updateMessage = async (
     await connectToDatabase();
 
     const updated = await Message.findOneAndUpdate(
-      { "messages._id": messageId },
+      { "messages._id.toString()": messageId },
       {
         $set: {
           "messages.$.text": updateData.text,

@@ -152,7 +152,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
           <TableBody>
             {paginatedPromotions.map((promotion, index) => (
               <TableRow
-                key={promotion._id}
+                key={promotion._id.toString()}
                 className="hover:bg-fuchsia-100 dark:hover:bg-gray-800"
               >
                 <TableCell>
@@ -315,7 +315,9 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                       className="w-56 p-2 space-y-1 rounded-xl shadow-lg"
                     >
                       {/* Edit */}
-                      <a href={`/promotions/${promotion._id}/update`}>
+                      <a
+                        href={`/promotions/${promotion._id.toString()}/update`}
+                      >
                         <Button
                           variant="ghost"
                           className="w-full justify-start text-purple-500 gap-2"
@@ -331,7 +333,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                         className="w-full justify-start gap-2"
                         onClick={async () => {
                           try {
-                            await updatePromotion(promotion._id, {
+                            await updatePromotion(promotion._id.toString(), {
                               isPaused: !promotion.isPaused,
                             });
                             toast.success(
@@ -360,7 +362,9 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
 
                       {/* Delete */}
                       <Button
-                        onClick={() => setConfirmDeleteId(promotion._id)}
+                        onClick={() =>
+                          setConfirmDeleteId(promotion._id.toString())
+                        }
                         variant="ghost"
                         className="w-full justify-start text-red-500 gap-2"
                       >

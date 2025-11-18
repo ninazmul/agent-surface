@@ -41,11 +41,18 @@ export default function QuotationDownloader({
 
     if (imgHeight <= pdfHeight) {
       // Fits on one page
-      pdf.addImage(imgToData(canvas), "PNG", margin, margin, imgWidth, imgHeight);
+      pdf.addImage(
+        imgToData(canvas),
+        "PNG",
+        margin,
+        margin,
+        imgWidth,
+        imgHeight
+      );
     } else {
       // Multiple pages
       let remainingHeight = canvas.height;
-      const pageCanvasHeight = (canvas.width * pdfHeight) / pdfWidth; 
+      const pageCanvasHeight = (canvas.width * pdfHeight) / pdfWidth;
 
       while (remainingHeight > 0) {
         const pageCanvas = document.createElement("canvas");
@@ -81,10 +88,11 @@ export default function QuotationDownloader({
       }
     }
 
-    pdf.save(`quotation_${data.name || data._id}.pdf`);
+    pdf.save(`quotation_${data.name || data._id.toString()}.pdf`);
   };
 
-  const imgToData = (canvas: HTMLCanvasElement) => canvas.toDataURL("image/png");
+  const imgToData = (canvas: HTMLCanvasElement) =>
+    canvas.toDataURL("image/png");
 
   return (
     <div>

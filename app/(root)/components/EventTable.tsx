@@ -156,7 +156,7 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
           <TableBody>
             {paginatedEvents.map((event, index) => (
               <TableRow
-                key={event._id}
+                key={event._id.toString()}
                 className="hover:bg-cyan-100 dark:hover:bg-gray-800"
               >
                 <TableCell>
@@ -197,14 +197,14 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
                       <div className="py-5">
                         <EventForm
                           Event={event}
-                          EventId={event._id}
+                          EventId={event._id.toString()}
                           type="Update"
                         />
                       </div>
                     </SheetContent>
                   </Sheet>
                   <Button
-                    onClick={() => setConfirmDeleteId(event._id)}
+                    onClick={() => setConfirmDeleteId(event._id.toString())}
                     variant="outline"
                     className="text-red-500"
                   >

@@ -27,6 +27,7 @@ import Select from "react-select";
 import { IServices } from "@/lib/database/models/service.model";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import toast from "react-hot-toast";
+import { Types } from "mongoose";
 
 // ✅ Schema
 const PromotionLeadFormSchema = z.object({
@@ -206,7 +207,7 @@ const PromotionLeadForm = ({
       services: Lead?.services?.length
         ? Lead.services
         : promotion?.services?.map((s) => ({
-            _id: s._id,
+            _id: s._id.toString(),
             title: s.title,
             serviceType: s.serviceType,
             amount: s.amount || "0",
@@ -256,7 +257,10 @@ const PromotionLeadForm = ({
             file: uploadedArrival || values?.arrival?.file,
           },
           course: values.course || [],
-          services: values.services || [],
+          services: values.services?.map((s) => ({
+            ...s,
+            _id: new Types.ObjectId(s._id),
+          })),
           others: values.others || [],
           promotionSku: promotion?.sku || values.promotionSku,
         });
@@ -283,7 +287,10 @@ const PromotionLeadForm = ({
             file: uploadedArrival || values?.arrival?.file,
           },
           course: values.course || [],
-          services: values.services || [],
+          services: values.services?.map((s) => ({
+            ...s,
+            _id: new Types.ObjectId(s._id),
+          })),
           others: values.others || [],
           promotionSku: values.promotionSku || promotion?.sku,
         });
@@ -642,7 +649,7 @@ const PromotionLeadForm = ({
             <div className="flex gap-4 overflow-x-auto pb-2">
               {form.watch("services")?.map((service) => (
                 <div
-                  key={service._id}
+                  key={service._id.toString()}
                   className="flex-shrink-0 rounded-xl border p-4 shadow-md w-[260px]"
                 >
                   <h4 className="font-semibold">{service.title}</h4>

@@ -245,7 +245,7 @@ export default function ProfilePage({
                   </div>
                 ) : (
                   <div className="text-center pt-4">
-                    <a href={`/profile/${myProfile?._id}/update`}>
+                    <a href={`/profile/${myProfile?._id.toString()}/update`}>
                       <Button
                         variant="outline"
                         className="text-purple-700 w-full max-w-5xl font-semibold bg-purple-100 hover:bg-purple-200 inline-flex items-center gap-2"
@@ -268,7 +268,7 @@ export default function ProfilePage({
                   {myLead ? (
                     <div className="text-center pt-4">
                       {" "}
-                      <a href={`/lead/${myLead._id}`}>
+                      <a href={`/lead/${myLead._id.toString()}`}>
                         <Button
                           variant="outline"
                           className="text-blue-700 w-full max-w-5xl font-semibold bg-blue-100 hover:bg-blue-200 inline-flex items-center gap-2"
@@ -318,8 +318,8 @@ export default function ProfilePage({
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {subAgents.map((agent) => (
                 <a
-                  href={`/profile/${agent._id}`}
-                  key={agent._id}
+                  href={`/profile/${agent._id.toString()}`}
+                  key={agent._id.toString()}
                   className="p-4 border rounded-lg shadow-sm bg-white dark:bg-gray-800 hover:shadow-md transition"
                 >
                   <div className="flex items-center gap-4">

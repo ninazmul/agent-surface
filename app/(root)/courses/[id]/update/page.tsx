@@ -14,7 +14,11 @@ const UpdatePage = async ({ params }: PageProps) => {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <h2 className="text-3xl font-bold mb-6">Update Course</h2>
-      <CourseForm type="Update" Course={course} CourseId={course._id} />
+      <CourseForm
+        type="Update"
+        Course={course}
+        CourseId={course._id.toString()}
+      />
     </div>
   );
 };

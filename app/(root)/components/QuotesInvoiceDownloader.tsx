@@ -33,7 +33,7 @@ export default function QuotesInvoiceDownloader({
     const imgHeight = (canvas.height * pageWidth) / canvas.width;
 
     pdf.addImage(imgData, "PNG", 0, 0, pageWidth, imgHeight);
-    pdf.save(`invoice_${data.name || data._id}.pdf`);
+    pdf.save(`invoice_${data.name || data._id.toString()}.pdf`);
   };
 
   return (

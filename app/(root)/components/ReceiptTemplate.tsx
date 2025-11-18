@@ -128,7 +128,7 @@ export default function ReceiptTemplate({
       <div className="flex justify-between items-start border-b border-gray-300 pb-4 mb-6">
         <div>
           <h1 className="text-2xl font-bold uppercase tracking-wide text-primary-700">
-            Receipt #{lead._id.slice(-4)}
+            Receipt #{lead._id.toString().slice(-4)}
           </h1>
           <p className="text-sm text-gray-600 dark:text-gray-300">
             Date: {today}

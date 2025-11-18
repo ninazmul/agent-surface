@@ -44,7 +44,7 @@ const UpdatePage = async ({ params }: PageProps) => {
           type="Update"
           email={email}
           lead={lead}
-          leadId={lead._id}
+          leadId={lead._id.toString()}
           isAdmin={adminStatus}
         />
       )}
@@ -53,7 +53,7 @@ const UpdatePage = async ({ params }: PageProps) => {
           type="Update"
           email={email}
           quotation={quotation}
-          quotationId={quotation._id}
+          quotationId={quotation._id.toString()}
           isAdmin={adminStatus}
         />
       )}

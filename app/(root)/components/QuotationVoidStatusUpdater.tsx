@@ -28,9 +28,9 @@ const QuotationVoidStatusUpdater = ({
     setLoading(true);
     try {
       if ("quotationNumber" in data) {
-        await updateQuotation(data._id, { isVoid: true });
+        await updateQuotation(data._id.toString(), { isVoid: true });
       } else {
-        await updateLead(data._id, { isVoid: true });
+        await updateLead(data._id.toString(), { isVoid: true });
       }
 
       setStatus(true);
@@ -39,7 +39,7 @@ const QuotationVoidStatusUpdater = ({
       await createTrack({
         student: data.email,
         event: `${data.name || "Student"}'s quotation marked as void`,
-        route: `/quotation/${data._id}`,
+        route: `/quotation/${data._id.toString()}`,
         status: "Void",
       });
     } catch (err) {

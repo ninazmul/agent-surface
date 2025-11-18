@@ -1,4 +1,4 @@
-import { Document, Schema, model, models } from "mongoose";
+import { Document, Schema, Types, model, models } from "mongoose";
 
 // Define allowed event types
 export type EventType =
@@ -11,7 +11,7 @@ export type EventType =
 
 // Interface for the event calendar
 export interface IEventCalendar extends Document {
-  _id: string;
+  _id: Types.ObjectId;
   title: string;
   description: string;
   eventType: EventType;

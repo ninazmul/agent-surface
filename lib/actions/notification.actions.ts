@@ -33,7 +33,9 @@ export const createNotification = async (params: NotificationParams) => {
 export const getAllNotifications = async () => {
   try {
     await connectToDatabase();
-    const notifications = await Notification.find().sort({ createdAt: -1 }).lean();
+    const notifications = await Notification.find()
+      .sort({ createdAt: -1 })
+      .lean();
     return JSON.parse(JSON.stringify(notifications));
   } catch (error) {
     handleError(error);
@@ -44,9 +46,11 @@ export const getAllNotifications = async () => {
 export const getNotificationsByAgency = async (agency: string) => {
   try {
     await connectToDatabase();
-    const notifications = await Notification.find({ agency }).sort({
-      createdAt: -1,
-    }).lean();
+    const notifications = await Notification.find({ agency })
+      .sort({
+        createdAt: -1,
+      })
+      .lean();
 
     if (!notifications.length) {
       console.warn(`No notifications found for agency: ${agency}`);
@@ -151,7 +155,7 @@ export const getNotificationsForUser = async (userEmail: string) => {
         userReadStatus?.status?.toLowerCase() === "read" ? "Read" : "Unread";
 
       return {
-        _id: n._id.toString(),
+        _id: n._id.toString().toString(),
         title: n.title,
         status: n.status,
         route: n.route,
@@ -211,7 +215,7 @@ export async function getNotificationsForUserDropdown(
     // Merge and deduplicate
     const combined = [...selfNotifications, ...subAgentNotifications];
     const uniqueMap = new Map<string, INotification>();
-    combined.forEach((n) => uniqueMap.set(n._id.toString(), n));
+    combined.forEach((n) => uniqueMap.set(n._id.toString().toString(), n));
 
     const uniqueNotifications = Array.from(uniqueMap.values());
 

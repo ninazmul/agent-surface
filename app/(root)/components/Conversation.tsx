@@ -2,7 +2,10 @@
 
 import React, { useEffect, useState, useRef, useCallback } from "react";
 import { getAdminCountriesByEmail } from "@/lib/actions/admin.actions";
-import { deleteSingleMessage, getMessagesByEmail } from "@/lib/actions/message.actions";
+import {
+  deleteSingleMessage,
+  getMessagesByEmail,
+} from "@/lib/actions/message.actions";
 import { Trash } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -36,15 +39,16 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail }) => {
       const data: IMessageResponse = await getMessagesByEmail(userEmail);
 
       if (data?.messages?.length) {
-        setThreadId(data._id);
+        setThreadId(data._id.toString());
 
         const filteredMessages = data.messages
           .filter((msg) => msg.text && msg.senderRole)
-          .filter((msg) =>
-            !msg.country ||
-            (Array.isArray(adminCountry)
-              ? adminCountry.includes(msg.country)
-              : msg.country === adminCountry)
+          .filter(
+            (msg) =>
+              !msg.country ||
+              (Array.isArray(adminCountry)
+                ? adminCountry.includes(msg.country)
+                : msg.country === adminCountry)
           )
           .sort(
             (a, b) =>
@@ -82,7 +86,9 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail }) => {
       try {
         await deleteSingleMessage(threadId, messageId);
         toast.success("Message deleted");
-        setMessages((prev) => prev.filter((msg) => msg._id !== messageId));
+        setMessages((prev) =>
+          prev.filter((msg) => msg._id.toString() !== messageId)
+        );
       } catch (err) {
         console.error("Failed to delete message", err);
         toast.error("Failed to delete");
@@ -106,14 +112,15 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail }) => {
             const isUser = msg.senderRole === "user";
             return (
               <div
-                key={msg._id}
+                key={msg._id.toString()}
                 className={`flex ${isUser ? "justify-end" : "justify-start"}`}
               >
                 <div
                   className={`relative group max-w-[75%] px-4 py-2 rounded-2xl shadow-md text-sm transition 
-                    ${isUser
-                      ? "bg-blue-500 text-white rounded-br-none hover:bg-blue-600"
-                      : "bg-gray-200 text-gray-900 rounded-bl-none hover:bg-gray-300"
+                    ${
+                      isUser
+                        ? "bg-blue-500 text-white rounded-br-none hover:bg-blue-600"
+                        : "bg-gray-200 text-gray-900 rounded-bl-none hover:bg-gray-300"
                     }`}
                 >
                   <p>{msg.text}</p>
@@ -129,7 +136,7 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail }) => {
 
                   {isUser && (
                     <button
-                      onClick={() => handleDeleteMessage(msg._id)}
+                      onClick={() => handleDeleteMessage(msg._id.toString())}
                       className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 
                       hover:bg-red-600 transition opacity-0 group-hover:opacity-100"
                     >

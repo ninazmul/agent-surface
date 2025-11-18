@@ -183,7 +183,7 @@ const RefundTable = ({
           <TableBody>
             {paginatedRefunds.map((refund, idx) => (
               <TableRow
-                key={refund._id}
+                key={refund._id.toString()}
                 className="hover:bg-green-100 dark:hover:bg-gray-800"
               >
                 <TableCell>
@@ -214,7 +214,10 @@ const RefundTable = ({
                   <select
                     value={refund.progress}
                     onChange={(e) =>
-                      handleProgressChange(refund._id, e.target.value)
+                      handleProgressChange(
+                        refund._id.toString(),
+                        e.target.value
+                      )
                     }
                     disabled={!isAdmin}
                     className={`border rounded-md px-2 py-1 text-sm font-semibold ${
@@ -264,14 +267,16 @@ const RefundTable = ({
                             <div className="py-5">
                               <RefundForm
                                 Refund={refund}
-                                RefundId={refund._id}
+                                RefundId={refund._id.toString()}
                                 type="Update"
                               />
                             </div>
                           </SheetContent>
                         </Sheet>
                         <Button
-                          onClick={() => setConfirmDeleteId(refund._id)}
+                          onClick={() =>
+                            setConfirmDeleteId(refund._id.toString())
+                          }
                           variant="outline"
                           size="icon"
                           className="text-red-500"

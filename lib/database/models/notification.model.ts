@@ -1,4 +1,4 @@
-import { Document, Schema, model, models } from "mongoose";
+import { Document, Schema, Types, model, models } from "mongoose";
 
 export interface IReadBy {
   email?: string;
@@ -6,7 +6,7 @@ export interface IReadBy {
 }
 
 export interface INotification extends Document {
-  _id: string;
+  _id: Types.ObjectId;
   title: string;
   route?: string;
   agency: string;

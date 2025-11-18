@@ -1,3 +1,5 @@
+import { Types } from "mongoose";
+
 // ====== USER PARAMS
 export type CreateUserParams = {
   clerkId: string;
@@ -129,7 +131,7 @@ export type LeadParams = {
     courseFee?: string;
   }[];
   services?: {
-    _id: string;
+    _id: Types.ObjectId;
     serviceType: string;
     title: string;
     amount?: string;
@@ -257,7 +259,7 @@ export type PromotionParams = {
     courseFee?: string;
   }[];
   services?: {
-    _id: string;
+    _id: Types.ObjectId;
     serviceType: string;
     title: string;
     amount?: string;
@@ -314,7 +316,7 @@ export type QuotationParams = {
     courseFee?: string;
   }[];
   services?: {
-    _id: string;
+    _id: Types.ObjectId;
     serviceType: string;
     title: string;
     amount?: string;

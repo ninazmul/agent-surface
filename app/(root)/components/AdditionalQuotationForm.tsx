@@ -28,6 +28,7 @@ import { createNotification } from "@/lib/actions/notification.actions";
 import { Input } from "@/components/ui/input";
 import { courseKey, expandCourses } from "@/lib/course.utils";
 import Select from "react-select";
+import { Types } from "mongoose";
 
 // ✅ Schema
 export const additionalQuotationFormSchema = z.object({
@@ -139,7 +140,7 @@ const AdditionalQuotationForm = ({
         })) || [],
       services:
         quotation?.services?.map((s) => ({
-          _id: s._id,
+          _id: s._id.toString(),
           title: s.title,
           serviceType: s.serviceType,
           amount: s.amount || "0",
@@ -163,7 +164,10 @@ const AdditionalQuotationForm = ({
             ? new Date(quotation.dateOfBirth)
             : new Date(),
           course: values.course || [],
-          services: values.services || [],
+          services: values.services?.map((s) => ({
+            ...s,
+            _id: new Types.ObjectId(s._id),
+          })),
         });
         if (newQuotation) {
           await createNotification({
@@ -181,7 +185,10 @@ const AdditionalQuotationForm = ({
         const updatedQuotation = await updateQuotation(quotationId, {
           ...values,
           course: values.course || [],
-          services: values.services || [],
+          services: values.services?.map((s) => ({
+            ...s,
+            _id: new Types.ObjectId(s._id),
+          })),
         });
         if (updatedQuotation) {
           await createNotification({
@@ -503,10 +510,10 @@ const AdditionalQuotationForm = ({
               {services?.map((service) => {
                 const isSelected = form
                   .watch("services")
-                  ?.some((s) => s._id === service._id);
+                  ?.some((s) => s._id.toString() === service._id.toString());
                 return (
                   <div
-                    key={service._id}
+                    key={service._id.toString()}
                     className={`flex-shrink-0 rounded-xl border p-4 shadow-md w-[260px]
               ${
                 isSelected
@@ -533,13 +540,15 @@ const AdditionalQuotationForm = ({
                         if (isSelected) {
                           form.setValue(
                             "services",
-                            current.filter((s) => s._id !== service._id)
+                            current.filter(
+                              (s) => s._id.toString() !== service._id.toString()
+                            )
                           );
                         } else {
                           form.setValue("services", [
                             ...current,
                             {
-                              _id: service._id,
+                              _id: service._id.toString(),
                               title: service.title,
                               serviceType: service.serviceType || "",
                               amount: service.amount || "",

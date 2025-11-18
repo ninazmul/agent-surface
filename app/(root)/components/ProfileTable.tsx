@@ -109,7 +109,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
   const handleSalesTarget = async (profileId: string) => {
     const value = editedData[profileId]?.salesTarget ?? "";
     const original =
-      profiles.find((r) => r._id === profileId)?.salesTarget ?? "";
+      profiles.find((r) => r._id.toString() === profileId)?.salesTarget ?? "";
     if (value && value !== original) {
       try {
         await updateProfile(profileId, { salesTarget: value });
@@ -269,7 +269,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
           <TableBody>
             {paginatedProfiles.map((profile, index) => (
               <TableRow
-                key={profile._id}
+                key={profile._id.toString()}
                 className="hover:bg-indigo-100 dark:hover:bg-gray-800"
               >
                 <TableCell>
@@ -277,7 +277,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                 </TableCell>
                 <TableCell>
                   <a
-                    href={`/profile/${profile._id}`}
+                    href={`/profile/${profile._id.toString()}`}
                     className="line-clamp-1 w-40 md:w-auto hover:underline"
                   >
                     {profile.name}
@@ -299,7 +299,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                 <TableCell>
                   <Button
                     onClick={() =>
-                      handleToggleStatus(profile._id, profile.status)
+                      handleToggleStatus(profile._id.toString(), profile.status)
                     }
                     variant={"outline"}
                     className={
@@ -327,32 +327,32 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                     type="number"
                     className="w-24"
                     value={
-                      editedData[profile._id]?.salesTarget ??
+                      editedData[profile._id.toString()]?.salesTarget ??
                       profile.salesTarget ??
                       ""
                     }
                     onChange={(e) =>
                       setEditedData((prev) => ({
                         ...prev,
-                        [profile._id]: {
+                        [profile._id.toString()]: {
                           salesTarget: e.target.value,
                         },
                       }))
                     }
-                    onBlur={() => handleSalesTarget(profile._id)}
+                    onBlur={() => handleSalesTarget(profile._id.toString())}
                     placeholder="e.g. €100"
                   />
                 </TableCell>
 
                 <TableCell className="flex items-center space-x-2">
-                  <a href={`/profile/${profile._id}/update`}>
+                  <a href={`/profile/${profile._id.toString()}/update`}>
                     <Button variant="outline" size="icon">
                       <Pencil className="w-4 h-4 text-purple-500" />
                     </Button>
                   </a>
 
                   <Button
-                    onClick={() => setConfirmDeleteId(profile._id)}
+                    onClick={() => setConfirmDeleteId(profile._id.toString())}
                     variant={"outline"}
                     className="text-red-500"
                   >

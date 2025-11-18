@@ -426,7 +426,7 @@ export default function QuotationClient({
               </Button>
               <div className="flex gap-2">
                 <QuotationDownloader data={data} agency={agency} />
-                <CopyQuotationButton quotationId={data._id} />
+                <CopyQuotationButton quotationId={data._id.toString()} />
               </div>
             </div>
           </div>

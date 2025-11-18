@@ -1,7 +1,7 @@
-import { Document, Schema, model, models } from "mongoose";
+import { Document, Schema, Types, model, models } from "mongoose";
 
 export interface IQuotation extends Document {
-  _id: string;
+  _id: Types.ObjectId;
   quotationNumber?: string;
   name: string;
   email: string;

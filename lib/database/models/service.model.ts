@@ -1,4 +1,4 @@
-import { Document, Schema, model, models } from "mongoose";
+import { Document, Schema, Types, model, models } from "mongoose";
 
 // Define allowed service types
 export type ServiceType =
@@ -10,7 +10,7 @@ export type ServiceType =
 
 // Interface for the service calendar
 export interface IServices extends Document {
-  _id: string;
+  _id: Types.ObjectId;
   title: string;
   description: string;
   serviceType: ServiceType;

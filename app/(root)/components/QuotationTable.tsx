@@ -38,9 +38,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { Types } from "mongoose";
 
 interface ICombinedItem {
-  _id: string;
+  _id: Types.ObjectId;
   name?: string;
   email?: string;
   number?: string;
@@ -111,7 +112,8 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
           if (!lead.email) return;
           // fetch lead by email
           const fetchedLead = await getLeadByEmail(lead.email);
-          if (fetchedLead?._id) newLeadIds[lead.email] = fetchedLead._id;
+          if (fetchedLead?._id.toString())
+            newLeadIds[lead.email] = fetchedLead._id.toString();
         })
       );
       setLeadIds(newLeadIds);
@@ -314,7 +316,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
               return (
                 <>
                   <TableRow
-                    key={lead._id}
+                    key={lead._id.toString()}
                     className={`hover:bg-pink-100 dark:hover:bg-gray-800 border-b-0 ${
                       lead.isPinned
                         ? "bg-yellow-200 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
@@ -449,7 +451,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                           </PopoverTrigger>
                           <PopoverContent className="p-4 w-52 flex flex-col items-start gap-2">
                             <a
-                              href={`/quotation/${lead._id}/invoice`}
+                              href={`/quotation/${lead._id.toString()}/invoice`}
                               target="_blank"
                             >
                               <Button
@@ -461,7 +463,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                               </Button>
                             </a>
                             <a
-                              href={`/quotation/${lead._id}/offer-letter`}
+                              href={`/quotation/${lead._id.toString()}/offer-letter`}
                               target="_blank"
                             >
                               <Button
@@ -551,7 +553,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             className="w-full justify-start text-purple-500 gap-2"
                             asChild
                           >
-                            <a href={`/quotation/${lead._id}/`}>
+                            <a href={`/quotation/${lead._id.toString()}/`}>
                               <FileText className="w-4 h-4" />
                               Generate Quotation
                             </a>
@@ -563,7 +565,9 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             className="w-full justify-start text-blue-500 gap-2"
                             onClick={() => {
                               navigator.clipboard.writeText(
-                                `${window.location.origin}/quotation/${lead._id}`
+                                `${
+                                  window.location.origin
+                                }/quotation/${lead._id.toString()}`
                               );
                               toast.success("Quotation link copied!");
                             }}
@@ -577,7 +581,9 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             variant="ghost"
                             className="w-full justify-start text-green-600 gap-2"
                             onClick={() => {
-                              const url = `${window.location.origin}/quotation/${lead._id}`;
+                              const url = `${
+                                window.location.origin
+                              }/quotation/${lead._id.toString()}`;
                               const text = encodeURIComponent(
                                 `Check this lead: ${url}`
                               );
@@ -629,7 +635,9 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             variant="ghost"
                             className="w-full justify-start text-green-800 gap-2"
                             onClick={() => {
-                              const url = `${window.location.origin}/quotation/${lead._id}`;
+                              const url = `${
+                                window.location.origin
+                              }/quotation/${lead._id.toString()}`;
                               // For WeChat, typically you would generate a QR code
                               // Example: open QR code generator page with the link
                               window.open(

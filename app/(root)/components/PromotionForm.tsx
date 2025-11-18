@@ -31,6 +31,7 @@ import { ICourse } from "@/lib/database/models/course.model";
 import { IServices } from "@/lib/database/models/service.model";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
+import { Types } from "mongoose";
 
 export const promotionFormSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters."),
@@ -128,7 +129,7 @@ const PromotionForm = ({
 
           services:
             promotion?.services?.map((s) => ({
-              _id: s._id,
+              _id: s._id.toString(),
               title: s.title,
               serviceType: s.serviceType,
               amount: s.amount || "0",
@@ -219,7 +220,10 @@ const PromotionForm = ({
           ...values,
           photo: uploadedPhotoUrl || "",
           course: values.course || [],
-          services: values.services || [],
+          services: values.services?.map((s) => ({
+            ...s,
+            _id: new Types.ObjectId(s._id),
+          })),
           createdAt: new Date(),
         });
         if (newPromotion) {
@@ -238,7 +242,10 @@ const PromotionForm = ({
           ...values,
           photo: uploadedPhotoUrl || "",
           course: values.course || [],
-          services: values.services || [],
+          services: values.services?.map((s) => ({
+            ...s,
+            _id: new Types.ObjectId(s._id),
+          })),
         });
         if (updatedPromotion) {
           form.reset();
@@ -582,10 +589,10 @@ const PromotionForm = ({
               {services?.map((service) => {
                 const isSelected = form
                   .watch("services")
-                  ?.some((s) => s._id === service._id);
+                  ?.some((s) => s._id.toString() === service._id.toString());
                 return (
                   <div
-                    key={service._id}
+                    key={service._id.toString()}
                     className={`flex-shrink-0 rounded-xl border p-4 shadow-md w-[260px]
                       ${
                         isSelected
@@ -612,13 +619,15 @@ const PromotionForm = ({
                         if (isSelected) {
                           form.setValue(
                             "services",
-                            current.filter((s) => s._id !== service._id)
+                            current.filter(
+                              (s) => s._id.toString() !== service._id.toString()
+                            )
                           );
                         } else {
                           form.setValue("services", [
                             ...current,
                             {
-                              _id: service._id,
+                              _id: service._id.toString(),
                               title: service.title,
                               serviceType: service.serviceType || "",
                               amount: service.amount || "",

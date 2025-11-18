@@ -203,14 +203,16 @@ const AdminTable = ({
                     </span>
                   ) : (
                     <>
-                      <a href={`/admins/${admin._id}/update`}>
+                      <a href={`/admins/${admin._id.toString()}/update`}>
                         <Button variant="outline" size="icon">
                           <Pencil className="w-4 h-4 text-purple-500" />
                         </Button>
                       </a>
 
                       <Button
-                        onClick={() => setConfirmDeleteId(admin._id.toString())}
+                        onClick={() =>
+                          setConfirmDeleteId(admin._id.toString().toString())
+                        }
                         variant="outline"
                         size="icon"
                         className="text-red-500"

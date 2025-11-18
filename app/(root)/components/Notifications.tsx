@@ -177,7 +177,7 @@ export default function NotificationsDropdown() {
           ) : (
             notifications.map((notification) => (
               <a
-                key={notification._id}
+                key={notification._id.toString()}
                 href={notification.route || "/notifications"}
                 className="block px-4 py-3 text-sm border-b last:border-0 hover:bg-gray-50 transition"
                 onClick={() => setOpen(false)}

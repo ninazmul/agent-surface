@@ -1,7 +1,8 @@
+import { Types } from "mongoose";
 import { Document, Schema, model, models } from "mongoose";
 
 export interface IChatMessage {
-  _id: string;
+  _id: Types.ObjectId;
   senderEmail: string;
   senderRole?: "user" | "admin";
   text: string;
@@ -9,7 +10,7 @@ export interface IChatMessage {
 }
 
 export interface IMessage extends Document {
-  _id: string;
+  _id: Types.ObjectId;
   userEmail: string;
   country?:string;
   messages: IChatMessage[];

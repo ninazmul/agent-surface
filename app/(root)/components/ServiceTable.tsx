@@ -144,7 +144,7 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
           <TableBody>
             {paginatedServices.map((service, index) => (
               <TableRow
-                key={service._id}
+                key={service._id.toString()}
                 className="hover:bg-teal-100 dark:hover:bg-gray-800"
               >
                 <TableCell>
@@ -174,13 +174,13 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
                 </TableCell>
                 <TableCell>{`€${service.amount}` || "N/A"}</TableCell>
                 <TableCell className="flex items-center space-x-2">
-                  <a href={`/services/${service._id}/update`}>
+                  <a href={`/services/${service._id.toString()}/update`}>
                     <Button variant="outline" size="icon">
                       <Pencil className="w-4 h-4 text-purple-500" />
                     </Button>
                   </a>
                   <Button
-                    onClick={() => setConfirmDeleteId(service._id)}
+                    onClick={() => setConfirmDeleteId(service._id.toString())}
                     variant="outline"
                     className="text-red-500"
                   >

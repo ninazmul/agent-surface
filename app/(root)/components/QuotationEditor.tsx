@@ -12,8 +12,9 @@ import { SelectedCourse } from "@/lib/course.utils";
 import { IQuotation } from "@/lib/database/models/quotation.model";
 import { updateQuotation } from "@/lib/actions/quotation.actions";
 import { createTrack } from "@/lib/actions/track.actions";
+import { Types } from "mongoose";
 interface IService {
-  _id?: string;
+  _id: Types.ObjectId;
   title: string;
   serviceType: string;
   amount: number;
@@ -88,7 +89,7 @@ export default function QuotationEditor({
 
   const [selectedServices, setSelectedServices] = useState<IService[]>(
     (data.services ?? []).map((s) => ({
-      _id: s._id,
+      _id: new Types.ObjectId(s._id),
       title: s.title,
       serviceType: s.serviceType || "",
       amount: Number(s.amount) || 0,
@@ -161,9 +162,9 @@ export default function QuotationEditor({
       };
 
       if ("quotationNumber" in data) {
-        await updateQuotation(data._id, payload);
+        await updateQuotation(data._id.toString(), payload);
       } else {
-        await updateLead(data._id, payload);
+        await updateLead(data._id.toString(), payload);
       }
 
       setIsEditing(false);
@@ -308,13 +309,13 @@ export default function QuotationEditor({
       {/* Services Selection */}
       {isEditing ? (
         <div className="flex gap-4 overflow-x-auto pb-2">
-          {allServices.map((service) => {
+          {allServices.map((service, idx) => {
             const isSelected = selectedServices.some(
               (s) => s._id === service._id
             );
             return (
               <div
-                key={service._id}
+                key={idx}
                 className={`flex-shrink-0 rounded-xl border p-4 shadow-md
                   bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700
                   w-[260px] md:w-[300px] transition-all duration-200
@@ -351,9 +352,9 @@ export default function QuotationEditor({
           })}
         </div>
       ) : (
-        selectedServices.map((service) => (
+        selectedServices.map((service, idx) => (
           <div
-            key={service._id}
+            key={idx}
             className="flex justify-between border-b border-gray-200 dark:border-gray-500 pb-2"
           >
             <div>

@@ -170,7 +170,10 @@ const UserTable = ({ users }: { users: Array<IUser> }) => {
           </TableHeader>
           <TableBody>
             {paginatedUsers.map((user, index) => (
-              <TableRow key={user._id} className="hover:bg-gray-100 dark:hover:bg-gray-800">
+              <TableRow
+                key={user._id.toString()}
+                className="hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
@@ -189,7 +192,7 @@ const UserTable = ({ users }: { users: Array<IUser> }) => {
                 </TableCell>
                 <TableCell>
                   <Button
-                    onClick={() => setConfirmDeleteId(user._id)}
+                    onClick={() => setConfirmDeleteId(user._id.toString())}
                     variant={"outline"}
                     className="text-red-500"
                   >

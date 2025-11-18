@@ -190,7 +190,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
                 <div className="grid gap-4 sm:grid-cols-2">
                   {promotion.services.map((s) => (
                     <div
-                      key={s._id}
+                      key={s._id.toString()}
                       className="border border-pink-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white/60 dark:bg-gray-800/60"
                     >
                       <p className="font-medium">{s.title}</p>
@@ -221,7 +221,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
                 ✨ Create Lead
               </h4>
               <a
-                href={`/promotions/${promotion._id}/leads/create`}
+                href={`/promotions/${promotion._id.toString()}/leads/create`}
                 className="w-full sm:w-auto"
               >
                 <button

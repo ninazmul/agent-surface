@@ -247,7 +247,7 @@ const MessageTable = ({
 
           <TableBody>
             {paginatedMessages.map((message, index) => (
-              <TableRow key={message._id}>
+              <TableRow key={message._id.toString()}>
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
@@ -275,7 +275,7 @@ const MessageTable = ({
                           const isAdminMsg = msg.senderRole === "admin";
                           return (
                             <div
-                              key={msg._id}
+                              key={msg._id.toString()}
                               className={`flex ${
                                 isAdminMsg ? "justify-end" : "justify-start"
                               }`}
@@ -298,8 +298,8 @@ const MessageTable = ({
                                   <button
                                     onClick={() =>
                                       handleDeleteSingleMessage(
-                                        message._id,
-                                        msg._id
+                                        message._id.toString(),
+                                        msg._id.toString()
                                       )
                                     }
                                     className={`absolute -top-1 ${
@@ -375,7 +375,7 @@ const MessageTable = ({
                 <TableCell className="flex items-center space-x-2">
                   {role === "admin" && (
                     <Button
-                      onClick={() => setConfirmDeleteId(message._id)}
+                      onClick={() => setConfirmDeleteId(message._id.toString())}
                       variant="outline"
                       className="text-red-500"
                     >

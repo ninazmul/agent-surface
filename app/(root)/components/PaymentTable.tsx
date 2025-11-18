@@ -182,7 +182,7 @@ const PaymentTable = ({
           <TableBody>
             {paginatedPayments.map((payment, idx) => (
               <TableRow
-                key={payment._id}
+                key={payment._id.toString()}
                 className="hover:bg-amber-100 dark:bg-gray-800"
               >
                 <TableCell>
@@ -212,7 +212,10 @@ const PaymentTable = ({
                     variant="outline"
                     size="sm"
                     onClick={() =>
-                      handleToggleProgress(payment._id, payment.progress)
+                      handleToggleProgress(
+                        payment._id.toString(),
+                        payment.progress
+                      )
                     }
                     className="text-xs"
                     disabled={!isAdmin}
@@ -239,13 +242,17 @@ const PaymentTable = ({
                   <>
                     <TableCell>
                       <div className="flex gap-2">
-                        <a href={`/commissions/payment/${payment._id}/update`}>
+                        <a
+                          href={`/commissions/payment/${payment._id.toString()}/update`}
+                        >
                           <Button variant="outline" size="icon">
                             <Pencil className="w-4 h-4 text-purple-500" />
                           </Button>
                         </a>
                         <Button
-                          onClick={() => setConfirmDeleteId(payment._id)}
+                          onClick={() =>
+                            setConfirmDeleteId(payment._id.toString())
+                          }
                           variant="outline"
                           size="icon"
                           className="text-red-500"

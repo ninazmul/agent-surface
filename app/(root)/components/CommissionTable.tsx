@@ -41,9 +41,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { createTrack } from "@/lib/actions/track.actions";
+import { Types } from "mongoose";
 
 interface ICombinedItem {
-  _id: string;
+  _id: Types.ObjectId;
   name?: string;
   email?: string;
   number?: string;
@@ -285,7 +286,9 @@ const CommissionTable = ({
                   checked={selectedLeads.length === paginatedLeads.length}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setSelectedLeads(paginatedLeads.map((r) => r._id));
+                      setSelectedLeads(
+                        paginatedLeads.map((r) => r._id.toString())
+                      );
                     } else setSelectedLeads([]);
                   }}
                 />
@@ -343,7 +346,7 @@ const CommissionTable = ({
               return (
                 <>
                   <TableRow
-                    key={lead._id}
+                    key={lead._id.toString()}
                     className={`hover:bg-pink-100 dark:hover:bg-gray-800 border-b-0 ${
                       lead.isPinned
                         ? "bg-yellow-200 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
@@ -353,13 +356,16 @@ const CommissionTable = ({
                     <TableCell>
                       <input
                         type="checkbox"
-                        checked={selectedLeads.includes(lead._id)}
+                        checked={selectedLeads.includes(lead._id.toString())}
                         onChange={(e) => {
                           if (e.target.checked) {
-                            setSelectedLeads((prev) => [...prev, lead._id]);
+                            setSelectedLeads((prev) => [
+                              ...prev,
+                              lead._id.toString(),
+                            ]);
                           } else {
                             setSelectedLeads((prev) =>
-                              prev.filter((id) => id !== lead._id)
+                              prev.filter((id) => id !== lead._id.toString())
                             );
                           }
                         }}
@@ -577,7 +583,9 @@ const CommissionTable = ({
                                 className="w-full justify-start text-purple-500 gap-2"
                                 asChild
                               >
-                                <a href={`/commissions/${lead._id}/receipt`}>
+                                <a
+                                  href={`/commissions/${lead._id.toString()}/receipt`}
+                                >
                                   <FileText className="w-4 h-4" />
                                   Payment Receipt
                                 </a>
@@ -623,7 +631,7 @@ const CommissionTable = ({
                                   // ✅ Optimistic update
                                   setLocalLeads((prev) =>
                                     prev.map((l) =>
-                                      l._id === lead._id
+                                      l._id.toString() === lead._id.toString()
                                         ? ({
                                             ...l,
                                             ...updatePayload,
@@ -635,12 +643,12 @@ const CommissionTable = ({
                                   // Update backend
                                   if ("quotationNumber" in lead) {
                                     updated = await updateQuotation(
-                                      lead._id,
+                                      lead._id.toString(),
                                       updatePayload
                                     );
                                   } else {
                                     updated = await updateLead(
-                                      lead._id,
+                                      lead._id.toString(),
                                       updatePayload
                                     );
                                   }

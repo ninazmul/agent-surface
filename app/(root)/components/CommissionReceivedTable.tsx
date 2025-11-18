@@ -32,9 +32,10 @@ import {
 } from "@/components/ui/popover";
 import { updateQuotation } from "@/lib/actions/quotation.actions";
 import { createTrack } from "@/lib/actions/track.actions";
+import { Types } from "mongoose";
 
 interface ICombinedItem {
-  _id: string;
+  _id: Types.ObjectId;
   name?: string;
   email?: string;
   number?: string;
@@ -325,7 +326,7 @@ const CommissionReceivedTable = ({
               return (
                 <>
                   <TableRow
-                    key={lead._id}
+                    key={lead._id.toString()}
                     className={`hover:bg-pink-100 dark:hover:bg-gray-800 border-b-0 ${
                       lead.isPinned
                         ? "bg-yellow-200 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
@@ -484,7 +485,9 @@ const CommissionReceivedTable = ({
                                 className="w-full justify-start text-purple-500 gap-2"
                                 asChild
                               >
-                                <a href={`/commissions/${lead._id}/receipt`}>
+                                <a
+                                  href={`/commissions/${lead._id.toString()}/receipt`}
+                                >
                                   <FileText className="w-4 h-4" />
                                   Payment Receipt
                                 </a>
@@ -534,7 +537,7 @@ const CommissionReceivedTable = ({
                                   // ✅ Optimistic update
                                   setLocalLeads((prev) =>
                                     prev.map((l) =>
-                                      l._id === lead._id
+                                      l._id.toString() === lead._id.toString()
                                         ? ({
                                             ...l,
                                             ...updatePayload,
@@ -546,12 +549,12 @@ const CommissionReceivedTable = ({
                                   // Update backend
                                   if ("quotationNumber" in lead) {
                                     updated = await updateQuotation(
-                                      lead._id,
+                                      lead._id.toString(),
                                       updatePayload
                                     );
                                   } else {
                                     updated = await updateLead(
-                                      lead._id,
+                                      lead._id.toString(),
                                       updatePayload
                                     );
                                   }

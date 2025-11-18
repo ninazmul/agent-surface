@@ -32,14 +32,14 @@ const QuotationStatusUpdater = ({
     try {
       // update DB status
       if ("quotationNumber" in data) {
-        await updateQuotation(data._id, { quotationStatus: true });
+        await updateQuotation(data._id.toString(), { quotationStatus: true });
       } else {
-        await updateLead(data._id, { quotationStatus: true });
+        await updateLead(data._id.toString(), { quotationStatus: true });
       }
 
       // generate links
-      const quotationLink = `https://agentsurface.com/quotation/${data._id}`;
-      const invoiceLink = `https://agentsurface.com/quotation/${data._id}/invoice`;
+      const quotationLink = `https://agentsurface.com/quotation/${data._id.toString()}`;
+      const invoiceLink = `https://agentsurface.com/quotation/${data._id.toString()}/invoice`;
 
       // send email via new API route
       await fetch("/api/send-message", {
@@ -68,7 +68,7 @@ const QuotationStatusUpdater = ({
       await createTrack({
         student: data.email,
         event: `Quotation accepted for ${data.name || "Student"}`,
-        route: `/quotation/${data._id}`,
+        route: `/quotation/${data._id.toString()}`,
         status: "Accepted",
       });
     } catch (err) {
