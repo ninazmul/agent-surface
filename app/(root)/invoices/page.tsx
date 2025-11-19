@@ -150,15 +150,11 @@ const Page = async () => {
 
   return (
     <>
-      <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
-        {/* Header + Actions */}
+      <section className="p-4">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <div className="flex items-center gap-2">
-            <h3 className="h3-bold text-center sm:text-left">All Invoices</h3>
-          </div>
+          <h3 className="h3-bold text-center sm:text-left">All Invoices</h3>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto my-8">
           <InvoiceTable leads={combinedData} />
         </div>

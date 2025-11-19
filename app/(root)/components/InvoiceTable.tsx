@@ -171,11 +171,11 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
         placeholder="Search leads..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full max-w-md rounded-2xl"
+        className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
 
       <div
-        className="overflow-x-auto rounded-2xl bg-pink-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -200,28 +200,34 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>#</TableHead>
+              <TableHead className="text-white cursor-pointer">#</TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
                 {sortKey === "name" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Course & Campus</TableHead>
-              <TableHead>Course + Services Fees</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Course & Campus
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Course + Service Fees
+              </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}
                 {sortKey === "date" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -244,11 +250,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                 <>
                   <TableRow
                     key={lead._id.toString()}
-                    className={`hover:bg-pink-100 dark:hover:bg-gray-800 border-b-0 ${
-                      lead.isPinned
-                        ? "bg-yellow-200 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
-                        : ""
-                    }`}
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0`}
                   >
                     <TableCell>
                       {(currentPage - 1) * itemsPerPage + idx + 1}
@@ -286,7 +288,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="rounded-xl text-xs"
+                              className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
                             >
                               View Courses & Services
                             </Button>
@@ -483,19 +485,19 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
         <div className="flex gap-2">
           <Button
             size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p - 1)}
             disabled={currentPage === 1}
-            className="rounded-2xl"
           >
             Previous
           </Button>
           <Button
             size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage === Math.ceil(filteredLeads.length / itemsPerPage)
             }
-            className="rounded-2xl"
           >
             Next
           </Button>
