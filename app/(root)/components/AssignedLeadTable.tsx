@@ -687,7 +687,7 @@ const AssignedLeadTable = ({
                             <Button
                               variant="outline"
                               size="sm"
-                              className="rounded-xl text-xs"
+                              className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
                             >
                               View Courses & Services
                             </Button>
@@ -746,7 +746,7 @@ const AssignedLeadTable = ({
                             e.target.value
                           )
                         }
-                        className={`border rounded-md px-2 py-1 text-sm font-semibold ${
+                        className={`px-4 py-2 text-xs font-medium rounded-full border text-center ${
                           lead.progress === "Open"
                             ? "bg-gray-100 text-gray-700"
                             : lead.progress === "Contacted"
@@ -775,7 +775,7 @@ const AssignedLeadTable = ({
                             e.target.value
                           )
                         }
-                        className={`border rounded-md px-2 py-1 text-sm font-semibold ${
+                        className={`px-4 py-2 text-xs font-medium rounded-full border text-center ${
                           lead.status === "Perception"
                             ? "bg-gray-100 text-gray-700"
                             : lead.status === "Cold"
