@@ -353,7 +353,7 @@ const CommissionTable = ({
                 <>
                   <TableRow
                     key={lead._id.toString()}
-                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0 `}
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0`}
                   >
                     <TableCell>
                       <input

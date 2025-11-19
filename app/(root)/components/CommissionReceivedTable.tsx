@@ -224,12 +224,12 @@ const CommissionReceivedTable = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-start sm:items-center">
         <Input
           placeholder="Search finance..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full max-w-md rounded-2xl"
+          className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
         />
 
         <select
@@ -237,7 +237,7 @@ const CommissionReceivedTable = ({
           onChange={(e) =>
             setDateFilter(e.target.value as "day" | "week" | "month" | "all")
           }
-          className="border rounded-2xl px-3 py-2"
+          className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
         >
           <option value="all">All Time</option>
           <option value="day">Today</option>
@@ -247,7 +247,7 @@ const CommissionReceivedTable = ({
       </div>
 
       <div
-        className="overflow-x-auto rounded-2xl bg-pink-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -272,21 +272,23 @@ const CommissionReceivedTable = ({
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>#</TableHead>
+              <TableHead className="text-white cursor-pointer">#</TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
                 {sortKey === "name" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Agency</TableHead>
-              <TableHead>Fees</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Agency
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">Fees</TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("paymentStatus")}
               >
                 Status{" "}
@@ -294,14 +296,16 @@ const CommissionReceivedTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="cursor-pointer"
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}
                 {sortKey === "date" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -327,11 +331,7 @@ const CommissionReceivedTable = ({
                 <>
                   <TableRow
                     key={lead._id.toString()}
-                    className={`hover:bg-pink-100 dark:hover:bg-gray-800 border-b-0 ${
-                      lead.isPinned
-                        ? "bg-yellow-200 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
-                        : ""
-                    }`}
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0`}
                   >
                     <TableCell>
                       {(currentPage - 1) * itemsPerPage + idx + 1}
@@ -419,7 +419,7 @@ const CommissionReceivedTable = ({
 
                         return (
                           <p
-                            className={`border rounded-md px-2 py-1 text-sm font-semibold ${statusStyles[status]}`}
+                            className={`px-4 py-2 text-xs font-medium rounded-full border ${statusStyles[status]}`}
                           >
                             {status === "NA" ? "N/A" : status}
                           </p>
@@ -629,19 +629,19 @@ const CommissionReceivedTable = ({
         <div className="flex gap-2">
           <Button
             size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p - 1)}
             disabled={currentPage === 1}
-            className="rounded-2xl"
           >
             Previous
           </Button>
           <Button
             size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage === Math.ceil(filteredLeads.length / itemsPerPage)
             }
-            className="rounded-2xl"
           >
             Next
           </Button>
