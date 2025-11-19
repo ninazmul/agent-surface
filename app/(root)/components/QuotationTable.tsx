@@ -434,7 +434,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                       )}
                     </TableCell>
 
-                    <TableCell className="text-left">
+                    <TableCell>
                       {lead.quotationStatus ? (
                         <Popover>
                           <PopoverTrigger asChild>
