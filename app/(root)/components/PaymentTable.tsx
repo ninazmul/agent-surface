@@ -17,9 +17,12 @@ import {
   Trash,
   SortAsc,
   SortDesc,
-  StickyNote,
   RefreshCcw,
   Pencil,
+  Banknote,
+  DollarSign,
+  CreditCard,
+  File,
 } from "lucide-react";
 import {
   Popover,
@@ -200,17 +203,39 @@ const PaymentTable = ({
                 </TableCell>
                 <TableCell>{payment.agency}</TableCell>
                 <TableCell>€{payment.amount}</TableCell>
-                <TableCell>{payment.paymentMethod}</TableCell>
+                <TableCell>
+                  {{
+                    Bank: (
+                      <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 text-gray-700 border inline-flex items-center gap-2">
+                        <Banknote className="w-4 h-4" />
+                        Bank
+                      </span>
+                    ),
+                    Paypal: (
+                      <span className="px-4 py-2 text-xs font-medium rounded-full bg-blue-100 text-blue-700 border inline-flex items-center gap-2">
+                        <DollarSign className="w-4 h-4" />
+                        Paypal
+                      </span>
+                    ),
+                    Wise: (
+                      <span className="px-4 py-2 text-xs font-medium rounded-full bg-green-100 text-green-700 border inline-flex items-center gap-2">
+                        <CreditCard className="w-4 h-4" />
+                        Wise
+                      </span>
+                    ),
+                  }[payment.paymentMethod] ?? (
+                    <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 text-gray-700 border inline-flex items-center gap-2">
+                      <CreditCard className="w-4 h-4" />
+                      {payment.paymentMethod || "Unknown"}
+                    </span>
+                  )}
+                </TableCell>
                 <TableCell>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="text-blue-500"
-                      >
-                        <StickyNote size={16} />
-                      </Button>
+                      <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 text-gray-700 border inline-flex items-center gap-2">
+                        <File className="w-4 h-4" /> Details
+                      </span>
                     </PopoverTrigger>
                     <PopoverContent className="max-w-xs text-sm">
                       {payment.accountDetails || "No note available."}
@@ -239,11 +264,11 @@ const PaymentTable = ({
                             payment.progress
                           )
                         }
-                        className={`text-xs px-4 py-2 font-medium rounded-full border flex items-center justify-center gap-1 ${progressStyles[status]}`}
+                        className={`px-4 py-2 text-xs font-medium rounded-full border text-center flex items-center justify-center gap-1 ${progressStyles[status]}`}
                         disabled={!isAdmin}
                       >
-                        {status}
                         {isAdmin && <RefreshCcw className="ml-1 h-3 w-3" />}
+                        {status}
                       </Button>
                     );
                   })()}
@@ -255,17 +280,17 @@ const PaymentTable = ({
                         <a
                           href={`/finance/payment/${payment._id.toString()}/update`}
                         >
-                          <Button variant="outline" size="icon">
-                            <Pencil className="w-4 h-4 text-purple-500" />
+                          <Button variant="ghost" size="icon">
+                            <Pencil className="w-4 h-4 text-black" />
                           </Button>
                         </a>
                         <Button
                           onClick={() =>
                             setConfirmDeleteId(payment._id.toString())
                           }
-                          variant="outline"
+                          variant="ghost"
                           size="icon"
-                          className="text-red-500"
+                          className="text-black"
                         >
                           <Trash size={18} />
                         </Button>
