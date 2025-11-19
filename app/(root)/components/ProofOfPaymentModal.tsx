@@ -96,7 +96,7 @@ const ProofOfPaymentModal = ({ lead }: { lead: ICombinedItem }) => {
         </div>
 
         <DialogFooter className="flex justify-between mt-4">
-          <a href={`/commissions/${lead._id.toString()}/transcript`}>
+          <a href={`/finance/${lead._id.toString()}/transcript`}>
             <Button>Add Proof of Payment</Button>
           </a>
           <Button variant={"destructive"} onClick={() => setOpen(false)}>

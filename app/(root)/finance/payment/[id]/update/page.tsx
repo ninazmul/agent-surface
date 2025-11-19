@@ -17,7 +17,7 @@ const UpdatePage = async ({ params }: PageProps) => {
   const myProfile = await getProfileByEmail(email);
 
   const payment = await getPaymentById(id);
-  if (!payment) redirect("/commissions/payment");
+  if (!payment) redirect("/finance/payment");
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">

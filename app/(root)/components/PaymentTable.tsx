@@ -243,7 +243,7 @@ const PaymentTable = ({
                     <TableCell>
                       <div className="flex gap-2">
                         <a
-                          href={`/commissions/payment/${payment._id.toString()}/update`}
+                          href={`/finance/payment/${payment._id.toString()}/update`}
                         >
                           <Button variant="outline" size="icon">
                             <Pencil className="w-4 h-4 text-purple-500" />

@@ -28,7 +28,7 @@ const Page = async () => {
     redirect("/profile");
   }
 
-  if (adminStatus && !rolePermissions.includes("commissions")) {
+  if (adminStatus && !rolePermissions.includes("finance")) {
     redirect("/");
   }
 
@@ -62,7 +62,7 @@ const Page = async () => {
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
             <a
-              href={`/commissions/payment/create`}
+              href={`/finance/payment/create`}
               className="w-full sm:w-auto"
             >
               <Button size="lg" className="rounded-full w-full sm:w-auto">

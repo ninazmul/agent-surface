@@ -35,7 +35,7 @@ const rolePermissionOptions = [
   { value: "courses", label: "Courses" },
   { value: "resources", label: "Resources" },
   { value: "promotions", label: "Promotions" },
-  { value: "commissions", label: "Commissions" },
+  { value: "finance", label: "Finance" },
   { value: "invoices", label: "Invoices" },
   { value: "downloads", label: "Downloads" },
   { value: "messages", label: "Messages" },

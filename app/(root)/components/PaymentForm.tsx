@@ -76,10 +76,10 @@ const PaymentForm = ({
             title: `New payment request created for ${values.agency}`,
             agency: values.agency,
             country: values.country,
-            route: `/commissions`,
+            route: `/finance`,
           });
           form.reset();
-          router.push("/commissions");
+          router.push("/finance");
         }
       } else if (type === "Update" && PaymentId) {
         const updated = await updatePayment(PaymentId, {
@@ -91,9 +91,9 @@ const PaymentForm = ({
             title: `${values.agency}'s payment request updated!`,
             agency: values.agency,
             country: values.country,
-            route: `/commissions`,
+            route: `/finance`,
           });
-          router.push("/commissions");
+          router.push("/finance");
         }
       }
     } catch (error) {

@@ -584,7 +584,7 @@ const CommissionTable = ({
                                 asChild
                               >
                                 <a
-                                  href={`/commissions/${lead._id.toString()}/receipt`}
+                                  href={`/finance/${lead._id.toString()}/receipt`}
                                 >
                                   <FileText className="w-4 h-4" />
                                   Payment Receipt
@@ -663,7 +663,7 @@ const CommissionTable = ({
                                   await createTrack({
                                     student: updated.email,
                                     event: `${updated.name}'s payment status set to ${newStatus} by ${email}`,
-                                    route: `/commissions`,
+                                    route: `/finance`,
                                     status: newStatus,
                                   });
 

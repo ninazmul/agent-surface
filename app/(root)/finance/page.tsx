@@ -1,5 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
+import CommissionTable from "../components/CommissionTable";
 import {
   getAdminCountriesByEmail,
   getAdminRolePermissionsByEmail,
@@ -14,7 +15,6 @@ import {
   getAllQuotations,
   getQuotationsByAgency,
 } from "@/lib/actions/quotation.actions";
-import CommissionReceivedTable from "../../components/CommissionReceivedTable";
 import { Types } from "mongoose";
 
 interface ICombinedItem {
@@ -62,11 +62,14 @@ const Page = async () => {
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
+  const notAcceptedOrMissing = (status?: string | null) =>
+    !status || status !== "Accepted";
+
   if (!adminStatus && myProfile?.role === "Student") {
     redirect("/profile");
   }
 
-  if (adminStatus && !rolePermissions.includes("commissions")) {
+  if (adminStatus && !rolePermissions.includes("finance")) {
     redirect("/");
   }
 
@@ -93,7 +96,7 @@ const Page = async () => {
   // Filter only Converted leads
   leads = leads.filter(
     (lead: ILead) =>
-      lead.quotationStatus === true && lead.paymentStatus === "Accepted"
+      lead.quotationStatus === true && notAcceptedOrMissing(lead.paymentStatus)
   );
 
   let quotations: IQuotation[] = [];
@@ -121,7 +124,8 @@ const Page = async () => {
   // Filter only Converted quotations
   quotations = quotations.filter(
     (quotation: IQuotation) =>
-      quotation.quotationStatus === true && quotation.paymentStatus === "Accepted"
+      quotation.quotationStatus === true &&
+      notAcceptedOrMissing(quotation.paymentStatus)
   );
 
   const mapLeadToCombined = (item: ILead): ICombinedItem => ({
@@ -151,13 +155,17 @@ const Page = async () => {
         {/* Header + Actions */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <h3 className="h3-bold text-center sm:text-left">
-            Received Payments
+            Receivable Payments
           </h3>
         </div>
 
         {/* Table */}
         <div className="overflow-x-auto">
-          <CommissionReceivedTable leads={combinedData} isAdmin={adminStatus} email={email} />
+          <CommissionTable
+            leads={combinedData}
+            isAdmin={adminStatus}
+            email={email}
+          />
         </div>
       </section>
     </>

@@ -70,17 +70,17 @@ const TranscriptForm = ({ type, lead, leadId }: TranscriptFormProps) => {
             title: `${lead?.name}'s transcript updated!`,
             agency: lead?.author || "",
             country: lead?.home?.country || "",
-            route: `/commissions`,
+            route: `/finance`,
           });
           await createTrack({
             student: updatedLead.email,
             event: `${updatedLead.name}'s proof of payment updated`,
-            route: `/commissions`,
+            route: `/finance`,
             status: "Proof of payment Updated",
           });
           form.reset({ transcript: values.transcript || [] });
           toast.success("Lead updated successfully!");
-          router.push("/commissions");
+          router.push("/finance");
         }
       }
     } catch (error) {

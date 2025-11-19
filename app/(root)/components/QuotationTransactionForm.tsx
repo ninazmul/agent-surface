@@ -77,20 +77,20 @@ const QuotationTranscriptForm = ({
             title: `${quotation.name}'s proof of payment updated!`,
             agency: quotation.author || "",
             country: quotation.home?.country || "",
-            route: `/commissions`,
+            route: `/finance`,
           });
 
           // ✅ Track transcript update properly
           await createTrack({
             student: updatedQuotation.email,
             event: `${updatedQuotation.name}'s proof of payment updated`,
-            route: `/commissions`,
+            route: `/finance`,
             status: "Proof of Payment Updated",
           });
 
           form.reset({ transcript: values.transcript || [] });
           toast.success("Quotation updated successfully!");
-          router.push("/commissions");
+          router.push("/finance");
         }
       }
     } catch (error) {
