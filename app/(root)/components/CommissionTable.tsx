@@ -516,7 +516,7 @@ const CommissionTable = ({
 
                         return (
                           <p
-                            className={`px-4 py-2 text-xs font-medium rounded-full border ${statusStyles[status]}`}
+                            className={`px-4 py-2 text-xs font-medium rounded-full border text-center ${statusStyles[status]}`}
                           >
                             {status === "NA" ? "N/A" : status}
                           </p>

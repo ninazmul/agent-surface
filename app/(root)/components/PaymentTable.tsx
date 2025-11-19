@@ -239,7 +239,7 @@ const PaymentTable = ({
                             payment.progress
                           )
                         }
-                        className={`text-xs px-4 py-2 font-medium rounded-full border flex items-center gap-1 ${progressStyles[status]}`}
+                        className={`text-xs px-4 py-2 font-medium rounded-full border flex items-center justify-center gap-1 ${progressStyles[status]}`}
                         disabled={!isAdmin}
                       >
                         {status}
