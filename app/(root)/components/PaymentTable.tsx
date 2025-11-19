@@ -121,11 +121,11 @@ const PaymentTable = ({
         placeholder="Search by any field"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full max-w-md rounded-2xl"
+        className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
 
       <div
-        className="overflow-x-auto rounded-2xl bg-amber-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -150,12 +150,12 @@ const PaymentTable = ({
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>#</TableHead>
+              <TableHead className="text-white cursor-pointer">#</TableHead>
               <TableHead
+                className="text-white cursor-pointer whitespace-nowrap"
                 onClick={() => handleSort("agency")}
-                className="cursor-pointer whitespace-nowrap"
               >
                 <div className="flex items-center gap-1">
                   Agency{" "}
@@ -163,12 +163,18 @@ const PaymentTable = ({
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Payment Method</TableHead>
-              <TableHead>Account Details</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Amount
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Payment Method
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Account Details
+              </TableHead>
               <TableHead
+                className="text-white cursor-pointer whitespace-nowrap"
                 onClick={() => handleSort("progress")}
-                className="cursor-pointer whitespace-nowrap"
               >
                 <div className="flex items-center gap-1">
                   Progress{" "}
@@ -176,14 +182,18 @@ const PaymentTable = ({
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              {isAdmin && <TableHead>Actions</TableHead>}
+              {isAdmin && (
+                <TableHead className="text-white cursor-pointer">
+                  Actions
+                </TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedPayments.map((payment, idx) => (
               <TableRow
                 key={payment._id.toString()}
-                className="hover:bg-amber-100 dark:bg-gray-800"
+                className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + idx + 1}
@@ -208,35 +218,35 @@ const PaymentTable = ({
                   </Popover>
                 </TableCell>
                 <TableCell>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() =>
-                      handleToggleProgress(
-                        payment._id.toString(),
-                        payment.progress
-                      )
-                    }
-                    className="text-xs"
-                    disabled={!isAdmin}
-                  >
-                    {payment.progress == "Pending" ? (
-                      <div className="border-yellow-400 text-yellow-500 hover:bg-yellow-50 flex items-center gap-1">
-                        {payment.progress}
+                  {(() => {
+                    const progressStyles: Record<string, string> = {
+                      Pending:
+                        "bg-yellow-100 text-yellow-600 border-yellow-300",
+                      "In Progress":
+                        "bg-blue-100 text-blue-600 border-blue-300",
+                      Completed: "bg-green-100 text-green-600 border-green-300",
+                    };
+
+                    const status = payment.progress || "Pending";
+
+                    return (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handleToggleProgress(
+                            payment._id.toString(),
+                            payment.progress
+                          )
+                        }
+                        className={`text-xs px-4 py-2 font-medium rounded-full border flex items-center gap-1 ${progressStyles[status]}`}
+                        disabled={!isAdmin}
+                      >
+                        {status}
                         {isAdmin && <RefreshCcw className="ml-1 h-3 w-3" />}
-                      </div>
-                    ) : payment.progress == "In Progress" ? (
-                      <div className="border-blue-400 text-blue-500 hover:bg-blue-50 flex items-center gap-1">
-                        {payment.progress}
-                        {isAdmin && <RefreshCcw className="ml-1 h-3 w-3" />}
-                      </div>
-                    ) : (
-                      <div className="border-green-500 text-green-600 hover:bg-green-50 flex items-center gap-1">
-                        {payment.progress}
-                        {isAdmin && <RefreshCcw className="ml-1 h-3 w-3" />}
-                      </div>
-                    )}
-                  </Button>
+                      </Button>
+                    );
+                  })()}
                 </TableCell>
                 {isAdmin && (
                   <>
