@@ -199,7 +199,7 @@ const DownloadTable = ({
                 <TableCell>
                   <a
                     href={`mailto:${download.email}`}
-                    className="text-blue-800 dark:text-blue-400 font-semibold underline"
+                    className=""
                     target="_blank"
                   >
                     {download.email}
@@ -208,13 +208,15 @@ const DownloadTable = ({
                 <TableCell>
                   <a
                     href={`mailto:${download.author}`}
-                    className="text-blue-800 dark:text-blue-400 font-semibold underline"
+                    className=""
                     target="_blank"
                   >
                     {download.author}
                   </a>
                 </TableCell>
-                <TableCell>{formatDateTime(download.date).dateOnly}</TableCell>
+                <TableCell className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border">
+                  {formatDateTime(download.date).dateOnly}
+                </TableCell>
                 <TableCell>
                   {download.documents?.length > 0 ? (
                     <select
@@ -222,7 +224,7 @@ const DownloadTable = ({
                         const selectedUrl = e.target.value;
                         if (selectedUrl) window.open(selectedUrl, "_blank");
                       }}
-                      className="text-sm border border-gray-300 rounded-md px-2 py-1"
+                      className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border"
                     >
                       <option value="">Select Document</option>
                       {download.documents.map((doc, idx) => (
@@ -232,7 +234,7 @@ const DownloadTable = ({
                       ))}
                     </select>
                   ) : (
-                    <span className="text-gray-500 text-sm italic">
+                    <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border">
                       No documents
                     </span>
                   )}
@@ -241,17 +243,17 @@ const DownloadTable = ({
                 {isAdmin && (
                   <TableCell className="flex items-center space-x-2">
                     <a href={`/downloads/${download._id.toString()}/update`}>
-                      <Button variant="outline" size="icon">
-                        <Pencil className="w-4 h-4 text-purple-500" />
+                      <Button variant="ghost" size="icon">
+                        <Pencil className="w-4 h-4 text-black" />
                       </Button>
                     </a>
                     <Button
                       onClick={() =>
                         setConfirmDeleteId(download._id.toString())
                       }
-                      variant={"outline"}
+                      variant={"ghost"}
                       size={"icon"}
-                      className="text-red-500"
+                      className="text-black"
                     >
                       <Trash />
                     </Button>
