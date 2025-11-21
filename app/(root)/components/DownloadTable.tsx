@@ -216,7 +216,7 @@ const DownloadTable = ({
                 </TableCell>
                 <TableCell>
                   {" "}
-                  <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border">
+                  <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border w-full">
                     {formatDateTime(download.date).dateOnly}
                   </span>
                 </TableCell>
@@ -227,7 +227,7 @@ const DownloadTable = ({
                         const selectedUrl = e.target.value;
                         if (selectedUrl) window.open(selectedUrl, "_blank");
                       }}
-                      className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border w-full"
+                      className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border w-52 text-center"
                     >
                       <option value="">Select Document</option>
                       {download.documents.map((doc, idx) => (
@@ -237,7 +237,7 @@ const DownloadTable = ({
                       ))}
                     </select>
                   ) : (
-                    <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border w-full">
+                    <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border w-52 text-center">
                       No documents
                     </span>
                   )}
