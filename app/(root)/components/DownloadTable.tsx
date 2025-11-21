@@ -214,20 +214,20 @@ const DownloadTable = ({
                     {download.author}
                   </a>
                 </TableCell>
-                <TableCell>
-                  {" "}
-                  <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border w-full">
+                <TableCell className="w-52">
+                  <span className="block w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border">
                     {formatDateTime(download.date).dateOnly}
                   </span>
                 </TableCell>
-                <TableCell>
+
+                <TableCell className="w-52">
                   {download.documents?.length > 0 ? (
                     <select
                       onChange={(e) => {
                         const selectedUrl = e.target.value;
                         if (selectedUrl) window.open(selectedUrl, "_blank");
                       }}
-                      className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border w-52 text-center"
+                      className="block w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
                     >
                       <option value="">Select Document</option>
                       {download.documents.map((doc, idx) => (
@@ -237,7 +237,7 @@ const DownloadTable = ({
                       ))}
                     </select>
                   ) : (
-                    <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border w-52 text-center">
+                    <span className="block w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center">
                       No documents
                     </span>
                   )}
