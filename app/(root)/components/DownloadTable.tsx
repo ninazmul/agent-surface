@@ -256,9 +256,8 @@ const DownloadTable = ({
                       }
                       variant={"ghost"}
                       size={"icon"}
-                      className="text-black"
                     >
-                      <Trash />
+                      <Trash className="w-4 h-4 text-red-600" />
                     </Button>
                   </TableCell>
                 )}

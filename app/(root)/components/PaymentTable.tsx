@@ -290,9 +290,8 @@ const PaymentTable = ({
                           }
                           variant="ghost"
                           size="icon"
-                          className="text-black"
                         >
-                          <Trash size={18} />
+                          <Trash className="w-4 h-4 text-red-600"/>
                         </Button>
                       </div>
                     </TableCell>
