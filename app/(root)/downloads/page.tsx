@@ -14,6 +14,7 @@ import {
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { redirect } from "next/navigation";
 import { IDownload } from "@/lib/database/models/download.model";
+import { Plus } from "lucide-react";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -57,23 +58,24 @@ const Page = async () => {
 
   return (
     <>
-      <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
-        {/* Header + Actions */}
+      <section className="p-4">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <h3 className="h3-bold text-center sm:text-left">All Docs</h3>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
             {adminStatus && (
               <a href={`/downloads/create`} className="w-full sm:w-auto">
-                <Button size="lg" className="rounded-full w-full sm:w-auto">
-                  Add Docs
+                <Button
+                  size="sm"
+                  className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+                >
+                  <Plus size={16} /> Add Docs
                 </Button>
               </a>
             )}
           </div>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto">
           <DownloadTable downloads={downloads} isAdmin={adminStatus} />
         </div>
