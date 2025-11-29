@@ -163,9 +163,6 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
         {/* Date Filter Dropdown */}
         <div>
-          <label className="block text-sm font-medium text-cyan-700 dark:text-gray-100 mb-1">
-            Date Range
-          </label>
           <select
             value={dateFilterType}
             onChange={(e) =>
@@ -215,7 +212,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Calendar */}
-        <div className="w-full md:w-2/3 bg-gray-100 dark:bg-gray-500">
+        <div className="w-full md:w-2/3 bg-gray-100 dark:bg-gray-500 border ">
           <Calendar
             mode="single"
             selected={selectedDate}
@@ -237,7 +234,8 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
               }),
             }}
             modifiersClassNames={{
-              highlighted: "bg-blue-100 border-2 border-blue-500 dark:bg-gray-600",
+              highlighted:
+                "bg-blue-100 border-2 border-blue-500 dark:bg-gray-600",
             }}
             className="w-full"
           />
@@ -267,11 +265,11 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
               <p className="text-gray-500 dark:text-gray-300">
                 Running Events:
               </p>
-              <ul className="space-y-4 grid grid-cols-2 gap-4">
+              <ul className="space-y-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                 {eventsOnSelectedDate.map((evt) => (
                   <li
                     key={evt.id}
-                    className="p-4 rounded-2xl cursor-pointer border"
+                    className="p-4 rounded-2xl cursor-pointer border h-full"
                     style={{
                       backgroundColor: evt.backgroundColor,
                       borderColor: evt.borderColor,
@@ -290,23 +288,30 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
               </ul>
               {/* Type Filter Dropdown */}
               <div>
-                <label className="block text-sm font-medium text-cyan-700 dark:text-gray-100 mb-1">
-                  Event Type
-                </label>
-                <select
-                  value={activeTypeFilter}
-                  onChange={(e) => setActiveTypeFilter(e.target.value)}
-                  className="rounded-2xl bg-cyan-100 dark:bg-gray-500 px-3 py-2 text-sm"
-                >
-                  <option value="all">All</option>
-                  {Object.keys(typeColors)
-                    .filter((t) => t !== "default")
-                    .map((type) => (
-                      <option key={type} value={type} className="line-clamp-1">
+                <p className="text-gray-500 dark:text-gray-300">Event Types:</p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    "all",
+                    ...Object.keys(typeColors).filter((t) => t !== "default"),
+                  ].map((type) => {
+                    const isActive = activeTypeFilter === type;
+                    return (
+                      <div
+                        key={type}
+                        onClick={() => setActiveTypeFilter(type)}
+                        className={`cursor-pointer px-4 py-2 rounded-2xl text-sm font-medium transition
+                      ${
+                        isActive
+                          ? "bg-cyan-500 text-white"
+                          : "bg-cyan-100 dark:bg-gray-600 text-cyan-700 dark:text-gray-200"
+                      }
+                      hover:bg-cyan-400 dark:hover:bg-gray-500`}
+                      >
                         {type.replace(/_/g, " ")}
-                      </option>
-                    ))}
-                </select>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}
