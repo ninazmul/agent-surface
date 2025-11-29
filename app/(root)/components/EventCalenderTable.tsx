@@ -157,7 +157,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
   });
 
   return (
-    <div className="p-4 max-w-6xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-md">
+    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
       {/* Filters */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
         {/* Date Filter Dropdown */}
