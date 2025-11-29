@@ -212,7 +212,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Calendar */}
-        <div className="w-full md:w-2/3 bg-gray-100 dark:bg-gray-500 border ">
+        <div className="w-full md:w-2/3 bg-gray-100 dark:bg-gray-500 border rounded">
           <Calendar
             mode="single"
             selected={selectedDate}
