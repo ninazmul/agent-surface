@@ -217,7 +217,6 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
       const start = startOfDay(evt.start as Date);
       const end = endOfDay(evt.end as Date);
 
-      // overlap between event interval and the selected day
       return start <= selEnd && end >= selStart;
     });
   }, [filteredEvents, selectedDate]);
