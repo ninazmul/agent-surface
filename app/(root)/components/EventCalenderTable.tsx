@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Calendar } from "@/components/ui/calendar";
 import {
   format,
   startOfWeek,
@@ -157,17 +158,45 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
   });
 
   return (
-    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
+    <div className="p-4 max-w-6xl mx-auto bg-cyan-50 dark:bg-gray-800 rounded-2xl shadow-md">
+      <h2 className="text-3xl font-bold mb-6 text-center text-cyan-800 dark:text-gray-100">
+        Event Calendar
+      </h2>
+
       {/* Filters */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        {/* Type Filter Dropdown */}
+        <div>
+          <label className="block text-sm font-medium text-cyan-700 dark:text-gray-100 mb-1">
+            Event Type
+          </label>
+          <select
+            value={activeTypeFilter}
+            onChange={(e) => setActiveTypeFilter(e.target.value)}
+            className="rounded-2xl bg-cyan-100 dark:bg-gray-500 px-3 py-2 text-sm"
+          >
+            <option value="all">All</option>
+            {Object.keys(typeColors)
+              .filter((t) => t !== "default")
+              .map((type) => (
+                <option key={type} value={type} className="line-clamp-1">
+                  {type.replace(/_/g, " ")}
+                </option>
+              ))}
+          </select>
+        </div>
+
         {/* Date Filter Dropdown */}
         <div>
+          <label className="block text-sm font-medium text-cyan-700 dark:text-gray-100 mb-1">
+            Date Range
+          </label>
           <select
             value={dateFilterType}
             onChange={(e) =>
               setDateFilterType(e.target.value as DateFilterType)
             }
-            className="border-none text-black dark:text-gray-100"
+            className="rounded-2xl bg-cyan-100 dark:bg-gray-500 px-3 py-2 text-sm"
           >
             <option value="week">This Week</option>
             <option value="month">This Month</option>
@@ -176,33 +205,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
           </select>
         </div>
 
-        {/* Type Filter Dropdown */}
-        <div>
-          <div className="flex flex-wrap gap-2">
-            {[
-              "all",
-              ...Object.keys(typeColors).filter((t) => t !== "default"),
-            ].map((type) => {
-              const isActive = activeTypeFilter === type;
-              return (
-                <div
-                  key={type}
-                  onClick={() => setActiveTypeFilter(type)}
-                  className={`cursor-pointer px-4 py-2 rounded-2xl text-sm font-medium transition
-                      ${
-                        isActive
-                          ? "bg-cyan-500 text-white"
-                          : "bg-cyan-100 dark:bg-gray-600 text-cyan-700 dark:text-gray-200"
-                      }
-                      hover:bg-cyan-400 dark:hover:bg-gray-500`}
-                >
-                  {type.replace(/_/g, " ")}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
+        {/* Custom Date Picker */}
         {dateFilterType === "custom" && (
           <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
             <div className="w-full md:w-auto">
@@ -236,73 +239,48 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6">
-        {/* Calendar - Regular Grid View */}
-        <div className="w-full md:w-1/2">
-          <div className="grid grid-cols-7 gap-1">
-            {/* Weekday Labels */}
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <div
-                key={day}
-                className="text-center font-semibold text-cyan-700 dark:text-gray-100"
-              >
-                {day}
-              </div>
-            ))}
-
-            {/* Dates */}
-            {(() => {
-              const start = startOfMonth(selectedDate);
-              const end = endOfMonth(selectedDate);
-              const days = [];
-              const firstDayIndex = start.getDay();
-
-              // Empty slots for alignment
-              for (let i = 0; i < firstDayIndex; i++) {
-                days.push(<div key={`empty-${i}`} />);
-              }
-
-              for (let d = start; d <= end; d.setDate(d.getDate() + 1)) {
-                const currentDate = new Date(d);
-                const isSelected =
-                  currentDate.toDateString() === selectedDate.toDateString();
-                const hasEvent = filteredEvents.some(
-                  (evt) =>
-                    new Date(evt.start) <= currentDate &&
-                    new Date(evt.end || evt.start) >= currentDate
-                );
-
-                days.push(
-                  <div
-                    key={currentDate.toDateString()}
-                    className={`cursor-pointer p-2 rounded-md text-center transition
-              ${
-                isSelected
-                  ? "bg-cyan-500 text-white"
-                  : "bg-white dark:bg-gray-700 text-black dark:text-gray-100"
-              }
-              ${hasEvent && !isSelected ? "border-2 border-indigo-400" : ""}
-              hover:bg-cyan-200 dark:hover:bg-gray-600`}
-                    onClick={() => setSelectedDate(new Date(currentDate))}
-                  >
-                    {currentDate.getDate()}
-                  </div>
-                );
-              }
-              return days;
-            })()}
-          </div>
+        {/* Calendar */}
+        <div className="w-full md:w-1/2 bg-cyan-100 dark:bg-gray-500 rounded-2xl">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            required={true}
+            modifiers={{
+              highlighted: filteredEvents.flatMap((evt) => {
+                const start = new Date(evt.start);
+                const end = new Date(evt.end || evt.start);
+                const dates = [];
+                for (
+                  let d = new Date(start);
+                  d <= end;
+                  d.setDate(d.getDate() + 1)
+                ) {
+                  dates.push(new Date(d));
+                }
+                return dates;
+              }),
+            }}
+            modifiersClassNames={{
+              highlighted: "bg-indigo-200 dark:bg-gray-600 rounded-md",
+            }}
+            className="w-full"
+          />
         </div>
 
         {/* Events for selected date */}
         <div className="w-full md:w-1/2">
           {isAdmin && (
             <a href={`/events/create`} className="w-full">
-              <Button size="lg" className="rounded-2xl w-full bg-black text-gray-100">
+              <Button
+                size="lg"
+                className="rounded-2xl w-full bg-black text-gray-100"
+              >
                 Create Event
               </Button>
             </a>
           )}
-          <h3 className="text-xl font-semibold mb-2 text-cyan-700 dark:text-gray-100">
+          <h3 className="text-xl font-semibold mb-2 text-cyan-700 dark:text-gray-100 mt-6">
             {selectedDate ? format(selectedDate, "PPP") : "Select a date"}
           </h3>
           {eventsOnSelectedDate.length === 0 ? (
@@ -338,6 +316,51 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
             </>
           )}
         </div>
+      </div>
+
+      {/* Table View */}
+      <div className="mt-10 overflow-x-auto">
+        <h3 className="text-2xl font-semibold mb-4 text-cyan-700 dark:text-gray-100">
+          Events ({filteredEvents.length})
+        </h3>
+        <table className="min-w-full rounded-2xl bg-cyan-100 dark:bg-gray-700">
+          <thead className="bg-cyan-150">
+            <tr>
+              <th className="text-left py-2 px-4 border-b">Title</th>
+              <th className="text-left py-2 px-4 border-b">Type</th>
+              <th className="text-left py-2 px-4 border-b">Start</th>
+              <th className="text-left py-2 px-4 border-b">End</th>
+              <th className="text-left py-2 px-4 border-b">Offer Expiry</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredEvents.map((evt) => (
+              <tr
+                key={evt.id}
+                className="hover:bg-cyan-200 dark:hover:bg-gray-800 cursor-pointer"
+                onClick={() => setSelectedEvent(evt)}
+              >
+                <td className="py-2 px-4 border-b line-clamp-1">{evt.title}</td>
+                <td className="py-2 px-4 border-b capitalize">
+                  {evt.extendedProps.type?.replace(/_/g, " ") || "N/A"}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {new Date(evt.start).toLocaleDateString()}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {evt.end ? new Date(evt.end).toLocaleDateString() : "-"}
+                </td>
+                <td className="py-2 px-4 border-b">
+                  {evt.extendedProps.offerExpiryDate
+                    ? new Date(
+                        evt.extendedProps.offerExpiryDate
+                      ).toLocaleDateString()
+                    : "-"}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       {/* Event Detail Modal */}
