@@ -10,7 +10,6 @@ import {
   endOfMonth,
   startOfYear,
   endOfYear,
-  isWithinInterval,
   startOfDay,
   endOfDay,
   isValid,
@@ -49,10 +48,16 @@ type DateFilterType = "week" | "month" | "year" | "custom";
 const parseDateSafe = (d?: string | Date | null): Date | null => {
   if (!d) return null;
   if (d instanceof Date) return isValid(d) ? d : null;
-  // ensure ISO-like string becomes a consistent Date by forcing T00:00:00 when only date
-  const iso = d.includes("T") ? d : `${d}T00:00:00`;
-  const dt = new Date(iso);
-  return isValid(dt) ? dt : null;
+  // If string looks like 'YYYY-MM-DD' (no 'T'), append 'T00:00:00' for local time.
+  // If it's ISO with time (contains 'T'), leave as-is.
+  try {
+    const str = String(d);
+    const isoLike = str.includes("T") ? str : `${str}T00:00:00`;
+    const dt = new Date(isoLike);
+    return isValid(dt) ? dt : null;
+  } catch {
+    return null;
+  }
 };
 
 const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
@@ -85,9 +90,8 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
           return {
             id: event._id.toString(),
             title: event.title,
-            start: event.startDate || new Date(),
-            end:
-              event.endDate || event.startDate || event.startDate || new Date(),
+            start: event.startDate || new Date().toISOString(),
+            end: event.endDate || event.startDate || new Date().toISOString(),
             backgroundColor: colors.bg,
             borderColor: colors.border,
             extendedProps: {
@@ -118,18 +122,18 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
     switch (dateFilterType) {
       case "week":
         return {
-          start: startOfWeek(selectedDate),
-          end: endOfWeek(selectedDate),
+          start: startOfDay(startOfWeek(selectedDate)),
+          end: endOfDay(endOfWeek(selectedDate)),
         };
       case "month":
         return {
-          start: startOfMonth(selectedDate),
-          end: endOfMonth(selectedDate),
+          start: startOfDay(startOfMonth(selectedDate)),
+          end: endOfDay(endOfMonth(selectedDate)),
         };
       case "year":
         return {
-          start: startOfYear(selectedDate),
-          end: endOfYear(selectedDate),
+          start: startOfDay(startOfYear(selectedDate)),
+          end: endOfDay(endOfYear(selectedDate)),
         };
       case "custom": {
         if (!customRange.start || !customRange.end) return null;
@@ -138,7 +142,6 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
         const end = parseDateSafe(customRange.end);
         if (!start || !end) return null;
 
-        // include whole days for inclusive comparisons
         return { start: startOfDay(start), end: endOfDay(end) };
       }
       default:
@@ -155,6 +158,14 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
         const start = parseDateSafe(evt.start);
         const end = parseDateSafe(evt.end || evt.start);
         if (!start || !end) return null;
+        // ensure start <= end
+        if (start > end) {
+          // swap if inconsistent
+          return { ...evt, start: end, end: start } as CalendarEvent & {
+            start: Date;
+            end: Date;
+          };
+        }
         return { ...evt, start, end } as CalendarEvent & {
           start: Date;
           end: Date;
@@ -176,12 +187,8 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
       const eventStart = event.start as Date;
       const eventEnd = event.end as Date;
 
-      // event intersects filter range if any part lies within, or it fully contains the range
-      return (
-        isWithinInterval(eventStart, filterRange) ||
-        isWithinInterval(eventEnd, filterRange) ||
-        (eventStart < filterRange.start && eventEnd > filterRange.end)
-      );
+      // overlap test: eventStart <= filterEnd && eventEnd >= filterStart
+      return eventStart <= filterRange.end && eventEnd >= filterRange.start;
     });
   }, [formattedEvents, activeTypeFilter, filterRange]);
 
@@ -210,7 +217,8 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
       const start = startOfDay(evt.start as Date);
       const end = endOfDay(evt.end as Date);
 
-      return selStart <= end && selEnd >= start;
+      // overlap between event interval and the selected day
+      return start <= selEnd && end >= selStart;
     });
   }, [filteredEvents, selectedDate]);
 
