@@ -308,7 +308,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
                       <div
                         key={type}
                         onClick={() => setActiveTypeFilter(type)}
-                        className={`${widthClass} cursor-pointer px-4 py-2 rounded-2xl text-sm font-medium transition
+                        className={`${widthClass} cursor-pointer p-4 rounded-2xl text-sm font-medium transition
                   ${
                     isActive
                       ? "bg-cyan-500 text-white"
