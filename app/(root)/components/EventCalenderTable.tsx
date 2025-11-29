@@ -201,8 +201,7 @@ const EventCalendar = () => {
             })}
           </div>
         </div>
-
-        {/* Custom Date Picker */}
+        
         {dateFilterType === "custom" && (
           <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
             <div className="w-full md:w-auto">
