@@ -241,7 +241,6 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
           />
         </div>
 
-        {/* Events for selected date */}
         <div className="w-full md:w-1/3">
           {isAdmin && (
             <a href={`/events/create`} className="w-full">
@@ -253,9 +252,11 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
               </Button>
             </a>
           )}
+
           <h3 className="text-xl font-semibold mb-2 text-cyan-700 dark:text-gray-100 mt-6">
             {selectedDate ? format(selectedDate, "PPP") : "Select a date"}
           </h3>
+
           {eventsOnSelectedDate.length === 0 ? (
             <p className="text-gray-500 dark:text-gray-300">
               No events for this date.
@@ -265,11 +266,13 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
               <p className="text-gray-500 dark:text-gray-300">
                 Running Events:
               </p>
-              <ul className="space-y-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+              {/* Events Grid */}
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {eventsOnSelectedDate.map((evt) => (
                   <li
                     key={evt.id}
-                    className="p-4 rounded-2xl cursor-pointer border h-full"
+                    className="p-4 rounded-2xl cursor-pointer border h-full flex flex-col justify-between transition hover:shadow-lg"
                     style={{
                       backgroundColor: evt.backgroundColor,
                       borderColor: evt.borderColor,
@@ -286,26 +289,32 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
                   </li>
                 ))}
               </ul>
-              {/* Type Filter Dropdown */}
+
+              {/* Event Type Filters */}
               <div>
                 <p className="text-gray-500 dark:text-gray-300">Event Types:</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-2 mt-2">
                   {[
                     "all",
                     ...Object.keys(typeColors).filter((t) => t !== "default"),
                   ].map((type) => {
                     const isActive = activeTypeFilter === type;
+
+                    // "All" button full width on large screens
+                    const widthClass =
+                      type === "all" ? "w-full lg:w-full" : "w-auto";
+
                     return (
                       <div
                         key={type}
                         onClick={() => setActiveTypeFilter(type)}
-                        className={`cursor-pointer px-4 py-2 rounded-2xl text-sm font-medium transition
-                      ${
-                        isActive
-                          ? "bg-cyan-500 text-white"
-                          : "bg-cyan-100 dark:bg-gray-600 text-cyan-700 dark:text-gray-200"
-                      }
-                      hover:bg-cyan-400 dark:hover:bg-gray-500`}
+                        className={`${widthClass} cursor-pointer px-4 py-2 rounded-2xl text-sm font-medium transition
+                  ${
+                    isActive
+                      ? "bg-cyan-500 text-white"
+                      : "bg-cyan-100 dark:bg-gray-600 text-cyan-700 dark:text-gray-200"
+                  }
+                  hover:bg-cyan-400 dark:hover:bg-gray-500`}
                       >
                         {type.replace(/_/g, " ")}
                       </div>
