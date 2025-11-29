@@ -100,72 +100,75 @@ const EventCalendarForm = ({
         onSubmit={form.handleSubmit(onSubmit)}
         className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm"
       >
-        {/* ===== Event Info ===== */}
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-            Event Information
-          </h2>
-        </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Title */}
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter event title" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="space-y-2 pt-4">
+            <h2 className="text-xl font-semibold text-gray-800">
+              Event Information
+            </h2>
+            <p className="text-sm text-gray-500">
+              Write a brief description of the event.
+            </p>
+            {/* Title */}
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter event title" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Description */}
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter event description" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter event description" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Event Type */}
-          <FormField
-            control={form.control}
-            name="eventType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Event Type</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="application_deadline">
-                      Application Deadline
-                    </option>
-                    <option value="enrollment_period">Enrollment Period</option>
-                    <option value="course_start">Course Start Date</option>
-                    <option value="offer_promotion">Offer / Promotion</option>
-                    <option value="webinar_event">Webinar / Event</option>
-                    <option value="holiday_closure">
-                      Holiday / College Closure
-                    </option>
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Event Type */}
+            <FormField
+              control={form.control}
+              name="eventType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Event Type</FormLabel>
+                  <FormControl>
+                    <select
+                      {...field}
+                      className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="application_deadline">
+                        Application Deadline
+                      </option>
+                      <option value="enrollment_period">
+                        Enrollment Period
+                      </option>
+                      <option value="course_start">Course Start Date</option>
+                      <option value="offer_promotion">Offer / Promotion</option>
+                      <option value="webinar_event">Webinar / Event</option>
+                      <option value="holiday_closure">
+                        Holiday / College Closure
+                      </option>
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
           {/* ===== Event Dates ===== */}
           <div className="space-y-2 pt-4">
