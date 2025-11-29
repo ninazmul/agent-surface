@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import {
   format,
@@ -11,6 +11,9 @@ import {
   startOfYear,
   endOfYear,
   isWithinInterval,
+  startOfDay,
+  endOfDay,
+  isValid,
 } from "date-fns";
 import { getAllEventCalendars } from "@/lib/actions/eventCalender.actions";
 import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
@@ -43,6 +46,15 @@ const typeColors: Record<string, { bg: string; border: string }> = {
 
 type DateFilterType = "week" | "month" | "year" | "custom";
 
+const parseDateSafe = (d?: string | Date | null): Date | null => {
+  if (!d) return null;
+  if (d instanceof Date) return isValid(d) ? d : null;
+  // ensure ISO-like string becomes a consistent Date by forcing T00:00:00 when only date
+  const iso = d.includes("T") ? d : `${d}T00:00:00`;
+  const dt = new Date(iso);
+  return isValid(dt) ? dt : null;
+};
+
 const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -57,9 +69,13 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
   }>({});
 
   useEffect(() => {
+    let mounted = true;
+
     const fetchEvents = async () => {
       try {
         const result: IEventCalendar[] = await getAllEventCalendars();
+
+        if (!mounted) return;
 
         const formatted = result.map((event) => {
           const colors =
@@ -70,7 +86,8 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
             id: event._id.toString(),
             title: event.title,
             start: event.startDate || new Date(),
-            end: event.endDate || event.startDate || new Date(),
+            end:
+              event.endDate || event.startDate || event.startDate || new Date(),
             backgroundColor: colors.bg,
             borderColor: colors.border,
             extendedProps: {
@@ -79,7 +96,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
               offerExpiryDate: event.offerExpiryDate,
               email: event.email,
             },
-          };
+          } as CalendarEvent;
         });
 
         setEvents(formatted);
@@ -89,10 +106,15 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
     };
 
     fetchEvents();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  const getFilterRange = (): { start: Date; end: Date } | null => {
+  const getFilterRange = useCallback((): { start: Date; end: Date } | null => {
     if (!selectedDate) return null;
+
     switch (dateFilterType) {
       case "week":
         return {
@@ -109,53 +131,88 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
           start: startOfYear(selectedDate),
           end: endOfYear(selectedDate),
         };
-      case "custom":
-        if (customRange.start && customRange.end) {
-          return {
-            start: new Date(customRange.start),
-            end: new Date(customRange.end),
-          };
-        }
-        return null;
+      case "custom": {
+        if (!customRange.start || !customRange.end) return null;
+
+        const start = parseDateSafe(customRange.start);
+        const end = parseDateSafe(customRange.end);
+        if (!start || !end) return null;
+
+        // include whole days for inclusive comparisons
+        return { start: startOfDay(start), end: endOfDay(end) };
+      }
       default:
         return null;
     }
-  };
+  }, [dateFilterType, customRange, selectedDate]);
 
-  const filterRange = getFilterRange();
+  const filterRange = useMemo(() => getFilterRange(), [getFilterRange]);
 
-  const filteredEvents = events.filter((event) => {
-    const typeMatch =
-      activeTypeFilter === "all"
-        ? true
-        : event.extendedProps.type === activeTypeFilter;
+  const formattedEvents = useMemo(() => {
+    // normalize event start/end to Date and drop invalid events
+    return events
+      .map((evt) => {
+        const start = parseDateSafe(evt.start);
+        const end = parseDateSafe(evt.end || evt.start);
+        if (!start || !end) return null;
+        return { ...evt, start, end } as CalendarEvent & {
+          start: Date;
+          end: Date;
+        };
+      })
+      .filter(Boolean) as (CalendarEvent & { start: Date; end: Date })[];
+  }, [events]);
 
-    if (!typeMatch) return false;
+  const filteredEvents = useMemo(() => {
+    return formattedEvents.filter((event) => {
+      const typeMatch =
+        activeTypeFilter === "all"
+          ? true
+          : event.extendedProps.type === activeTypeFilter;
+      if (!typeMatch) return false;
 
-    if (!filterRange) return true;
+      if (!filterRange) return true;
 
-    const eventStart = new Date(event.start);
-    const eventEnd = new Date(event.end || event.start);
+      const eventStart = event.start as Date;
+      const eventEnd = event.end as Date;
 
-    return (
-      isWithinInterval(eventStart, filterRange) ||
-      isWithinInterval(eventEnd, filterRange) ||
-      (eventStart < filterRange.start && eventEnd > filterRange.end)
-    );
-  });
+      // event intersects filter range if any part lies within, or it fully contains the range
+      return (
+        isWithinInterval(eventStart, filterRange) ||
+        isWithinInterval(eventEnd, filterRange) ||
+        (eventStart < filterRange.start && eventEnd > filterRange.end)
+      );
+    });
+  }, [formattedEvents, activeTypeFilter, filterRange]);
 
-  const eventsOnSelectedDate = filteredEvents.filter((evt) => {
-    const selected = selectedDate.toDateString();
-    const start = new Date(evt.start).toDateString();
-    const end = new Date(evt.end || evt.start).toDateString();
+  const highlightedDates = useMemo(() => {
+    // produce unique dates for calendar modifiers to avoid duplicates
+    const set = new Map<number, Date>();
 
-    return (
-      selected === start ||
-      selected === end ||
-      (new Date(evt.start) <= selectedDate &&
-        new Date(evt.end || evt.start) >= selectedDate)
-    );
-  });
+    for (const evt of filteredEvents) {
+      const start = startOfDay(evt.start as Date);
+      const end = startOfDay(evt.end as Date);
+
+      for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+        const key = new Date(d).setHours(0, 0, 0, 0);
+        if (!set.has(key)) set.set(key, new Date(d));
+      }
+    }
+
+    return Array.from(set.values());
+  }, [filteredEvents]);
+
+  const eventsOnSelectedDate = useMemo(() => {
+    const selStart = startOfDay(selectedDate);
+    const selEnd = endOfDay(selectedDate);
+
+    return filteredEvents.filter((evt) => {
+      const start = startOfDay(evt.start as Date);
+      const end = endOfDay(evt.end as Date);
+
+      return selStart <= end && selEnd >= start;
+    });
+  }, [filteredEvents, selectedDate]);
 
   return (
     <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
@@ -219,19 +276,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
             onSelect={setSelectedDate}
             required={true}
             modifiers={{
-              highlighted: filteredEvents.flatMap((evt) => {
-                const start = new Date(evt.start);
-                const end = new Date(evt.end || evt.start);
-                const dates = [];
-                for (
-                  let d = new Date(start);
-                  d <= end;
-                  d.setDate(d.getDate() + 1)
-                ) {
-                  dates.push(new Date(d));
-                }
-                return dates;
-              }),
+              highlighted: highlightedDates,
             }}
             modifiersClassNames={{
               highlighted:
