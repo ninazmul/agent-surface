@@ -222,19 +222,6 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
     });
   }, [filteredEvents, selectedDate]);
 
-  useEffect(() => {
-    if (!filterRange) return;
-    // Auto-sync selected day to start of filter range
-    if (dateFilterType !== "custom") {
-      setSelectedDate(filterRange.start);
-    } else {
-      if (customRange.start) {
-        const d = parseDateSafe(customRange.start);
-        if (d) setSelectedDate(d);
-      }
-    }
-  }, [dateFilterType, filterRange, customRange.start]);
-
   return (
     <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
       {/* Filters */}
