@@ -215,7 +215,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Calendar */}
-        <div className="w-full md:w-1/2 bg-cyan-100 dark:bg-gray-500 rounded-2xl">
+        <div className="w-full md:w-2/3 bg-cyan-100 dark:bg-gray-500 rounded-2xl">
           <Calendar
             mode="single"
             selected={selectedDate}
@@ -244,7 +244,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
         </div>
 
         {/* Events for selected date */}
-        <div className="w-full md:w-1/2">
+        <div className="w-full md:w-1/3">
           {isAdmin && (
             <a href={`/events/create`} className="w-full">
               <Button
