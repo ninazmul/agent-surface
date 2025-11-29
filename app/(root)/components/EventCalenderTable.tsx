@@ -160,7 +160,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
   return (
     <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
       {/* Filters */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 w-full md:w-2/3">
         {/* Date Filter Dropdown */}
         <div>
           <select
@@ -168,7 +168,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
             onChange={(e) =>
               setDateFilterType(e.target.value as DateFilterType)
             }
-            className="border-none text-black dark:text-gray-100"
+            className="border-none text-black dark:text-gray-100 text-xl"
           >
             <option value="week">This Week</option>
             <option value="month">This Month</option>
@@ -181,7 +181,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
         {dateFilterType === "custom" && (
           <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
             <div className="w-full md:w-auto">
-              <label className="block text-sm font-medium text-cyan-700 dark:text-gray-100">
+              <label className="block text-lg font-medium text-cyan-700 dark:text-gray-100">
                 From
               </label>
               <input
@@ -190,11 +190,11 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
                 onChange={(e) =>
                   setCustomRange((prev) => ({ ...prev, start: e.target.value }))
                 }
-                className="w-full border rounded px-2 py-1 text-sm"
+                className="w-full border rounded px-2 py-1 text-lg"
               />
             </div>
             <div className="w-full md:w-auto">
-              <label className="block text-sm font-medium text-cyan-700 dark:text-gray-100">
+              <label className="block text-lg font-medium text-cyan-700 dark:text-gray-100">
                 To
               </label>
               <input
@@ -203,7 +203,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
                 onChange={(e) =>
                   setCustomRange((prev) => ({ ...prev, end: e.target.value }))
                 }
-                className="w-full border rounded px-2 py-1 text-sm"
+                className="w-full border rounded px-2 py-1 text-lg"
               />
             </div>
           </div>
@@ -212,7 +212,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Calendar */}
-        <div className="w-full md:w-2/3 bg-gray-100 dark:bg-gray-500 border rounded">
+        <div className="w-full md:w-2/3 bg-gray-100 dark:bg-gray-500 border rounded-2xl">
           <Calendar
             mode="single"
             selected={selectedDate}
