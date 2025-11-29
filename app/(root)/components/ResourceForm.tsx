@@ -110,31 +110,30 @@ const ResourceForm = ({ type, resource, resourceId }: ResourceFormProps) => {
         {/* Section: Resource Info */}
         <div className="space-y-2">
           <h2 className="text-xl font-semibold text-purple-800 dark:text-gray-100">
-            Resource Information
+            Add New Resource
           </h2>
         </div>
 
-        {/* File Name */}
-        <FormField
-          control={form.control}
-          name="fileName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>File Name</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter file name"
-                  {...field}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* File Name */}
+          <FormField
+            control={form.control}
+            name="fileName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>File Name</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter file name"
+                    {...field}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Category and Custom Category */}
-        <div className="grid grid-cols-1 gap-4">
           <FormField
             control={form.control}
             name="category"
@@ -164,29 +163,29 @@ const ResourceForm = ({ type, resource, resourceId }: ResourceFormProps) => {
               </FormItem>
             )}
           />
-
-          <FormField
-            control={form.control}
-            name="customCategory"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Or Add New Category</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter custom category"
-                    {...field}
-                    onChange={(e) => {
-                      field.onChange(e.target.value);
-                      if (e.target.value) form.setValue("category", "");
-                    }}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
         </div>
+
+        <FormField
+          control={form.control}
+          name="customCategory"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Or Add New Category</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter custom category"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    if (e.target.value) form.setValue("category", "");
+                  }}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         {/* File Upload */}
         <FormField
@@ -213,7 +212,7 @@ const ResourceForm = ({ type, resource, resourceId }: ResourceFormProps) => {
             type="submit"
             size="lg"
             disabled={form.formState.isSubmitting}
-            className="w-full rounded-2xl"
+            className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
           >
             {form.formState.isSubmitting
               ? "Uploading..."
