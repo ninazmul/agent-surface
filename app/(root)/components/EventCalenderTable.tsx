@@ -291,7 +291,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
               </ul>
 
               {/* Event Type Filters */}
-              <div>
+              <div className="space-y-4">
                 <p className="text-gray-500 dark:text-gray-300">Event Types:</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
@@ -302,13 +302,15 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
 
                     // "All" button full width on large screens
                     const widthClass =
-                      type === "all" ? "w-full lg:w-full" : "w-auto";
+                      type === "all"
+                        ? "w-full md:w-full md:col-span-2"
+                        : "w-auto";
 
                     return (
                       <div
                         key={type}
                         onClick={() => setActiveTypeFilter(type)}
-                        className={`${widthClass} p-4 rounded-2xl cursor-pointer border h-full flex flex-col justify-between transition hover:shadow-lg
+                        className={`${widthClass} uppercase text-center p-4 rounded-2xl cursor-pointer border h-full transition hover:shadow-lg
                   ${
                     isActive
                       ? "bg-purple-500 text-white"
