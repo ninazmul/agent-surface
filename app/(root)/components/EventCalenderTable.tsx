@@ -158,11 +158,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
   });
 
   return (
-    <div className="p-4 max-w-6xl mx-auto bg-cyan-50 dark:bg-gray-800 rounded-2xl shadow-md">
-      <h2 className="text-3xl font-bold mb-6 text-center text-cyan-800 dark:text-gray-100">
-        Event Calendar
-      </h2>
-
+    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
       {/* Filters */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
         {/* Date Filter Dropdown */}
@@ -175,7 +171,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
             onChange={(e) =>
               setDateFilterType(e.target.value as DateFilterType)
             }
-            className="rounded-2xl bg-cyan-100 dark:bg-gray-500 px-3 py-2 text-sm"
+            className="border-none text-black dark:text-gray-100"
           >
             <option value="week">This Week</option>
             <option value="month">This Month</option>
@@ -267,7 +263,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
               No events for this date.
             </p>
           ) : (
-            <>
+            <div className="space-y-4">
               <p className="text-gray-500 dark:text-gray-300">
                 Running Events:
               </p>
@@ -312,7 +308,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
                     ))}
                 </select>
               </div>
-            </>
+            </div>
           )}
         </div>
       </div>
