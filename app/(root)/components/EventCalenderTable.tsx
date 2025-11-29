@@ -165,27 +165,6 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
 
       {/* Filters */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
-        {/* Type Filter Dropdown */}
-        <div>
-          <label className="block text-sm font-medium text-cyan-700 dark:text-gray-100 mb-1">
-            Event Type
-          </label>
-          <select
-            value={activeTypeFilter}
-            onChange={(e) => setActiveTypeFilter(e.target.value)}
-            className="rounded-2xl bg-cyan-100 dark:bg-gray-500 px-3 py-2 text-sm"
-          >
-            <option value="all">All</option>
-            {Object.keys(typeColors)
-              .filter((t) => t !== "default")
-              .map((type) => (
-                <option key={type} value={type} className="line-clamp-1">
-                  {type.replace(/_/g, " ")}
-                </option>
-              ))}
-          </select>
-        </div>
-
         {/* Date Filter Dropdown */}
         <div>
           <label className="block text-sm font-medium text-cyan-700 dark:text-gray-100 mb-1">
@@ -313,6 +292,26 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
                   </li>
                 ))}
               </ul>
+              {/* Type Filter Dropdown */}
+              <div>
+                <label className="block text-sm font-medium text-cyan-700 dark:text-gray-100 mb-1">
+                  Event Type
+                </label>
+                <select
+                  value={activeTypeFilter}
+                  onChange={(e) => setActiveTypeFilter(e.target.value)}
+                  className="rounded-2xl bg-cyan-100 dark:bg-gray-500 px-3 py-2 text-sm"
+                >
+                  <option value="all">All</option>
+                  {Object.keys(typeColors)
+                    .filter((t) => t !== "default")
+                    .map((type) => (
+                      <option key={type} value={type} className="line-clamp-1">
+                        {type.replace(/_/g, " ")}
+                      </option>
+                    ))}
+                </select>
+              </div>
             </>
           )}
         </div>
