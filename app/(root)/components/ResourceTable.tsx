@@ -95,15 +95,15 @@ const ResourceTable = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Input
         placeholder="Search by File Name or category"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
+        className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
       <div
-        className="overflow-x-auto rounded-2xl bg-purple-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -128,10 +128,10 @@ const ResourceTable = ({
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">#</TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("fileName")}
                   className="flex items-center gap-2 cursor-pointer"
@@ -141,7 +141,7 @@ const ResourceTable = ({
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("category")}
                   className="flex items-center gap-2 cursor-pointer"
@@ -151,8 +151,14 @@ const ResourceTable = ({
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>Download</TableHead>
-              {isAdmin && <TableHead>Actions</TableHead>}
+              <TableHead className="text-white cursor-pointer">
+                Download
+              </TableHead>
+              {isAdmin && (
+                <TableHead className="text-white cursor-pointer">
+                  Actions
+                </TableHead>
+              )}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -177,13 +183,9 @@ const ResourceTable = ({
                 </TableCell>
                 <TableCell>
                   <a href={resource.link} target="_blank">
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      className="text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400"
-                    >
-                      Download
-                    </Button>
+                    <span className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center">
+                      Download File
+                    </span>
                   </a>
                 </TableCell>
 
@@ -191,18 +193,18 @@ const ResourceTable = ({
                   <>
                     <TableCell className="flex items-center space-x-2">
                       <a href={`/resources/${resource._id.toString()}/update`}>
-                        <Button variant="outline" size="icon">
-                          <Pencil className="w-4 h-4 text-purple-500" />
+                        <Button variant="ghost" size="icon">
+                          <Pencil className="w-4 h-4 text-black" />
                         </Button>
                       </a>
                       <Button
                         onClick={() =>
                           setConfirmDeleteId(resource._id.toString())
                         }
-                        variant={"outline"}
-                        className="text-red-500"
+                        variant={"ghost"}
+                        size={"icon"}
                       >
-                        <Trash />
+                        <Trash className="w-4 h-4 text-red-600" />
                       </Button>
                     </TableCell>
                   </>
@@ -219,22 +221,22 @@ const ResourceTable = ({
           {Math.min(itemsPerPage * currentPage, filteredResources.length)} of{" "}
           {filteredResources.length} resources
         </span>
-        <div className="flex items-center space-x-2">
+        <div className="flex gap-2">
           <Button
+            size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p - 1)}
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-            size={"sm"}
-            className="rounded-2xl"
           >
             Previous
           </Button>
           <Button
+            size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage === Math.ceil(filteredResources.length / itemsPerPage)
             }
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            size={"sm"}
-            className="rounded-2xl"
           >
             Next
           </Button>
