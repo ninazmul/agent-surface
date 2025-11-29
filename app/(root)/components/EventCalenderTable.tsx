@@ -215,7 +215,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
 
       <div className="flex flex-col md:flex-row gap-6">
         {/* Calendar */}
-        <div className="w-full md:w-2/3 bg-cyan-100 dark:bg-gray-500 rounded-2xl">
+        <div className="w-full md:w-2/3 bg-gray-100 dark:bg-gray-500">
           <Calendar
             mode="single"
             selected={selectedDate}
@@ -237,7 +237,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
               }),
             }}
             modifiersClassNames={{
-              highlighted: "bg-indigo-200 dark:bg-gray-600 rounded-md",
+              highlighted: "bg-blue-100 border-2 border-blue-500 dark:bg-gray-600",
             }}
             className="w-full"
           />
@@ -311,51 +311,6 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Table View */}
-      <div className="mt-10 overflow-x-auto">
-        <h3 className="text-2xl font-semibold mb-4 text-cyan-700 dark:text-gray-100">
-          Events ({filteredEvents.length})
-        </h3>
-        <table className="min-w-full rounded-2xl bg-cyan-100 dark:bg-gray-700">
-          <thead className="bg-cyan-150">
-            <tr>
-              <th className="text-left py-2 px-4 border-b">Title</th>
-              <th className="text-left py-2 px-4 border-b">Type</th>
-              <th className="text-left py-2 px-4 border-b">Start</th>
-              <th className="text-left py-2 px-4 border-b">End</th>
-              <th className="text-left py-2 px-4 border-b">Offer Expiry</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredEvents.map((evt) => (
-              <tr
-                key={evt.id}
-                className="hover:bg-cyan-200 dark:hover:bg-gray-800 cursor-pointer"
-                onClick={() => setSelectedEvent(evt)}
-              >
-                <td className="py-2 px-4 border-b line-clamp-1">{evt.title}</td>
-                <td className="py-2 px-4 border-b capitalize">
-                  {evt.extendedProps.type?.replace(/_/g, " ") || "N/A"}
-                </td>
-                <td className="py-2 px-4 border-b">
-                  {new Date(evt.start).toLocaleDateString()}
-                </td>
-                <td className="py-2 px-4 border-b">
-                  {evt.end ? new Date(evt.end).toLocaleDateString() : "-"}
-                </td>
-                <td className="py-2 px-4 border-b">
-                  {evt.extendedProps.offerExpiryDate
-                    ? new Date(
-                        evt.extendedProps.offerExpiryDate
-                      ).toLocaleDateString()
-                    : "-"}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
 
       {/* Event Detail Modal */}
