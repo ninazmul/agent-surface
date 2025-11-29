@@ -13,6 +13,7 @@ import {
 } from "date-fns";
 import { getAllEventCalendars } from "@/lib/actions/eventCalender.actions";
 import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
+import { Button } from "@/components/ui/button";
 
 type CalendarEvent = {
   id: string;
@@ -41,7 +42,7 @@ const typeColors: Record<string, { bg: string; border: string }> = {
 
 type DateFilterType = "week" | "month" | "year" | "custom";
 
-const EventCalendar = () => {
+const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
@@ -201,7 +202,7 @@ const EventCalendar = () => {
             })}
           </div>
         </div>
-        
+
         {dateFilterType === "custom" && (
           <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
             <div className="w-full md:w-auto">
@@ -294,6 +295,13 @@ const EventCalendar = () => {
 
         {/* Events for selected date */}
         <div className="w-full md:w-1/2">
+          {isAdmin && (
+            <a href={`/events/create`} className="w-full sm:w-auto">
+              <Button size="lg" className="rounded-2xl w-full sm:w-auto">
+                Create Event
+              </Button>
+            </a>
+          )}
           <h3 className="text-xl font-semibold mb-2 text-cyan-700 dark:text-gray-100">
             {selectedDate ? format(selectedDate, "PPP") : "Select a date"}
           </h3>
@@ -302,27 +310,32 @@ const EventCalendar = () => {
               No events for this date.
             </p>
           ) : (
-            <ul className="space-y-4">
-              {eventsOnSelectedDate.map((evt) => (
-                <li
-                  key={evt.id}
-                  className="p-4 rounded-2xl cursor-pointer border"
-                  style={{
-                    backgroundColor: evt.backgroundColor,
-                    borderColor: evt.borderColor,
-                    borderWidth: "2px",
-                  }}
-                  onClick={() => setSelectedEvent(evt)}
-                >
-                  <h4 className="text-lg font-bold dark:text-black">
-                    {evt.title}
-                  </h4>
-                  <p className="text-sm capitalize dark:text-black">
-                    {evt.extendedProps.type?.replace(/_/g, " ") || "N/A"}
-                  </p>
-                </li>
-              ))}
-            </ul>
+            <>
+              <p className="text-gray-500 dark:text-gray-300">
+                Running Events:
+              </p>
+              <ul className="space-y-4 grid grid-cols-2 gap-4">
+                {eventsOnSelectedDate.map((evt) => (
+                  <li
+                    key={evt.id}
+                    className="p-4 rounded-2xl cursor-pointer border"
+                    style={{
+                      backgroundColor: evt.backgroundColor,
+                      borderColor: evt.borderColor,
+                      borderWidth: "2px",
+                    }}
+                    onClick={() => setSelectedEvent(evt)}
+                  >
+                    <h4 className="text-lg font-bold dark:text-black">
+                      {evt.title}
+                    </h4>
+                    <p className="text-sm capitalize dark:text-black">
+                      {evt.extendedProps.type?.replace(/_/g, " ") || "N/A"}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
         </div>
       </div>
