@@ -298,10 +298,10 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
           {isAdmin && (
             <a href={`/events/create`} className="w-full">
               <Button
-                size="sm"
-                className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1 w-full"
+                size="lg"
+                className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white text-lg flex items-center gap-1 w-full"
               >
-                <Plus size={16} /> Add Lead
+                Create Event <Plus size={16} />
               </Button>
             </a>
           )}
