@@ -293,7 +293,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
               {/* Event Type Filters */}
               <div>
                 <p className="text-gray-500 dark:text-gray-300">Event Types:</p>
-                <div className="flex flex-wrap gap-2 mt-2">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   {[
                     "all",
                     ...Object.keys(typeColors).filter((t) => t !== "default"),
@@ -308,13 +308,13 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
                       <div
                         key={type}
                         onClick={() => setActiveTypeFilter(type)}
-                        className={`${widthClass} cursor-pointer p-4 rounded-2xl text-sm font-medium transition
+                        className={`${widthClass} p-4 rounded-2xl cursor-pointer border h-full flex flex-col justify-between transition hover:shadow-lg
                   ${
                     isActive
-                      ? "bg-cyan-500 text-white"
-                      : "bg-cyan-100 dark:bg-gray-600 text-cyan-700 dark:text-gray-200"
+                      ? "bg-purple-500 text-white"
+                      : "bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200"
                   }
-                  hover:bg-cyan-400 dark:hover:bg-gray-500`}
+                  hover:bg-purple-400 dark:hover:bg-purple-500`}
                       >
                         {type.replace(/_/g, " ")}
                       </div>
