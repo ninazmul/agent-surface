@@ -56,7 +56,6 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
     end?: string;
   }>({});
 
-  // Fetch Events
   useEffect(() => {
     const fetchEvents = async () => {
       try {
@@ -92,8 +91,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
     fetchEvents();
   }, []);
 
-  // Date range logic
-  const getFilterRange = () => {
+  const getFilterRange = (): { start: Date; end: Date } | null => {
     if (!selectedDate) return null;
     switch (dateFilterType) {
       case "week":
@@ -126,7 +124,6 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
 
   const filterRange = getFilterRange();
 
-  // Type + date filtered events
   const filteredEvents = events.filter((event) => {
     const typeMatch =
       activeTypeFilter === "all"
@@ -134,6 +131,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
         : event.extendedProps.type === activeTypeFilter;
 
     if (!typeMatch) return false;
+
     if (!filterRange) return true;
 
     const eventStart = new Date(event.start);
@@ -160,75 +158,71 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
   });
 
   return (
-    <div className="p-6 bg-white dark:bg-gray-900 rounded-3xl shadow-lg border border-gray-100 dark:border-gray-700">
-      {/* Top Filters */}
-      <div className="flex flex-col md:flex-row justify-between gap-4 mb-6">
-        {/* Date Filter */}
-        <div className="flex flex-col">
-          <label className="text-sm font-semibold mb-1 text-gray-700 dark:text-gray-200">
-            Date Filter
-          </label>
+    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
+      {/* Filters */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        {/* Date Filter Dropdown */}
+        <div>
           <select
             value={dateFilterType}
             onChange={(e) =>
               setDateFilterType(e.target.value as DateFilterType)
             }
-            className="rounded-xl py-2 px-3 border bg-gray-50 dark:bg-gray-800 dark:text-gray-100"
+            className="border-none text-black dark:text-gray-100"
           >
             <option value="week">This Week</option>
             <option value="month">This Month</option>
             <option value="year">This Year</option>
-            <option value="custom">Custom Range</option>
+            <option value="custom">Custom</option>
           </select>
         </div>
 
-        {/* Custom Date Input */}
+        {/* Custom Date Picker */}
         {dateFilterType === "custom" && (
-          <div className="flex gap-2">
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+          <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+            <div className="w-full md:w-auto">
+              <label className="block text-sm font-medium text-cyan-700 dark:text-gray-100">
                 From
-              </span>
+              </label>
               <input
                 type="date"
                 value={customRange.start || ""}
                 onChange={(e) =>
-                  setCustomRange((p) => ({ ...p, start: e.target.value }))
+                  setCustomRange((prev) => ({ ...prev, start: e.target.value }))
                 }
-                className="rounded-xl py-2 px-3 border bg-gray-50 dark:bg-gray-800 dark:text-gray-100"
+                className="w-full border rounded px-2 py-1 text-sm"
               />
             </div>
-
-            <div className="flex flex-col">
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-200">
+            <div className="w-full md:w-auto">
+              <label className="block text-sm font-medium text-cyan-700 dark:text-gray-100">
                 To
-              </span>
+              </label>
               <input
                 type="date"
                 value={customRange.end || ""}
                 onChange={(e) =>
-                  setCustomRange((p) => ({ ...p, end: e.target.value }))
+                  setCustomRange((prev) => ({ ...prev, end: e.target.value }))
                 }
-                className="rounded-xl py-2 px-3 border bg-gray-50 dark:bg-gray-800 dark:text-gray-100"
+                className="w-full border rounded px-2 py-1 text-sm"
               />
             </div>
           </div>
         )}
       </div>
 
-      <div className="flex flex-col md:flex-row gap-8">
+      <div className="flex flex-col md:flex-row gap-6">
         {/* Calendar */}
-        <div className="w-full md:w-2/3 bg-gray-50 dark:bg-gray-800 p-4 rounded-2xl shadow border border-gray-200 dark:border-gray-700">
+        <div className="w-full md:w-2/3 bg-gray-100 dark:bg-gray-500 border rounded">
           <Calendar
             mode="single"
             selected={selectedDate}
             onSelect={setSelectedDate}
-            required
+            required={true}
             modifiers={{
               highlighted: filteredEvents.flatMap((evt) => {
                 const start = new Date(evt.start);
                 const end = new Date(evt.end || evt.start);
-                const dates: Date[] = [];
+                const dates = [];
                 for (
                   let d = new Date(start);
                   d <= end;
@@ -241,140 +235,142 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
             }}
             modifiersClassNames={{
               highlighted:
-                "bg-blue-500 text-white rounded-full border border-blue-600",
+                "bg-blue-100 border-2 border-blue-500 dark:bg-gray-600",
             }}
             className="w-full"
           />
         </div>
 
-        {/* Sidebar */}
         <div className="w-full md:w-1/3">
           {isAdmin && (
-            <a href={`/events/create`} className="w-full block">
+            <a href={`/events/create`} className="w-full">
               <Button
                 size="lg"
-                className="w-full rounded-xl bg-black dark:bg-gray-200 dark:text-black text-white"
+                className="rounded-2xl w-full bg-black text-gray-100"
               >
                 Create Event
               </Button>
             </a>
           )}
 
-          <h3 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mt-6 mb-4">
-            {format(selectedDate, "PPP")}
+          <h3 className="text-xl font-semibold mb-2 text-cyan-700 dark:text-gray-100 mt-6">
+            {selectedDate ? format(selectedDate, "PPP") : "Select a date"}
           </h3>
 
-          {/* Events */}
           {eventsOnSelectedDate.length === 0 ? (
             <p className="text-gray-500 dark:text-gray-300">
-              No events on this date.
+              No events for this date.
             </p>
           ) : (
-            <>
-              <p className="text-gray-600 dark:text-gray-300 mb-2">
-                Running Events
+            <div className="space-y-4">
+              <p className="text-gray-500 dark:text-gray-300">
+                Running Events:
               </p>
 
-              <div className="grid grid-cols-1 gap-4">
+              {/* Events Grid */}
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {eventsOnSelectedDate.map((evt) => (
-                  <div
+                  <li
                     key={evt.id}
-                    className="rounded-xl p-4 shadow cursor-pointer border-2 flex flex-col gap-1 hover:scale-[1.02] transition"
+                    className="p-4 rounded-2xl cursor-pointer border h-full flex flex-col justify-between transition hover:shadow-lg"
                     style={{
                       backgroundColor: evt.backgroundColor,
                       borderColor: evt.borderColor,
+                      borderWidth: "2px",
                     }}
                     onClick={() => setSelectedEvent(evt)}
                   >
-                    <h4 className="text-lg font-bold">{evt.title}</h4>
-                    <span className="text-sm opacity-80">
-                      {evt.extendedProps.type?.replace(/_/g, " ")}
-                    </span>
-                  </div>
+                    <h4 className="text-lg font-bold dark:text-black">
+                      {evt.title}
+                    </h4>
+                    <p className="text-sm capitalize dark:text-black">
+                      {evt.extendedProps.type?.replace(/_/g, " ") || "N/A"}
+                    </p>
+                  </li>
                 ))}
+              </ul>
+
+              {/* Event Type Filters */}
+              <div>
+                <p className="text-gray-500 dark:text-gray-300">Event Types:</p>
+                <div className="flex flex-wrap gap-2 mt-2">
+                  {[
+                    "all",
+                    ...Object.keys(typeColors).filter((t) => t !== "default"),
+                  ].map((type) => {
+                    const isActive = activeTypeFilter === type;
+
+                    // "All" button full width on large screens
+                    const widthClass =
+                      type === "all" ? "w-full lg:w-full" : "w-auto";
+
+                    return (
+                      <div
+                        key={type}
+                        onClick={() => setActiveTypeFilter(type)}
+                        className={`${widthClass} cursor-pointer px-4 py-2 rounded-2xl text-sm font-medium transition
+                  ${
+                    isActive
+                      ? "bg-cyan-500 text-white"
+                      : "bg-cyan-100 dark:bg-gray-600 text-cyan-700 dark:text-gray-200"
+                  }
+                  hover:bg-cyan-400 dark:hover:bg-gray-500`}
+                      >
+                        {type.replace(/_/g, " ")}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-            </>
-          )}
-
-          {/* Event Type Filter */}
-          <div className="mt-6">
-            <p className="text-gray-600 dark:text-gray-300 mb-2">Event Types</p>
-
-            <div className="flex flex-wrap gap-2">
-              {[
-                "all",
-                ...Object.keys(typeColors).filter((t) => t !== "default"),
-              ].map((type) => {
-                const active = activeTypeFilter === type;
-
-                return (
-                  <button
-                    key={type}
-                    onClick={() => setActiveTypeFilter(type)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition ${
-                      active
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 dark:bg-gray-700 dark:text-gray-200 text-gray-700"
-                    }`}
-                  >
-                    {type.replace(/_/g, " ")}
-                  </button>
-                );
-              })}
             </div>
-          </div>
+          )}
         </div>
       </div>
 
-      {/* Modal */}
+      {/* Event Detail Modal */}
       {selectedEvent && (
         <div
-          className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50"
+          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
           onClick={() => setSelectedEvent(null)}
+          role="dialog"
         >
           <div
-            className="bg-white dark:bg-gray-800 rounded-2xl p-6 w-full max-w-lg shadow-xl border border-gray-200 dark:border-gray-700"
+            className="bg-cyan-50 text-black p-6 rounded-2xl shadow-lg max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-2xl font-bold mb-2">{selectedEvent.title}</h3>
-
-            <p className="mb-1">
+            <h3 className="text-xl font-bold mb-2">{selectedEvent.title}</h3>
+            <p className="mb-2">
               <strong>Type:</strong>{" "}
               {selectedEvent.extendedProps.type?.replace(/_/g, " ") || "N/A"}
             </p>
-
-            <p className="mb-3">{selectedEvent.extendedProps.description}</p>
-
-            <p className="mb-1">
+            <p className="mb-2">{selectedEvent.extendedProps.description}</p>
+            <p className="mb-2">
               <strong>Start:</strong>{" "}
               {new Date(selectedEvent.start).toLocaleDateString()}
             </p>
-
-            <p className="mb-3">
+            <p className="mb-2">
               <strong>End:</strong>{" "}
               {selectedEvent.end
                 ? new Date(selectedEvent.end).toLocaleDateString()
                 : "-"}
             </p>
-
             {selectedEvent.extendedProps.offerExpiryDate && (
-              <p className="mb-3 text-yellow-600 font-semibold">
+              <p className="mb-2 text-yellow-700 font-semibold">
                 Offer Expires:{" "}
                 {new Date(
                   selectedEvent.extendedProps.offerExpiryDate
                 ).toLocaleDateString()}
               </p>
             )}
-
             {selectedEvent.extendedProps.email && (
-              <p className="mb-3">
-                <strong>Contact:</strong> {selectedEvent.extendedProps.email}
+              <p className="mb-2">
+                <strong>Contact Email:</strong>{" "}
+                {selectedEvent.extendedProps.email}
               </p>
             )}
-
             <button
               onClick={() => setSelectedEvent(null)}
-              className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
             >
               Close
             </button>
