@@ -296,8 +296,8 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
         {/* Events for selected date */}
         <div className="w-full md:w-1/2">
           {isAdmin && (
-            <a href={`/events/create`} className="w-full sm:w-auto">
-              <Button size="lg" className="rounded-2xl w-full sm:w-auto">
+            <a href={`/events/create`} className="w-full">
+              <Button size="lg" className="rounded-2xl w-full bg-black text-gray-100">
                 Create Event
               </Button>
             </a>
