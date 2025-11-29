@@ -17,6 +17,7 @@ import {
 import { getAllEventCalendars } from "@/lib/actions/eventCalender.actions";
 import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
 import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
 
 type CalendarEvent = {
   id: string;
@@ -297,10 +298,10 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
           {isAdmin && (
             <a href={`/events/create`} className="w-full">
               <Button
-                size="lg"
-                className="rounded-2xl w-full bg-black text-gray-100"
+                size="sm"
+                className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1 w-full"
               >
-                Create Event
+                <Plus size={16} /> Add Lead
               </Button>
             </a>
           )}
