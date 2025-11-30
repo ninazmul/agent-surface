@@ -93,15 +93,15 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Input
         placeholder="Search title, description, country..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full max-w-md rounded-2xl"
+        className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
       <div
-        className="overflow-x-auto rounded-2xl bg-fuchsia-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -126,26 +126,38 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>#</TableHead>
+              <TableHead className="text-white cursor-pointer">#</TableHead>
+              <TableHead className="text-white cursor-pointer">Photo</TableHead>
               <TableHead
+                className="text-white cursor-pointer"
                 onClick={() => handleSort("title")}
-                className="cursor-pointer"
               >
                 Title{" "}
                 {sortKey === "title" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Criteria</TableHead>
-              <TableHead>Date</TableHead>
-              <TableHead>Courses & Services</TableHead>
-              <TableHead>Countries</TableHead>
-              <TableHead>Agencies</TableHead>
-              <TableHead>SKU</TableHead>
-              <TableHead>Photo</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Description
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Criteria
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">Date</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Courses & Services
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Countries
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Agencies
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">SKU</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
 
@@ -153,10 +165,24 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
             {paginatedPromotions.map((promotion, index) => (
               <TableRow
                 key={promotion._id.toString()}
-                className="hover:bg-fuchsia-100 dark:hover:bg-gray-800"
+                className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}
+                </TableCell>
+                {/* Photo */}
+                <TableCell>
+                  {promotion.photo ? (
+                    <Image
+                      src={promotion.photo}
+                      alt="Photo"
+                      width={50}
+                      height={50}
+                      className="rounded"
+                    />
+                  ) : (
+                    "-"
+                  )}
                 </TableCell>
                 <TableCell>{promotion.title}</TableCell>
                 <TableCell className="max-w-40 truncate">
@@ -166,7 +192,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                   {promotion.criteria}
                 </TableCell>
                 <TableCell>
-                  {formatDateTime(promotion.startDate).dateOnly} -{" "}
+                  {formatDateTime(promotion.startDate).dateOnly} <br />
                   {formatDateTime(promotion.endDate).dateOnly}
                 </TableCell>
 
@@ -178,9 +204,9 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="rounded-xl text-xs"
+                          className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
                         >
-                          View
+                          View Details
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-64 p-3 space-y-2 rounded-xl shadow-lg">
@@ -227,7 +253,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="rounded-xl text-xs"
+                          className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
                         >
                           {promotion.countries.length} Countries
                         </Button>
@@ -258,7 +284,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="rounded-xl text-xs"
+                          className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
                         >
                           {promotion.agencies.length} Agencies
                         </Button>
@@ -282,21 +308,6 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                 </TableCell>
 
                 <TableCell>{promotion.sku}</TableCell>
-
-                {/* Photo */}
-                <TableCell>
-                  {promotion.photo ? (
-                    <Image
-                      src={promotion.photo}
-                      alt="Photo"
-                      width={50}
-                      height={50}
-                      className="rounded"
-                    />
-                  ) : (
-                    "-"
-                  )}
-                </TableCell>
 
                 {/* Actions */}
                 <TableCell className="relative text-right">
@@ -387,23 +398,23 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
           {Math.min(currentPage * itemsPerPage, filteredPromotions.length)} of{" "}
           {filteredPromotions.length}
         </span>
-        <div className="space-x-2">
+        <div className="flex gap-2">
           <Button
             size="sm"
-            disabled={currentPage === 1}
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p - 1)}
-            className="rounded-2xl"
+            disabled={currentPage === 1}
           >
             Previous
           </Button>
           <Button
             size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage ===
               Math.ceil(filteredPromotions.length / itemsPerPage)
             }
-            onClick={() => setCurrentPage((p) => p + 1)}
-            className="rounded-2xl"
           >
             Next
           </Button>
