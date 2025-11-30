@@ -72,7 +72,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
                 src={promotion.photo || "/assets/images/logo.png"}
                 alt={promotion.title}
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="object-cover group-hover:scale-105 transition-transform duration-300 bg-gray-300 dark:bg-gray-700"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent group-hover:scale-105 transition-transform duration-300" />
             </div>
