@@ -19,6 +19,7 @@ import { redirect } from "next/navigation";
 import { IEvent } from "@/lib/database/models/event.model";
 import EventForm from "../../components/EventForm";
 import EventTable from "../../components/EventTable";
+import { Plus } from "lucide-react";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -54,15 +55,16 @@ const Page = async () => {
 
   return (
     <>
-      <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
+      <section className="p-4">
         <Sheet>
           <div className="wrapper flex flex-wrap justify-between items-center gap-4 mx-auto">
-            <div className="flex items-center gap-2">
-              <h3 className="h3-bold text-center sm:text-left">Our Events</h3>
-            </div>
+            <h3 className="h3-bold text-center sm:text-left">Our Events</h3>
             <SheetTrigger className="w-full md:w-max">
-              <Button size="lg" className="rounded-full w-full">
-                Add Event
+              <Button
+                size="sm"
+                className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+              >
+                <Plus size={16} /> Add Event
               </Button>
             </SheetTrigger>
           </div>
