@@ -222,11 +222,11 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
               </h4>
               <a
                 href={`/promotions/${promotion._id.toString()}/leads/create`}
-                className="w-full sm:w-auto"
+                className="w-full"
               >
                 <button
                   disabled={isPaused}
-                  className={`w-full sm:w-auto px-5 py-2 rounded-lg ${
+                  className={`w-full px-5 py-2 rounded-lg ${
                     isPaused
                       ? "bg-gray-400 cursor-not-allowed text-gray-200"
                       : "bg-gradient-to-r from-fuchsia-600 via-pink-600 to-rose-600 hover:opacity-90 text-white"
