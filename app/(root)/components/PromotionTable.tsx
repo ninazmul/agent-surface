@@ -340,7 +340,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
 
                       {/* Pause / Activate */}
                       <Button
-                        variant={promotion.isPaused ? "destructive" : "outline"}
+                        variant={promotion.isPaused ? "destructive" : "ghost"}
                         className="w-full justify-start gap-2"
                         onClick={async () => {
                           try {
