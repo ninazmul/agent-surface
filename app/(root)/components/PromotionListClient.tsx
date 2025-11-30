@@ -12,12 +12,12 @@ type Props = {
 
 const PromotionListClient = ({ promotions, isAdmin }: Props) => {
   return (
-    <section className="wrapper my-2">
+    <section className="">
       <h3 className="h3-bold text-center sm:text-left mb-6">
         Current Promotions
       </h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 rounded-2xl bg-white dark:bg-gray-800">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 rounded-2xl bg-white dark:bg-gray-800 p-4">
         {promotions.length > 0 ? (
           promotions.map((promotion, index) => (
             <PromotionCard key={index} promotion={promotion} isAdmin={isAdmin} />
