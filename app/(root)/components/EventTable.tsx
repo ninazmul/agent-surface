@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, SortAsc, SortDesc } from "lucide-react";
+import { Trash, SortAsc, SortDesc, Pencil } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -21,7 +21,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import Image from "next/image";
 import EventForm from "./EventForm";
 import { IEvent } from "@/lib/database/models/event.model";
 import toast from "react-hot-toast";
@@ -181,13 +180,8 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
                 <TableCell className="flex items-center space-x-2">
                   <Sheet>
                     <SheetTrigger>
-                      <Button variant="outline" className="text-red-500">
-                        <Image
-                          src="/assets/icons/edit.svg"
-                          alt="edit"
-                          width={20}
-                          height={20}
-                        />
+                      <Button variant="ghost" size="icon">
+                        <Pencil className="w-4 h-4 text-black" />
                       </Button>
                     </SheetTrigger>
                     <SheetContent className="bg-white">
@@ -209,10 +203,10 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
                   </Sheet>
                   <Button
                     onClick={() => setConfirmDeleteId(event._id.toString())}
-                    variant="outline"
-                    className="text-red-500"
+                    variant={"ghost"}
+                    size={"icon"}
                   >
-                    <Trash />
+                    <Trash className="w-4 h-4 text-red-600" />
                   </Button>
                 </TableCell>
               </TableRow>
