@@ -105,7 +105,7 @@ const ResourceForm = ({ type, resource, resourceId }: ResourceFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-6 rounded-2xl bg-gray-50 dark:bg-gray-800 p-6 shadow-sm"
+        className="flex flex-col gap-6 rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm"
       >
         {/* Section: Resource Info */}
         <div className="space-y-2">
