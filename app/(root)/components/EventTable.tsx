@@ -92,15 +92,15 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Input
         placeholder="Search by title, description, or email"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
+        className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
       <div
-        className="overflow-x-auto rounded-2xl bg-cyan-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -125,10 +125,10 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">#</TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("title")}
                   className="flex items-center gap-2 cursor-pointer"
@@ -138,8 +138,10 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Description
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("date")}
                   className="flex items-center gap-2 cursor-pointer"
@@ -150,14 +152,16 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
                 </div>
               </TableHead>
 
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedEvents.map((event, index) => (
               <TableRow
                 key={event._id.toString()}
-                className="hover:bg-cyan-100 dark:hover:bg-gray-800"
+                className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}
@@ -223,22 +227,22 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
           Showing {Math.min(itemsPerPage * currentPage, filteredEvents.length)}{" "}
           of {filteredEvents.length} events
         </span>
-        <div className="flex items-center space-x-2">
+        <div className="flex gap-2">
           <Button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
             size="sm"
-            className="rounded-2xl"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p - 1)}
+            disabled={currentPage === 1}
           >
             Previous
           </Button>
           <Button
+            size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage === Math.ceil(filteredEvents.length / itemsPerPage)
             }
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            size="sm"
-            className="rounded-2xl"
           >
             Next
           </Button>

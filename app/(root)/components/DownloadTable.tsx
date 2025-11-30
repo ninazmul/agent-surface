@@ -103,7 +103,7 @@ const DownloadTable = ({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Input
         placeholder="Search by name or email"
         value={searchQuery}
