@@ -165,7 +165,7 @@ const ResourceTable = ({
             {paginatedResources.map((resource, index) => (
               <TableRow
                 key={resource._id.toString()}
-                className="hover:bg-purple-100"
+                className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}

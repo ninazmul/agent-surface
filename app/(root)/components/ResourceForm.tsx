@@ -105,11 +105,11 @@ const ResourceForm = ({ type, resource, resourceId }: ResourceFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-6 rounded-2xl bg-purple-50 dark:bg-gray-800 p-6 shadow-sm"
+        className="flex flex-col gap-6 rounded-2xl bg-gray-50 dark:bg-gray-800 p-6 shadow-sm"
       >
         {/* Section: Resource Info */}
         <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-purple-800 dark:text-gray-100">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 text-center">
             Add New Resource
           </h2>
         </div>
