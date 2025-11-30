@@ -17,7 +17,7 @@ const PromotionListClient = ({ promotions, isAdmin }: Props) => {
         Current Promotions
       </h3>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 rounded-2xl bg-white dark:bg-gray-800">
         {promotions.length > 0 ? (
           promotions.map((promotion, index) => (
             <PromotionCard key={index} promotion={promotion} isAdmin={isAdmin} />

@@ -87,7 +87,7 @@ const Page = async () => {
   return (
     <>
       {/* Client Promotions */}
-      <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
+      <section className="p-4">
         <PromotionListClient
           promotions={dateFilteredPromotions}
           agency={agency}
