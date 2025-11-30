@@ -66,7 +66,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
       {/* --- Main Promotion Dialog (existing) --- */}
       <Dialog>
         <DialogTrigger asChild>
-          <div className="group bg-gradient-to-b from-fuchsia-100 via-pink-100 to-white dark:from-gray-800 dark:via-gray-900 dark:to-black cursor-pointer shadow-md hover:shadow-lg rounded-2xl overflow-hidden transition-transform hover:scale-[1.02] relative">
+          <div className="group bg-gray-50 dark:from-gray-800 dark:via-gray-900 dark:to-black cursor-pointer shadow-md hover:shadow-lg rounded-2xl overflow-hidden transition-transform hover:scale-[1.02] relative">
             <div className="relative w-full h-56 sm:h-64">
               <Image
                 src={promotion.photo || "/assets/images/logo.png"}
@@ -84,10 +84,10 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
             )}
 
             <div className="p-5">
-              <h3 className="text-lg sm:text-xl font-semibold text-fuchsia-900 dark:text-white group-hover:text-fuchsia-700 dark:group-hover:text-fuchsia-300 transition-colors">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                 {promotion.title}
               </h3>
-              <p className="mt-1 text-sm text-fuchsia-600 dark:text-gray-300 line-clamp-2">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                 {promotion.description}
               </p>
               {promotion.discount && (
@@ -99,9 +99,9 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
           </div>
         </DialogTrigger>
 
-        <DialogContent className="w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 bg-gradient-to-b from-fuchsia-50 via-pink-50 to-white dark:from-gray-800 dark:via-gray-900 dark:to-black rounded-xl shadow-2xl">
+        <DialogContent className="w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 bg-white dark:from-gray-800 dark:via-gray-900 dark:to-black rounded-xl shadow-2xl">
           <DialogHeader>
-            <DialogTitle className="text-xl sm:text-2xl font-bold text-fuchsia-900 dark:text-white">
+            <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
               {promotion.title} {isPaused && "(Paused)"}
             </DialogTitle>
           </DialogHeader>
@@ -121,14 +121,14 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
             <p>{promotion.description}</p>
 
             {promotion.criteria && (
-              <p className="text-purple-700 dark:text-purple-300">
+              <p className="text-gray-700 dark:text-gray-300">
                 <span className="font-medium">Eligibility:</span>{" "}
                 {promotion.criteria}
               </p>
             )}
 
             {promotion.countries && promotion.countries.length > 0 && (
-              <p className="text-blue-700 dark:text-blue-300">
+              <p className="text-gray-700 dark:text-gray-300">
                 <span className="font-medium">Countries:</span>{" "}
                 {promotion.countries.join(", ")}
               </p>
@@ -217,7 +217,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
 
             {/* Create Lead */}
             <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-base font-semibold text-fuchsia-800 dark:text-fuchsia-200 mb-3">
+              <h4 className="text-base font-semibold text-gray-800 dark:text-gray-200 mb-3">
                 ✨ Create Lead
               </h4>
               <a
