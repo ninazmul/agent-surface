@@ -66,7 +66,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
       {/* --- Main Promotion Dialog (existing) --- */}
       <Dialog>
         <DialogTrigger asChild>
-          <div className="group bg-gray-50 dark:from-gray-800 dark:via-gray-900 dark:to-black cursor-pointer shadow-md hover:shadow-lg rounded-2xl overflow-hidden transition-transform hover:scale-[1.02] relative">
+          <div className="group bg-gray-50 dark:bg-black cursor-pointer shadow-md hover:shadow-lg rounded-2xl overflow-hidden transition-transform hover:scale-[1.02] relative">
             <div className="relative w-full h-56 sm:h-64">
               <Image
                 src={promotion.photo || "/assets/images/logo.png"}
@@ -99,7 +99,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
           </div>
         </DialogTrigger>
 
-        <DialogContent className="w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 bg-white dark:from-gray-800 dark:via-gray-900 dark:to-black rounded-xl shadow-2xl">
+        <DialogContent className="w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 bg-white dark:bg-black rounded-xl shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
               {promotion.title} {isPaused && "(Paused)"}
@@ -148,17 +148,17 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
             {/* Courses */}
             {promotion.course && promotion.course.length > 0 && (
               <div>
-                <h4 className="text-base font-semibold text-indigo-800 dark:text-indigo-200 mb-3">
+                <h4 className="text-base font-semibold text-gray-800 dark:text-gray-200 mb-3">
                   🎓 Courses
                 </h4>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {promotion.course.map((c) => (
                     <div
                       key={c.name}
-                      className="border border-indigo-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white/60 dark:bg-gray-800/60"
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white/60 dark:bg-gray-800/60"
                     >
                       <p className="font-medium">{c.name}</p>
-                      <p className="text-xs text-indigo-600 dark:text-gray-400">
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
                         {c.courseType} – {c.courseDuration}
                       </p>
                       <p className="text-xs mt-1">
@@ -184,17 +184,17 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
             {/* Services */}
             {promotion.services && promotion.services.length > 0 && (
               <div>
-                <h4 className="text-base font-semibold text-pink-800 dark:text-pink-200 mb-3">
+                <h4 className="text-base font-semibold text-gray-800 dark:text-gray-200 mb-3">
                   🛠 Services
                 </h4>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {promotion.services.map((s) => (
                     <div
                       key={s._id.toString()}
-                      className="border border-pink-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white/60 dark:bg-gray-800/60"
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white/60 dark:bg-gray-800/60"
                     >
                       <p className="font-medium">{s.title}</p>
-                      <p className="text-xs text-pink-600 dark:text-gray-400">
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
                         {s.serviceType}
                       </p>
                       <p className="text-xs mt-1">{s.description}</p>
