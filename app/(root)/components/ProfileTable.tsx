@@ -306,8 +306,8 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                     className={`flex items-center gap-1 px-4 py-2 text-xs font-medium rounded-full w-full border text-center 
                     ${
                       profile.status === "Pending"
-                        ? "text-yellow-700 bg-yellow-100 border-yellow-300"
-                        : "text-green-700 bg-green-100 border-green-300"
+                        ? "text-yellow-700 bg-yellow-100 hover:bg-yellow-300 border-yellow-300"
+                        : "text-green-700 bg-green-100 hover:bg-green-300 border-green-300"
                     }`}
                   >
                     {profile.status === "Pending" ? <Clock /> : <Check />}
