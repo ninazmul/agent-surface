@@ -65,7 +65,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
   return (
     <div className="relative">
       {/* --- Main Promotion Dialog (existing) --- */}
-      <Dialog>
+      <Dialog onOpenChange={(open) => open && fetchLeads()}>
         <div className="group bg-gray-50 dark:bg-black cursor-pointer shadow-md hover:shadow-lg rounded-2xl overflow-hidden transition-transform hover:scale-[1.02] relative">
           <div className="relative w-full h-56 sm:h-64">
             <Image
@@ -251,77 +251,64 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
               </a>
             </div>
           </div>
+
+          {/* --- Leads Stats Dialog --- */}
+          {isAdmin && (
+            <>
+              {loading ? (
+                <p className="text-sm text-gray-500">Loading stats...</p>
+              ) : leads.length === 0 ? (
+                <p className="text-sm text-gray-500">
+                  No leads found for this promotion.
+                </p>
+              ) : (
+                <div>
+                  <div className="grid gap-6 sm:grid-cols-2 mt-4">
+                    {/* Bar Chart */}
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <BarChart data={stats}>
+                          <XAxis dataKey="name" stroke="#888" />
+                          <YAxis />
+                          <Tooltip />
+                          <Bar
+                            dataKey="value"
+                            fill="#6366f1"
+                            radius={[6, 6, 0, 0]}
+                          />
+                        </BarChart>
+                      </ResponsiveContainer>
+                    </div>
+
+                    {/* Pie Chart */}
+                    <div className="h-64">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={stats}
+                            dataKey="value"
+                            nameKey="name"
+                            cx="50%"
+                            cy="50%"
+                            outerRadius={80}
+                            label
+                          >
+                            {stats.map((_, i) => (
+                              <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                  </div>
+                  <PromotionLeadsStats leads={leads} loading={loading} />
+                </div>
+              )}
+            </>
+          )}
         </DialogContent>
       </Dialog>
-
-      {/* --- Admin Statistics Modal --- */}
-      {isAdmin && (
-        <Dialog onOpenChange={(open) => open && fetchLeads()}>
-          <DialogTrigger asChild>
-            <button className="absolute bottom-3 right-3 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-3 py-1.5 rounded-lg shadow transition">
-              📊 Stats
-            </button>
-          </DialogTrigger>
-          <DialogContent className="w-full max-w-2xl p-6 bg-white dark:bg-gray-900 rounded-xl shadow-2xl">
-            <DialogHeader>
-              <DialogTitle className="text-lg font-bold text-indigo-700 dark:text-indigo-300">
-                Promotion Statistics
-              </DialogTitle>
-            </DialogHeader>
-
-            {loading ? (
-              <p className="text-sm text-gray-500">Loading stats...</p>
-            ) : leads.length === 0 ? (
-              <p className="text-sm text-gray-500">
-                No leads found for this promotion.
-              </p>
-            ) : (
-              <div>
-                <div className="grid gap-6 sm:grid-cols-2 mt-4">
-                  {/* Bar Chart */}
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <BarChart data={stats}>
-                        <XAxis dataKey="name" stroke="#888" />
-                        <YAxis />
-                        <Tooltip />
-                        <Bar
-                          dataKey="value"
-                          fill="#6366f1"
-                          radius={[6, 6, 0, 0]}
-                        />
-                      </BarChart>
-                    </ResponsiveContainer>
-                  </div>
-
-                  {/* Pie Chart */}
-                  <div className="h-64">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={stats}
-                          dataKey="value"
-                          nameKey="name"
-                          cx="50%"
-                          cy="50%"
-                          outerRadius={80}
-                          label
-                        >
-                          {stats.map((_, i) => (
-                            <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                          ))}
-                        </Pie>
-                        <Tooltip />
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                </div>
-                <PromotionLeadsStats leads={leads} loading={loading} />
-              </div>
-            )}
-          </DialogContent>
-        </Dialog>
-      )}
     </div>
   );
 };
