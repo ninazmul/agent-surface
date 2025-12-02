@@ -8,6 +8,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { getLeadsByPromotion } from "@/lib/actions/lead.actions";
 import {
@@ -34,13 +41,13 @@ type Props = {
 const PromotionCard = ({ promotion, isAdmin }: Props) => {
   const isPaused = promotion.isPaused;
 
-  // leads + stats state
+  // leads + stats
   const [leads, setLeads] = useState<ILead[]>([]);
   const [loading, setLoading] = useState(false);
 
   const COLORS = ["#8b5cf6", "#ec4899", "#10b981"];
 
-  // Derived stats
+  // stats data
   const stats = [
     { name: "Leads", value: leads.length },
     {
@@ -53,7 +60,6 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
     },
   ];
 
-  // fetch leads when stats modal opens
   const fetchLeads = async () => {
     if (!promotion.sku) return;
     setLoading(true);
@@ -64,8 +70,8 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
 
   return (
     <div className="relative">
-      {/* --- Main Promotion Dialog (existing) --- */}
-      <Dialog onOpenChange={(open) => open && fetchLeads()}>
+      {/* --- Main Promotion DETAILS Dialog --- */}
+      <Dialog>
         <div className="group bg-gray-50 dark:bg-black cursor-pointer shadow-md hover:shadow-lg rounded-2xl overflow-hidden transition-transform hover:scale-[1.02] relative">
           <div className="relative w-full h-56 sm:h-64">
             <Image
@@ -83,29 +89,32 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
             </span>
           )}
 
-          <div className="p-5 flex justify-between items-center gap-4">
-            <div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+          <div className="p-5 flex justify-between items-center gap-4 relative">
+            <div className="flex-1 pr-4">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300">
                 {promotion.title}
               </h3>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                 {promotion.description}
               </p>
             </div>
+
             <DialogTrigger asChild>
               <button className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-500 text-white shadow">
                 See Details
               </button>
             </DialogTrigger>
+
             {promotion.discount && (
               <span className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full bg-white text-black shadow">
                 €{promotion.discount} OFF
               </span>
             )}
+
             {isAdmin && (
               <a
                 href={`/promotions/${promotion._id.toString()}/update`}
-                className="absolute top-3 right-3 p-2 text-xs font-semibold rounded-full bg-white/50 text-black shadow"
+                className="absolute top-3 right-3 p-2 bg-white/50 rounded-full shadow"
               >
                 <Pencil className="w-3 h-3" />
               </a>
@@ -113,6 +122,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
           </div>
         </div>
 
+        {/* --- Promotion DETAILS Content --- */}
         <DialogContent className="w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 bg-white dark:bg-black rounded-xl shadow-2xl">
           <DialogHeader>
             <DialogTitle className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
@@ -131,18 +141,19 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
             </div>
           )}
 
+          {/* Description */}
           <div className="space-y-5 text-sm leading-relaxed text-gray-700 dark:text-gray-200">
             <p>{promotion.description}</p>
 
             {promotion.criteria && (
-              <p className="text-gray-700 dark:text-gray-300">
+              <p>
                 <span className="font-medium">Eligibility:</span>{" "}
                 {promotion.criteria}
               </p>
             )}
 
             {promotion.countries && promotion.countries.length > 0 && (
-              <p className="text-gray-700 dark:text-gray-300">
+              <p>
                 <span className="font-medium">Countries:</span>{" "}
                 {promotion.countries.join(", ")}
               </p>
@@ -150,11 +161,11 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
 
             <p className="text-xs text-gray-500 dark:text-gray-400">
               Valid from{" "}
-              <span className="font-medium text-emerald-600 dark:text-emerald-400">
+              <span className="font-medium">
                 {new Date(promotion.startDate).toLocaleDateString()}
               </span>{" "}
               to{" "}
-              <span className="font-medium text-rose-600 dark:text-rose-400">
+              <span className="font-medium">
                 {new Date(promotion.endDate).toLocaleDateString()}
               </span>
             </p>
@@ -162,14 +173,12 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
             {/* Courses */}
             {promotion.course && promotion.course.length > 0 && (
               <div>
-                <h4 className="text-base font-semibold text-gray-800 dark:text-gray-200 mb-3">
-                  🎓 Courses
-                </h4>
+                <h4 className="text-base font-semibold mb-3">🎓 Courses</h4>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {promotion.course.map((c) => (
                     <div
                       key={c.name}
-                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white/60 dark:bg-gray-800/60"
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm bg-white/60 dark:bg-gray-800/60"
                     >
                       <p className="font-medium">{c.name}</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -182,7 +191,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
                       <p className="text-xs">
                         <span className="font-medium">Fee:</span> €{c.courseFee}
                       </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
+                      <p className="text-xs text-gray-500 mt-1">
                         {new Date(
                           c.startDate || new Date()
                         ).toLocaleDateString()}{" "}
@@ -198,14 +207,12 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
             {/* Services */}
             {promotion.services && promotion.services.length > 0 && (
               <div>
-                <h4 className="text-base font-semibold text-gray-800 dark:text-gray-200 mb-3">
-                  🛠 Services
-                </h4>
+                <h4 className="text-base font-semibold mb-3">🛠 Services</h4>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {promotion.services.map((s) => (
                     <div
                       key={s._id.toString()}
-                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm hover:shadow-md transition bg-white/60 dark:bg-gray-800/60"
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm bg-white/60 dark:bg-gray-800/60"
                     >
                       <p className="font-medium">{s.title}</p>
                       <p className="text-xs text-gray-600 dark:text-gray-400">
@@ -221,6 +228,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
               </div>
             )}
 
+            {/* Discount */}
             {promotion.discount && (
               <div className="mt-4">
                 <span className="inline-block px-3 py-1 text-sm font-semibold rounded-lg bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 text-white shadow">
@@ -229,86 +237,102 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
               </div>
             )}
 
-            {/* Create Lead */}
+            {/* Create Lead button */}
             <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
-              <h4 className="text-base font-semibold text-gray-800 dark:text-gray-200 mb-3">
-                ✨ Create Lead
-              </h4>
-              <a
-                href={`/promotions/${promotion._id.toString()}/leads/create`}
-                className="w-full"
-              >
+              <h4 className="text-base font-semibold mb-3">✨ Create Lead</h4>
+
+              <a href={`/promotions/${promotion._id.toString()}/leads/create`}>
                 <button
                   disabled={isPaused}
                   className={`w-full px-5 py-2 rounded-lg ${
                     isPaused
                       ? "bg-gray-400 cursor-not-allowed text-gray-200"
                       : "bg-gradient-to-r from-fuchsia-600 via-pink-600 to-rose-600 hover:opacity-90 text-white"
-                  } font-medium shadow transition`}
+                  } font-medium shadow`}
                 >
                   {isPaused ? "Paused" : "Get Started"}
                 </button>
               </a>
             </div>
+
+            {/* --- Admin Stats Sheet Trigger --- */}
+            {isAdmin && (
+              <div className="mt-4 flex justify-end">
+                <SheetTrigger asChild>
+                  <button className="px-4 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white shadow hover:bg-blue-700">
+                    View Stats
+                  </button>
+                </SheetTrigger>
+              </div>
+            )}
           </div>
-
-          {/* --- Leads Stats Dialog --- */}
-          {isAdmin && (
-            <>
-              {loading ? (
-                <p className="text-sm text-gray-500">Loading stats...</p>
-              ) : leads.length === 0 ? (
-                <p className="text-sm text-gray-500">
-                  No leads found for this promotion.
-                </p>
-              ) : (
-                <div>
-                  <div className="grid gap-6 sm:grid-cols-2 mt-4">
-                    {/* Bar Chart */}
-                    <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={stats}>
-                          <XAxis dataKey="name" stroke="#888" />
-                          <YAxis />
-                          <Tooltip />
-                          <Bar
-                            dataKey="value"
-                            fill="#6366f1"
-                            radius={[6, 6, 0, 0]}
-                          />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-
-                    {/* Pie Chart */}
-                    <div className="h-64">
-                      <ResponsiveContainer width="100%" height="100%">
-                        <PieChart>
-                          <Pie
-                            data={stats}
-                            dataKey="value"
-                            nameKey="name"
-                            cx="50%"
-                            cy="50%"
-                            outerRadius={80}
-                            label
-                          >
-                            {stats.map((_, i) => (
-                              <Cell key={i} fill={COLORS[i % COLORS.length]} />
-                            ))}
-                          </Pie>
-                          <Tooltip />
-                        </PieChart>
-                      </ResponsiveContainer>
-                    </div>
-                  </div>
-                  <PromotionLeadsStats leads={leads} loading={loading} />
-                </div>
-              )}
-            </>
-          )}
         </DialogContent>
       </Dialog>
+
+      {/* --- SEPARATE STATS SHEET --- */}
+      {isAdmin && (
+        <Sheet onOpenChange={(open) => open && fetchLeads()}>
+          <SheetContent
+            side="right"
+            className="w-full sm:w-[420px] overflow-y-auto bg-white dark:bg-black"
+          >
+            <SheetHeader>
+              <SheetTitle className="text-lg font-bold">
+                Promotion Analytics
+              </SheetTitle>
+            </SheetHeader>
+
+            {loading ? (
+              <p className="text-sm mt-4 text-gray-500">Loading…</p>
+            ) : leads.length === 0 ? (
+              <p className="text-sm mt-4 text-gray-500">No leads found.</p>
+            ) : (
+              <div className="mt-6 space-y-8">
+                {/* Bar Chart */}
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={stats}>
+                      <XAxis dataKey="name" stroke="#888" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar
+                        dataKey="value"
+                        fill="#6366f1"
+                        radius={[6, 6, 0, 0]}
+                      />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Pie Chart */}
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={stats}
+                        dataKey="value"
+                        nameKey="name"
+                        cx="50%"
+                        cy="50%"
+                        outerRadius={80}
+                        label
+                      >
+                        {stats.map((_, i) => (
+                          <Cell key={i} fill={COLORS[i % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Detailed Table */}
+                <PromotionLeadsStats leads={leads} loading={loading} />
+              </div>
+            )}
+          </SheetContent>
+        </Sheet>
+      )}
     </div>
   );
 };
