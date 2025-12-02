@@ -24,6 +24,7 @@ import {
 import { useState } from "react";
 import { ILead } from "@/lib/database/models/lead.model";
 import PromotionLeadsStats from "./PromotionLeadsStats";
+import { Pencil } from "lucide-react";
 
 type Props = {
   promotion: IPromotion;
@@ -94,6 +95,14 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
                 <span className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full bg-white text-black shadow">
                   €{promotion.discount} OFF
                 </span>
+              )}
+              {isAdmin && (
+                <a
+                  href={`/promotions/${promotion._id.toString()}/update`}
+                  className="absolute top-3 right-3 p-1 text-xs font-semibold rounded-full bg-white text-black shadow"
+                >
+                  <Pencil className="w-4 h-4" />
+                </a>
               )}
             </div>
           </div>
