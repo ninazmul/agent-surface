@@ -91,7 +91,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
                 {promotion.description}
               </p>
               {promotion.discount && (
-                <span className="inline-block mt-3 px-3 py-1 text-xs font-semibold rounded-full bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 text-white shadow">
+                <span className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full bg-white text-black shadow">
                   €{promotion.discount} OFF
                 </span>
               )}
