@@ -299,29 +299,20 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                 <TableCell>{profile.country}</TableCell>
                 <TableCell>{profile.role}</TableCell>
                 <TableCell>
-                  <span
+                  <Button
                     onClick={() =>
                       handleToggleStatus(profile._id.toString(), profile.status)
                     }
-                    className={
-                      (profile.status === "Pending"
-                        ? "text-yellow-700  bg-yellow-100"
-                        : "text-green-700 bg-green-100") +
-                      "px-4 py-2 text-xs font-medium rounded-full border text-center"
-                    }
+                    className={`flex items-center gap-1 px-4 py-2 text-xs font-medium rounded-full border text-center 
+                    ${
+                      profile.status === "Pending"
+                        ? "text-yellow-700 bg-yellow-100 border-yellow-300"
+                        : "text-green-700 bg-green-100 border-green-300"
+                    }`}
                   >
-                    {profile.status === "Pending" ? (
-                      <>
-                        <Clock />
-                        <p>Pending</p>
-                      </>
-                    ) : (
-                      <>
-                        <Check />
-                        <p>Approved</p>
-                      </>
-                    )}
-                  </span>
+                    {profile.status === "Pending" ? <Clock /> : <Check />}
+                    <span>{profile.status}</span>
+                  </Button>
                 </TableCell>
                 <TableCell>
                   <Input
