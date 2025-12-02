@@ -99,7 +99,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
               {isAdmin && (
                 <a
                   href={`/promotions/${promotion._id.toString()}/update`}
-                  className="absolute top-3 right-3 p-1 text-xs font-semibold rounded-full bg-white text-black shadow"
+                  className="absolute top-3 right-3 p-3 text-xs font-semibold rounded-full bg-white text-black shadow"
                 >
                   <Pencil className="w-4 h-4" />
                 </a>
