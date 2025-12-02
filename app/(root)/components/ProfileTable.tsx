@@ -315,25 +315,30 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                   </Button>
                 </TableCell>
                 <TableCell>
-                  <Input
-                    type="number"
-                    className="w-24 rounded-full text-center"
-                    value={`€${
-                      editedData[profile._id.toString()]?.salesTarget ??
-                      profile.salesTarget ??
-                      ""
-                    }`}
-                    onChange={(e) =>
-                      setEditedData((prev) => ({
-                        ...prev,
-                        [profile._id.toString()]: {
-                          salesTarget: e.target.value,
-                        },
-                      }))
-                    }
-                    onBlur={() => handleSalesTarget(profile._id.toString())}
-                    placeholder="e.g. €100"
-                  />
+                  <div className="relative w-24">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                      €
+                    </span>
+                    <Input
+                      type="number"
+                      className="w-full pl-6 rounded-full text-center"
+                      value={
+                        editedData[profile._id.toString()]?.salesTarget ??
+                        profile.salesTarget ??
+                        ""
+                      }
+                      onChange={(e) =>
+                        setEditedData((prev) => ({
+                          ...prev,
+                          [profile._id.toString()]: {
+                            salesTarget: e.target.value,
+                          },
+                        }))
+                      }
+                      onBlur={() => handleSalesTarget(profile._id.toString())}
+                      placeholder="100"
+                    />
+                  </div>
                 </TableCell>
 
                 <TableCell className="flex items-center space-x-2">
