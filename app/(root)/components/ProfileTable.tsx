@@ -327,11 +327,11 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                   <Input
                     type="number"
                     className="w-24 rounded-full text-center"
-                    value={
+                    value={`€${
                       editedData[profile._id.toString()]?.salesTarget ??
                       profile.salesTarget ??
                       ""
-                    }
+                    }`}
                     onChange={(e) =>
                       setEditedData((prev) => ({
                         ...prev,
