@@ -303,7 +303,6 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                     onClick={() =>
                       handleToggleStatus(profile._id.toString(), profile.status)
                     }
-                    variant={"outline"}
                     className={
                       (profile.status === "Pending"
                         ? "text-yellow-700  bg-yellow-100"
