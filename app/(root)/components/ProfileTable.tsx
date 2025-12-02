@@ -299,7 +299,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                 <TableCell>{profile.country}</TableCell>
                 <TableCell>{profile.role}</TableCell>
                 <TableCell>
-                  <Button
+                  <span
                     onClick={() =>
                       handleToggleStatus(profile._id.toString(), profile.status)
                     }
@@ -321,7 +321,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                         <p>Approved</p>
                       </>
                     )}
-                  </Button>
+                  </span>
                 </TableCell>
                 <TableCell>
                   <Input
