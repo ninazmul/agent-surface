@@ -83,7 +83,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
             </span>
           )}
 
-          <div className="p-5">
+          <div className="p-5 flex justify-between items-center gap-4">
             <div>
               <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                 {promotion.title}
