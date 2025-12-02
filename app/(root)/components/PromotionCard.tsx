@@ -66,47 +66,52 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
     <div className="relative">
       {/* --- Main Promotion Dialog (existing) --- */}
       <Dialog>
-        <DialogTrigger asChild>
-          <div className="group bg-gray-50 dark:bg-black cursor-pointer shadow-md hover:shadow-lg rounded-2xl overflow-hidden transition-transform hover:scale-[1.02] relative">
-            <div className="relative w-full h-56 sm:h-64">
-              <Image
-                src={promotion.photo || "/assets/images/logo.png"}
-                alt={promotion.title}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300 bg-gray-300 dark:bg-gray-700"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent group-hover:scale-105 transition-transform duration-300" />
-            </div>
+        <div className="group bg-gray-50 dark:bg-black cursor-pointer shadow-md hover:shadow-lg rounded-2xl overflow-hidden transition-transform hover:scale-[1.02] relative">
+          <div className="relative w-full h-56 sm:h-64">
+            <Image
+              src={promotion.photo || "/assets/images/logo.png"}
+              alt={promotion.title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300 bg-gray-300 dark:bg-gray-700"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent group-hover:scale-105 transition-transform duration-300" />
+          </div>
 
-            {isPaused && (
-              <span className="absolute top-3 right-3 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">
-                Paused
-              </span>
-            )}
+          {isPaused && (
+            <span className="absolute top-3 right-3 bg-red-600 text-white text-xs font-semibold px-2 py-1 rounded-full shadow">
+              Paused
+            </span>
+          )}
 
-            <div className="p-5">
+          <div className="p-5">
+            <div>
               <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                 {promotion.title}
               </h3>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-2">
                 {promotion.description}
               </p>
-              {promotion.discount && (
-                <span className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full bg-white text-black shadow">
-                  €{promotion.discount} OFF
-                </span>
-              )}
-              {isAdmin && (
-                <a
-                  href={`/promotions/${promotion._id.toString()}/update`}
-                  className="absolute top-3 right-3 p-2 text-xs font-semibold rounded-full bg-white/50 text-black shadow"
-                >
-                  <Pencil className="w-3 h-3" />
-                </a>
-              )}
             </div>
+            <DialogTrigger asChild>
+              <button className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-500 text-white shadow">
+                See Details
+              </button>
+            </DialogTrigger>
+            {promotion.discount && (
+              <span className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full bg-white text-black shadow">
+                €{promotion.discount} OFF
+              </span>
+            )}
+            {isAdmin && (
+              <a
+                href={`/promotions/${promotion._id.toString()}/update`}
+                className="absolute top-3 right-3 p-2 text-xs font-semibold rounded-full bg-white/50 text-black shadow"
+              >
+                <Pencil className="w-3 h-3" />
+              </a>
+            )}
           </div>
-        </DialogTrigger>
+        </div>
 
         <DialogContent className="w-full max-w-3xl max-h-[90vh] overflow-y-auto p-6 bg-white dark:bg-black rounded-xl shadow-2xl">
           <DialogHeader>
