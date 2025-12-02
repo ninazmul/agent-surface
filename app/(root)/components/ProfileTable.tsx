@@ -288,7 +288,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                 <TableCell>
                   <a
                     href={`mailto:${profile.email}`}
-                    className="text-blue-800 dark:text-blue-400 font-semibold underline"
+                    className=""
                     target="_blank"
                     rel="noopener noreferrer"
                   >
