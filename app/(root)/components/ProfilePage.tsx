@@ -350,13 +350,16 @@ export default function ProfilePage({
       </section>
 
       {adminStatus && (
-        <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
+        <section className="p-4">
           {/* Header */}
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
+          <div className="px-2 sm:px-4 flex flex-col md:flex-row items-center justify-between gap-3">
             <h3 className="h3-bold text-center sm:text-left">All Profiles</h3>
             <a href={"/profile/create"} className="w-full sm:w-auto">
-              <Button size="lg" className="rounded-full w-full sm:w-auto">
-                Add Profile
+              <Button
+                size="sm"
+                className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+              >
+                <Plus size={16} /> Add Profile
               </Button>
             </a>
           </div>

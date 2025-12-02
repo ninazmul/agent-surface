@@ -166,15 +166,15 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Input
         placeholder="Search by name, email, number, or country"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
+        className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
       <div
-        className="overflow-x-auto rounded-2xl bg-indigo-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -199,10 +199,10 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">#</TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("name")}
                   className="flex items-center gap-2 cursor-pointer"
@@ -212,7 +212,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("email")}
                   className="flex items-center gap-2 cursor-pointer"
@@ -222,7 +222,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("number")}
                   className="flex items-center gap-2 cursor-pointer"
@@ -232,7 +232,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("country")}
                   className="flex items-center gap-2 cursor-pointer"
@@ -242,7 +242,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("role")}
                   className="flex items-center gap-2 cursor-pointer"
@@ -252,7 +252,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("status")}
                   className="flex items-center gap-2 cursor-pointer"
@@ -262,15 +262,17 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>S/T</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-white cursor-pointer">S/T</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedProfiles.map((profile, index) => (
               <TableRow
                 key={profile._id.toString()}
-                className="hover:bg-indigo-100 dark:hover:bg-gray-800"
+                className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}
@@ -304,9 +306,9 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                     variant={"outline"}
                     className={
                       (profile.status === "Pending"
-                        ? "text-yellow-500  bg-yellow-500/10"
-                        : "text-green-500 bg-green-500/10") +
-                      "font-semibold rounded-full"
+                        ? "text-yellow-700  bg-yellow-100"
+                        : "text-green-700 bg-green-100") +
+                      "px-4 py-2 text-xs font-medium rounded-full border text-center"
                     }
                   >
                     {profile.status === "Pending" ? (
@@ -325,7 +327,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                 <TableCell>
                   <Input
                     type="number"
-                    className="w-24"
+                    className="w-24 rounded-full text-center"
                     value={
                       editedData[profile._id.toString()]?.salesTarget ??
                       profile.salesTarget ??
@@ -346,17 +348,17 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
 
                 <TableCell className="flex items-center space-x-2">
                   <a href={`/profile/${profile._id.toString()}/update`}>
-                    <Button variant="outline" size="icon">
-                      <Pencil className="w-4 h-4 text-purple-500" />
+                    <Button variant="ghost" size="icon">
+                      <Pencil className="w-4 h-4 text-black" />
                     </Button>
                   </a>
 
                   <Button
                     onClick={() => setConfirmDeleteId(profile._id.toString())}
-                    variant={"outline"}
-                    className="text-red-500"
+                    variant={"ghost"}
+                    size={"icon"}
                   >
-                    <Trash />
+                    <Trash className="w-4 h-4 text-red-600" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -371,22 +373,22 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
           {Math.min(itemsPerPage * currentPage, filteredProfiles.length)} of{" "}
           {filteredProfiles.length} profiles
         </span>
-        <div className="flex items-center space-x-2">
+        <div className="flex gap-2">
           <Button
+            size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p - 1)}
             disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
-            size={"sm"}
-            className="rounded-2xl"
           >
             Previous
           </Button>
           <Button
+            size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage === Math.ceil(filteredProfiles.length / itemsPerPage)
             }
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            size={"sm"}
-            className="rounded-2xl"
           >
             Next
           </Button>
