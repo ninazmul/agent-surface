@@ -100,13 +100,13 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
 
   return (
     <section className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
           Sales Target Progress
         </h2>
 
         {/* Preset Date Filters */}
-        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+        <div className="flex flex-row gap-3 w-full sm:w-auto">
           <select
             onChange={(e) =>
               updateDateRange(e.target.value as "7d" | "1m" | "1y" | "custom")
@@ -165,7 +165,7 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
             }}
           />
         </div>
-        <p className="mt-2 text-xs text-end text-gray-500 dark:text-gray-300">
+        <p className="mt-2 text-xs text-end text-orange-500">
           {((salesAchieved || 0 / profile.salesTarget) * 100).toFixed(1)}%
           achieved
         </p>

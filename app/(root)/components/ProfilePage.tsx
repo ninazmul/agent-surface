@@ -140,7 +140,7 @@ export default function ProfilePage({
                   <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
                     Agent Information
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 ">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
                     <div>
                       <p className="text-lg text-gray-700">Name:</p>
                       <p>{myProfile?.name}</p>
@@ -190,7 +190,7 @@ export default function ProfilePage({
                   <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
                     Bank Information
                   </h3>
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 ">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
                     <div>
                       <p className="text-lg text-gray-700">Bank Name:</p>
                       <p>{myProfile?.bankName}</p>
