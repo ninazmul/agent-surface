@@ -89,7 +89,7 @@ export default function ProfilePage({
         {myProfile && (
           <section className="p-4">
             <h3 className="h3-bold text-center sm:text-left">Profile</h3>
-            <div className="rounded-2xl bg-white dark:bg-gray-800">
+            <div className="rounded-2xl bg-white dark:bg-gray-800 p-4">
               {/* Header */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                 <div className="flex items-center gap-4">
