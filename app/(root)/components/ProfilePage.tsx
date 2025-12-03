@@ -203,38 +203,37 @@ export default function ProfilePage({
               </div>
 
               {/* Documents */}
-              {myProfile?.licenseDocument ||
-                (myProfile.agreementDocument && (
-                  <>
-                    <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
-                      <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
-                        Documents
-                      </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
-                        {myProfile?.licenseDocument && (
-                          <a
-                            href={myProfile?.licenseDocument}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
-                          >
-                            📄 View License Document
-                          </a>
-                        )}
-                        {myProfile?.agreementDocument && (
-                          <a
-                            href={myProfile?.agreementDocument}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
-                          >
-                            📄 View Agreement Document
-                          </a>
-                        )}
-                      </div>
-                    </div>
-                  </>
-                ))}
+              {(myProfile?.licenseDocument || myProfile?.agreementDocument) && (
+                <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                  <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
+                    Documents
+                  </h3>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    {myProfile?.licenseDocument && (
+                      <a
+                        href={myProfile.licenseDocument}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 text-xs font-medium rounded-full bg-white dark:bg-gray-800 border text-center hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+                      >
+                        📄 View License Document
+                      </a>
+                    )}
+
+                    {myProfile?.agreementDocument && (
+                      <a
+                        href={myProfile.agreementDocument}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-4 py-2 text-xs font-medium rounded-full bg-white dark:bg-gray-800 border text-center hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+                      >
+                        📄 View Agreement Document
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {myProfile && (
                 <SalesTargetProgress
