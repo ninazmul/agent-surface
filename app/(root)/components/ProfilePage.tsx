@@ -125,7 +125,7 @@ export default function ProfilePage({
 
               {/* Basic Info */}
               <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
-                <h3 className="text-lg font-semibold text-black dark:text-gray-100 mb-2">
+                <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
                   Agent Information
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 ">
@@ -175,7 +175,7 @@ export default function ProfilePage({
 
               {/* Bank Info */}
               <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
-                <h3 className="text-lg font-semibold text-black dark:text-gray-100 mb-2">
+                <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
                   Bank Information
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 ">
@@ -201,16 +201,13 @@ export default function ProfilePage({
                   </div>
                 </div>
               </div>
-              <div></div>
-
-              <hr className="border-indigo-200" />
 
               {/* Documents */}
               {myProfile?.licenseDocument ||
                 (myProfile.agreementDocument && (
                   <>
-                    <div>
-                      <h3 className="text-lg font-semibold text-black dark:text-gray-100 mb-2">
+                    <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                      <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
                         Documents
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">

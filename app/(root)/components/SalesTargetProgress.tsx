@@ -99,55 +99,57 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
   if (!profile?.salesTarget) return null;
 
   return (
-    <section className="mb-10">
-      <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-4 border-b pb-2">
-        Sales Target Progress
-      </h2>
+    <section className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+      <div className="flex items-center justify-between gap-4">
+        <h2 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
+          Sales Target Progress
+        </h2>
 
-      {/* Preset Date Filters */}
-      <div className="flex gap-4 mb-4 items-center flex-wrap">
-        <select
-          onChange={(e) =>
-            updateDateRange(e.target.value as "7d" | "1m" | "1y" | "custom")
-          }
-          className="border rounded px-3 py-2"
-          defaultValue="7d"
-        >
-          <option value="7d">Last 7 Days</option>
-          <option value="1m">Last 1 Month</option>
-          <option value="1y">Last 1 Year</option>
-          <option value="custom">Custom</option>
-        </select>
+        {/* Preset Date Filters */}
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <select
+            onChange={(e) =>
+              updateDateRange(e.target.value as "7d" | "1m" | "1y" | "custom")
+            }
+            className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+            defaultValue="7d"
+          >
+            <option value="7d">Last 7 Days</option>
+            <option value="1m">Last 1 Month</option>
+            <option value="1y">Last 1 Year</option>
+            <option value="custom">Custom</option>
+          </select>
 
-        {/* Custom Date Range */}
-        <input
-          type="date"
-          value={startDate ? startDate.toISOString().split("T")[0] : ""}
-          onChange={(e) =>
-            updateDateRange(
-              "custom",
-              e.target.value,
-              endDate?.toISOString().split("T")[0]
-            )
-          }
-          className="border rounded px-3 py-2"
-        />
-        <input
-          type="date"
-          value={endDate ? endDate.toISOString().split("T")[0] : ""}
-          onChange={(e) =>
-            updateDateRange(
-              "custom",
-              startDate?.toISOString().split("T")[0],
-              e.target.value
-            )
-          }
-          className="border rounded px-3 py-2"
-        />
+          {/* Custom Date Range */}
+          <input
+            type="date"
+            value={startDate ? startDate.toISOString().split("T")[0] : ""}
+            onChange={(e) =>
+              updateDateRange(
+                "custom",
+                e.target.value,
+                endDate?.toISOString().split("T")[0]
+              )
+            }
+            className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+          />
+          <input
+            type="date"
+            value={endDate ? endDate.toISOString().split("T")[0] : ""}
+            onChange={(e) =>
+              updateDateRange(
+                "custom",
+                startDate?.toISOString().split("T")[0],
+                e.target.value
+              )
+            }
+            className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+          />
+        </div>
       </div>
 
       {/* Progress Display */}
-      <div className="bg-gray-50 dark:bg-gray-800 border rounded-xl p-6">
+      <div>
         <p className="mb-2 text-sm text-gray-600 dark:text-gray-300">
           {salesAchieved?.toLocaleString()} /{" "}
           {profile.salesTarget.toLocaleString()} €
@@ -163,8 +165,9 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
             }}
           />
         </div>
-        <p className="mt-2 text-xs text-gray-500 dark:text-gray-300">
-          {((salesAchieved || 0 / profile.salesTarget) * 100).toFixed(1)}% achieved
+        <p className="mt-2 text-xs text-end text-gray-500 dark:text-gray-300">
+          {((salesAchieved || 0 / profile.salesTarget) * 100).toFixed(1)}%
+          achieved
         </p>
       </div>
     </section>
