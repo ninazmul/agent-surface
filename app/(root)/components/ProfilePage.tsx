@@ -124,73 +124,84 @@ export default function ProfilePage({
               </div>
 
               {/* Basic Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
-                <div>
-                  <p className="text-lg text-gray-700">Name</p>
-                  <p>{myProfile?.name}</p>
-                </div>
-                <div>
-                  <p className="text-lg text-gray-700">Location</p>
-                  <p>{myProfile?.location}</p>
-                </div>
-                <div>
-                  <p className="text-lg text-gray-700">Email</p>
-                  <p>{myProfile?.email}</p>
-                </div>
-                <div>
-                  <p className="text-lg text-gray-700">Phone</p>
-                  <p>{myProfile?.number}</p>
-                </div>
-                <div>
-                  <p className="text-lg text-gray-700">Created At</p>
-                  <p>
-                    {myProfile?.createdAt
-                      ? new Date(myProfile.createdAt).toLocaleDateString()
-                      : "N/A"}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-lg text-gray-700">Country</p>
-                  <p>{myProfile?.country}</p>
-                </div>
-                <div>
-                  <p className="text-lg text-gray-700">Country Agent</p>
-                  {countryAgent?.name ? (
-                    <>
-                      {countryAgent.name}{" "}
-                      <span className="text-indigo-500 text-xs">
-                        ({countryAgent.email})
-                      </span>
-                    </>
-                  ) : (
-                    "N/A"
-                  )}
+              <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                <h3 className="text-lg font-semibold text-black dark:text-gray-100 mb-2">
+                  Agent Information
+                </h3>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 ">
+                  <div>
+                    <p className="text-lg text-gray-700">Name:</p>
+                    <p>{myProfile?.name}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg text-gray-700">Location:</p>
+                    <p>{myProfile?.location}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg text-gray-700">Email:</p>
+                    <p>{myProfile?.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg text-gray-700">Phone:</p>
+                    <p>{myProfile?.number}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg text-gray-700">Created At:</p>
+                    <p>
+                      {myProfile?.createdAt
+                        ? new Date(myProfile.createdAt).toLocaleDateString()
+                        : "N/A"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-lg text-gray-700">Country:</p>
+                    <p>{myProfile?.country}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg text-gray-700">Country Agent:</p>
+                    {countryAgent?.name ? (
+                      <>
+                        {countryAgent.name}{" "}
+                        <span className="text-indigo-500 text-xs">
+                          ({countryAgent.email})
+                        </span>
+                      </>
+                    ) : (
+                      "N/A"
+                    )}
+                  </div>
                 </div>
               </div>
 
               {/* Bank Info */}
-              <div>
-                <h3 className="text-lg font-semibold text-indigo-800 dark:text-gray-100 mb-2">
+              <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                <h3 className="text-lg font-semibold text-black dark:text-gray-100 mb-2">
                   Bank Information
                 </h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-indigo-700 dark:text-gray-100">
-                  <p>
-                    <p>Bank Name:</p> {myProfile?.bankName}
-                  </p>
-                  <p>
-                    <strong>Account Number:</strong> {myProfile?.accountNumber}
-                  </p>
-                  <p>
-                    <strong>SWIFT Code:</strong> {myProfile?.swiftCode}
-                  </p>
-                  <p>
-                    <strong>Routing Number:</strong> {myProfile?.routingNumber}
-                  </p>
-                  <p className="sm:col-span-2">
-                    <strong>Branch Address:</strong> {myProfile?.branchAddress}
-                  </p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 ">
+                  <div>
+                    <p className="text-lg text-gray-700">Bank Name:</p>
+                    <p>{myProfile?.bankName}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg text-gray-700">SWIFT Code:</p>
+                    <p>{myProfile?.swiftCode}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg text-gray-700">Branch Address:</p>
+                    <p>{myProfile?.branchAddress}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg text-gray-700">Account Number:</p>
+                    <p>{myProfile?.accountNumber}</p>
+                  </div>
+                  <div>
+                    <p className="text-lg text-gray-700">Routing Number:</p>
+                    <p>{myProfile?.routingNumber}</p>
+                  </div>
                 </div>
               </div>
+              <div></div>
 
               <hr className="border-indigo-200" />
 
@@ -199,7 +210,7 @@ export default function ProfilePage({
                 (myProfile.agreementDocument && (
                   <>
                     <div>
-                      <h3 className="text-lg font-semibold text-indigo-800 dark:text-gray-100 mb-2">
+                      <h3 className="text-lg font-semibold text-black dark:text-gray-100 mb-2">
                         Documents
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
@@ -208,7 +219,7 @@ export default function ProfilePage({
                             href={myProfile?.licenseDocument}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary dark:text-gray-300 hover:underline"
+                            className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
                           >
                             📄 View License Document
                           </a>
@@ -218,7 +229,7 @@ export default function ProfilePage({
                             href={myProfile?.agreementDocument}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="text-primary dark:text-gray-300 hover:underline"
+                            className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
                           >
                             📄 View Agreement Document
                           </a>
