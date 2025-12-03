@@ -88,7 +88,7 @@ export default function ProfilePage({
 
         {myProfile && (
           <section className="p-4">
-            <h3 className="h3-bold text-center sm:text-left">Profile</h3>
+            <h3 className="h3-bold text-center sm:text-left mb-4">Profile</h3>
             <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 space-y-4">
               {/* Header */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
@@ -126,35 +126,35 @@ export default function ProfilePage({
               {/* Basic Info */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                 <div>
-                  <p>Name</p>
-                  <strong>{myProfile?.name}</strong>
+                  <p className="text-lg text-gray-800">Name</p>
+                  <p>{myProfile?.name}</p>
                 </div>
                 <div>
-                  <p>Email</p>
-                  <strong>{myProfile?.email}</strong>
+                  <p className="text-lg text-gray-800">Email</p>
+                  <p>{myProfile?.email}</p>
                 </div>
                 <div>
-                  <p>Phone</p>
-                  <strong>{myProfile?.number}</strong>
+                  <p className="text-lg text-gray-800">Phone</p>
+                  <p>{myProfile?.number}</p>
                 </div>
                 <div>
-                  <p>Location</p>
-                  <strong>{myProfile?.location}</strong>
+                  <p className="text-lg text-gray-800">Location</p>
+                  <p>{myProfile?.location}</p>
                 </div>
                 <div>
-                  <p>Created At</p>
-                  <strong>
+                  <p className="text-lg text-gray-800">Created At</p>
+                  <p>
                     {myProfile?.createdAt
                       ? new Date(myProfile.createdAt).toLocaleDateString()
                       : "N/A"}
-                  </strong>
+                  </p>
                 </div>
                 <div>
-                  <p>Country</p>
-                  <strong>{myProfile?.country}</strong>
+                  <p className="text-lg text-gray-800">Country</p>
+                  <p>{myProfile?.country}</p>
                 </div>
                 <div>
-                  <p>Country Agent</p>
+                  <p className="text-lg text-gray-800">Country Agent</p>
                   {countryAgent?.name ? (
                     <>
                       {countryAgent.name}{" "}
@@ -175,7 +175,7 @@ export default function ProfilePage({
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-indigo-700 dark:text-gray-100">
                   <p>
-                    <strong>Bank Name:</strong> {myProfile?.bankName}
+                    <p>Bank Name:</p> {myProfile?.bankName}
                   </p>
                   <p>
                     <strong>Account Number:</strong> {myProfile?.accountNumber}
