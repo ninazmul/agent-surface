@@ -89,7 +89,7 @@ export default function ProfilePage({
         {myProfile && (
           <section className="p-4">
             <h3 className="h3-bold text-center sm:text-left">Profile</h3>
-            <div className="rounded-2xl bg-white dark:bg-gray-800 p-4">
+            <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 space-y-4">
               {/* Header */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                 <div className="flex items-center gap-4">
@@ -123,15 +123,38 @@ export default function ProfilePage({
                 </div>
               </div>
 
-              <hr className="border-indigo-200" />
-
               {/* Basic Info */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-indigo-700 dark:text-gray-100">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                 <div>
-                  <strong>Role:</strong> {myProfile?.role}
+                  <p>Name</p>
+                  <strong>{myProfile?.name}</strong>
                 </div>
                 <div>
-                  <strong>Country Agent:</strong>{" "}
+                  <p>Email</p>
+                  <strong>{myProfile?.email}</strong>
+                </div>
+                <div>
+                  <p>Phone</p>
+                  <strong>{myProfile?.number}</strong>
+                </div>
+                <div>
+                  <p>Location</p>
+                  <strong>{myProfile?.location}</strong>
+                </div>
+                <div>
+                  <p>Created At</p>
+                  <strong>
+                    {myProfile?.createdAt
+                      ? new Date(myProfile.createdAt).toLocaleDateString()
+                      : "N/A"}
+                  </strong>
+                </div>
+                <div>
+                  <p>Country</p>
+                  <strong>{myProfile?.country}</strong>
+                </div>
+                <div>
+                  <p>Country Agent</p>
                   {countryAgent?.name ? (
                     <>
                       {countryAgent.name}{" "}
@@ -143,21 +166,7 @@ export default function ProfilePage({
                     "N/A"
                   )}
                 </div>
-                <div>
-                  <strong>Country:</strong> {myProfile?.country}
-                </div>
-                <div>
-                  <strong>Location:</strong> {myProfile?.location}
-                </div>
-                <div>
-                  <strong>Created At:</strong>{" "}
-                  {myProfile?.createdAt
-                    ? new Date(myProfile.createdAt).toLocaleDateString()
-                    : "N/A"}
-                </div>
               </div>
-
-              <hr className="border-indigo-200" />
 
               {/* Bank Info */}
               <div>
