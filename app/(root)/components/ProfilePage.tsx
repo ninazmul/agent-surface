@@ -126,23 +126,23 @@ export default function ProfilePage({
               {/* Basic Info */}
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                 <div>
-                  <p className="text-lg text-gray-800">Name</p>
+                  <p className="text-lg text-gray-700">Name</p>
                   <p>{myProfile?.name}</p>
                 </div>
                 <div>
-                  <p className="text-lg text-gray-800">Location</p>
+                  <p className="text-lg text-gray-700">Location</p>
                   <p>{myProfile?.location}</p>
                 </div>
                 <div>
-                  <p className="text-lg text-gray-800">Email</p>
+                  <p className="text-lg text-gray-700">Email</p>
                   <p>{myProfile?.email}</p>
                 </div>
                 <div>
-                  <p className="text-lg text-gray-800">Phone</p>
+                  <p className="text-lg text-gray-700">Phone</p>
                   <p>{myProfile?.number}</p>
                 </div>
                 <div>
-                  <p className="text-lg text-gray-800">Created At</p>
+                  <p className="text-lg text-gray-700">Created At</p>
                   <p>
                     {myProfile?.createdAt
                       ? new Date(myProfile.createdAt).toLocaleDateString()
@@ -150,11 +150,11 @@ export default function ProfilePage({
                   </p>
                 </div>
                 <div>
-                  <p className="text-lg text-gray-800">Country</p>
+                  <p className="text-lg text-gray-700">Country</p>
                   <p>{myProfile?.country}</p>
                 </div>
                 <div>
-                  <p className="text-lg text-gray-800">Country Agent</p>
+                  <p className="text-lg text-gray-700">Country Agent</p>
                   {countryAgent?.name ? (
                     <>
                       {countryAgent.name}{" "}
