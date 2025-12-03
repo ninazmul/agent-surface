@@ -217,7 +217,7 @@ export default function ProfilePage({
                           href={myProfile.licenseDocument}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-4 py-2 text-xs font-medium rounded-full bg-white dark:bg-gray-800 border text-center hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+                          className="px-4 py-2 text-sm font-medium rounded-full bg-white dark:bg-gray-800 border text-center hover:bg-gray-200 dark:hover:bg-gray-600 transition w-full"
                         >
                           📄 View License Document
                         </a>
@@ -228,7 +228,7 @@ export default function ProfilePage({
                           href={myProfile.agreementDocument}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="px-4 py-2 text-xs font-medium rounded-full bg-white dark:bg-gray-800 border text-center hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+                          className="px-4 py-2 text-sm font-medium rounded-full bg-white dark:bg-gray-800 border text-center hover:bg-gray-200 dark:hover:bg-gray-600 transition w-full"
                         >
                           📄 View Agreement Document
                         </a>
