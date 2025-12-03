@@ -93,16 +93,15 @@ export default function ProfilePage({
               {/* Header */}
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                 <div className="flex items-center gap-4">
-                  <div className="w-20 md:w-32 aspect-[3/4] rounded-lg overflow-hidden border">
-                    <Image
-                      src={
-                        myProfile?.logo || "/assets/images/default-profile.png"
-                      }
-                      alt={myProfile?.name || "N/A"}
-                      fill
-                      className="w-12 md:w-24 h-16 md:h-32 rounded-lg object-cover border"
-                    />
-                  </div>
+                  <Image
+                    src={
+                      myProfile?.logo || "/assets/images/default-profile.png"
+                    }
+                    alt={myProfile?.name || "N/A"}
+                    width={150} // 3 units
+                    height={200} // 4 units
+                    className="w-20 md:w-24 h-16 md:h-32 rounded-lg object-cover border"
+                  />
 
                   <div>
                     <h2 className="text-lg md:text-2xl font-semibold text-black dark:text-gray-100 flex items-center gap-2">
