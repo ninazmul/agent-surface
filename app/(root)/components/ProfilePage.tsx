@@ -93,7 +93,7 @@ export default function ProfilePage({
               <div className="col-span-3 space-y-4">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-4 w-full">
                     <Image
                       src={
                         myProfile?.logo || "/assets/images/default-profile.png"
@@ -334,7 +334,7 @@ export default function ProfilePage({
                           height={200} // 4 units
                           className="w-16 md:w-20 h-12 md:h-28 rounded-lg object-cover border"
                         />
-                        <div className="space-y-4">
+                        <div className="space-y-2">
                           <h4 className="text-md font-medium text-black dark:text-gray-100">
                             {agent.name}
                           </h4>
