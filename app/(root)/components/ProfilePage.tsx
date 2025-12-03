@@ -6,7 +6,7 @@ import ProfileForm from "./ProfileForm";
 import { Button } from "@/components/ui/button";
 import ProfileTable from "./ProfileTable";
 import SalesTargetProgress from "./SalesTargetProgress";
-import { FileEdit, Plus } from "lucide-react";
+import { Edit, FileEdit, Plus } from "lucide-react";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useEffect, useState } from "react";
 import { getLeadByEmail } from "@/lib/actions/lead.actions";
@@ -89,7 +89,7 @@ export default function ProfilePage({
         {myProfile && (
           <section className="p-4">
             <h3 className="h3-bold text-center sm:text-left mb-4">Profile</h3>
-            <div className="grid grid-cols-3 md:grid-cols-5 rounded-2xl bg-white dark:bg-gray-800 p-4">
+            <div className="grid grid-cols-3 md:grid-cols-5 gap-4 rounded-2xl bg-white dark:bg-gray-800 p-4">
               <div className="col-span-3 space-y-4">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
@@ -104,22 +104,33 @@ export default function ProfilePage({
                       className="w-20 md:w-24 h-16 md:h-32 rounded-lg object-cover border"
                     />
 
-                    <div>
-                      <h2 className="text-lg md:text-2xl font-semibold text-black dark:text-gray-100 flex items-center gap-2">
-                        {myProfile?.name}
-                        <span
-                          className={`inline-flex items-center justify-center px-3 py-1 rounded-md text-xs font-medium ${
-                            myProfile?.status === "Approved"
-                              ? "bg-green-300 text-green-800"
-                              : "bg-yellow-300 text-yellow-800"
-                          }`}
+                    <div className="flex items-center justify-between w-full">
+                      <div className="w-full">
+                        <h2 className="text-lg md:text-2xl font-semibold text-black dark:text-gray-100 flex items-center gap-2">
+                          {myProfile?.name}
+                          <span
+                            className={`inline-flex items-center justify-center px-3 py-1 rounded-md text-xs font-medium ${
+                              myProfile?.status === "Approved"
+                                ? "bg-green-300 text-green-800"
+                                : "bg-yellow-300 text-yellow-800"
+                            }`}
+                          >
+                            {myProfile?.status}
+                          </span>
+                        </h2>
+                        <p className="text-sm px-2 py-1 rounded-md bg-purple-500 text-white w-max">
+                          {myProfile?.role}
+                        </p>
+                      </div>
+                      <a href={`/profile/${myProfile?._id.toString()}/update`}>
+                        <Button
+                          variant="outline"
+                          className="text-white dark:text-gray-100 w-max bg-black dark:bg-gray-600 hover:bg-gray-800 inline-flex items-center gap-2"
                         >
-                          {myProfile?.status}
-                        </span>
-                      </h2>
-                      <p className="text-sm px-2 py-1 rounded-md bg-purple-500 text-white w-max">
-                        {myProfile?.role}
-                      </p>
+                          Edit Profile
+                          <Edit />
+                        </Button>
+                      </a>
                     </div>
                   </div>
                 </div>
@@ -252,27 +263,10 @@ export default function ProfilePage({
 
                 {/* Profile Status or Update */}
                 <div>
-                  {myProfile?.status === "Pending" ? (
+                  {myProfile?.status === "Pending" && (
                     <div className="mt-4 text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 px-4 py-3 rounded-md">
                       Your profile is currently under review. Please wait for
                       admin approval to access full features.
-                    </div>
-                  ) : (
-                    <div className="text-center pt-4">
-                      <a href={`/profile/${myProfile?._id.toString()}/update`}>
-                        <Button
-                          variant="outline"
-                          className="text-purple-700 w-full max-w-5xl font-semibold bg-purple-100 hover:bg-purple-200 inline-flex items-center gap-2"
-                        >
-                          <Image
-                            src="/assets/icons/edit.svg"
-                            alt="edit"
-                            width={20}
-                            height={20}
-                          />
-                          Update Profile
-                        </Button>
-                      </a>
                     </div>
                   )}
                 </div>
@@ -340,7 +334,7 @@ export default function ProfilePage({
                           height={200} // 4 units
                           className="w-16 md:w-20 h-12 md:h-28 rounded-lg object-cover border"
                         />
-                        <div>
+                        <div className="space-y-4">
                           <h4 className="text-md font-medium text-black dark:text-gray-100">
                             {agent.name}
                           </h4>
@@ -349,11 +343,11 @@ export default function ProfilePage({
                           </p>
                           <div className="flex items-center gap-4">
                             <p className="text-xs px-3 py-1 rounded-full bg-green-500 text-white w-max">
-                            {agent.country}
-                          </p>
-                          <p className="text-xs px-3 py-1 rounded-full bg-black border text-white w-max">
-                            {agent.country}
-                          </p>
+                              {agent.country}
+                            </p>
+                            <p className="text-xs px-3 py-1 rounded-full bg-white border text-black w-max">
+                              {agent.country}
+                            </p>
                           </div>
                         </div>
                       </div>
