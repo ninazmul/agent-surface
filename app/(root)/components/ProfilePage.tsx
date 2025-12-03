@@ -89,8 +89,8 @@ export default function ProfilePage({
         {myProfile && (
           <section className="p-4">
             <h3 className="h3-bold text-center sm:text-left mb-4">Profile</h3>
-            <div className="rounded-2xl bg-white dark:bg-gray-800 p-4 space-y-4">
-              <div>
+            <div className="rounded-2xl bg-white dark:bg-gray-800 p-4">
+              <div className="space-y-4">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                   <div className="flex items-center gap-4">
@@ -211,7 +211,7 @@ export default function ProfilePage({
                       Documents
                     </h3>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+                    <div className="flex items-center justify-around gap-4 text-sm">
                       {myProfile?.licenseDocument && (
                         <a
                           href={myProfile.licenseDocument}
