@@ -130,16 +130,16 @@ export default function ProfilePage({
                   <p>{myProfile?.name}</p>
                 </div>
                 <div>
+                  <p className="text-lg text-gray-800">Location</p>
+                  <p>{myProfile?.location}</p>
+                </div>
+                <div>
                   <p className="text-lg text-gray-800">Email</p>
                   <p>{myProfile?.email}</p>
                 </div>
                 <div>
                   <p className="text-lg text-gray-800">Phone</p>
                   <p>{myProfile?.number}</p>
-                </div>
-                <div>
-                  <p className="text-lg text-gray-800">Location</p>
-                  <p>{myProfile?.location}</p>
                 </div>
                 <div>
                   <p className="text-lg text-gray-800">Created At</p>
