@@ -89,7 +89,7 @@ export default function ProfilePage({
         {myProfile && (
           <section className="p-4">
             <h3 className="h3-bold text-center sm:text-left mb-4">Profile</h3>
-            <div className="grid grid-cols-3 md:grid-cols-5 gap-4 rounded-2xl bg-white dark:bg-gray-800 p-4">
+            <div className="grid grid-cols-3 lg:grid-cols-5 gap-4 rounded-2xl bg-white dark:bg-gray-800 p-4">
               <div className="col-span-3 space-y-4">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
@@ -127,7 +127,7 @@ export default function ProfilePage({
                           variant="outline"
                           className="text-white dark:text-gray-100 w-max bg-black dark:bg-gray-600 hover:bg-gray-800 inline-flex items-center gap-2"
                         >
-                          Edit Profile
+                          <span className="hidden lg:flex">Edit Profile</span>
                           <Edit />
                         </Button>
                       </a>
@@ -303,7 +303,7 @@ export default function ProfilePage({
                   </>
                 )}
               </div>
-              <div className="col-span-2 space-y-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+              <div className="col-span-3 lg:col-span-2 space-y-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                 <div className="flex items-center justify-between gap-4">
                   <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
                     Your Sub Agents
