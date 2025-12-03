@@ -89,8 +89,8 @@ export default function ProfilePage({
         {myProfile && (
           <section className="p-4">
             <h3 className="h3-bold text-center sm:text-left mb-4">Profile</h3>
-            <div className="rounded-2xl bg-white dark:bg-gray-800 p-4">
-              <div className="space-y-4">
+            <div className="grid grid-cols-3 md:grid-cols-5 rounded-2xl bg-white dark:bg-gray-800 p-4">
+              <div className="col-span-3 space-y-4">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                   <div className="flex items-center gap-4">
@@ -309,14 +309,14 @@ export default function ProfilePage({
                   </>
                 )}
               </div>
-              <div>
+              <div className="col-span-2 space-y-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                 <div className="flex items-center justify-between gap-4">
                   <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
-                    Agent Information
+                    Your Sub Agents
                   </h3>
                   <a href={"/profile/create"} className="w-full sm:w-auto">
                     <Button
-                      size="lg"
+                      size="sm"
                       className="rounded-xl w-full sm:w-auto bg-purple-500 hover:bg-purple-600 text-white flex items-center gap-1"
                     >
                       Add Sub Agent <Plus />
@@ -328,28 +328,33 @@ export default function ProfilePage({
                     <a
                       href={`/profile/${agent._id.toString()}`}
                       key={agent._id.toString()}
-                      className="p-4 border rounded-lg shadow-sm bg-white dark:bg-gray-800 hover:shadow-md transition"
+                      className="rounded-2xl bg-white dark:bg-gray-800 p-4 hover:shadow-md transition"
                     >
                       <div className="flex items-center gap-4">
                         <Image
                           src={
-                            agent.logo || "/assets/images/default-profile.png"
+                            agent?.logo || "/assets/images/default-profile.png"
                           }
-                          alt={agent.name}
-                          height={60}
-                          width={60}
-                          className="w-14 h-14 rounded-full object-cover border"
+                          alt={agent?.name || "N/A"}
+                          width={150} // 3 units
+                          height={200} // 4 units
+                          className="w-16 md:w-20 h-12 md:h-28 rounded-lg object-cover border"
                         />
                         <div>
-                          <h4 className="text-md font-medium text-indigo-800 dark:text-gray-100">
+                          <h4 className="text-md font-medium text-black dark:text-gray-100">
                             {agent.name}
                           </h4>
-                          <p className="text-sm text-indigo-500 dark:text-gray-300">
+                          <p className="text-sm text-black dark:text-gray-300">
                             {agent.email}
                           </p>
-                          <p className="text-xs text-indigo-400 dark:text-gray-300">
+                          <div className="flex items-center gap-4">
+                            <p className="text-xs px-3 py-1 rounded-full bg-green-500 text-white w-max">
                             {agent.country}
                           </p>
+                          <p className="text-xs px-3 py-1 rounded-full bg-black border text-white w-max">
+                            {agent.country}
+                          </p>
+                          </div>
                         </div>
                       </div>
                     </a>
