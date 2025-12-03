@@ -87,44 +87,41 @@ export default function ProfilePage({
         )}
 
         {myProfile && (
-          <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
-            <div className="mx-auto bg-indigo-50 dark:bg-gray-800 p-6 md:p-8 rounded-2xl shadow space-y-6">
+          <section className="p-4">
+            <h3 className="h3-bold text-center sm:text-left">Profile</h3>
+            <div className="rounded-2xl bg-white dark:bg-gray-800">
               {/* Header */}
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                 <div className="flex items-center gap-4">
-                  <Image
-                    src={
-                      myProfile?.logo || "/assets/images/default-profile.png"
-                    }
-                    alt={myProfile?.name || "N/A"}
-                    height={80}
-                    width={80}
-                    className="w-10 md:w-20 h-10 md:h-20 rounded-full object-cover border border-indigo-300"
-                  />
+                  <div className="w-20 md:w-32 aspect-[3/4] rounded-lg overflow-hidden border border-indigo-300">
+                    <Image
+                      src={
+                        myProfile?.logo || "/assets/images/default-profile.png"
+                      }
+                      alt={myProfile?.name || "N/A"}
+                      fill
+                      className="object-cover"
+                    />
+                  </div>
+
                   <div>
-                    <h2 className="text-lg md:text-2xl font-semibold text-indigo-800 dark:text-gray-100 flex items-center gap-2">
+                    <h2 className="text-lg md:text-2xl font-semibold text-black dark:text-gray-100 flex items-center gap-2">
                       {myProfile?.name}
-                      <span className="text-xs px-2 py-1 rounded-full bg-indigo-200 text-indigo-600 dark:text-gray-500">
-                        {myProfile?.role}
+                      <span
+                        className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium ${
+                          myProfile?.status === "Approved"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-yellow-100 text-yellow-800"
+                        }`}
+                      >
+                        {myProfile?.status}
                       </span>
                     </h2>
-                    <p className="text-xs md:text-sm text-indigo-500 dark:text-gray-300">
-                      {myProfile?.email}
-                    </p>
-                    <p className="text-xs md:text-sm text-indigo-500 dark:text-gray-300">
-                      {myProfile?.number}
+                    <p className="text-xs px-2 py-1 rounded-full bg-indigo-200 text-indigo-600 dark:text-gray-500">
+                      {myProfile?.role}
                     </p>
                   </div>
                 </div>
-                <span
-                  className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium ${
-                    myProfile?.status === "Approved"
-                      ? "bg-green-100 text-green-800"
-                      : "bg-yellow-100 text-yellow-800"
-                  }`}
-                >
-                  {myProfile?.status}
-                </span>
               </div>
 
               <hr className="border-indigo-200" />
