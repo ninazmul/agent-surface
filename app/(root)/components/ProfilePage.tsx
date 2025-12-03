@@ -107,16 +107,16 @@ export default function ProfilePage({
                     <h2 className="text-lg md:text-2xl font-semibold text-black dark:text-gray-100 flex items-center gap-2">
                       {myProfile?.name}
                       <span
-                        className={`inline-flex items-center justify-center px-3 py-1 rounded-full text-sm font-medium ${
+                        className={`inline-flex items-center justify-center px-3 py-1 rounded-md text-xs font-medium ${
                           myProfile?.status === "Approved"
-                            ? "bg-green-100 text-green-800"
-                            : "bg-yellow-100 text-yellow-800"
+                            ? "bg-green-300 text-green-800"
+                            : "bg-yellow-300 text-yellow-800"
                         }`}
                       >
                         {myProfile?.status}
                       </span>
                     </h2>
-                    <p className="text-xs px-2 py-1 rounded-full bg-indigo-200 text-indigo-600 dark:text-gray-500">
+                    <p className="text-sm px-2 py-1 rounded-md bg-purple-500 text-white w-max">
                       {myProfile?.role}
                     </p>
                   </div>
