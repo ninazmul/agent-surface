@@ -99,8 +99,7 @@ export default function ProfilePage({
                         myProfile?.logo || "/assets/images/default-profile.png"
                       }
                       alt={myProfile?.name || "N/A"}
-                      width={150} // 3 units
-                      height={200} // 4 units
+                      fill
                       className="w-12 md:w-24 h-16 md:h-32 rounded-lg object-cover border"
                     />
                   </div>
