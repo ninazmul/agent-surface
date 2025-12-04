@@ -198,12 +198,12 @@ const PaymentTable = ({
                 key={payment._id.toString()}
                 className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
-                <TableCell>
+                <TableCell className="align-top">
                   {(currentPage - 1) * itemsPerPage + idx + 1}
                 </TableCell>
-                <TableCell>{payment.agency}</TableCell>
-                <TableCell>€{payment.amount}</TableCell>
-                <TableCell>
+                <TableCell className="align-top">{payment.agency}</TableCell>
+                <TableCell className="align-top">€{payment.amount}</TableCell>
+                <TableCell className="align-top">
                   {{
                     Bank: (
                       <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 text-gray-700 border inline-flex items-center gap-2">
@@ -230,7 +230,7 @@ const PaymentTable = ({
                     </span>
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="align-top">
                   <Popover>
                     <PopoverTrigger asChild>
                       <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 text-gray-700 border inline-flex items-center gap-2">
@@ -242,7 +242,7 @@ const PaymentTable = ({
                     </PopoverContent>
                   </Popover>
                 </TableCell>
-                <TableCell>
+                <TableCell className="align-top">
                   {(() => {
                     const progressStyles: Record<string, string> = {
                       Pending:
@@ -275,7 +275,7 @@ const PaymentTable = ({
                 </TableCell>
                 {isAdmin && (
                   <>
-                    <TableCell>
+                    <TableCell className="align-top">
                       <div className="flex gap-2">
                         <a
                           href={`/finance/payment/${payment._id.toString()}/update`}
@@ -291,7 +291,7 @@ const PaymentTable = ({
                           variant="ghost"
                           size="icon"
                         >
-                          <Trash className="w-4 h-4 text-red-600"/>
+                          <Trash className="w-4 h-4 text-red-600" />
                         </Button>
                       </div>
                     </TableCell>
