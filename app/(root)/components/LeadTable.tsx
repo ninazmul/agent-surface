@@ -562,7 +562,7 @@ const LeadTable = ({
                 <>
                   <TableRow
                     key={idx}
-                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0 align-top ${
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0 flex items-start gap-2 ${
                       lead.isPinned
                         ? "bg-yellow-200 hover:bg-yellow-300 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
                         : ""
