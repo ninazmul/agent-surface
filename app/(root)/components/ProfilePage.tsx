@@ -106,10 +106,10 @@ export default function ProfilePage({
 
                     <div className="flex items-center justify-between w-full">
                       <div className="w-full">
-                        <h2 className="text-lg md:text-2xl font-semibold text-black dark:text-gray-100 flex items-center gap-2">
-                          {myProfile?.name}
+                        <h2 className="text-lg md:text-2xl font-semibold text-black dark:text-gray-100 flex flex-wrap items-center gap-2">
+                          <span className="break-words">{myProfile?.name}</span>
                           <span
-                            className={`inline-flex items-center justify-center px-3 py-1 rounded-md text-xs font-medium ${
+                            className={`inline-flex items-center justify-center px-2 md:px-3 py-1 rounded-md text-xs md:text-sm font-medium ${
                               myProfile?.status === "Approved"
                                 ? "bg-green-300 text-green-800"
                                 : "bg-yellow-300 text-yellow-800"
