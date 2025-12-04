@@ -90,16 +90,16 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Input
         placeholder="Search by course name"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
+        className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
 
       <div
-        className="overflow-x-auto rounded-2xl bg-orange-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -124,10 +124,10 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">#</TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("name")}
                   className="flex items-center gap-2 cursor-pointer select-none"
@@ -137,13 +137,23 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Duration</TableHead>
-              <TableHead>Course Fee</TableHead>
-              <TableHead>Start Date</TableHead>
-              <TableHead>End Date</TableHead>
-              <TableHead>Campuses</TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">Type</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Duration
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Course Fee
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Start Date
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                End Date
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Campuses
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("createdAt")}
                   className="flex items-center gap-2 cursor-pointer select-none"
@@ -153,7 +163,9 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
 
@@ -161,7 +173,7 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
             {paginatedCourses.map((course, index) => (
               <TableRow
                 key={course._id.toString()}
-                className="hover:bg-orange-100 dark:bg-gray-800"
+                className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}
@@ -190,14 +202,10 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
                 <TableCell>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex gap-2 items-center"
-                      >
+                      <span className="flex gap-2 items-center px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center">
                         <Info className="w-4 h-4" />
                         View
-                      </Button>
+                      </span>
                     </PopoverTrigger>
                     <PopoverContent className="w-72 text-sm">
                       <div className="space-y-2">
