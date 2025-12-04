@@ -53,7 +53,6 @@ import { getAllPromotions } from "@/lib/actions/promotion.actions";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { createTrack, getTracksByStudent } from "@/lib/actions/track.actions";
 import { IStudentEvent, ITrack } from "@/lib/database/models/track.model";
-import { ImFacebook, ImInstagram, ImSkype, ImTwitter } from "react-icons/im";
 import Image from "next/image";
 
 type PinUnpinStatus = ILead & { isPinned: "pinned" | "unpinned" };
