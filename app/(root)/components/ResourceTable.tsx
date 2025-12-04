@@ -167,10 +167,10 @@ const ResourceTable = ({
                 key={resource._id.toString()}
                 className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
-                <TableCell>
+                <TableCell className="align-top">
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
-                <TableCell>
+                <TableCell className="align-top">
                   <a
                     href={`/applications/${resource._id.toString()}`}
                     className="line-clamp-1 w-40 md:w-auto hover:underline"
@@ -178,10 +178,10 @@ const ResourceTable = ({
                     {resource.fileName}
                   </a>
                 </TableCell>
-                <TableCell className="line-clamp-1 w-40 md:w-auto">
+                <TableCell className="line-clamp-1 w-40 md:w-auto align-top">
                   {resource.category}
                 </TableCell>
-                <TableCell>
+                <TableCell className="align-top">
                   <a href={resource.link} target="_blank">
                     <span className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center">
                       Download File
@@ -191,7 +191,7 @@ const ResourceTable = ({
 
                 {isAdmin && (
                   <>
-                    <TableCell className="flex items-center space-x-2">
+                    <TableCell className="flex items-center space-x-2 align-top">
                       <a href={`/resources/${resource._id.toString()}/update`}>
                         <Button variant="ghost" size="icon">
                           <Pencil className="w-4 h-4 text-black" />
