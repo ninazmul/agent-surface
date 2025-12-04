@@ -598,7 +598,7 @@ const LeadTable = ({
                           {lead.status && (
                             <span
                               className={`
-                            inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-semibold border
+                            inline-flex items-center justify-center p-1 rounded-full text-xs font-semibold border
                             ${
                               lead.status === "Perception" &&
                               "bg-gray-100 text-gray-700"
@@ -858,28 +858,48 @@ const LeadTable = ({
                           target="_blank"
                           className="text-blue-600 hover:text-blue-800 transition"
                         >
-                          <ImFacebook size={18} />
+                          <img
+                            src="/assets/social/facebook.svg"
+                            alt="Facebook"
+                            width={18}
+                            height={18}
+                          />
                         </a>
                         <a
                           href={lead.social?.instagram}
                           target="_blank"
                           className="text-pink-600 hover:text-pink-800 transition"
                         >
-                          <ImInstagram size={18} />
+                          <img
+                            src="/assets/social/instagram.svg"
+                            alt="Facebook"
+                            width={18}
+                            height={18}
+                          />
                         </a>
                         <a
                           href={lead.social?.skype}
                           target="_blank"
                           className="text-sky-600 hover:text-sky-800 transition"
                         >
-                          <ImSkype size={18} />
+                          <img
+                            src="/assets/social/skype.svg"
+                            alt="Facebook"
+                            width={18}
+                            height={18}
+                          />
                         </a>
                         <a
                           href={lead.social?.twitter}
                           target="_blank"
                           className="text-blue-400 hover:text-blue-600 transition"
                         >
-                          <ImTwitter size={18} />
+                          <img
+                            src="/assets/social//twitter.svg"
+                            alt="Facebook"
+                            width={18}
+                            height={18}
+                          />
                         </a>
                       </div>
                     </TableCell>
