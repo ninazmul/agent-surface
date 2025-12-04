@@ -164,8 +164,9 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
                 <TableCell>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <span className="w-32 px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center">
-                        <StickyNote size={16} /> Description
+                      <span className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border">
+                        <StickyNote size={14} />
+                        Description
                       </span>
                     </PopoverTrigger>
                     <PopoverContent className="max-w-xs text-sm">
