@@ -228,19 +228,18 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
                 <TableCell className="space-x-2">
                   {/* Edit */}
                   <a href={`/courses/${course._id.toString()}/update`}>
-                    <Button variant="outline" size="icon">
-                      <Pencil className="w-4 h-4 text-purple-500" />
+                    <Button variant="ghost" size="icon">
+                      <Pencil className="w-4 h-4 text-black" />
                     </Button>
                   </a>
 
                   {/* Delete */}
                   <Button
                     onClick={() => setConfirmDeleteId(course._id.toString())}
-                    variant="outline"
-                    size="icon"
-                    className="text-red-500"
+                    variant={"ghost"}
+                    size={"icon"}
                   >
-                    <Trash className="h-4 w-4" />
+                    <Trash className="w-4 h-4 text-red-600" />
                   </Button>
                 </TableCell>
               </TableRow>
