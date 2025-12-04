@@ -92,7 +92,7 @@ export default function ProfilePage({
             <div className="grid grid-cols-3 lg:grid-cols-5 gap-4 rounded-2xl bg-white dark:bg-gray-800 p-4">
               <div className="col-span-3 space-y-4">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                <div className="flex flex-row items-center justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
                   {/* Profile Image */}
                   <div className="flex-shrink-0 mx-auto sm:mx-0">
                     <Image
@@ -114,7 +114,7 @@ export default function ProfilePage({
                         <h2 className="text-base sm:text-lg md:text-xl font-semibold text-black dark:text-gray-100 flex flex-wrap items-center gap-2">
                           <span className="break-words">{myProfile?.name}</span>
                           <span
-                            className={`inline-flex items-center justify-center px-2 sm:px-3 py-1 rounded-md text-xs sm:text-sm md:text-base font-medium ${
+                            className={`inline-flex items-center justify-center px-2 py-1 rounded-md text-xs md:text-base font-medium ${
                               myProfile?.status === "Approved"
                                 ? "bg-green-300 text-green-800"
                                 : "bg-yellow-300 text-yellow-800"
