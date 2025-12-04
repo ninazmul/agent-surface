@@ -54,6 +54,7 @@ import { IPromotion } from "@/lib/database/models/promotion.model";
 import { createTrack, getTracksByStudent } from "@/lib/actions/track.actions";
 import { IStudentEvent, ITrack } from "@/lib/database/models/track.model";
 import { ImFacebook, ImInstagram, ImSkype, ImTwitter } from "react-icons/im";
+import Image from "next/image";
 
 type PinUnpinStatus = ILead & { isPinned: "pinned" | "unpinned" };
 
@@ -480,28 +481,6 @@ const AssignedLeadTable = ({
           </TableHeader>
           <TableBody>
             {paginatedLeads.map((lead, idx) => {
-              const progressColor =
-                lead.progress === "Open"
-                  ? "bg-gray-400"
-                  : lead.progress === "Contacted"
-                  ? "bg-yellow-500"
-                  : lead.progress === "Converted"
-                  ? "bg-green-500"
-                  : lead.progress === "Closed"
-                  ? "bg-red-500"
-                  : "bg-gray-300";
-
-              const progressValue =
-                lead.progress === "Open"
-                  ? 25
-                  : lead.progress === "Contacted"
-                  ? 50
-                  : lead.progress === "Converted"
-                  ? 75
-                  : lead.progress === "Closed"
-                  ? 100
-                  : 0;
-
               return (
                 <>
                   <TableRow
@@ -512,7 +491,7 @@ const AssignedLeadTable = ({
                         : ""
                     }`}
                   >
-                    <TableCell>
+                    <TableCell className="align-top">
                       <input
                         type="checkbox"
                         checked={selectedLeads.includes(lead._id.toString())}
@@ -531,7 +510,7 @@ const AssignedLeadTable = ({
                       />
                     </TableCell>
                     {/* Name & Email */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <a
                         href={`/leads/${lead._id.toString()}`}
                         className="flex flex-col space-y-1"
@@ -541,7 +520,7 @@ const AssignedLeadTable = ({
                           {lead.status && (
                             <span
                               className={`
-                            inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-semibold border
+                            inline-flex items-center justify-center p-1 rounded-full text-xs font-semibold border
                             ${
                               lead.status === "Perception" &&
                               "bg-gray-100 text-gray-700"
@@ -606,7 +585,7 @@ const AssignedLeadTable = ({
                       </a>
                     </TableCell>
 
-                    <TableCell>
+                    <TableCell className="align-top">
                       <div className="flex flex-col space-y-1">
                         <span className="font-semibold">
                           {profiles[lead.author] ? (
@@ -680,7 +659,7 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     {/* Course & Services */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       {lead.course ? (
                         <Popover>
                           <PopoverTrigger asChild>
@@ -737,7 +716,7 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     {/* Progress */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <select
                         value={lead.progress}
                         onChange={(e) =>
@@ -766,7 +745,7 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     {/* Status */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <select
                         value={lead.status}
                         onChange={(e) =>
@@ -795,7 +774,7 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     {/* Date */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <div className="flex flex-col text-sm">
                         <span>
                           <strong>Created:</strong>{" "}
@@ -821,41 +800,61 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     {/* Social icons */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <div className="flex items-center gap-2">
                         <a
                           href={lead.social?.facebook}
                           target="_blank"
                           className="text-blue-600 hover:text-blue-800 transition"
                         >
-                          <ImFacebook size={18} />
+                          <Image
+                            src="/assets/social/facebook.svg"
+                            alt="Facebook"
+                            width={18}
+                            height={18}
+                          />
                         </a>
                         <a
                           href={lead.social?.instagram}
                           target="_blank"
                           className="text-pink-600 hover:text-pink-800 transition"
                         >
-                          <ImInstagram size={18} />
+                          <Image
+                            src="/assets/social/instagram.svg"
+                            alt="Facebook"
+                            width={18}
+                            height={18}
+                          />
                         </a>
                         <a
                           href={lead.social?.skype}
                           target="_blank"
                           className="text-sky-600 hover:text-sky-800 transition"
                         >
-                          <ImSkype size={18} />
+                          <Image
+                            src="/assets/social/skype.svg"
+                            alt="Facebook"
+                            width={18}
+                            height={18}
+                          />
                         </a>
                         <a
                           href={lead.social?.twitter}
                           target="_blank"
                           className="text-blue-400 hover:text-blue-600 transition"
                         >
-                          <ImTwitter size={18} />
+                          <Image
+                            src="/assets/social//twitter.svg"
+                            alt="Facebook"
+                            width={16}
+                            height={16}
+                          />
                         </a>
                       </div>
                     </TableCell>
 
                     {/* Actions */}
-                    <TableCell className="relative text-right">
+                    <TableCell className="relative text-right align-top">
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
@@ -990,24 +989,6 @@ const AssignedLeadTable = ({
                           )}
                         </PopoverContent>
                       </Popover>
-                    </TableCell>
-                  </TableRow>
-
-                  {/* Full-width Progress Bar */}
-                  <TableRow
-                    className={
-                      lead.isPinned
-                        ? "bg-yellow-200 border-l-4 border-yellow-400 hover:bg-yellow-300 dark:hover:bg-yellow-300 dark:text-black"
-                        : "border-t-0"
-                    }
-                  >
-                    <TableCell colSpan={11}>
-                      <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-500">
-                        <div
-                          className={`h-2 rounded-full ${progressColor}`}
-                          style={{ width: `${progressValue}%` }}
-                        />
-                      </div>
                     </TableCell>
                   </TableRow>
                 </>
