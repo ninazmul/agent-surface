@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { getAllCourses } from "@/lib/actions/course.actions";
-import JsonToExcel from "../components/JsonToExcel";
 import CourseTable from "../components/CourseTable";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
