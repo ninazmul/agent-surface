@@ -106,7 +106,7 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
         </h2>
 
         {/* Preset Date Filters */}
-        <div className="flex flex-row gap-3 w-full sm:w-auto">
+        <div className="flex flex-wrap gap-3 w-full sm:w-auto">
           <select
             onChange={(e) =>
               updateDateRange(e.target.value as "7d" | "1m" | "1y" | "custom")
