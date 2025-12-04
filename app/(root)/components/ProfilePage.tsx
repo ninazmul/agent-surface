@@ -93,23 +93,28 @@ export default function ProfilePage({
               <div className="col-span-3 space-y-4">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
-                  <div className="flex items-center gap-4 w-full">
+                  {/* Profile Image */}
+                  <div className="flex-shrink-0 mx-auto sm:mx-0">
                     <Image
                       src={
                         myProfile?.logo || "/assets/images/default-profile.png"
                       }
                       alt={myProfile?.name || "N/A"}
-                      width={150} // 3 units
-                      height={200} // 4 units
-                      className="w-20 md:w-24 h-16 md:h-32 rounded-lg object-cover border"
+                      width={150}
+                      height={200}
+                      className="w-24 h-32 sm:w-28 sm:h-36 md:w-32 md:h-40 rounded-lg object-cover border"
                     />
+                  </div>
 
-                    <div className="flex items-center justify-between w-full">
-                      <div className="w-full">
-                        <h2 className="text-lg md:text-2xl font-semibold text-black dark:text-gray-100 flex flex-wrap items-center gap-2">
+                  {/* Profile Info */}
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
+                    {/* Name and Role */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 w-full">
+                      <div className="flex flex-col gap-1 sm:gap-2">
+                        <h2 className="text-base sm:text-lg md:text-xl font-semibold text-black dark:text-gray-100 flex flex-wrap items-center gap-2">
                           <span className="break-words">{myProfile?.name}</span>
                           <span
-                            className={`inline-flex items-center justify-center px-2 md:px-3 py-1 rounded-md text-xs md:text-sm font-medium ${
+                            className={`inline-flex items-center justify-center px-2 sm:px-3 py-1 rounded-md text-xs sm:text-sm md:text-base font-medium ${
                               myProfile?.status === "Approved"
                                 ? "bg-green-300 text-green-800"
                                 : "bg-yellow-300 text-yellow-800"
@@ -118,17 +123,23 @@ export default function ProfilePage({
                             {myProfile?.status}
                           </span>
                         </h2>
-                        <p className="text-sm px-2 py-1 rounded-md bg-purple-500 text-white w-max">
+                        <p className="text-xs sm:text-sm md:text-base px-2 py-1 rounded-md bg-purple-500 text-white w-max">
                           {myProfile?.role}
                         </p>
                       </div>
+                    </div>
+
+                    {/* Edit Button */}
+                    <div className="flex-shrink-0 mt-2 sm:mt-0">
                       <a href={`/profile/${myProfile?._id.toString()}/update`}>
                         <Button
                           variant="outline"
-                          className="text-white dark:text-gray-100 w-max bg-black dark:bg-gray-600 hover:bg-gray-800 inline-flex items-center gap-2"
+                          className="flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-black text-white dark:bg-gray-600 dark:text-gray-100 hover:bg-gray-800 rounded-md w-max"
                         >
-                          <span className="hidden lg:flex">Edit Profile</span>
-                          <Edit />
+                          <span className="text-xs sm:text-sm md:text-base">
+                            Edit Profile
+                          </span>
+                          <Edit className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
                         </Button>
                       </a>
                     </div>
