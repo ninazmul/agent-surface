@@ -496,7 +496,7 @@ const LeadTable = ({
       >
         <Table>
           <TableHeader className="bg-gray-900">
-            <TableRow className="flex items-center justify-evenly gap-2">
+            <TableRow>
               <TableHead className="text-white cursor-pointer">
                 <input
                   type="checkbox"
@@ -562,13 +562,13 @@ const LeadTable = ({
                 <>
                   <TableRow
                     key={idx}
-                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0 flex items-start justify-evenly gap-2 ${
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0 ${
                       lead.isPinned
                         ? "bg-yellow-200 hover:bg-yellow-300 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
                         : ""
                     }`}
                   >
-                    <TableCell>
+                    <TableCell className="align-top">
                       <input
                         type="checkbox"
                         checked={selectedLeads.includes(lead._id.toString())}
@@ -588,7 +588,7 @@ const LeadTable = ({
                     </TableCell>
 
                     {/* Name & Email */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <a
                         href={`/leads/${lead._id.toString()}`}
                         className="flex flex-col space-y-1"
@@ -663,7 +663,7 @@ const LeadTable = ({
                       </a>
                     </TableCell>
 
-                    <TableCell>
+                    <TableCell className="align-top">
                       <div className="flex flex-col space-y-1">
                         <span className="font-semibold">
                           {profiles[lead.author] ? (
@@ -710,7 +710,7 @@ const LeadTable = ({
                     </TableCell>
 
                     {/* Course & Services */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       {lead.course ? (
                         <Popover>
                           <PopoverTrigger asChild>
@@ -767,7 +767,7 @@ const LeadTable = ({
                     </TableCell>
 
                     {/* Progress */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <select
                         value={lead.progress}
                         onChange={(e) =>
@@ -796,7 +796,7 @@ const LeadTable = ({
                     </TableCell>
 
                     {/* Status */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <select
                         value={lead.status}
                         onChange={(e) =>
@@ -825,7 +825,7 @@ const LeadTable = ({
                     </TableCell>
 
                     {/* Date */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <div className="flex flex-col text-sm">
                         <span>
                           <strong>Created:</strong>{" "}
@@ -851,7 +851,7 @@ const LeadTable = ({
                     </TableCell>
 
                     {/* Social icons */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <div className="flex items-center gap-2">
                         <a
                           href={lead.social?.facebook}
@@ -885,7 +885,7 @@ const LeadTable = ({
                     </TableCell>
 
                     {/* Actions */}
-                    <TableCell className="relative text-right">
+                    <TableCell className="relative text-right align-top">
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
