@@ -15,6 +15,9 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
 
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
+  const [dateRange, setDateRange] = useState<"7d" | "1m" | "1y" | "custom">(
+    "7d"
+  );
 
   // On mount, set default to last 7 days if no params
   useEffect(() => {
@@ -24,12 +27,14 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
     if (startParam && endParam) {
       setStartDate(new Date(startParam));
       setEndDate(new Date(endParam));
+      setDateRange("custom");
     } else {
       const today = new Date();
       const last7Days = new Date();
-      last7Days.setDate(today.getDate() - 6); // include today
+      last7Days.setDate(today.getDate() - 6);
       setStartDate(last7Days);
       setEndDate(today);
+      setDateRange("7d");
     }
   }, [searchParams]);
 
@@ -62,6 +67,7 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
 
     setStartDate(start);
     setEndDate(end);
+    setDateRange(range);
 
     const params = new URLSearchParams(searchParams.toString());
     params.set("startDate", start.toISOString().split("T")[0]);
@@ -72,14 +78,13 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
   const parseNumber = (value: string | undefined) =>
     parseFloat((value || "0").toString().replace(/,/g, "").trim()) || 0;
 
-  // Filter leads based on paymentStatus and date range
   const salesAchieved = useMemo(() => {
     if (!startDate || !endDate) return 0;
 
     const paidLeads = leads?.filter((l) => l.paymentStatus === "Accepted");
 
     const filteredLeads = paidLeads?.filter((lead) => {
-      const leadDate = new Date(lead.createdAt); // adjust if another date field
+      const leadDate = new Date(lead.createdAt);
       return leadDate >= startDate && leadDate <= endDate;
     });
 
@@ -100,19 +105,18 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
 
   return (
     <section className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
-      <div className="flex flex-wrap items-center justify-between gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
         <h2 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
           Sales Target Progress
         </h2>
 
-        {/* Preset Date Filters */}
         <div className="flex flex-wrap gap-3 w-full sm:w-auto">
           <select
             onChange={(e) =>
               updateDateRange(e.target.value as "7d" | "1m" | "1y" | "custom")
             }
             className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
-            defaultValue="7d"
+            value={dateRange}
           >
             <option value="7d">Last 7 Days</option>
             <option value="1m">Last 1 Month</option>
@@ -120,31 +124,35 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
             <option value="custom">Custom</option>
           </select>
 
-          {/* Custom Date Range */}
-          <input
-            type="date"
-            value={startDate ? startDate.toISOString().split("T")[0] : ""}
-            onChange={(e) =>
-              updateDateRange(
-                "custom",
-                e.target.value,
-                endDate?.toISOString().split("T")[0]
-              )
-            }
-            className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
-          />
-          <input
-            type="date"
-            value={endDate ? endDate.toISOString().split("T")[0] : ""}
-            onChange={(e) =>
-              updateDateRange(
-                "custom",
-                startDate?.toISOString().split("T")[0],
-                e.target.value
-              )
-            }
-            className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
-          />
+          {/* Only show custom inputs if "custom" is selected */}
+          {dateRange === "custom" && (
+            <>
+              <input
+                type="date"
+                value={startDate ? startDate.toISOString().split("T")[0] : ""}
+                onChange={(e) =>
+                  updateDateRange(
+                    "custom",
+                    e.target.value,
+                    endDate?.toISOString().split("T")[0]
+                  )
+                }
+                className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              />
+              <input
+                type="date"
+                value={endDate ? endDate.toISOString().split("T")[0] : ""}
+                onChange={(e) =>
+                  updateDateRange(
+                    "custom",
+                    startDate?.toISOString().split("T")[0],
+                    e.target.value
+                  )
+                }
+                className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              />
+            </>
+          )}
         </div>
       </div>
 
@@ -159,14 +167,14 @@ export default function SalesTargetProgress({ profile, leads }: Props) {
             className="bg-green-500 h-3"
             style={{
               width: `${Math.min(
-                (salesAchieved || 0 / profile.salesTarget) * 100,
+                ((salesAchieved || 0) / profile.salesTarget) * 100,
                 100
               )}%`,
             }}
           />
         </div>
         <p className="mt-2 text-xs text-end text-orange-500">
-          {((salesAchieved || 0 / profile.salesTarget) * 100).toFixed(1)}%
+          {(((salesAchieved || 0) / profile.salesTarget) * 100).toFixed(1)}%
           achieved
         </p>
       </div>
