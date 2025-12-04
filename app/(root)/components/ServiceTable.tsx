@@ -87,15 +87,15 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <Input
         placeholder="Search by title or description"
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
+        className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
       <div
-        className="overflow-x-auto rounded-2xl bg-teal-50 dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -120,10 +120,10 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
         }}
       >
         <Table>
-          <TableHeader>
+          <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>
+              <TableHead className="text-white cursor-pointer">#</TableHead>
+              <TableHead className="text-white cursor-pointer">
                 <div
                   onClick={() => handleSort("title")}
                   className="flex items-center gap-2 cursor-pointer"
@@ -133,19 +133,29 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
                     (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
                 </div>
               </TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Start Date</TableHead>
-              <TableHead>End Date</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Actions</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Description
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">Type</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Start Date
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                End Date
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Amount
+              </TableHead>
+              <TableHead className="text-white cursor-pointer">
+                Actions
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {paginatedServices.map((service, index) => (
               <TableRow
                 key={service._id.toString()}
-                className="hover:bg-teal-100 dark:hover:bg-gray-800"
+                className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}
@@ -154,9 +164,9 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
                 <TableCell>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="">
+                      <span className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center">
                         <StickyNote size={16} /> Description
-                      </Button>
+                      </span>
                     </PopoverTrigger>
                     <PopoverContent className="max-w-xs text-sm">
                       {service.description}
@@ -175,16 +185,16 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
                 <TableCell>{`€${service.amount}` || "N/A"}</TableCell>
                 <TableCell className="flex items-center space-x-2">
                   <a href={`/services/${service._id.toString()}/update`}>
-                    <Button variant="outline" size="icon">
-                      <Pencil className="w-4 h-4 text-purple-500" />
+                    <Button variant="ghost" size="icon">
+                      <Pencil className="w-4 h-4 text-black" />
                     </Button>
                   </a>
                   <Button
                     onClick={() => setConfirmDeleteId(service._id.toString())}
-                    variant="outline"
-                    className="text-red-500"
+                    variant={"ghost"}
+                    size={"icon"}
                   >
-                    <Trash />
+                    <Trash className="w-4 h-4 text-red-600" />
                   </Button>
                 </TableCell>
               </TableRow>
@@ -199,22 +209,22 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
           {Math.min(itemsPerPage * currentPage, filteredServices.length)} of{" "}
           {filteredServices.length} services
         </span>
-        <div className="flex items-center space-x-2">
+        <div className="flex gap-2">
           <Button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
             size="sm"
-            className="rounded-2xl"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p - 1)}
+            disabled={currentPage === 1}
           >
             Previous
           </Button>
           <Button
+            size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage === Math.ceil(filteredServices.length / itemsPerPage)
             }
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            size="sm"
-            className="rounded-2xl"
           >
             Next
           </Button>

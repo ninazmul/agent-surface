@@ -9,6 +9,7 @@ import {
 import { redirect } from "next/navigation";
 import ServiceTable from "../components/ServiceTable";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
+import { Plus } from "lucide-react";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -30,28 +31,26 @@ const Page = async () => {
 
   return (
     <>
-      <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
+      <section className="p-4">
         {/* Header + Actions */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
-          {/* Title */}
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-            <h3 className="h3-bold text-center sm:text-left">All Services</h3>
-          </div>
+          <h3 className="h3-bold text-center sm:text-left">All Services</h3>
 
-          {/* Action Button */}
           {adminStatus && (
             <div className="w-full sm:w-auto">
               <a href="/services/create" className="w-full sm:w-auto">
-                <Button size="lg" className="rounded-full w-full sm:w-auto">
-                  Create Service
+                <Button
+                  size="sm"
+                  className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+                >
+                  <Plus size={16} /> Add Service
                 </Button>
               </a>
             </div>
           )}
         </div>
 
-        {/* Table */}
-        <div className="overflow-x-auto my-8">
+        <div className="overflow-x-auto">
           <ServiceTable services={services} />
         </div>
       </section>
