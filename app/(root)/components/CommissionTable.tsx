@@ -355,7 +355,7 @@ const CommissionTable = ({
                     key={lead._id.toString()}
                     className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0`}
                   >
-                    <TableCell>
+                    <TableCell className="align-top">
                       <input
                         type="checkbox"
                         checked={selectedLeads.includes(lead._id.toString())}
@@ -373,12 +373,12 @@ const CommissionTable = ({
                         }}
                       />
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="align-top">
                       {(currentPage - 1) * itemsPerPage + idx + 1}
                     </TableCell>
 
                     {/* Name & Email */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <a className="flex flex-col">
                         <span className="font-semibold flex items-center gap-2">
                           <span className="line-clamp-1">{lead.name}</span>
@@ -401,7 +401,7 @@ const CommissionTable = ({
                       </a>
                     </TableCell>
 
-                    <TableCell>
+                    <TableCell className="align-top">
                       <div className="flex flex-col">
                         <span className="font-semibold">
                           {profile?.name ?? "Name: N/A"}
@@ -416,7 +416,7 @@ const CommissionTable = ({
                     </TableCell>
 
                     {/* Course & Services */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       {lead.course ? (
                         <Popover>
                           <PopoverTrigger asChild>
@@ -472,7 +472,7 @@ const CommissionTable = ({
                       )}
                     </TableCell>
 
-                    <TableCell className="font-semibold">
+                    <TableCell className="font-semibold align-top">
                       <div className="text-sm space-y-1">
                         {/* Paid & Due calculation */}
                         {(() => {
@@ -503,7 +503,7 @@ const CommissionTable = ({
                     </TableCell>
 
                     {/* PaymentStatus */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       {(() => {
                         const statusStyles: Record<string, string> = {
                           Accepted: "bg-green-100 text-green-600",
@@ -525,7 +525,7 @@ const CommissionTable = ({
                     </TableCell>
 
                     {/* Date */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <div className="flex flex-col text-sm">
                         <span>
                           <strong>Created:</strong>{" "}
@@ -559,7 +559,7 @@ const CommissionTable = ({
                     </TableCell>
 
                     {/* Actions */}
-                    <TableCell className="relative text-right">
+                    <TableCell className="relative text-right align-top">
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
