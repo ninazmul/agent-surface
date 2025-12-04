@@ -12,6 +12,7 @@ import { getUserEmailById } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
 import { IAdmin } from "@/lib/database/models/admin.model";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
+import { Plus } from "lucide-react";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -41,22 +42,21 @@ const Page = async () => {
 
   return (
     <>
-      <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
+      <section className="p-4">
         {/* Header + Actions */}
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <h3 className="h3-bold text-center sm:text-left">All Admins</h3>
 
-          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-            <JsonToExcel data={admins} fileName="admins.xlsx" />
-            <a href={`/admins/create`} className="w-full sm:w-auto">
-              <Button size="lg" className="rounded-full w-full sm:w-auto">
-                Add Admin
-              </Button>
-            </a>
-          </div>
+          <a href={`/admins/create`} className="w-full sm:w-auto">
+            <Button
+              size="sm"
+              className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+            >
+              <Plus size={16} /> Add Admin
+            </Button>
+          </a>
         </div>
 
-        {/* Table */}
         <div className="overflow-x-auto">
           <AdminTable admins={admins} currentAdminCountries={adminCountries} />
         </div>
