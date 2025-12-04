@@ -558,33 +558,11 @@ const LeadTable = ({
           </TableHeader>
           <TableBody>
             {paginatedLeads.map((lead, idx) => {
-              const progressColor =
-                lead.progress === "Open"
-                  ? "bg-gray-400"
-                  : lead.progress === "Contacted"
-                  ? "bg-yellow-500"
-                  : lead.progress === "Converted"
-                  ? "bg-green-500"
-                  : lead.progress === "Closed"
-                  ? "bg-red-500"
-                  : "bg-gray-300";
-
-              const progressValue =
-                lead.progress === "Open"
-                  ? 25
-                  : lead.progress === "Contacted"
-                  ? 50
-                  : lead.progress === "Converted"
-                  ? 75
-                  : lead.progress === "Closed"
-                  ? 100
-                  : 0;
-
               return (
                 <>
                   <TableRow
                     key={idx}
-                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0 ${
+                    className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0 align-top ${
                       lead.isPinned
                         ? "bg-yellow-200 hover:bg-yellow-300 border-l-4 border-yellow-400 dark:text-black dark:hover:bg-yellow-300"
                         : ""
@@ -1060,24 +1038,6 @@ const LeadTable = ({
                           )}
                         </PopoverContent>
                       </Popover>
-                    </TableCell>
-                  </TableRow>
-
-                  {/* Full-width Progress Bar */}
-                  <TableRow
-                    className={
-                      lead.isPinned
-                        ? "bg-yellow-200 border-l-4 border-yellow-400 hover:bg-yellow-300 dark:hover:bg-yellow-300 dark:text-black"
-                        : "border-t-0"
-                    }
-                  >
-                    <TableCell colSpan={11}>
-                      <div className="w-full h-2 rounded-full bg-gray-200 dark:bg-gray-500">
-                        <div
-                          className={`h-2 rounded-full ${progressColor}`}
-                          style={{ width: `${progressValue}%` }}
-                        />
-                      </div>
                     </TableCell>
                   </TableRow>
                 </>
