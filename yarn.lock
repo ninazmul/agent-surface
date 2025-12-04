@@ -4519,7 +4519,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@uploadthing/react@npm:^7.1.3":
+"@uploadthing/react@npm:^7.3.3":
   version: 7.3.3
   resolution: "@uploadthing/react@npm:7.3.3"
   dependencies:
@@ -4668,7 +4668,7 @@ __metadata:
     "@types/stripe": "npm:^8.0.417"
     "@types/styled-components": "npm:^5.1.34"
     "@types/topojson": "npm:^3"
-    "@uploadthing/react": "npm:^7.1.3"
+    "@uploadthing/react": "npm:^7.3.3"
     "@vercel/analytics": "npm:^1.5.0"
     "@vercel/speed-insights": "npm:^1.2.0"
     axios: "npm:^1.11.0"
