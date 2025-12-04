@@ -5,7 +5,6 @@ import {
   getAllAdmins,
   isAdmin,
 } from "@/lib/actions/admin.actions";
-import JsonToExcel from "../components/JsonToExcel";
 import AdminTable from "../components/AdminTable";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
