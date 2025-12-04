@@ -167,11 +167,11 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                 key={promotion._id.toString()}
                 className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
-                <TableCell>
+                <TableCell className="align-top">
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
                 {/* Photo */}
-                <TableCell>
+                <TableCell className="align-top">
                   {promotion.photo ? (
                     <Image
                       src={promotion.photo}
@@ -184,20 +184,20 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                     "-"
                   )}
                 </TableCell>
-                <TableCell>{promotion.title}</TableCell>
-                <TableCell className="max-w-40 truncate">
+                <TableCell className="align-top">{promotion.title}</TableCell>
+                <TableCell className="max-w-40 truncate align-top">
                   {promotion.description}
                 </TableCell>
-                <TableCell className="max-w-40 truncate">
+                <TableCell className="max-w-40 truncate align-top">
                   {promotion.criteria}
                 </TableCell>
-                <TableCell>
+                <TableCell className="align-top">
                   {formatDateTime(promotion.startDate).dateOnly} <br />
                   {formatDateTime(promotion.endDate).dateOnly}
                 </TableCell>
 
                 {/* Courses & Services */}
-                <TableCell>
+                <TableCell className="align-top">
                   {promotion.course?.length || promotion.services?.length ? (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -246,7 +246,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                 </TableCell>
 
                 {/* Countries */}
-                <TableCell>
+                <TableCell className="align-top">
                   {promotion.countries?.length ? (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -277,7 +277,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                 </TableCell>
 
                 {/* Agencies */}
-                <TableCell>
+                <TableCell className="align-top">
                   {promotion.agencies?.length ? (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -307,10 +307,10 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                   )}
                 </TableCell>
 
-                <TableCell>{promotion.sku}</TableCell>
+                <TableCell className="align-top">{promotion.sku}</TableCell>
 
                 {/* Actions */}
-                <TableCell className="relative text-right">
+                <TableCell className="relative text-right align-top">
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button
