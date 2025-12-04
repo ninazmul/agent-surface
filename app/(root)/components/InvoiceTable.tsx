@@ -252,12 +252,12 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                     key={lead._id.toString()}
                     className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0`}
                   >
-                    <TableCell>
+                    <TableCell className="align-top">
                       {(currentPage - 1) * itemsPerPage + idx + 1}
                     </TableCell>
 
                     {/* Name & Email */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <a className="flex flex-col">
                         <span className="font-semibold flex items-center gap-2">
                           <span className="line-clamp-1">{lead.name}</span>
@@ -281,7 +281,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                     </TableCell>
 
                     {/* Course & Services */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       {lead.course ? (
                         <Popover>
                           <PopoverTrigger asChild>
@@ -337,7 +337,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                       )}
                     </TableCell>
 
-                    <TableCell>
+                    <TableCell className="align-top">
                       <div className="text-sm space-y-1">
                         <div className="text-gray-500 dark:text-gray-300">
                           €{courseAmount} + €{servicesTotal}
@@ -350,7 +350,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                     </TableCell>
 
                     {/* Date */}
-                    <TableCell>
+                    <TableCell className="align-top">
                       <div className="flex flex-col text-sm">
                         <span>
                           <strong>Created:</strong>{" "}
@@ -384,7 +384,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                     </TableCell>
 
                     {/* Actions */}
-                    <TableCell className="relative text-right">
+                    <TableCell className="relative text-right align-top">
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
