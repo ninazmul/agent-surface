@@ -162,12 +162,12 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
                 key={event._id.toString()}
                 className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
-                <TableCell>
+                <TableCell className="align-top">
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
-                <TableCell>{event.title}</TableCell>
-                <TableCell className="">{event.description}</TableCell>
-                <TableCell>
+                <TableCell className="align-top">{event.title}</TableCell>
+                <TableCell className="align-top">{event.description}</TableCell>
+                <TableCell className="align-top">
                   {new Date(event.date).toLocaleString("en-GB", {
                     day: "2-digit",
                     month: "2-digit",
@@ -177,7 +177,7 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
                     hour12: true,
                   })}
                 </TableCell>
-                <TableCell className="flex items-center space-x-2">
+                <TableCell className="flex items-center space-x-2 align-top">
                   <Sheet>
                     <SheetTrigger>
                       <Button variant="ghost" size="icon">
