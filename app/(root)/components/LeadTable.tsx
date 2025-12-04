@@ -60,8 +60,8 @@ import { getAllPromotions } from "@/lib/actions/promotion.actions";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { createTrack, getTracksByStudent } from "@/lib/actions/track.actions";
 import { IStudentEvent, ITrack } from "@/lib/database/models/track.model";
-import { ImFacebook, ImInstagram, ImSkype, ImTwitter } from "react-icons/im";
 import { getAllAdmins } from "@/lib/actions/admin.actions";
+import Image from "next/image";
 
 type PinUnpinStatus = ILead & { isPinned: "pinned" | "unpinned" };
 
@@ -858,7 +858,7 @@ const LeadTable = ({
                           target="_blank"
                           className="text-blue-600 hover:text-blue-800 transition"
                         >
-                          <img
+                          <Image
                             src="/assets/social/facebook.svg"
                             alt="Facebook"
                             width={18}
@@ -870,7 +870,7 @@ const LeadTable = ({
                           target="_blank"
                           className="text-pink-600 hover:text-pink-800 transition"
                         >
-                          <img
+                          <Image
                             src="/assets/social/instagram.svg"
                             alt="Facebook"
                             width={18}
@@ -882,7 +882,7 @@ const LeadTable = ({
                           target="_blank"
                           className="text-sky-600 hover:text-sky-800 transition"
                         >
-                          <img
+                          <Image
                             src="/assets/social/skype.svg"
                             alt="Facebook"
                             width={18}
@@ -894,7 +894,7 @@ const LeadTable = ({
                           target="_blank"
                           className="text-blue-400 hover:text-blue-600 transition"
                         >
-                          <img
+                          <Image
                             src="/assets/social//twitter.svg"
                             alt="Facebook"
                             width={18}
