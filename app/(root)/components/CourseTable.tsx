@@ -253,22 +253,22 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
           Showing {Math.min(itemsPerPage * currentPage, filteredCourses.length)}{" "}
           of {filteredCourses.length} courses
         </span>
-        <div className="flex items-center space-x-2">
+        <div className="flex gap-2">
           <Button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((prev) => prev - 1)}
             size="sm"
-            className="rounded-2xl"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p - 1)}
+            disabled={currentPage === 1}
           >
             Previous
           </Button>
           <Button
+            size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage === Math.ceil(filteredCourses.length / itemsPerPage)
             }
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            size="sm"
-            className="rounded-2xl"
           >
             Next
           </Button>
