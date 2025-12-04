@@ -897,8 +897,8 @@ const LeadTable = ({
                           <Image
                             src="/assets/social//twitter.svg"
                             alt="Facebook"
-                            width={18}
-                            height={18}
+                            width={16}
+                            height={16}
                           />
                         </a>
                       </div>
