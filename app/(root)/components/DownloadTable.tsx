@@ -185,10 +185,10 @@ const DownloadTable = ({
                 key={download._id.toString()}
                 className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
-                <TableCell className="align-top">
+                <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
-                <TableCell className="align-top">
+                <TableCell>
                   <a
                     href={`/applications/${download._id.toString()}`}
                     className="line-clamp-1 w-40 md:w-auto hover:underline"
@@ -196,7 +196,7 @@ const DownloadTable = ({
                     {download.name}
                   </a>
                 </TableCell>
-                <TableCell className="align-top">
+                <TableCell>
                   <a
                     href={`mailto:${download.email}`}
                     className=""
@@ -205,7 +205,7 @@ const DownloadTable = ({
                     {download.email}
                   </a>
                 </TableCell>
-                <TableCell className="align-top">
+                <TableCell>
                   <a
                     href={`mailto:${download.author}`}
                     className=""
@@ -214,13 +214,13 @@ const DownloadTable = ({
                     {download.author}
                   </a>
                 </TableCell>
-                <TableCell className="w-52 align-top">
+                <TableCell className="w-52">
                   <span className="block w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border">
                     {formatDateTime(download.date).dateOnly}
                   </span>
                 </TableCell>
 
-                <TableCell className="w-52 align-top">
+                <TableCell className="w-52">
                   {download.documents?.length > 0 ? (
                     <select
                       onChange={(e) => {
@@ -244,7 +244,7 @@ const DownloadTable = ({
                 </TableCell>
 
                 {isAdmin && (
-                  <TableCell className="flex items-center space-x-2 align-top">
+                  <TableCell className="flex items-center space-x-2">
                     <a href={`/downloads/${download._id.toString()}/update`}>
                       <Button variant="ghost" size="icon">
                         <Pencil className="w-4 h-4 text-black" />
