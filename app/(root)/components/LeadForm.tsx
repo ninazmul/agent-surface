@@ -332,7 +332,7 @@ const LeadForm = ({
           e.preventDefault();
           form.handleSubmit(onSubmit)(e);
         }}
-        className="flex flex-col gap-6 rounded-2xl bg-pink-50 dark:bg-gray-900 p-6 shadow-sm"
+        className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm"
       >
         {/* ✅ Personal Information */}
         <h3 className="text-xl font-semibold">Personal Information</h3>
@@ -1185,7 +1185,7 @@ const LeadForm = ({
         {/* ✅ Submit */}
         <Button
           type="submit"
-          className="mt-4"
+          className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
           disabled={form.formState.isSubmitting}
         >
           {form.formState.isSubmitting ? "Submitting..." : "Submit"}
