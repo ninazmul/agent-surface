@@ -140,7 +140,7 @@ const DownloadForm = ({
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-6 rounded-2xl bg-yellow-50 dark:bg-gray-800 p-6 shadow-sm"
+        className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm space-y-4"
       >
         <div className="space-y-2">
           <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
@@ -361,7 +361,7 @@ const DownloadForm = ({
           type="submit"
           size="lg"
           disabled={form.formState.isSubmitting}
-          className="w-full rounded-2xl"
+          className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
         >
           {form.formState.isSubmitting ? "Uploading..." : "Submit Form"}
         </Button>
