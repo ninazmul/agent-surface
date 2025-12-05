@@ -18,7 +18,9 @@ import { IEvent } from "@/lib/database/models/event.model";
 
 const EventFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
-  description: z.string().min(10, "Description must be at least 10 characters."),
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters."),
   date: z.string().min(1, "Date and time are required."),
 });
 
@@ -117,7 +119,7 @@ const EventForm = ({ type, Event, EventId, email }: EventFormProps) => {
           type="submit"
           size="lg"
           disabled={form.formState.isSubmitting}
-          className="button col-span-2 w-full"
+          className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
         >
           {form.formState.isSubmitting
             ? "Submitting..."
