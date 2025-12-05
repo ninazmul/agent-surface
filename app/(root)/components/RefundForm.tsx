@@ -122,7 +122,7 @@ const RefundForm = ({ type, Refund, RefundId, leads }: RefundFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-6 rounded-2xl bg-green-50 dark:bg-gray-900 p-6 shadow-sm"
+        className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm space-y-4"
       >
         {/* Name Select with react-select */}
         <FormItem className="w-full">
@@ -254,7 +254,7 @@ const RefundForm = ({ type, Refund, RefundId, leads }: RefundFormProps) => {
           type="submit"
           size="lg"
           disabled={form.formState.isSubmitting}
-          className="button col-span-2 w-full"
+          className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
         >
           {form.formState.isSubmitting
             ? "Submitting..."

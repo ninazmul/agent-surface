@@ -142,11 +142,7 @@ const DownloadForm = ({
         onSubmit={form.handleSubmit(onSubmit)}
         className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm space-y-4"
       >
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
-            Document Information
-          </h2>
-        </div>
+        <h2 className="text-xl font-semibold">Document Information</h2>
 
         {/* Student Name (react-select) */}
         <FormItem>

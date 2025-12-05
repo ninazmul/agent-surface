@@ -102,9 +102,7 @@ const EventCalendarForm = ({
       >
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2 pt-4">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Event Information
-            </h2>
+            <h2 className="text-xl font-semibold">Event Information</h2>
             <p className="text-sm text-gray-500">
               Write a brief description of the event.
             </p>

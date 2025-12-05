@@ -276,12 +276,7 @@ const PromotionForm = ({
         onSubmit={form.handleSubmit(onSubmit)}
         className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm space-y-4"
       >
-        {/* Section: Promotion Info */}
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold">
-            Promotion Information
-          </h2>
-        </div>
+        <h2 className="text-xl font-semibold">Promotion Information</h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Title */}
