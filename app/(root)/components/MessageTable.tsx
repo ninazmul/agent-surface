@@ -397,9 +397,10 @@ const MessageTable = ({
         <div className="w-[320px] flex-shrink-0 bg-gray-100 dark:bg-gray-700 h-full overflow-y-auto p-4 rounded-2xl">
           <NewMessageForm
             allUsers={allUsers}
+            agencyProfiles={agencyProfiles}
             onSelectUser={(email) => {
               setNewMessageUser(email);
-              setSelectedThread(null); // hide existing thread if any
+              setSelectedThread(null);
             }}
           />
         </div>

@@ -1,35 +1,43 @@
 "use client";
 
-import {
-  Select,
-  SelectTrigger,
-  SelectContent,
-  SelectItem,
-  SelectValue,
-} from "@/components/ui/select";
+import Image from "next/image";
 
 const NewMessageForm = ({
   allUsers,
   onSelectUser,
+  agencyProfiles,
 }: {
   allUsers: { email: string; name?: string }[];
   onSelectUser: (email: string) => void;
+  agencyProfiles: Record<string, { name?: string; logo?: string }>;
 }) => {
   return (
-    <div className="p-4 border rounded-2xl space-y-3 bg-gray-50 dark:bg-gray-900">
+    <div className="p-4 border rounded-2xl space-y-3 bg-gray-50 dark:bg-gray-900 h-full overflow-y-auto">
       <h3 className="text-lg font-semibold">Send New Message</h3>
-      <Select onValueChange={onSelectUser} defaultValue="">
-        <SelectTrigger className="w-full md:w-1/3">
-          <SelectValue placeholder="Select a user" />
-        </SelectTrigger>
-        <SelectContent>
-          {allUsers.map((user) => (
-            <SelectItem key={user.email} value={user.email}>
+      <div className="space-y-2 mt-2">
+        {allUsers.map((user) => (
+          <div
+            key={user.email}
+            onClick={() => onSelectUser(user.email)}
+            className="flex items-center gap-2 p-2 rounded-lg cursor-pointer hover:bg-purple-500 hover:text-white transition"
+          >
+            {agencyProfiles[user.email]?.logo ? (
+              <Image
+                src={agencyProfiles[user.email]?.logo ?? "/assets/user.png"}
+                alt={user.name || user.email}
+                width={40}
+                height={40}
+                className="rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full" />
+            )}
+            <div className="font-medium text-sm line-clamp-1">
               {user.name || user.email}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
