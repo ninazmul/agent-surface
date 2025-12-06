@@ -15,11 +15,15 @@ import { Trash } from "lucide-react";
 import { IMessage } from "@/lib/database/models/message.model";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
+import {
+  getAllProfiles,
+  getProfileByEmail,
+} from "@/lib/actions/profile.actions";
 import { getAdminCountriesByEmail, isAdmin } from "@/lib/actions/admin.actions";
 import NewMessageForm from "./NewMessageForm";
 import Image from "next/image";
 import { timeAgo } from "@/lib/utils";
+import MessageForm from "./MessageForm";
 
 const MessageTable = ({
   email,
@@ -42,6 +46,24 @@ const MessageTable = ({
   >({});
   const [sending, setSending] = useState(false);
   const [selectedThread, setSelectedThread] = useState<IMessage | null>(null);
+  const [newMessageUser, setNewMessageUser] = useState<string>("");
+  const [allUsers, setAllUsers] = useState<{ email: string; name?: string }[]>(
+    []
+  );
+
+  // Fetch all users for NewMessageForm
+  const fetchAllUsers = useCallback(async () => {
+    try {
+      const profiles = await getAllProfiles();
+      setAllUsers(profiles || []);
+    } catch (err) {
+      console.error("Failed to fetch all users", err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchAllUsers();
+  }, [fetchAllUsers]);
 
   // Fetch agency names (only missing emails)
   const fetchAgencyNames = useCallback(
@@ -266,11 +288,11 @@ const MessageTable = ({
           </Table>
         </div>
         <div className="flex-1 bg-gray-100 dark:bg-gray-700 p-4 flex flex-col h-full overflow-hidden rounded-2xl">
-          {!selectedThread ? (
+          {!selectedThread && !newMessageUser ? (
             <div className="h-full flex items-center justify-center text-gray-500">
-              Select a profile to view messages
+              Select a profile to view messages or send a new message
             </div>
-          ) : (
+          ) : selectedThread ? (
             <>
               <div className="flex items-center gap-3 mb-4 border-b pb-2">
                 {agencyProfiles[selectedThread.userEmail]?.logo && (
@@ -360,13 +382,25 @@ const MessageTable = ({
                 </Button>
               </div>
             </>
+          ) : (
+            <div className="flex-1 overflow-y-auto">
+              <MessageForm
+                userEmail={newMessageUser}
+                senderEmail={email}
+                country={country?.[0] || ""}
+                senderRole="admin"
+                type="Create"
+              />
+            </div>
           )}
         </div>
         <div className="w-[320px] flex-shrink-0 bg-gray-100 dark:bg-gray-700 h-full overflow-y-auto p-4 rounded-2xl">
           <NewMessageForm
-            senderEmail={email}
-            senderRole="admin"
-            country={country?.[0] || ""}
+            allUsers={allUsers}
+            onSelectUser={(email) => {
+              setNewMessageUser(email);
+              setSelectedThread(null); // hide existing thread if any
+            }}
           />
         </div>
       </div>
