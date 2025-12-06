@@ -326,13 +326,13 @@ const MessageTable = ({
                       <div
                         className={`group relative max-w-[75%] px-4 py-2 rounded-2xl shadow-sm text-sm ${
                           isAdminMsg
-                            ? "bg-blue-500 text-white rounded-br-none"
+                            ? "bg-gray-600 text-white rounded-br-none"
                             : "bg-gray-200 text-black rounded-bl-none"
                         }`}
                       >
                         <p>{msg.text}</p>
                         <span className="text-xs opacity-70 block text-right">
-                          {new Date(msg.timestamp).toLocaleString("en-GB")}
+                          {timeAgo(msg.timestamp)}
                         </span>
 
                         {role === "admin" && (
