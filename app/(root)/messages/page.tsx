@@ -1,6 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
-import MessageForm from "../components/MessageForm";
 import {
   getAdminCountriesByEmail,
   getAdminRolePermissionsByEmail,
@@ -43,14 +42,7 @@ const Page = async () => {
       <section className="p-4 space-y-4">
         <h3 className="h3-bold text-center sm:text-left">Inbox</h3>
         {/* Their own conversation */}
-        <Conversation userEmail={email} />
-        <MessageForm
-          userEmail={email}
-          senderEmail={email}
-          country={profile.country || ""}
-          senderRole="user"
-          type="Create"
-        />
+        <Conversation userEmail={email} country={profile.country || ""} />
       </section>
 
       {/* Message form */}

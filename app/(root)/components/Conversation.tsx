@@ -9,6 +9,7 @@ import {
 import { Trash } from "lucide-react";
 import toast from "react-hot-toast";
 import { timeAgo } from "@/lib/utils";
+import MessageForm from "./MessageForm";
 
 interface MessageEntry {
   _id: string;
@@ -27,9 +28,10 @@ interface IMessageResponse {
 
 interface ConversationProps {
   userEmail: string;
+  country?: string;
 }
 
-const Conversation: React.FC<ConversationProps> = ({ userEmail }) => {
+const Conversation: React.FC<ConversationProps> = ({ userEmail, country }) => {
   const [messages, setMessages] = useState<MessageEntry[]>([]);
   const [threadId, setThreadId] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -99,7 +101,7 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail }) => {
   );
 
   return (
-    <section className="p-4 bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-b-none flex flex-col h-[calc(100vh-10rem)] shadow-lg">
+    <section className="p-4 bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-b-none flex flex-col h-[calc(100vh-10rem)]">
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto space-y-3 p-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
@@ -152,6 +154,13 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail }) => {
           <p className="text-gray-500 text-sm">No messages found</p>
         )}
       </div>
+      <MessageForm
+        userEmail={userEmail}
+        senderEmail={userEmail}
+        country={country}
+        senderRole="user"
+        type="Create"
+      />
     </section>
   );
 };
