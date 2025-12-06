@@ -211,7 +211,7 @@ const MessageTable = ({
     <div className="space-y-6">
       <div className="flex h-[calc(100vh-10rem)] w-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden p-4 gap-4">
         <div className="w-[320px] flex-shrink-0 bg-gray-100 dark:bg-gray-700 h-full overflow-y-auto p-4 space-y-4 rounded-2xl">
-          <div className="p-4 space-y-2">
+          <div className="space-y-2">
             <h3 className="text-lg font-semibold">Messages</h3>
             <Input
               placeholder="Search by user email..."
