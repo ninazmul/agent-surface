@@ -199,7 +199,7 @@ const MessageTable = ({
         className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
       />
 
-      <div className="grid grid-cols-5 w-full gap-4">
+      <div className="grid grid-cols-7 w-full gap-4">
         <div className="col-span-1 overflow-x-auto scrollbar-hide bg-gray-100 rounded-2xl">
           <Table>
             <TableBody>
@@ -231,7 +231,7 @@ const MessageTable = ({
                       <div>
                         {agencyNames[message.userEmail]}
                         {agencyNames[message.userEmail] && lastMsg && (
-                          <div className="text-xs text-gray-500 dark:text-gray-300 max-w-[180px] truncate hover:text-white">
+                          <div className="text-xs max-w-[180px] truncate">
                             {lastMsg}
                           </div>
                         )}
