@@ -199,8 +199,8 @@ const MessageTable = ({
         className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
       />
 
-      <div className="flex w-full gap-4">
-        <div className="w-2/5 overflow-x-auto scrollbar-hide bg-gray-100 rounded-2xl">
+      <div className="grid grid-cols-5 w-full gap-4">
+        <div className="col-span-1 overflow-x-auto scrollbar-hide bg-gray-100 rounded-2xl">
           <Table>
             <TableBody>
               {messages.map((message) => {
@@ -213,7 +213,7 @@ const MessageTable = ({
                   <TableRow
                     key={message._id.toString()}
                     onClick={() => setSelectedThread(message)}
-                    className="hover:bg-purple-500 hover:text-white rounded-2xl border-none"
+                    className="hover:bg-purple-500 hover:text-white rounded-2xl border-none flex items-center justify-between"
                   >
                     <TableCell className="flex items-center space-x-2">
                       {agencyProfiles[message.userEmail]?.logo && (
@@ -266,7 +266,7 @@ const MessageTable = ({
             </TableBody>
           </Table>
         </div>
-        <div className="flex-1 bg-gray-100 rounded-2xl p-4 flex flex-col">
+        <div className="col-span-3 bg-gray-100 rounded-2xl p-4 flex flex-col">
           {!selectedThread ? (
             <div className="h-full flex items-center justify-center text-gray-500">
               Select a profile to view messages
