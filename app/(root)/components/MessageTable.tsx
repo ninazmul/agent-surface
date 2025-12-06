@@ -214,7 +214,7 @@ const MessageTable = ({
                       {agencyProfiles[message.userEmail]?.logo && (
                         <Image
                           src={
-                            agencyProfiles[message.userEmail]?.logo ||
+                            agencyProfiles[message.userEmail]?.logo ??
                             "/assets/user.png"
                           }
                           alt="logo"
@@ -272,7 +272,7 @@ const MessageTable = ({
                 {agencyProfiles[selectedThread.userEmail]?.logo && (
                   <Image
                     src={
-                      agencyProfiles[selectedThread.userEmail]?.logo ||
+                      agencyProfiles[selectedThread.userEmail]?.logo ??
                       "/assets/user.png"
                     }
                     alt="logo"
