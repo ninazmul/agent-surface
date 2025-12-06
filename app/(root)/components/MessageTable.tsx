@@ -248,7 +248,7 @@ const MessageTable = ({
                         />
                       )}
                       <div>
-                        <p className="line-clamp-1">
+                        <p className="line-clamp-1 font-bold">
                           {agencyNames[message.userEmail] || "User Name"}
                         </p>
                         {agencyNames[message.userEmail] && lastMsg && (
