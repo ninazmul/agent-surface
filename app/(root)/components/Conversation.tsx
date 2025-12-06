@@ -8,6 +8,7 @@ import {
 } from "@/lib/actions/message.actions";
 import { Trash } from "lucide-react";
 import toast from "react-hot-toast";
+import { timeAgo } from "@/lib/utils";
 
 interface MessageEntry {
   _id: string;
@@ -98,11 +99,7 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail }) => {
   );
 
   return (
-    <section className="p-4 bg-blue-50 dark:bg-gray-800 rounded-2xl rounded-b-none flex flex-col h-[28rem] shadow-lg">
-      <h2 className="text-lg font-semibold mb-3 text-gray-800 dark:text-gray-100">
-        Conversation
-      </h2>
-
+    <section className="p-4 bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-b-none flex flex-col h-[calc(100vh-10rem)] shadow-lg">
       <div
         ref={scrollRef}
         className="flex-1 overflow-y-auto space-y-3 p-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
@@ -119,7 +116,7 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail }) => {
                   className={`relative group max-w-[75%] px-4 py-2 rounded-2xl shadow-md text-sm transition 
                     ${
                       isUser
-                        ? "bg-blue-500 text-white rounded-br-none hover:bg-blue-600"
+                        ? "bg-gray-600 text-white rounded-br-none hover:bg-gray-700"
                         : "bg-gray-200 text-gray-900 rounded-bl-none hover:bg-gray-300"
                     }`}
                 >
@@ -127,11 +124,11 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail }) => {
                   <span
                     className={`text-xs mt-1 block ${
                       isUser
-                        ? "text-blue-100 text-right"
-                        : "text-gray-500 text-left"
+                        ? "text-right"
+                        : "text-left"
                     }`}
                   >
-                    {new Date(msg.timestamp).toLocaleString("en-GB")}
+                    {timeAgo(msg.timestamp)}
                   </span>
 
                   {isUser && (
