@@ -354,7 +354,7 @@ const MessageTable = ({
                         ...
                       </span>
 
-                      <span className="absolute left-0 top-0 opacity-0 group-hover:opacity-100 whitespace-nowrap text-black dark:text-white bg-white dark:bg-gray-900 p-1 rounded-md shadow transition-opacity">
+                      <span className="absolute left-0 top-0 opacity-0 group-hover:opacity-100 whitespace-nowrap text-black dark:text-white bg-white dark:bg-gray-900 p-1 rounded-md shadow transition-opacity z-10">
                         {timeAgo(message.updatedAt || message.createdAt)}
                       </span>
                     </div>
