@@ -9,7 +9,7 @@ import MessageTable from "../components/MessageTable";
 import Conversation from "../components/Conversation";
 import { redirect } from "next/navigation";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import SubAgentMessagesTable from "../components/SubAgentMessagesTable";
+// import SubAgentMessagesTable from "../components/SubAgentMessagesTable";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -35,7 +35,7 @@ const Page = async () => {
 
   // Only fetch profile for non-admin users
   const profile = await getProfileByEmail(email);
-  const hasSubAgents = profile?.subAgents?.length > 0;
+  // const hasSubAgents = profile?.subAgents?.length > 0;
 
   return (
     <>
@@ -46,11 +46,11 @@ const Page = async () => {
       </section>
 
       {/* Message form */}
-      {hasSubAgents && (
+      {/* {hasSubAgents && (
         <div className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
           <SubAgentMessagesTable email={email} />
         </div>
-      )}
+      )} */}
     </>
   );
 };
