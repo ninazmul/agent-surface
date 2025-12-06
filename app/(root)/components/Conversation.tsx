@@ -89,9 +89,7 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail, country }) => {
       try {
         await deleteSingleMessage(threadId, messageId);
         toast.success("Message deleted");
-        setMessages((prev) =>
-          prev.filter((msg) => msg._id.toString() !== messageId)
-        );
+        setMessages((prev) => prev.filter((msg) => msg._id !== messageId));
       } catch (err) {
         console.error("Failed to delete message", err);
         toast.error("Failed to delete");
@@ -101,17 +99,18 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail, country }) => {
   );
 
   return (
-    <section className="p-4 bg-gray-100 dark:bg-gray-700 rounded-2xl rounded-b-none flex flex-col h-[calc(100vh-10rem)]">
+    <section className="flex flex-col h-[calc(100vh-10rem)] bg-gray-100 dark:bg-gray-700 rounded-2xl p-4">
+      {/* Scrollable messages */}
       <div
         ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-3 p-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
+        className="flex-1 overflow-y-auto space-y-3 pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-transparent"
       >
         {messages.length ? (
           messages.map((msg) => {
             const isUser = msg.senderRole === "user";
             return (
               <div
-                key={msg._id.toString()}
+                key={msg._id}
                 className={`flex flex-col ${
                   isUser ? "items-end" : "items-start"
                 } space-y-1`}
@@ -119,20 +118,20 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail, country }) => {
                 {/* Message bubble */}
                 <div
                   className={`relative group max-w-[75%] px-4 py-2 rounded-2xl shadow-md text-sm transition 
-                ${
-                  isUser
-                    ? "bg-gray-600 text-white rounded-br-none hover:bg-gray-700"
-                    : "bg-gray-200 text-gray-900 rounded-bl-none hover:bg-gray-300"
-                }`}
+                    ${
+                      isUser
+                        ? "bg-gray-600 text-white rounded-br-none hover:bg-gray-700"
+                        : "bg-gray-200 text-gray-900 rounded-bl-none hover:bg-gray-300"
+                    }`}
                 >
                   <p>{msg.text}</p>
 
                   {/* Delete button for user messages */}
                   {isUser && (
                     <button
-                      onClick={() => handleDeleteMessage(msg._id.toString())}
+                      onClick={() => handleDeleteMessage(msg._id)}
                       className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 
-                  hover:bg-red-600 transition opacity-0 group-hover:opacity-100"
+                        hover:bg-red-600 transition opacity-0 group-hover:opacity-100"
                     >
                       <Trash size={14} />
                     </button>
@@ -151,16 +150,25 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail, country }) => {
             );
           })
         ) : (
-          <p className="text-gray-500 text-sm">No messages found</p>
+          <p className="text-gray-500 text-sm text-center">No messages found</p>
         )}
       </div>
-      <MessageForm
-        userEmail={userEmail}
-        senderEmail={userEmail}
-        country={country}
-        senderRole="user"
-        type="Create"
-      />
+
+      {/* Input at the bottom */}
+      <div className="mt-2">
+        <MessageForm
+          userEmail={userEmail}
+          senderEmail={userEmail}
+          country={country}
+          senderRole="user"
+          type="Create"
+          onMessageSent={(newMsg) => {
+            if (newMsg._id) {
+              setMessages((prev) => [...prev, newMsg as MessageEntry]);
+            }
+          }}
+        />
+      </div>
     </section>
   );
 };
