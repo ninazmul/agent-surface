@@ -101,7 +101,7 @@ const MessageForm = ({
         {/* Message Input Area sticks to bottom */}
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="mt-auto flex gap-2 items-center p-3 rounded-2xl bg-gray-100 dark:bg-gray-700 shadow-inner"
+          className="mt-auto flex gap-2 items-center pt-2 bg-gray-100 dark:bg-gray-700"
         >
           <FormField
             control={form.control}
@@ -113,7 +113,6 @@ const MessageForm = ({
                     {...field}
                     placeholder="Type a message..."
                     autoComplete="off"
-                    className="rounded-2xl bg-gray-200 dark:bg-gray-600 px-4 py-2 text-sm shadow-sm focus:ring-1 focus:ring-purple-400"
                     disabled={form.formState.isSubmitting}
                   />
                 </FormControl>
@@ -125,7 +124,6 @@ const MessageForm = ({
             type="submit"
             size="sm"
             disabled={form.formState.isSubmitting}
-            className="rounded-2xl px-4 py-2 bg-blue-500 text-white hover:bg-blue-600"
           >
             {form.formState.isSubmitting ? "Sending..." : "Send"}
           </Button>
