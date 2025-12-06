@@ -209,21 +209,16 @@ const MessageTable = ({
             {messages.map((message) => (
               <TableRow key={message._id.toString()}>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    {agencyProfiles[message.userEmail]?.logo && (
-                      <Image
-                        src={
-                          agencyProfiles[message.userEmail]?.logo ||
-                          "/public/assets/images/logo.png"
-                        }
-                        alt="logo"
-                        className="w-6 h-6 rounded-full object-cover"
-                      />
-                    )}
-
-                    {agencyProfiles[message.userEmail]?.name ||
-                      message.userEmail}
-                  </div>
+                  {agencyProfiles[message.userEmail]?.logo && (
+                    <Image
+                      src={
+                        agencyProfiles[message.userEmail]?.logo ||
+                        "/public/assets/images/logo.png"
+                      }
+                      alt="logo"
+                      className="w-10 h-10 rounded-full object-cover"
+                    />
+                  )}
                 </TableCell>
 
                 <TableCell>
