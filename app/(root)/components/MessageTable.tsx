@@ -319,10 +319,11 @@ const MessageTable = ({
                   return (
                     <div
                       key={msg._id.toString()}
-                      className={`flex ${
-                        isAdminMsg ? "justify-end" : "justify-start"
-                      }`}
+                      className={`flex flex-col ${
+                        isAdminMsg ? "items-end" : "items-start"
+                      } space-y-1`} // space between bubble and timestamp
                     >
+                      {/* Message bubble */}
                       <div
                         className={`group relative max-w-[75%] px-4 py-2 rounded-2xl shadow-sm text-sm ${
                           isAdminMsg
@@ -331,10 +332,8 @@ const MessageTable = ({
                         }`}
                       >
                         <p>{msg.text}</p>
-                        <span className="text-xs opacity-70 block text-right">
-                          {timeAgo(msg.timestamp)}
-                        </span>
 
+                        {/* Admin-only delete button */}
                         {role === "admin" && (
                           <button
                             onClick={() =>
@@ -352,6 +351,15 @@ const MessageTable = ({
                           </button>
                         )}
                       </div>
+
+                      {/* Timestamp outside the bubble */}
+                      <span
+                        className={`text-xs text-gray-500 dark:text-gray-400 ${
+                          isAdminMsg ? "text-right" : "text-left"
+                        }`}
+                      >
+                        {timeAgo(msg.timestamp)}
+                      </span>
                     </div>
                   );
                 })}

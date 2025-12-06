@@ -110,37 +110,41 @@ const Conversation: React.FC<ConversationProps> = ({ userEmail }) => {
             return (
               <div
                 key={msg._id.toString()}
-                className={`flex ${isUser ? "justify-end" : "justify-start"}`}
+                className={`flex flex-col ${
+                  isUser ? "items-end" : "items-start"
+                } space-y-1`}
               >
+                {/* Message bubble */}
                 <div
                   className={`relative group max-w-[75%] px-4 py-2 rounded-2xl shadow-md text-sm transition 
-                    ${
-                      isUser
-                        ? "bg-gray-600 text-white rounded-br-none hover:bg-gray-700"
-                        : "bg-gray-200 text-gray-900 rounded-bl-none hover:bg-gray-300"
-                    }`}
+                ${
+                  isUser
+                    ? "bg-gray-600 text-white rounded-br-none hover:bg-gray-700"
+                    : "bg-gray-200 text-gray-900 rounded-bl-none hover:bg-gray-300"
+                }`}
                 >
                   <p>{msg.text}</p>
-                  <span
-                    className={`text-xs mt-1 block ${
-                      isUser
-                        ? "text-right"
-                        : "text-left"
-                    }`}
-                  >
-                    {timeAgo(msg.timestamp)}
-                  </span>
 
+                  {/* Delete button for user messages */}
                   {isUser && (
                     <button
                       onClick={() => handleDeleteMessage(msg._id.toString())}
                       className="absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 
-                      hover:bg-red-600 transition opacity-0 group-hover:opacity-100"
+                  hover:bg-red-600 transition opacity-0 group-hover:opacity-100"
                     >
                       <Trash size={14} />
                     </button>
                   )}
                 </div>
+
+                {/* Timestamp outside the bubble */}
+                <span
+                  className={`text-xs text-gray-500 dark:text-gray-400 ${
+                    isUser ? "text-right" : "text-left"
+                  }`}
+                >
+                  {timeAgo(msg.timestamp)}
+                </span>
               </div>
             );
           })
