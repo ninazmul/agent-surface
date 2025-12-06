@@ -204,8 +204,8 @@ const MessageTable = ({
       />
 
       <div className="overflow-x-auto scrollbar-hide">
-        <Table>
-          <TableBody className="bg-gray-100 rounded-2xl">
+        <Table className="bg-gray-100 rounded-2xl">
+          <TableBody>
             {messages.map((message) => {
               const lastMsg =
                 message.messages.length > 0
@@ -234,7 +234,7 @@ const MessageTable = ({
                   <TableCell>
                     {agencyNames[message.userEmail]}
                     {agencyNames[message.userEmail] && lastMsg && (
-                      <div className="text-xs text-gray-500 dark:text-gray-300 max-w-[180px] truncate group-hover:text-white">
+                      <div className="text-xs text-gray-500 dark:text-gray-300 max-w-[180px] truncate hover:text-white">
                         {lastMsg}
                       </div>
                     )}
