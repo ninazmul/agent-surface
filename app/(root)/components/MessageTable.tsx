@@ -189,13 +189,15 @@ const MessageTable = ({
     <div className="space-y-6">
       <div className="grid grid-cols-7 w-full gap-4 rounded-2xl bg-white dark:bg-gray-800 p-4">
         <div className="col-span-2 overflow-x-auto scrollbar-hide bg-gray-100 dark:bg-gray-700 rounded-2xl space-y-4">
-          <h3 className="text-lg font-semibold">Messages</h3>
-          <Input
-            placeholder="Search by user email..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-2xl"
-          />
+          <div className="p-2 space-y-2">
+            <h3 className="text-lg font-semibold">Messages</h3>
+            <Input
+              placeholder="Search by user email..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full rounded-2xl"
+            />
+          </div>
           <Table>
             <TableBody>
               {messages.map((message) => {
