@@ -187,7 +187,7 @@ const MessageTable = ({
 
   return (
     <div className="space-y-6">
-      <div className="flex h-screen w-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden p-4 gap-4">
+      <div className="flex h-[calc(100vh-10rem)] w-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden p-4 gap-4">
         <div className="w-[320px] flex-shrink-0 bg-gray-100 dark:bg-gray-700 h-full overflow-y-auto p-4 space-y-4 rounded-2xl">
           <div className="p-4 space-y-2">
             <h3 className="text-lg font-semibold">Messages</h3>
@@ -265,7 +265,7 @@ const MessageTable = ({
             </TableBody>
           </Table>
         </div>
-        <div className="flex-1 bg-gray-100 dark:bg-gray-700 p-4 flex flex-col h-[calc(100vh-2.5rem)] overflow-hidden rounded-2xl">
+        <div className="flex-1 bg-gray-100 dark:bg-gray-700 p-4 flex flex-col h-full overflow-hidden rounded-2xl">
           {!selectedThread ? (
             <div className="h-full flex items-center justify-center text-gray-500">
               Select a profile to view messages
