@@ -188,7 +188,7 @@ const MessageTable = ({
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-7 w-full gap-4 rounded-2xl bg-white dark:bg-gray-800 p-4">
-        <div className="col-span-2 overflow-x-auto scrollbar-hide bg-gray-100 rounded-2xl space-y-4">
+        <div className="col-span-2 overflow-x-auto scrollbar-hide bg-gray-100 dark:bg-gray-700 rounded-2xl space-y-4">
           <h3 className="text-lg font-semibold">Messages</h3>
           <Input
             placeholder="Search by user email..."
@@ -261,7 +261,7 @@ const MessageTable = ({
             </TableBody>
           </Table>
         </div>
-        <div className="col-span-3 bg-gray-100 rounded-2xl p-4 flex flex-col">
+        <div className="col-span-3 bg-gray-100 dark:bg-gray-700 rounded-2xl p-4 flex flex-col">
           {!selectedThread ? (
             <div className="h-full flex items-center justify-center text-gray-500">
               Select a profile to view messages
@@ -358,7 +358,7 @@ const MessageTable = ({
             </>
           )}
         </div>
-        <div className="col-span-2 overflow-x-auto scrollbar-hide bg-gray-100 rounded-2xl">
+        <div className="col-span-2 overflow-x-auto scrollbar-hide bg-gray-100 dark:bg-gray-700 rounded-2xl">
           <NewMessageForm
             senderEmail={email}
             senderRole="admin"
