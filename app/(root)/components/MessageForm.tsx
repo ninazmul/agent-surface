@@ -16,7 +16,6 @@ import { createMessage } from "@/lib/actions/message.actions";
 import { useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
 
-// Schema with optional country
 const MessageFormSchema = z.object({
   text: z.string().min(1, "Message cannot be empty"),
   country: z.string().optional(),
@@ -27,7 +26,7 @@ type MessageFormProps = {
   userEmail: string;
   senderEmail: string;
   senderRole: "user" | "admin";
-  country?: string; // optional
+  country?: string;
   onMessageSent?: (message: {
     senderEmail: string;
     senderRole?: "user" | "admin";
@@ -50,11 +49,8 @@ const MessageForm = ({
 
   const form = useForm<z.infer<typeof MessageFormSchema>>({
     resolver: zodResolver(MessageFormSchema),
-    defaultValues: {
-      text: "",
-      country: country || "",
-    },
-    mode: "onSubmit", // validates only on submit
+    defaultValues: { text: "", country: country || "" },
+    mode: "onSubmit",
   });
 
   const onSubmit = useCallback(
@@ -87,44 +83,55 @@ const MessageForm = ({
         setError("Failed to send message. Please try again.");
       }
     },
-    [userEmail, senderEmail, senderRole, type, country, onMessageSent, router, form]
+    [
+      userEmail,
+      senderEmail,
+      senderRole,
+      type,
+      country,
+      onMessageSent,
+      router,
+      form,
+    ]
   );
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-4 rounded-2xl rounded-t-none bg-blue-50 dark:bg-gray-800 p-6 shadow-sm"
-      >
-        <FormField
-          control={form.control}
-          name="text"
-          render={({ field }) => (
-            <FormItem className="flex-grow mb-0">
-              <FormControl>
-                <Input
-                  {...field}
-                  placeholder="Type your message..."
-                  autoComplete="off"
-                  className="rounded-full px-4 py-2"
-                  aria-label="Message input"
-                  disabled={form.formState.isSubmitting}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button
-          type="submit"
-          size="sm"
-          disabled={form.formState.isSubmitting}
-          className="rounded-full px-4 py-2"
+      <div className="flex flex-col h-full">
+        {/* Message Input Area sticks to bottom */}
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="mt-auto flex gap-2 items-center p-3 rounded-2xl bg-gray-100 dark:bg-gray-700 shadow-inner"
         >
-          {form.formState.isSubmitting ? "Sending..." : "Send"}
-        </Button>
-      </form>
-      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+          <FormField
+            control={form.control}
+            name="text"
+            render={({ field }) => (
+              <FormItem className="flex-grow mb-0">
+                <FormControl>
+                  <Input
+                    {...field}
+                    placeholder="Type a message..."
+                    autoComplete="off"
+                    className="rounded-2xl bg-gray-200 dark:bg-gray-600 px-4 py-2 text-sm shadow-sm focus:ring-1 focus:ring-purple-400"
+                    disabled={form.formState.isSubmitting}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button
+            type="submit"
+            size="sm"
+            disabled={form.formState.isSubmitting}
+            className="rounded-2xl px-4 py-2 bg-blue-500 text-white hover:bg-blue-600"
+          >
+            {form.formState.isSubmitting ? "Sending..." : "Send"}
+          </Button>
+        </form>
+        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+      </div>
     </Form>
   );
 };
