@@ -27,7 +27,7 @@ const Page = async () => {
     }
 
     return (
-      <div className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
+      <div className="p-4">
         <MessageTable email={email} role="admin" country={adminCountry || []} />
       </div>
     );

@@ -186,21 +186,16 @@ const MessageTable = ({
   }, [activeUserEmail, newMessageText, email, role, router]);
 
   return (
-    <div className="space-y-4">
-      <NewMessageForm
-        senderEmail={email}
-        senderRole="admin"
-        country={country?.[0] || ""}
-      />
+    <div className="space-y-6">
       <Input
         placeholder="Search by user email..."
         value={searchQuery}
         onChange={(e) => setSearchQuery(e.target.value)}
-        className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
+        className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
 
-      <div className="grid grid-cols-7 w-full gap-4">
-        <div className="col-span-1 overflow-x-auto scrollbar-hide bg-gray-100 rounded-2xl">
+      <div className="grid grid-cols-7 w-full gap-4 rounded-2xl bg-white dark:bg-gray-800">
+        <div className="col-span-2 overflow-x-auto scrollbar-hide bg-gray-100 rounded-2xl">
           <Table>
             <TableBody>
               {messages.map((message) => {
@@ -362,6 +357,13 @@ const MessageTable = ({
               </div>
             </>
           )}
+        </div>
+        <div className="col-span-2 overflow-x-auto scrollbar-hide bg-gray-100 rounded-2xl">
+          <NewMessageForm
+            senderEmail={email}
+            senderRole="admin"
+            country={country?.[0] || ""}
+          />
         </div>
       </div>
 
