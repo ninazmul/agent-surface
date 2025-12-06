@@ -207,7 +207,10 @@ const MessageTable = ({
         <Table>
           <TableBody>
             {messages.map((message) => (
-              <TableRow key={message._id.toString()} className="hover:bg-purple-500 text-white">
+              <TableRow
+                key={message._id.toString()}
+                className="hover:bg-purple-500 hover:text-white rounded-2xl border-none"
+              >
                 <TableCell>
                   {agencyProfiles[message.userEmail]?.logo && (
                     <Image
@@ -216,6 +219,7 @@ const MessageTable = ({
                         "/assets/user.png"
                       }
                       alt="logo"
+                      fill
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   )}
@@ -223,7 +227,7 @@ const MessageTable = ({
                 <TableCell>
                   {agencyNames[message.userEmail]}
                   {agencyNames[message.userEmail] && (
-                    <div className="text-xs text-muted-foreground">
+                    <div className="text-xs text-muted-foreground hover:text-white">
                       {message.userEmail}
                     </div>
                   )}
@@ -338,11 +342,11 @@ const MessageTable = ({
                 </TableCell>
                 <TableCell>
                   <div className="relative group w-fit cursor-default">
-                    <span className="opacity-100 group-hover:opacity-0 transition-opacity">
+                    <span className="opacity-100 group-hover:opacity-0 transition-opacity text-black dark:text-white">
                       ...
                     </span>
 
-                    <span className="absolute left-0 top-0 opacity-0 group-hover:opacity-100 whitespace-nowrap bg-white dark:bg-gray-900 p-1 rounded-md shadow transition-opacity">
+                    <span className="absolute left-0 top-0 opacity-0 group-hover:opacity-100 whitespace-nowrap text-black dark:text-white bg-white dark:bg-gray-900 p-1 rounded-md shadow transition-opacity">
                       {timeAgo(message.updatedAt || message.createdAt)}
                     </span>
                   </div>
@@ -352,10 +356,10 @@ const MessageTable = ({
                   {role === "admin" && (
                     <Button
                       onClick={() => setConfirmDeleteId(message._id.toString())}
-                      variant="outline"
-                      className="text-red-500"
+                      variant={"ghost"}
+                      size={"icon"}
                     >
-                      <Trash />
+                      <Trash className="w-4 h-4 text-red-600" />
                     </Button>
                   )}
                 </TableCell>
