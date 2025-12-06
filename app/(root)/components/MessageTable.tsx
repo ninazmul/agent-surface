@@ -203,24 +203,23 @@ const MessageTable = ({
         className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
       />
 
-      <div className="overflow-x-auto rounded-2xl scrollbar-hide">
+      <div className="overflow-x-auto scrollbar-hide">
         <Table>
           <TableBody>
             {messages.map((message) => (
-              <TableRow key={message._id.toString()}>
+              <TableRow key={message._id.toString()} className="hover:bg-purple-500 text-white">
                 <TableCell>
                   {agencyProfiles[message.userEmail]?.logo && (
                     <Image
                       src={
                         agencyProfiles[message.userEmail]?.logo ||
-                        "/public/assets/images/logo.png"
+                        "/assets/user.png"
                       }
                       alt="logo"
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   )}
                 </TableCell>
-
                 <TableCell>
                   {agencyNames[message.userEmail]}
                   {agencyNames[message.userEmail] && (
@@ -338,7 +337,15 @@ const MessageTable = ({
                   </Popover>
                 </TableCell>
                 <TableCell>
-                  {timeAgo(message.updatedAt || message.createdAt)}
+                  <div className="relative group w-fit cursor-default">
+                    <span className="opacity-100 group-hover:opacity-0 transition-opacity">
+                      ...
+                    </span>
+
+                    <span className="absolute left-0 top-0 opacity-0 group-hover:opacity-100 whitespace-nowrap bg-white dark:bg-gray-900 p-1 rounded-md shadow transition-opacity">
+                      {timeAgo(message.updatedAt || message.createdAt)}
+                    </span>
+                  </div>
                 </TableCell>
 
                 <TableCell className="flex items-center space-x-2">
