@@ -206,166 +206,173 @@ const MessageTable = ({
       <div className="overflow-x-auto scrollbar-hide">
         <Table>
           <TableBody className="bg-gray-100 rounded-2xl">
-            {messages.map((message) => (
-              <TableRow
-                key={message._id.toString()}
-                className="hover:bg-purple-500 hover:text-white rounded-2xl border-none"
-              >
-                <TableCell>
-                  {agencyProfiles[message.userEmail]?.logo && (
-                    <Image
-                      src={
-                        agencyProfiles[message.userEmail]?.logo ||
-                        "/assets/user.png"
-                      }
-                      alt="logo"
-                      width={80}
-                      height={80}
-                      className="w-10 h-10 rounded-full object-cover"
-                    />
-                  )}
-                </TableCell>
-                <TableCell>
-                  {agencyNames[message.userEmail]}
-                  {agencyNames[message.userEmail] && (
-                    <div className="text-xs hover:text-white">
-                      {message.userEmail}
-                    </div>
-                  )}
-                </TableCell>
-                <TableCell>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        className="px-3 py-1.5 text-sm font-medium text-blue-500 hover:text-blue-600 border border-blue-500 hover:bg-blue-200 transition-all rounded-full rounded-br-none"
-                      >
-                        View Messages
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="max-w-md max-h-72 overflow-hidden text-sm">
-                      <div className="overflow-y-auto flex-1 space-y-3 pr-1">
-                        {message.messages.map((msg) => {
-                          const isAdminMsg = msg.senderRole === "admin";
-                          return (
-                            <div
-                              key={msg._id.toString()}
-                              className={`flex ${
-                                isAdminMsg ? "justify-end" : "justify-start"
-                              }`}
-                            >
+            {messages.map((message) => {
+              const lastMsg =
+                message.messages.length > 0
+                  ? message.messages[message.messages.length - 1].text
+                  : null;
+
+              return (
+                <TableRow
+                  key={message._id.toString()}
+                  className="hover:bg-purple-500 hover:text-white rounded-2xl border-none"
+                >
+                  <TableCell>
+                    {agencyProfiles[message.userEmail]?.logo && (
+                      <Image
+                        src={
+                          agencyProfiles[message.userEmail]?.logo ||
+                          "/assets/user.png"
+                        }
+                        alt="logo"
+                        width={80}
+                        height={80}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    {agencyNames[message.userEmail]}
+                    {agencyNames[message.userEmail] && lastMsg && (
+                      <div className="text-xs text-gray-500 dark:text-gray-300 max-w-[180px] truncate group-hover:text-white">
+                        {lastMsg}
+                      </div>
+                    )}
+                  </TableCell>
+                  <TableCell>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          className="px-3 py-1.5 text-sm font-medium text-blue-500 hover:text-blue-600 border border-blue-500 hover:bg-blue-200 transition-all rounded-full rounded-br-none"
+                        >
+                          View Messages
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="max-w-md max-h-72 overflow-hidden text-sm">
+                        <div className="overflow-y-auto flex-1 space-y-3 pr-1">
+                          {message.messages.map((msg) => {
+                            const isAdminMsg = msg.senderRole === "admin";
+                            return (
                               <div
-                                className={`group relative max-w-[75%] px-4 py-2 rounded-2xl shadow-sm text-sm ${
-                                  isAdminMsg
-                                    ? "bg-blue-500 text-white rounded-br-none"
-                                    : "bg-gray-200 text-black rounded-bl-none"
+                                key={msg._id.toString()}
+                                className={`flex ${
+                                  isAdminMsg ? "justify-end" : "justify-start"
                                 }`}
                               >
-                                <p>{msg.text}</p>
-                                <span className="text-xs text-gray-600 mt-1 block text-right">
-                                  {new Date(msg.timestamp).toLocaleString(
-                                    "en-GB"
-                                  )}
-                                </span>
+                                <div
+                                  className={`group relative max-w-[75%] px-4 py-2 rounded-2xl shadow-sm text-sm ${
+                                    isAdminMsg
+                                      ? "bg-blue-500 text-white rounded-br-none"
+                                      : "bg-gray-200 text-black rounded-bl-none"
+                                  }`}
+                                >
+                                  <p>{msg.text}</p>
+                                  <span className="text-xs text-gray-600 mt-1 block text-right">
+                                    {new Date(msg.timestamp).toLocaleString(
+                                      "en-GB"
+                                    )}
+                                  </span>
 
-                                {role === "admin" && (
-                                  <button
-                                    onClick={() =>
-                                      handleDeleteSingleMessage(
-                                        message._id.toString(),
-                                        msg._id.toString()
-                                      )
-                                    }
-                                    className={`absolute -top-1 ${
-                                      isAdminMsg ? "-left-1" : "-right-1"
-                                    } bg-red-500 text-white rounded-full p-1 hover:bg-red-600 
+                                  {role === "admin" && (
+                                    <button
+                                      onClick={() =>
+                                        handleDeleteSingleMessage(
+                                          message._id.toString(),
+                                          msg._id.toString()
+                                        )
+                                      }
+                                      className={`absolute -top-1 ${
+                                        isAdminMsg ? "-left-1" : "-right-1"
+                                      } bg-red-500 text-white rounded-full p-1 hover:bg-red-600 
                                     transition opacity-0 group-hover:opacity-100`}
-                                  >
-                                    <Trash size={14} />
-                                  </button>
-                                )}
+                                    >
+                                      <Trash size={14} />
+                                    </button>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          );
-                        })}
-                      </div>
+                            );
+                          })}
+                        </div>
 
-                      <div className="flex items-center gap-2 pt-2 border-t">
-                        <Input
-                          value={
-                            activeUserEmail === message.userEmail
-                              ? newMessageText
-                              : ""
-                          }
-                          onChange={(e) => {
-                            setActiveUserEmail(message.userEmail);
-                            setNewMessageText(e.target.value);
-                          }}
-                          placeholder="Type a message..."
-                          className="flex-1"
-                          onKeyDown={async (e) =>
-                            e.key === "Enter" && (await handleAppendMessage())
-                          }
-                        />
-                        <Button
-                          size="sm"
-                          onClick={handleAppendMessage}
-                          disabled={sending}
-                        >
-                          {sending ? (
-                            <svg
-                              className="animate-spin h-4 w-4 text-white mx-auto"
-                              xmlns="http://www.w3.org/2000/svg"
-                              fill="none"
-                              viewBox="0 0 24 24"
-                            >
-                              <circle
-                                className="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                strokeWidth="4"
-                              ></circle>
-                              <path
-                                className="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8v8z"
-                              ></path>
-                            </svg>
-                          ) : (
-                            "Send"
-                          )}
-                        </Button>
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </TableCell>
-                <TableCell>
-                  <div className="relative group w-fit cursor-default">
-                    <span className="opacity-100 group-hover:opacity-0 transition-opacity text-black dark:text-white">
-                      ...
-                    </span>
+                        <div className="flex items-center gap-2 pt-2 border-t">
+                          <Input
+                            value={
+                              activeUserEmail === message.userEmail
+                                ? newMessageText
+                                : ""
+                            }
+                            onChange={(e) => {
+                              setActiveUserEmail(message.userEmail);
+                              setNewMessageText(e.target.value);
+                            }}
+                            placeholder="Type a message..."
+                            className="flex-1"
+                            onKeyDown={async (e) =>
+                              e.key === "Enter" && (await handleAppendMessage())
+                            }
+                          />
+                          <Button
+                            size="sm"
+                            onClick={handleAppendMessage}
+                            disabled={sending}
+                          >
+                            {sending ? (
+                              <svg
+                                className="animate-spin h-4 w-4 text-white mx-auto"
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                              >
+                                <circle
+                                  className="opacity-25"
+                                  cx="12"
+                                  cy="12"
+                                  r="10"
+                                  stroke="currentColor"
+                                  strokeWidth="4"
+                                ></circle>
+                                <path
+                                  className="opacity-75"
+                                  fill="currentColor"
+                                  d="M4 12a8 8 0 018-8v8z"
+                                ></path>
+                              </svg>
+                            ) : (
+                              "Send"
+                            )}
+                          </Button>
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </TableCell>
 
-                    <span className="absolute left-0 top-0 opacity-0 group-hover:opacity-100 whitespace-nowrap text-black dark:text-white bg-white dark:bg-gray-900 p-1 rounded-md shadow transition-opacity">
-                      {timeAgo(message.updatedAt || message.createdAt)}
-                    </span>
-                  </div>
-                </TableCell>
+                  <TableCell className="flex items-center space-x-2">
+                    <div className="relative group w-fit cursor-default">
+                      <span className="opacity-100 group-hover:opacity-0 transition-opacity text-black dark:text-white">
+                        ...
+                      </span>
 
-                <TableCell className="flex items-center space-x-2">
-                  {role === "admin" && (
-                    <Button
-                      onClick={() => setConfirmDeleteId(message._id.toString())}
-                      variant={"ghost"}
-                      size={"icon"}
-                    >
-                      <Trash className="w-4 h-4 text-red-600" />
-                    </Button>
-                  )}
-                </TableCell>
-              </TableRow>
-            ))}
+                      <span className="absolute left-0 top-0 opacity-0 group-hover:opacity-100 whitespace-nowrap text-black dark:text-white bg-white dark:bg-gray-900 p-1 rounded-md shadow transition-opacity">
+                        {timeAgo(message.updatedAt || message.createdAt)}
+                      </span>
+                    </div>
+                    {role === "admin" && (
+                      <Button
+                        onClick={() =>
+                          setConfirmDeleteId(message._id.toString())
+                        }
+                        variant={"ghost"}
+                        size={"icon"}
+                      >
+                        <Trash className="w-4 h-4 text-red-600" />
+                      </Button>
+                    )}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </div>
