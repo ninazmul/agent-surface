@@ -12,7 +12,7 @@ const NewMessageForm = ({
   agencyProfiles: Record<string, { name?: string; logo?: string }>;
 }) => {
   return (
-    <div className="p-4 border rounded-2xl space-y-3 bg-gray-50 dark:bg-gray-900 h-full overflow-y-auto">
+    <div className="p-4 border space-y-4 h-full overflow-y-auto">
       <h3 className="text-lg font-semibold">Send New Message</h3>
       <div className="space-y-2 mt-2">
         {allUsers.map((user) => (
