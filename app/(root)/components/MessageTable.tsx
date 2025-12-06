@@ -200,7 +200,7 @@ const MessageTable = ({
       />
 
       <div className="flex w-full gap-4">
-        <div className="col-span-1 overflow-x-auto scrollbar-hide bg-gray-100 rounded-2xl">
+        <div className="w-2/5 overflow-x-auto scrollbar-hide bg-gray-100 rounded-2xl">
           <Table>
             <TableBody>
               {messages.map((message) => {
