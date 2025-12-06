@@ -40,7 +40,8 @@ const Page = async () => {
 
   return (
     <>
-      <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
+      <section className="p-4 space-y-4">
+        <h3 className="h3-bold text-center sm:text-left">Inbox</h3>
         {/* Their own conversation */}
         <Conversation userEmail={email} />
         <MessageForm
