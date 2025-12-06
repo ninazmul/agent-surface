@@ -219,7 +219,8 @@ const MessageTable = ({
                         "/assets/user.png"
                       }
                       alt="logo"
-                      fill
+                      width={80}
+                      height={80}
                       className="w-10 h-10 rounded-full object-cover"
                     />
                   )}
