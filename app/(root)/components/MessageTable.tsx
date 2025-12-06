@@ -205,7 +205,7 @@ const MessageTable = ({
 
       <div className="overflow-x-auto scrollbar-hide">
         <Table>
-          <TableBody>
+          <TableBody className="bg-gray-100 rounded-2xl">
             {messages.map((message) => (
               <TableRow
                 key={message._id.toString()}
@@ -228,7 +228,7 @@ const MessageTable = ({
                 <TableCell>
                   {agencyNames[message.userEmail]}
                   {agencyNames[message.userEmail] && (
-                    <div className="text-xs text-muted-foreground hover:text-white">
+                    <div className="text-xs hover:text-white">
                       {message.userEmail}
                     </div>
                   )}
