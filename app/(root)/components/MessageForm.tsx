@@ -102,7 +102,7 @@ const MessageForm = ({
         {/* Message Input Area sticks to bottom */}
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="mt-auto flex gap-2 items-center pt-2 bg-gray-100 dark:bg-gray-700"
+          className="mt-auto flex gap-2 items-center pt-2 border-t bg-gray-100 dark:bg-gray-700"
         >
           <FormField
             control={form.control}
