@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   appendMessageByEmail,
   deleteMessage,
@@ -8,17 +8,10 @@ import {
   getAllMessages,
   getMessagesByEmail,
 } from "@/lib/actions/message.actions";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, SortAsc, SortDesc } from "lucide-react";
+import { Trash } from "lucide-react";
 import { IMessage } from "@/lib/database/models/message.model";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -30,6 +23,8 @@ import {
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { getAdminCountriesByEmail, isAdmin } from "@/lib/actions/admin.actions";
 import NewMessageForm from "./NewMessageForm";
+import Image from "next/image";
+import { timeAgo } from "@/lib/utils";
 
 const MessageTable = ({
   email,
@@ -43,16 +38,13 @@ const MessageTable = ({
   const router = useRouter();
   const [messages, setMessages] = useState<IMessage[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortKey, setSortKey] = useState<"userEmail" | "createdAt" | null>(
-    null
-  );
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [newMessageText, setNewMessageText] = useState("");
   const [activeUserEmail, setActiveUserEmail] = useState<string | null>(null);
   const [agencyNames, setAgencyNames] = useState<Record<string, string>>({});
+  const [agencyProfiles, setAgencyProfiles] = useState<
+    Record<string, { name?: string; logo?: string }>
+  >({});
   const [sending, setSending] = useState(false);
 
   // Fetch agency names (only missing emails)
@@ -76,6 +68,41 @@ const MessageTable = ({
     },
     [agencyNames]
   );
+
+  const fetchAgencyProfiles = useCallback(
+    async (emails: string[]) => {
+      const missing = emails.filter((e) => !agencyProfiles[e]);
+      if (!missing.length) return;
+
+      const map: Record<string, { name?: string; logo?: string }> = {};
+
+      await Promise.all(
+        missing.map(async (email) => {
+          try {
+            const profile = await getProfileByEmail(email);
+            if (profile) {
+              map[email] = {
+                name: profile.name,
+                logo: profile.logo, // <-- fetch logo
+              };
+            }
+          } catch (err) {
+            console.error(`Failed to fetch profile for ${email}`, err);
+          }
+        })
+      );
+
+      setAgencyProfiles((prev) => ({ ...prev, ...map }));
+    },
+    [agencyProfiles]
+  );
+
+  useEffect(() => {
+    if (messages.length > 0) {
+      const emails = messages.map((m) => m.userEmail);
+      fetchAgencyProfiles(emails);
+    }
+  }, [messages, fetchAgencyProfiles]);
 
   // Fetch messages
   const fetchMessages = useCallback(async () => {
@@ -111,34 +138,6 @@ const MessageTable = ({
     const interval = setInterval(fetchMessages, 5000); // Reduced frequency
     return () => clearInterval(interval);
   }, [fetchMessages]);
-
-  // Sorting and filtering
-  const filteredMessages = useMemo(() => {
-    const filtered = messages.filter((msg) =>
-      msg.userEmail.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-    if (sortKey) {
-      filtered.sort((a, b) => {
-        if (sortKey === "createdAt") {
-          return sortOrder === "asc"
-            ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
-            : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
-        } else {
-          return sortOrder === "asc"
-            ? a.userEmail.toLowerCase().localeCompare(b.userEmail.toLowerCase())
-            : b.userEmail
-                .toLowerCase()
-                .localeCompare(a.userEmail.toLowerCase());
-        }
-      });
-    }
-    return filtered;
-  }, [messages, searchQuery, sortKey, sortOrder]);
-
-  const paginatedMessages = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredMessages.slice(start, start + itemsPerPage);
-  }, [filteredMessages, currentPage, itemsPerPage]);
 
   const handleDeleteMessage = useCallback(
     async (id: string) => {
@@ -190,17 +189,6 @@ const MessageTable = ({
     }
   }, [activeUserEmail, newMessageText, email, role, router]);
 
-  const handleSort = useCallback(
-    (key: "userEmail" | "createdAt") => {
-      if (sortKey === key) setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
-      else {
-        setSortKey(key);
-        setSortOrder("asc");
-      }
-    },
-    [sortKey]
-  );
-
   return (
     <div className="space-y-4">
       <NewMessageForm
@@ -215,42 +203,29 @@ const MessageTable = ({
         className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
       />
 
-      <div className="overflow-x-auto rounded-2xl bg-blue-50 dark:bg-gray-800 scrollbar-hide">
+      <div className="overflow-x-auto rounded-2xl scrollbar-hide">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>#</TableHead>
-              <TableHead>
-                <div
-                  className="flex items-center gap-2 cursor-pointer"
-                  onClick={() => handleSort("userEmail")}
-                >
-                  Agency{" "}
-                  {sortKey === "userEmail" &&
-                    (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
-                </div>
-              </TableHead>
-              <TableHead>Messages</TableHead>
-              <TableHead>
-                <div
-                  className="flex items-center gap-2 cursor-pointer"
-                  onClick={() => handleSort("createdAt")}
-                >
-                  Date{" "}
-                  {sortKey === "createdAt" &&
-                    (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
-                </div>
-              </TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-
           <TableBody>
-            {paginatedMessages.map((message, index) => (
+            {messages.map((message) => (
               <TableRow key={message._id.toString()}>
                 <TableCell>
-                  {(currentPage - 1) * itemsPerPage + index + 1}
+                  <div className="flex items-center gap-2">
+                    {agencyProfiles[message.userEmail]?.logo && (
+                      <Image
+                        src={
+                          agencyProfiles[message.userEmail]?.logo ||
+                          "/public/assets/images/logo.png"
+                        }
+                        alt="logo"
+                        className="w-6 h-6 rounded-full object-cover"
+                      />
+                    )}
+
+                    {agencyProfiles[message.userEmail]?.name ||
+                      message.userEmail}
+                  </div>
                 </TableCell>
+
                 <TableCell>
                   {agencyNames[message.userEmail]}
                   {agencyNames[message.userEmail] && (
@@ -368,10 +343,9 @@ const MessageTable = ({
                   </Popover>
                 </TableCell>
                 <TableCell>
-                  {new Date(
-                    message.updatedAt || message.createdAt
-                  ).toLocaleDateString("en-GB")}
+                  {timeAgo(message.updatedAt || message.createdAt)}
                 </TableCell>
+
                 <TableCell className="flex items-center space-x-2">
                   {role === "admin" && (
                     <Button
@@ -387,34 +361,6 @@ const MessageTable = ({
             ))}
           </TableBody>
         </Table>
-      </div>
-
-      <div className="flex justify-between items-center mt-4">
-        <span className="text-sm text-muted-foreground">
-          Showing{" "}
-          {Math.min(itemsPerPage * currentPage, filteredMessages.length)} of{" "}
-          {filteredMessages.length} messages
-        </span>
-        <div className="flex items-center space-x-2">
-          <Button
-            disabled={currentPage === 1}
-            onClick={() => setCurrentPage((p) => p - 1)}
-            size="sm"
-            className="rounded-2xl"
-          >
-            Previous
-          </Button>
-          <Button
-            disabled={
-              currentPage === Math.ceil(filteredMessages.length / itemsPerPage)
-            }
-            onClick={() => setCurrentPage((p) => p + 1)}
-            size="sm"
-            className="rounded-2xl"
-          >
-            Next
-          </Button>
-        </div>
       </div>
 
       {confirmDeleteId && (
