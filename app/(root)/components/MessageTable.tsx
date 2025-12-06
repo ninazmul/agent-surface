@@ -249,11 +249,11 @@ const MessageTable = ({
                       )}
                       <div>
                         <p className="line-clamp-1">
-                          {agencyNames[message.userEmail]}
+                          {agencyNames[message.userEmail] || "User Name"}
                         </p>
                         {agencyNames[message.userEmail] && lastMsg && (
                           <div className="text-xs max-w-[180px] truncate line-clamp-1">
-                            {lastMsg}
+                            {lastMsg || "No messages yet"}
                           </div>
                         )}
                       </div>
@@ -261,7 +261,7 @@ const MessageTable = ({
 
                     <TableCell className="flex items-center space-x-2">
                       <div className="relative group w-fit cursor-default">
-                        <span className="opacity-100 group-hover:opacity-0 transition-opacity text-black dark:text-white">
+                        <span className="opacity-100 group-hover:opacity-0 transition-opacity">
                           ...
                         </span>
 
@@ -346,7 +346,7 @@ const MessageTable = ({
                             className={`absolute -top-1 ${
                               isAdminMsg ? "-left-1" : "-right-1"
                             } bg-red-500 text-white rounded-full p-1 hover:bg-red-600 
-                    transition opacity-0 group-hover:opacity-100`}
+                            transition opacity-0 group-hover:opacity-100`}
                           >
                             <Trash size={14} />
                           </button>

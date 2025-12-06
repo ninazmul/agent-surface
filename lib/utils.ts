@@ -83,9 +83,9 @@ export const timeAgo = (input: string | Date) => {
   const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
   if (minutes < 1) return "just now";
-  if (minutes < 60) return `${minutes} minute${minutes > 1 ? "s" : ""} ago`;
-  if (hours < 24) return `${hours} hour${hours > 1 ? "s" : ""} ago`;
-  if (days < 7) return `${days} day${days > 1 ? "s" : ""} ago`;
+  if (minutes < 60) return `${minutes} m${minutes > 1 ? "s" : ""} ago`;
+  if (hours < 24) return `${hours} h${hours > 1 ? "s" : ""} ago`;
+  if (days < 7) return `${days} d${days > 1 ? "s" : ""} ago`;
 
   return date.toLocaleDateString("en-GB");
 };
