@@ -11,7 +11,7 @@ import {
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash } from "lucide-react";
+import { Send, Trash } from "lucide-react";
 import { IMessage } from "@/lib/database/models/message.model";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -378,7 +378,7 @@ const MessageTable = ({
                   onClick={handleAppendMessage}
                   disabled={sending}
                 >
-                  {sending ? "..." : "Send"}
+                  <Send /> {sending ? "..." : "Send"}
                 </Button>
               </div>
             </>

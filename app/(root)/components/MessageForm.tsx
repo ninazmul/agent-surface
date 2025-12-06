@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { createMessage } from "@/lib/actions/message.actions";
 import { useRouter } from "next/navigation";
 import { useState, useCallback } from "react";
+import { Send } from "lucide-react";
 
 const MessageFormSchema = z.object({
   text: z.string().min(1, "Message cannot be empty"),
@@ -125,7 +126,7 @@ const MessageForm = ({
             size="sm"
             disabled={form.formState.isSubmitting}
           >
-            {form.formState.isSubmitting ? "Sending..." : "Send"}
+          <Send/>  {form.formState.isSubmitting ? "..." : "Send"}
           </Button>
         </form>
         {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
