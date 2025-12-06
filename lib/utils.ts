@@ -71,10 +71,12 @@ export const handleError = (error: unknown) => {
   throw new Error(typeof error === "string" ? error : JSON.stringify(error));
 };
 
-export const timeAgo = (dateStr: Date) => {
-  const date = new Date(dateStr);
+export const timeAgo = (input: string | Date) => {
+  const date = new Date(input);
   const now = new Date();
   const diffMs = now.getTime() - date.getTime();
+
+  if (diffMs < 0) return "just now"; 
 
   const minutes = Math.floor(diffMs / (1000 * 60));
   const hours = Math.floor(diffMs / (1000 * 60 * 60));
@@ -87,3 +89,4 @@ export const timeAgo = (dateStr: Date) => {
 
   return date.toLocaleDateString("en-GB");
 };
+
