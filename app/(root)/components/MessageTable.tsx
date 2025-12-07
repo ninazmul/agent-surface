@@ -305,171 +305,164 @@ const MessageTable = ({
           </Table>
         </div>
         <div className="flex-1 bg-gray-100 dark:bg-gray-700 p-4 flex flex-col h-full overflow-hidden rounded-2xl">
+          <div className="flex justify-between mb-4 lg:hidden">
+            <Sheet open={showLeftSheet} onOpenChange={setShowLeftSheet}>
+              <SheetTrigger asChild>
+                <MessagesSquare />
+              </SheetTrigger>
+              <SheetContent
+                side="left"
+                className="w-[320px] bg-white dark:bg-gray-800"
+              >
+                <SheetHeader>
+                  <SheetTitle className="text-lg font-semibold mb-2">
+                    Messages
+                  </SheetTitle>
+                </SheetHeader>
+                {/* Move your left sidebar code here */}
+                <div className="space-y-4">
+                  <Input
+                    placeholder="Search by user email..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full rounded-2xl"
+                  />
+                  <Table>
+                    <TableBody>
+                      {messages.map((message) => {
+                        const lastMsg =
+                          message.messages.length > 0
+                            ? message.messages[message.messages.length - 1].text
+                            : null;
+
+                        return (
+                          <TableRow
+                            key={message._id.toString()}
+                            onClick={() => setSelectedThread(message)}
+                            className="hover:bg-purple-500 hover:text-white rounded-2xl border-none flex items-center justify-between"
+                          >
+                            <TableCell className="flex items-center space-x-2">
+                              {agencyProfiles[message.userEmail]?.logo ? (
+                                <Image
+                                  src={
+                                    agencyProfiles[message.userEmail]?.logo ??
+                                    "/assets/user.png"
+                                  }
+                                  alt="logo"
+                                  width={48}
+                                  height={48}
+                                  className="rounded-full object-cover"
+                                />
+                              ) : (
+                                <Image
+                                  src="/assets/user.png"
+                                  alt="default logo"
+                                  width={48}
+                                  height={48}
+                                  className="rounded-full object-cover"
+                                />
+                              )}
+                              <div>
+                                <p className="line-clamp-1 font-bold">
+                                  {agencyNames[message.userEmail] ||
+                                    "User Name"}
+                                </p>
+                                {agencyNames[message.userEmail] && lastMsg && (
+                                  <div className="text-xs max-w-[180px] truncate line-clamp-1">
+                                    {lastMsg || "No messages yet"}
+                                  </div>
+                                )}
+                              </div>
+                            </TableCell>
+
+                            <TableCell className="flex items-center space-x-2">
+                              <div className="relative group w-fit cursor-default">
+                                <span className="opacity-100 group-hover:opacity-0 transition-opacity">
+                                  ...
+                                </span>
+
+                                <span className="absolute left-0 top-0 opacity-0 group-hover:opacity-100 whitespace-nowrap text-black dark:text-white bg-white dark:bg-gray-900 p-1 rounded-md shadow transition-opacity z-10">
+                                  {timeAgo(
+                                    message.updatedAt || message.createdAt
+                                  )}
+                                </span>
+                              </div>
+                              {role === "admin" && (
+                                <Button
+                                  onClick={() =>
+                                    setConfirmDeleteId(message._id.toString())
+                                  }
+                                  variant={"ghost"}
+                                  size={"icon"}
+                                >
+                                  <Trash className="w-4 h-4 text-red-600" />
+                                </Button>
+                              )}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </SheetContent>
+            </Sheet>
+
+            <Sheet open={showRightSheet} onOpenChange={setShowRightSheet}>
+              <SheetTrigger asChild>
+                <PencilRulerIcon />
+              </SheetTrigger>
+              <SheetContent
+                side="right"
+                className="w-[320px] bg-white dark:bg-gray-800"
+              >
+                <SheetHeader>
+                  <SheetTitle className="text-lg font-semibold mb-2">
+                    New Message
+                  </SheetTitle>
+                </SheetHeader>
+                <NewMessageForm
+                  allUsers={allUsers}
+                  agencyProfiles={agencyProfiles}
+                  onSelectUser={(email) => {
+                    setNewMessageUser(email);
+                    setSelectedThread(null);
+                    setShowRightSheet(false);
+                  }}
+                />
+              </SheetContent>
+            </Sheet>
+          </div>
           {!selectedThread && !newMessageUser ? (
             <div className="h-full flex items-center justify-center text-gray-500">
               Select a profile to view messages or send a new message
             </div>
           ) : selectedThread ? (
             <>
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 p-4 border-b sticky top-0 bg-gray-100 dark:bg-gray-700 z-10">
-                  {agencyProfiles[selectedThread.userEmail]?.logo ? (
-                    <Image
-                      src={
-                        agencyProfiles[selectedThread.userEmail]?.logo ??
-                        "/assets/user.png"
-                      }
-                      alt="logo"
-                      width={48}
-                      height={48}
-                      className="rounded-full object-cover"
-                    />
-                  ) : (
-                    <Image
-                      src="/assets/user.png"
-                      alt="default logo"
-                      width={48}
-                      height={48}
-                      className="rounded-full object-cover"
-                    />
-                  )}
-                  <div className="font-semibold text-lg line-clamp-1">
-                    {agencyNames[selectedThread.userEmail] ||
-                      selectedThread.userEmail}
-                  </div>
-                </div>
-                <div className="flex justify-between mb-2 lg:hidden">
-                  <Sheet open={showLeftSheet} onOpenChange={setShowLeftSheet}>
-                    <SheetTrigger asChild>
-                      <MessagesSquare />
-                    </SheetTrigger>
-                    <SheetContent
-                      side="left"
-                      className="w-[320px] bg-white dark:bg-gray-800"
-                    >
-                      <SheetHeader>
-                        <SheetTitle className="text-lg font-semibold mb-2">
-                          Messages
-                        </SheetTitle>
-                      </SheetHeader>
-                      {/* Move your left sidebar code here */}
-                      <div className="space-y-4">
-                        <Input
-                          placeholder="Search by user email..."
-                          value={searchQuery}
-                          onChange={(e) => setSearchQuery(e.target.value)}
-                          className="w-full rounded-2xl"
-                        />
-                        <Table>
-                          <TableBody>
-                            {messages.map((message) => {
-                              const lastMsg =
-                                message.messages.length > 0
-                                  ? message.messages[
-                                      message.messages.length - 1
-                                    ].text
-                                  : null;
-
-                              return (
-                                <TableRow
-                                  key={message._id.toString()}
-                                  onClick={() => setSelectedThread(message)}
-                                  className="hover:bg-purple-500 hover:text-white rounded-2xl border-none flex items-center justify-between"
-                                >
-                                  <TableCell className="flex items-center space-x-2">
-                                    {agencyProfiles[message.userEmail]?.logo ? (
-                                      <Image
-                                        src={
-                                          agencyProfiles[message.userEmail]
-                                            ?.logo ?? "/assets/user.png"
-                                        }
-                                        alt="logo"
-                                        width={48}
-                                        height={48}
-                                        className="rounded-full object-cover"
-                                      />
-                                    ) : (
-                                      <Image
-                                        src="/assets/user.png"
-                                        alt="default logo"
-                                        width={48}
-                                        height={48}
-                                        className="rounded-full object-cover"
-                                      />
-                                    )}
-                                    <div>
-                                      <p className="line-clamp-1 font-bold">
-                                        {agencyNames[message.userEmail] ||
-                                          "User Name"}
-                                      </p>
-                                      {agencyNames[message.userEmail] &&
-                                        lastMsg && (
-                                          <div className="text-xs max-w-[180px] truncate line-clamp-1">
-                                            {lastMsg || "No messages yet"}
-                                          </div>
-                                        )}
-                                    </div>
-                                  </TableCell>
-
-                                  <TableCell className="flex items-center space-x-2">
-                                    <div className="relative group w-fit cursor-default">
-                                      <span className="opacity-100 group-hover:opacity-0 transition-opacity">
-                                        ...
-                                      </span>
-
-                                      <span className="absolute left-0 top-0 opacity-0 group-hover:opacity-100 whitespace-nowrap text-black dark:text-white bg-white dark:bg-gray-900 p-1 rounded-md shadow transition-opacity z-10">
-                                        {timeAgo(
-                                          message.updatedAt || message.createdAt
-                                        )}
-                                      </span>
-                                    </div>
-                                    {role === "admin" && (
-                                      <Button
-                                        onClick={() =>
-                                          setConfirmDeleteId(
-                                            message._id.toString()
-                                          )
-                                        }
-                                        variant={"ghost"}
-                                        size={"icon"}
-                                      >
-                                        <Trash className="w-4 h-4 text-red-600" />
-                                      </Button>
-                                    )}
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            })}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    </SheetContent>
-                  </Sheet>
-
-                  <Sheet open={showRightSheet} onOpenChange={setShowRightSheet}>
-                    <SheetTrigger asChild>
-                      <PencilRulerIcon />
-                    </SheetTrigger>
-                    <SheetContent
-                      side="right"
-                      className="w-[320px] bg-white dark:bg-gray-800"
-                    >
-                      <SheetHeader>
-                        <SheetTitle className="text-lg font-semibold mb-2">
-                          New Message
-                        </SheetTitle>
-                      </SheetHeader>
-                      <NewMessageForm
-                        allUsers={allUsers}
-                        agencyProfiles={agencyProfiles}
-                        onSelectUser={(email) => {
-                          setNewMessageUser(email);
-                          setSelectedThread(null);
-                          setShowRightSheet(false);
-                        }}
-                      />
-                    </SheetContent>
-                  </Sheet>
+              <div className="flex items-center gap-3 p-4 border-b sticky top-0 bg-gray-100 dark:bg-gray-700 z-10">
+                {agencyProfiles[selectedThread.userEmail]?.logo ? (
+                  <Image
+                    src={
+                      agencyProfiles[selectedThread.userEmail]?.logo ??
+                      "/assets/user.png"
+                    }
+                    alt="logo"
+                    width={48}
+                    height={48}
+                    className="rounded-full object-cover"
+                  />
+                ) : (
+                  <Image
+                    src="/assets/user.png"
+                    alt="default logo"
+                    width={48}
+                    height={48}
+                    className="rounded-full object-cover"
+                  />
+                )}
+                <div className="font-semibold text-lg line-clamp-1">
+                  {agencyNames[selectedThread.userEmail] ||
+                    selectedThread.userEmail}
                 </div>
               </div>
 
