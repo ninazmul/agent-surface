@@ -549,6 +549,7 @@ const MessageTable = ({
                 userEmail={newMessageUser}
                 senderEmail={email}
                 country={country?.[0] || ""}
+                isAdmin={true}
                 senderRole="admin"
                 type="Create"
               />

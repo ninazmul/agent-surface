@@ -30,6 +30,7 @@ type MessageFormProps = {
   senderEmail: string;
   senderRole: "user" | "admin";
   country?: string;
+  isAdmin?: boolean;
   onMessageSent?: (message: {
     senderEmail: string;
     senderRole?: "user" | "admin";
@@ -46,6 +47,7 @@ const MessageForm = ({
   senderRole,
   onMessageSent,
   country,
+  isAdmin,
 }: MessageFormProps) => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
@@ -127,18 +129,20 @@ const MessageForm = ({
       {" "}
       <Form {...form}>
         {/* Top Profile Header */}
-        <div className="flex items-center gap-3 p-4 border-b sticky top-0 bg-gray-100 dark:bg-gray-800 z-10">
-          <Image
-            src={profile?.logo ?? "/assets/user.png"}
-            alt="logo"
-            width={48}
-            height={48}
-            className="rounded-full object-cover w-10 h-10"
-          />
-          <div className="font-semibold text-lg line-clamp-1">
-            {profile?.name || userEmail}
+        {isAdmin && (
+          <div className="flex items-center gap-3 p-4 border-b sticky top-0 bg-gray-100 dark:bg-gray-800 z-10">
+            <Image
+              src={profile?.logo ?? "/assets/user.png"}
+              alt="logo"
+              width={48}
+              height={48}
+              className="rounded-full object-cover w-10 h-10"
+            />
+            <div className="font-semibold text-lg line-clamp-1">
+              {profile?.name || userEmail}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Messages & Input */}
         <div className="flex flex-col flex-grow justify-end">
