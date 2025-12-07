@@ -253,7 +253,7 @@ const MessageTable = ({
                           alt="logo"
                           width={48}
                           height={48}
-                          className="rounded-full object-cover"
+                          className="rounded-full object-cover w-10 h-10"
                         />
                       ) : (
                         <Image
@@ -449,7 +449,7 @@ const MessageTable = ({
                     alt="logo"
                     width={48}
                     height={48}
-                    className="rounded-full object-cover"
+                    className="rounded-full object-cover w-10 h-10"
                   />
                 ) : (
                   <Image
