@@ -14,8 +14,10 @@ import {
 import { Input } from "@/components/ui/input";
 import { createMessage } from "@/lib/actions/message.actions";
 import { useRouter } from "next/navigation";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { Send } from "lucide-react";
+import Image from "next/image";
+import { getProfileByEmail } from "@/lib/actions";
 
 const MessageFormSchema = z.object({
   text: z.string().min(1, "Message cannot be empty"),
@@ -47,6 +49,30 @@ const MessageForm = ({
 }: MessageFormProps) => {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
+  const [profile, setProfile] = useState<{
+    name?: string;
+    logo?: string;
+  } | null>(null);
+
+  // Fetch profile
+  useEffect(() => {
+    if (!userEmail) return;
+    let isMounted = true;
+
+    const fetchProfile = async () => {
+      try {
+        const data = await getProfileByEmail(userEmail);
+        if (isMounted) setProfile(data || null);
+      } catch (err) {
+        console.error("Failed to fetch profile", err);
+      }
+    };
+
+    fetchProfile();
+    return () => {
+      isMounted = false;
+    };
+  }, [userEmail]);
 
   const form = useForm<z.infer<typeof MessageFormSchema>>({
     resolver: zodResolver(MessageFormSchema),
@@ -97,41 +123,58 @@ const MessageForm = ({
   );
 
   return (
-    <Form {...form}>
-      <div className="flex flex-col h-full">
-        {/* Message Input Area sticks to bottom */}
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="mt-auto flex gap-2 items-center pt-2 border-t bg-gray-100 dark:bg-gray-700"
-        >
-          <FormField
-            control={form.control}
-            name="text"
-            render={({ field }) => (
-              <FormItem className="flex-grow mb-0">
-                <FormControl>
-                  <Input
-                    {...field}
-                    placeholder="Type a message..."
-                    autoComplete="off"
-                    disabled={form.formState.isSubmitting}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
+    <div className="flex flex-col h-full">
+      {" "}
+      <Form {...form}>
+        {/* Top Profile Header */}
+        <div className="flex items-center gap-3 p-4 border-b sticky top-0 bg-white dark:bg-gray-800 z-10">
+          <Image
+            src={profile?.logo ?? "/assets/user.png"}
+            alt="logo"
+            width={48}
+            height={48}
+            className="rounded-full object-cover"
           />
-          <Button
-            type="submit"
-            size="sm"
-            disabled={form.formState.isSubmitting}
+          <div className="font-semibold text-lg line-clamp-1">
+            {profile?.name || userEmail}
+          </div>
+        </div>
+
+        {/* Messages & Input */}
+        <div className="flex flex-col flex-grow justify-end">
+          <form
+            onSubmit={form.handleSubmit(onSubmit)}
+            className="flex gap-2 items-center p-4 border-t bg-gray-100 dark:bg-gray-700"
           >
-          <Send/>  {form.formState.isSubmitting ? "..." : "Send"}
-          </Button>
-        </form>
-        {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
-      </div>
-    </Form>
+            <FormField
+              control={form.control}
+              name="text"
+              render={({ field }) => (
+                <FormItem className="flex-grow mb-0">
+                  <FormControl>
+                    <Input
+                      {...field}
+                      placeholder="Type a message..."
+                      autoComplete="off"
+                      disabled={form.formState.isSubmitting}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              size="sm"
+              disabled={form.formState.isSubmitting}
+            >
+              <Send /> {form.formState.isSubmitting ? "..." : "Send"}
+            </Button>
+          </form>
+          {error && <p className="text-red-500 text-sm mt-1 px-4">{error}</p>}
+        </div>
+      </Form>
+    </div>
   );
 };
 

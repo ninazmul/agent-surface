@@ -244,16 +244,24 @@ const MessageTable = ({
                     className="hover:bg-purple-500 hover:text-white rounded-2xl border-none flex items-center justify-between"
                   >
                     <TableCell className="flex items-center space-x-2">
-                      {agencyProfiles[message.userEmail]?.logo && (
+                      {agencyProfiles[message.userEmail]?.logo ? (
                         <Image
                           src={
                             agencyProfiles[message.userEmail]?.logo ??
                             "/assets/user.png"
                           }
                           alt="logo"
-                          width={80}
-                          height={80}
-                          className="w-10 h-10 rounded-full object-cover"
+                          width={48}
+                          height={48}
+                          className="rounded-full object-cover"
+                        />
+                      ) : (
+                        <Image
+                          src="/assets/user.png"
+                          alt="default logo"
+                          width={48}
+                          height={48}
+                          className="rounded-full object-cover"
                         />
                       )}
                       <div>
@@ -304,14 +312,22 @@ const MessageTable = ({
           ) : selectedThread ? (
             <>
               <div className="flex items-center justify-between gap-4">
-                <div className="flex items-center gap-3 mb-4 border-b pb-2">
-                  {agencyProfiles[selectedThread.userEmail]?.logo && (
+                <div className="flex items-center gap-3 p-4 border-b sticky top-0 bg-gray-100 dark:bg-gray-700 z-10">
+                  {agencyProfiles[selectedThread.userEmail]?.logo ? (
                     <Image
                       src={
                         agencyProfiles[selectedThread.userEmail]?.logo ??
                         "/assets/user.png"
                       }
                       alt="logo"
+                      width={48}
+                      height={48}
+                      className="rounded-full object-cover"
+                    />
+                  ) : (
+                    <Image
+                      src="/assets/user.png"
+                      alt="default logo"
                       width={48}
                       height={48}
                       className="rounded-full object-cover"
@@ -361,17 +377,24 @@ const MessageTable = ({
                                   className="hover:bg-purple-500 hover:text-white rounded-2xl border-none flex items-center justify-between"
                                 >
                                   <TableCell className="flex items-center space-x-2">
-                                    {agencyProfiles[message.userEmail]
-                                      ?.logo && (
+                                    {agencyProfiles[message.userEmail]?.logo ? (
                                       <Image
                                         src={
                                           agencyProfiles[message.userEmail]
                                             ?.logo ?? "/assets/user.png"
                                         }
                                         alt="logo"
-                                        width={80}
-                                        height={80}
-                                        className="w-10 h-10 rounded-full object-cover"
+                                        width={48}
+                                        height={48}
+                                        className="rounded-full object-cover"
+                                      />
+                                    ) : (
+                                      <Image
+                                        src="/assets/user.png"
+                                        alt="default logo"
+                                        width={48}
+                                        height={48}
+                                        className="rounded-full object-cover"
                                       />
                                     )}
                                     <div>
