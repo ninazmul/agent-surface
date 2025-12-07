@@ -219,7 +219,7 @@ const MessageTable = ({
   return (
     <div className="space-y-6">
       <div className="flex h-[calc(100vh-10rem)] w-full lg:bg-white lg:dark:bg-gray-800 rounded-2xl overflow-hidden lg:p-4 gap-4">
-        <div className="hidden lg:flex w-[320px] flex-shrink-0 bg-gray-100 dark:bg-gray-700 h-full overflow-y-auto p-4 space-y-4 rounded-2xl">
+        <div className="hidden lg:block w-[320px] flex-shrink-0 bg-gray-100 dark:bg-gray-700 h-full overflow-y-auto p-4 space-y-4 rounded-2xl">
           <div className="space-y-2">
             <h3 className="text-lg font-semibold">Messages</h3>
             <Input
@@ -532,7 +532,7 @@ const MessageTable = ({
             </div>
           )}
         </div>
-        <div className="hidden lg:flex w-[320px] flex-shrink-0 bg-gray-100 dark:bg-gray-700 h-full overflow-y-auto p-4 rounded-2xl">
+        <div className="hidden lg:block w-[320px] flex-shrink-0 bg-gray-100 dark:bg-gray-700 h-full overflow-y-auto p-4 rounded-2xl">
           <NewMessageForm
             allUsers={allUsers}
             agencyProfiles={agencyProfiles}
