@@ -11,7 +11,7 @@ import {
 import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Send, Trash } from "lucide-react";
+import { MessagesSquare, PencilRulerIcon, Send, Trash } from "lucide-react";
 import { IMessage } from "@/lib/database/models/message.model";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -300,9 +300,12 @@ const MessageTable = ({
           <div className="flex justify-between mb-2 lg:hidden">
             <Sheet open={showLeftSheet} onOpenChange={setShowLeftSheet}>
               <SheetTrigger asChild>
-                <Button size="sm">Messages</Button>
+                <MessagesSquare />
               </SheetTrigger>
-              <SheetContent side="left" className="w-[300px]">
+              <SheetContent
+                side="left"
+                className="w-[300px] bg-white dark:bg-gray-800"
+              >
                 <SheetHeader>
                   <SheetTitle>Messages</SheetTitle>
                 </SheetHeader>
@@ -389,9 +392,12 @@ const MessageTable = ({
 
             <Sheet open={showRightSheet} onOpenChange={setShowRightSheet}>
               <SheetTrigger asChild>
-                <Button size="sm">New Message</Button>
+                <PencilRulerIcon />
               </SheetTrigger>
-              <SheetContent side="right" className="w-[300px]">
+              <SheetContent
+                side="right"
+                className="w-[300px] bg-white dark:bg-gray-800"
+              >
                 <SheetHeader>
                   <SheetTitle>New Message</SheetTitle>
                 </SheetHeader>
