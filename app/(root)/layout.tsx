@@ -74,11 +74,11 @@ export default async function AdminLayout({
         </div>
 
         {/* Floating Help Button */}
-        {myProfile?.name && myProfile?.email && (
+        {email && myProfile?.email && (
           <div className="fixed bottom-6 left-6 z-50">
             <HelpModal
-              agentName={myProfile.name}
-              agentEmail={myProfile.email}
+              agentName={myProfile.name || "Admin"}
+              agentEmail={email}
             />
           </div>
         )}
