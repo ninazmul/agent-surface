@@ -1,7 +1,7 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import HomeSidebar from "../(root)/components/HomeSidebar";
+import HomeSidebar from "../../(root)/components/HomeSidebar";
 import { Toaster } from "react-hot-toast";
-import MessageCount from "../(root)/components/MessageCount";
+import MessageCount from "../../(root)/components/MessageCount";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
@@ -10,7 +10,7 @@ import {
   getAdminRolePermissionsByEmail,
   isAdmin,
 } from "@/lib/actions/admin.actions";
-import NotificationsCount from "../(root)/components/Notifications";
+import NotificationsCount from "../../(root)/components/Notifications";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import ThemeToggle from "@/components/shared/ThemeToggle";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
