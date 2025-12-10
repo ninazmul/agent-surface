@@ -2,13 +2,14 @@
 
 import { connectToDatabase } from "../database";
 import { getProfileByEmail } from "./profile.actions";
-import { getAdminCountriesByEmail } from "./admin.actions";
+import { getAdminCountriesByEmail, isAdmin } from "./admin.actions";
 import Message, {
   IChatMessage,
   IMessage,
   Role,
 } from "../database/models/message.model";
 import { Types } from "mongoose";
+import { handleError } from "../utils";
 
 // ---------- CREATE OR APPEND MESSAGE ----------
 export const createOrAppendMessage = async ({
@@ -148,5 +149,64 @@ export const deleteSingleMessage = async (
   } catch (err) {
     console.error("deleteSingleMessage error:", err);
     throw new Error("Failed to delete single message");
+  }
+};
+
+// ====== UNREAD SUMMARY FOR ADMIN ======
+export const getUnreadSummary = async (adminEmail: string) => {
+  try {
+    await connectToDatabase();
+
+    const isCurrentAdmin = await isAdmin(adminEmail);
+    if (!isCurrentAdmin) {
+      throw new Error("User is not an admin");
+    }
+
+    const allowedCountries = await getAdminCountriesByEmail(adminEmail);
+
+    const allThreads = await Message.find().lean();
+
+    let totalUnread = 0;
+
+    const filteredThreads = allowedCountries.length
+      ? allThreads.filter((thread) => allowedCountries.includes(thread.country))
+      : allThreads;
+
+    const unreadCounts = filteredThreads.map((thread) => {
+      const messages: IChatMessage[] = thread.messages || [];
+
+      // Find the last admin message timestamp
+      const lastAdminMsg = [...messages]
+        .reverse()
+        .find((msg) => msg.senderRole === "Admin");
+
+      const lastAdminTime = lastAdminMsg
+        ? new Date(lastAdminMsg.timestamp)
+        : null;
+
+      const unreadMessages = messages.filter((msg) => {
+        // Only user messages after last admin reply are unread
+        const isUserMsg = msg.senderRole !== "Admin"; // any non-admin message
+        const isUnread =
+          !lastAdminTime || new Date(msg.timestamp) > lastAdminTime;
+
+        return isUserMsg && isUnread;
+      });
+
+      totalUnread += unreadMessages.length;
+
+      return {
+        userEmail: thread.userEmail,
+        unreadCount: unreadMessages.length,
+      };
+    });
+
+    return {
+      totalUnread,
+      unreadCounts,
+    };
+  } catch (error) {
+    handleError(error);
+    return { totalUnread: 0, unreadCounts: [] };
   }
 };
