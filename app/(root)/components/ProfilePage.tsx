@@ -6,11 +6,12 @@ import ProfileForm from "./ProfileForm";
 import { Button } from "@/components/ui/button";
 import ProfileTable from "./ProfileTable";
 import SalesTargetProgress from "./SalesTargetProgress";
-import { Edit, FileEdit, Plus } from "lucide-react";
+import { Copy, Edit, FileEdit, Plus, Share2 } from "lucide-react";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useEffect, useState } from "react";
 import { getLeadByEmail } from "@/lib/actions/lead.actions";
 import { useTheme } from "next-themes";
+import toast from "react-hot-toast";
 
 interface ProfilePageProps {
   adminStatus: boolean;
@@ -376,14 +377,57 @@ export default function ProfilePage({
           {/* Header */}
           <div className="px-2 sm:px-4 flex flex-col md:flex-row items-center justify-between gap-3">
             <h3 className="h3-bold text-center sm:text-left">All Profiles</h3>
-            <a href={"/profile/create"} className="w-full sm:w-auto">
+
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              {/* Add Profile */}
+              <a href={"/profile/create"}>
+                <Button
+                  size="sm"
+                  className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+                >
+                  <Plus size={16} />
+                  Add Profile
+                </Button>
+              </a>
+
+              {/* Copy Link */}
               <Button
                 size="sm"
-                className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+                variant="outline"
+                className="rounded-xl flex items-center gap-1"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${window.location.origin}/profile/create`
+                  );
+                  toast.success("Link copied");
+                }}
               >
-                <Plus size={16} /> Add Profile
+                <Copy size={16} />
+                Copy
               </Button>
-            </a>
+
+              {/* Share Link */}
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-xl flex items-center gap-1"
+                onClick={async () => {
+                  const link = `${window.location.origin}/profile/create`;
+                  if (navigator.share) {
+                    await navigator.share({
+                      title: "Create Profile",
+                      url: link,
+                    });
+                  } else {
+                    navigator.clipboard.writeText(link);
+                    toast.success("Link copied (Share unavailable)");
+                  }
+                }}
+              >
+                <Share2 size={16} />
+                Share
+              </Button>
+            </div>
           </div>
 
           {/* Table */}
