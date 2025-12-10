@@ -59,7 +59,7 @@ export default function HelpModal() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="fixed bottom-6 right-6 z-50 bg-black text-white hover:bg-white hover:text-black border border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white rounded-full p-4 shadow-lg flex items-center justify-center">
+        <Button className="fixed bottom-6 right-6 z-50 bg-black text-white hover:bg-white hover:text-black border border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white rounded-full py-3 px-2 shadow-lg flex items-center justify-center">
           <HelpCircle size={24} />
         </Button>
       </DialogTrigger>
