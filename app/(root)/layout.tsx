@@ -16,6 +16,7 @@ import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import ThemeToggle from "@/components/shared/ThemeToggle";
 import { DashboardProvider } from "@/components/shared/DashboardProvider";
 import { redirect } from "next/navigation";
+import HelpModal from "@/components/shared/HelpForm";
 
 export default async function AdminLayout({
   children,
@@ -30,17 +31,8 @@ export default async function AdminLayout({
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
-  if (!userId) {
-    redirect("/sign-in");
-  }
-
-  if (!userId) {
-    redirect("/sign-in");
-  }
-
-  if (!adminStatus && myProfile?.status === "Pending") {
-    redirect("/profile");
-  }
+  if (!userId) redirect("/sign-in");
+  if (!adminStatus && myProfile?.status === "Pending") redirect("/profile");
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -52,7 +44,7 @@ export default async function AdminLayout({
         admin={admin}
       />
       <Toaster />
-      <main className="flex-1 h-screen mx-auto overflow-y-auto">
+      <main className="flex-1 h-screen mx-auto overflow-y-auto relative">
         <div
           className={`flex justify-between items-center p-4 w-full text-white no-print bg-gray-50 dark:bg-gray-900 border-b`}
         >
@@ -76,9 +68,20 @@ export default async function AdminLayout({
             </SignedIn>
           </div>
         </div>
+
         <div>
           <DashboardProvider>{children}</DashboardProvider>
         </div>
+
+        {/* Floating Help Button */}
+        {myProfile?.name && myProfile?.email && (
+          <div className="fixed bottom-6 left-6 z-50">
+            <HelpModal
+              agentName={myProfile.name}
+              agentEmail={myProfile.email}
+            />
+          </div>
+        )}
       </main>
     </SidebarProvider>
   );
