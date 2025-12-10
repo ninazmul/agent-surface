@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   createOrAppendMessage,
   getMessagesForUser,
@@ -20,7 +20,6 @@ import NewMessageForm from "./NewMessageForm";
 import { timeAgo } from "@/lib/utils";
 import {
   IMessage,
-  IChatMessage,
   Role,
 } from "@/lib/database/models/message.model";
 import { isAdmin } from "@/lib/actions";
@@ -46,8 +45,9 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
   const [availableUsers, setAvailableUsers] = useState<
     { email: string; name?: string }[]
   >([]);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
 
-  // Fetch all users for NewMessageForm
+  // Fetch all users
   const fetchAllUsers = useCallback(async () => {
     try {
       const profiles = await getAllProfiles();
@@ -57,13 +57,12 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     }
   }, []);
 
-  // Fetch messages based on role
+  // Fetch messages and profiles
   const fetchMessages = useCallback(async () => {
     try {
       const threads = await getMessagesForUser(email, role);
       setMessages(threads);
 
-      // populate agencyProfiles for display
       const profileMap: Record<string, { name?: string; logo?: string }> = {};
       await Promise.all(
         threads.map(async (t) => {
@@ -118,23 +117,17 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     fetchMessages,
   ]);
 
-  const getAvailableUsers = async (
-    email: string,
-    allUsers: { email: string; name?: string }[]
-  ) => {
+  // Get available users
+  const getAvailableUsers = useCallback(async () => {
     const adminStatus = await isAdmin(email);
 
-    // Admin → can message anyone
     if (adminStatus) return allUsers;
 
-    // Fetch user profile for role determination
     const profile = await getProfileByEmail(email);
-    const role = profile?.role;
+    const roleProfile = profile?.role;
 
-    // Agent → can message Sub Agents and Admins
-    if (role === "Agent") {
-      const subAgents = await getSubAgentsByEmail(email); // returns array of emails
-      // Admins from allUsers, filtered by isAdmin
+    if (roleProfile === "Agent") {
+      const subAgents = await getSubAgentsByEmail(email);
       const adminEmails = (
         await Promise.all(
           allUsers.map(async (u) => ((await isAdmin(u.email)) ? u.email : null))
@@ -146,14 +139,12 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
       );
     }
 
-    // Sub Agent → can message only their Agent
-    if (role === "Sub Agent") {
+    if (roleProfile === "Sub Agent") {
       if (!profile?.countryAgent) return [];
       return allUsers.filter((u) => u.email === profile.countryAgent);
     }
 
-    // Student → can message only Admins
-    if (role === "Student") {
+    if (roleProfile === "Student") {
       const adminEmails = (
         await Promise.all(
           allUsers.map(async (u) => ((await isAdmin(u.email)) ? u.email : null))
@@ -163,25 +154,31 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     }
 
     return [];
-  };
+  }, [allUsers, email]);
 
   useEffect(() => {
-    const fetchAvailableUsers = async () => {
-      const users = await getAvailableUsers(email, allUsers);
+    const fetchAvailable = async () => {
+      const users = await getAvailableUsers();
       setAvailableUsers(users);
     };
+    if (allUsers.length > 0) fetchAvailable();
+  }, [allUsers, getAvailableUsers]);
 
-    if (allUsers.length > 0) fetchAvailableUsers();
-  }, [email, allUsers]);
+  // Scroll to latest message
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [selectedThread, messages]);
 
   return (
     <div className="space-y-6">
       <div className="flex h-[calc(100vh-10rem)] w-full lg:bg-white lg:dark:bg-gray-800 rounded-2xl overflow-hidden lg:p-4 gap-4">
-        {/* Left sidebar */}
+        {/* Left sidebar: threads */}
         <div className="hidden lg:block w-[320px] flex-shrink-0 bg-gray-100 dark:bg-gray-700 h-full overflow-y-auto p-4 space-y-4 rounded-2xl">
-          <h3 className="text-lg font-semibold">Messages</h3>
+          <h3 className="text-lg font-semibold">Threads</h3>
           <Input
-            placeholder="Search by user email..."
+            placeholder="Search by email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-2xl"
@@ -189,40 +186,41 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
           <Table>
             <TableBody>
               {messages
-                .filter((m) =>
-                  m.userEmail.toLowerCase().includes(searchQuery.toLowerCase())
+                .filter((t) =>
+                  t.userEmail.toLowerCase().includes(searchQuery.toLowerCase())
                 )
-                .map((message) => {
+                .map((thread) => {
                   const lastMsg =
-                    message.messages[message.messages.length - 1]?.text || "";
+                    thread.messages[thread.messages.length - 1]?.text ||
+                    "No messages yet";
                   return (
                     <TableRow
-                      key={message._id.toString()}
+                      key={thread._id.toString()}
                       onClick={() => {
-                        setSelectedThread(message);
+                        setSelectedThread(thread);
                         setNewMessageUser("");
                       }}
-                      className="hover:bg-purple-500 hover:text-white rounded-2xl border-none flex items-center justify-between"
+                      className="hover:bg-purple-500 hover:text-white rounded-2xl border-none flex items-center justify-between cursor-pointer"
                     >
                       <TableCell className="flex items-center space-x-2">
                         <Image
                           src={
-                            agencyProfiles[message.userEmail]?.logo ||
+                            agencyProfiles[thread.userEmail]?.logo ||
                             "/assets/user.png"
                           }
                           alt="logo"
-                          width={48}
-                          height={48}
+                          width={40}
+                          height={40}
                           className="rounded-full object-cover w-10 h-10"
                         />
-                        <div>
-                          <p className="line-clamp-1 font-bold">
-                            {agencyProfiles[message.userEmail]?.name ||
-                              message.userEmail}
+                        <div className="truncate">
+                          <p className="font-bold truncate">
+                            {agencyProfiles[thread.userEmail]?.name ||
+                              thread.userEmail}
                           </p>
-                          <div className="text-xs max-w-[180px] truncate line-clamp-1">
-                            {lastMsg || "No messages yet"}
-                          </div>
+                          <p className="text-xs text-gray-500 truncate">
+                            {lastMsg}
+                          </p>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -236,43 +234,43 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
         <div className="flex-1 bg-gray-100 dark:bg-gray-700 p-4 flex flex-col h-full overflow-hidden rounded-2xl">
           {!selectedThread && !newMessageUser ? (
             <div className="h-full flex items-center justify-center text-gray-500">
-              Select a profile to view messages or send a new message
+              Select a thread or start a new message
             </div>
           ) : (
             <>
-              <div className="flex-1 overflow-y-auto space-y-3 pr-2">
-                {(selectedThread ? selectedThread.messages : []).map(
-                  (msg: IChatMessage) => {
-                    const isAdminMsg = msg.senderRole === "Admin";
-                    return (
+              <div
+                ref={scrollRef}
+                className="flex-1 overflow-y-auto space-y-3 pr-2"
+              >
+                {(selectedThread ? selectedThread.messages : []).map((msg) => {
+                  const isAdminMsg = msg.senderRole === "Admin";
+                  return (
+                    <div
+                      key={msg._id.toString()}
+                      className={`flex flex-col ${
+                        isAdminMsg ? "items-end" : "items-start"
+                      } space-y-1`}
+                    >
                       <div
-                        key={msg._id.toString()}
-                        className={`flex flex-col ${
-                          isAdminMsg ? "items-end" : "items-start"
-                        } space-y-1`}
+                        className={`max-w-[75%] px-4 py-2 rounded-2xl shadow-sm text-sm ${
+                          isAdminMsg
+                            ? "bg-purple-600 text-white rounded-br-none"
+                            : "bg-gray-200 text-black rounded-bl-none"
+                        }`}
                       >
-                        <div
-                          className={`group relative max-w-[75%] px-4 py-2 rounded-2xl shadow-sm text-sm ${
-                            isAdminMsg
-                              ? "bg-gray-600 text-white rounded-br-none"
-                              : "bg-gray-200 text-black rounded-bl-none"
-                          }`}
-                        >
-                          <p>{msg.text}</p>
-                        </div>
-                        <span
-                          className={`text-xs text-gray-500 dark:text-gray-400 ${
-                            isAdminMsg ? "text-right" : "text-left"
-                          }`}
-                        >
-                          {timeAgo(msg.timestamp)}
-                        </span>
+                        {msg.text}
                       </div>
-                    );
-                  }
-                )}
+                      <span
+                        className={`text-xs text-gray-500 ${
+                          isAdminMsg ? "text-right" : "text-left"
+                        }`}
+                      >
+                        {timeAgo(msg.timestamp)}
+                      </span>
+                    </div>
+                  );
+                })}
               </div>
-
               <div className="flex items-center gap-2 pt-2 border-t">
                 <Input
                   value={newMessageText}
