@@ -74,9 +74,7 @@ export default async function AdminLayout({
         </div>
 
         {/* Floating Help Button */}
-        {email && (
-          <HelpModal agentName={myProfile.name || "Admin"} agentEmail={email} />
-        )}
+        <HelpModal />
       </main>
     </SidebarProvider>
   );

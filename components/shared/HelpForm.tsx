@@ -10,25 +10,24 @@ import {
 } from "@/components/ui/dialog";
 import { Card } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { HelpCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
-interface HelpModalProps {
-  agentName: string;
-  agentEmail: string;
-}
-
-export default function HelpModal({ agentName, agentEmail }: HelpModalProps) {
+export default function HelpModal() {
   const [open, setOpen] = useState(false);
+  const [agentName, setAgentName] = useState("");
+  const [agentEmail, setAgentEmail] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!message.trim()) {
-      toast.error("Please enter a message.");
+
+    if (!agentName.trim() || !agentEmail.trim() || !message.trim()) {
+      toast.error("Please fill out all fields.");
       return;
     }
 
@@ -43,6 +42,8 @@ export default function HelpModal({ agentName, agentEmail }: HelpModalProps) {
 
       if (res.ok) {
         toast.success("Help request sent!");
+        setAgentName("");
+        setAgentEmail("");
         setMessage("");
         setOpen(false);
       } else {
@@ -53,10 +54,6 @@ export default function HelpModal({ agentName, agentEmail }: HelpModalProps) {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setMessage(e.target.value);
   };
 
   return (
@@ -75,11 +72,34 @@ export default function HelpModal({ agentName, agentEmail }: HelpModalProps) {
         <Card className="p-6 border-0 shadow-none bg-transparent text-inherit">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
+              <Label>Name</Label>
+              <Input
+                type="text"
+                value={agentName}
+                onChange={(e) => setAgentName(e.target.value)}
+                placeholder="Your name"
+                className="bg-gray-100 dark:bg-gray-900 border-gray-300 dark:border-gray-600"
+                required
+              />
+            </div>
+
+            <div>
+              <Label>Email</Label>
+              <Input
+                type="email"
+                value={agentEmail}
+                onChange={(e) => setAgentEmail(e.target.value)}
+                placeholder="Your email"
+                className="bg-gray-100 dark:bg-gray-900 border-gray-300 dark:border-gray-600"
+                required
+              />
+            </div>
+
+            <div>
               <Label>Message</Label>
               <Textarea
-                name="message"
                 value={message}
-                onChange={handleChange}
+                onChange={(e) => setMessage(e.target.value)}
                 rows={5}
                 placeholder="Describe the help you need..."
                 className="bg-gray-100 dark:bg-gray-900 border-gray-300 dark:border-gray-600"
