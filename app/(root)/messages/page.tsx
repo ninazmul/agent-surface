@@ -19,7 +19,6 @@ const Page = async () => {
   let role: Role;
 
   if (adminStatus) {
-    // Admin logic
     const rolePermissions = await getAdminRolePermissionsByEmail(email);
     if (!rolePermissions.includes("messages")) {
       redirect("/");
