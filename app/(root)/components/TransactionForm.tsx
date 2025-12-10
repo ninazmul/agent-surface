@@ -93,7 +93,7 @@ const TranscriptForm = ({ type, lead, leadId }: TranscriptFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm space-y-4"
+        className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm space-y-4"
       >
         <div className="space-y-4">
           <h3 className="text-xl font-semibold">Additional Documents</h3>

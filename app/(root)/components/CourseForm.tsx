@@ -117,11 +117,9 @@ const CourseForm = ({ type, Course, CourseId }: CourseFormProps) => {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
-        className="rounded-2xl bg-white dark:bg-gray-900 p-6 shadow-sm space-y-4"
+        className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm space-y-4"
       >
-        <h2 className="text-xl font-semibold">
-            Course Details
-          </h2>
+        <h2 className="text-xl font-semibold">Course Details</h2>
 
         {/* Course Name */}
         <FormField
