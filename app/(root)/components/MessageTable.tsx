@@ -23,7 +23,7 @@ import { isAdmin } from "@/lib/actions";
 
 interface MessageTableProps {
   email: string;
-  role: Role;
+  role: Role; // ✔ Trust this
 }
 
 const MessageTable = ({ email, role }: MessageTableProps) => {
@@ -33,6 +33,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
   const [newMessageUser, setNewMessageUser] = useState<string>("");
   const [newMessageText, setNewMessageText] = useState("");
   const [sending, setSending] = useState(false);
+
   const [allUsers, setAllUsers] = useState<{ email: string; name?: string }[]>(
     []
   );
@@ -42,9 +43,11 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
   const [availableUsers, setAvailableUsers] = useState<
     { email: string; name?: string }[]
   >([]);
-  const scrollRef = useRef<HTMLDivElement | null>(null);
 
-  // Fetch all users
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const isAdminUser = role === "Admin"; // ✔ Trust props
+
+  // ====== FETCH ALL USERS ======
   const fetchAllUsers = useCallback(async () => {
     try {
       const profiles = await getAllProfiles();
@@ -54,38 +57,43 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     }
   }, []);
 
-  // Fetch messages based on role
+  // ====== FETCH THREADS ======
   const fetchThreads = useCallback(async () => {
     try {
       const allThreads = await getMessagesForUser(email, role);
 
-      // For non-admin users: only show threads they are allowed to see
-      let filteredThreads = allThreads;
-      if (role !== "Admin") {
-        filteredThreads = allThreads.filter((t) =>
+      let filtered = allThreads;
+
+      // Non-admin users see threads where:
+      // - They wrote a message
+      // - Or an admin replied to them
+      if (!isAdminUser) {
+        filtered = allThreads.filter((t) =>
           t.messages.some(
             (msg) => msg.senderEmail === email || msg.senderRole === "Admin"
           )
         );
       }
 
-      setThreads(filteredThreads);
+      setThreads(filtered);
 
-      // Map profiles for display
-      const profileMap: Record<string, { name?: string; logo?: string }> = {};
+      // Preload profile names/logos
+      const map: Record<string, { name?: string; logo?: string }> = {};
+
       await Promise.all(
-        filteredThreads.map(async (t) => {
-          if (!profileMap[t.userEmail]) {
-            const profile = await getProfileByEmail(t.userEmail);
-            profileMap[t.userEmail] = profile || {};
+        filtered.map(async (t) => {
+          if (!map[t.userEmail]) {
+            const p = await getProfileByEmail(t.userEmail);
+            map[t.userEmail] = p || {};
           }
         })
       );
-      setAgencyProfiles(profileMap);
+
+      setAgencyProfiles(map);
     } catch (err) {
       console.error(err);
     }
-  }, [email, role]);
+  }, [email, role, isAdminUser]);
 
   useEffect(() => {
     fetchAllUsers();
@@ -94,25 +102,27 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     return () => clearInterval(interval);
   }, [fetchAllUsers, fetchThreads]);
 
-  // Send message
+  // ====== SEND MESSAGE ======
   const handleSendMessage = useCallback(async () => {
     if (!selectedThread && !newMessageUser) return;
+
     const targetEmail = selectedThread?.userEmail || newMessageUser;
     if (!targetEmail || !newMessageText.trim()) return;
 
     try {
       setSending(true);
+
       await createOrAppendMessage({
         userEmail: targetEmail,
         senderEmail: email,
-        senderRole: role === "Admin" ? "Admin" : role,
+        senderRole: isAdminUser ? "Admin" : role,
         text: newMessageText,
       });
+
       setNewMessageText("");
       fetchThreads();
       toast.success("Message sent");
-    } catch (err) {
-      console.error(err);
+    } catch {
       toast.error("Failed to send message");
     } finally {
       setSending(false);
@@ -123,19 +133,20 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     newMessageText,
     email,
     role,
+    isAdminUser,
     fetchThreads,
   ]);
 
-  // Get available users for NewMessageForm
+  // ====== AVAILABLE USERS FOR NEW MESSAGE ======
   const getAvailableUsers = useCallback(async () => {
-    const adminStatus = await isAdmin(email);
-    if (adminStatus) return allUsers;
+    if (isAdminUser) return allUsers;
 
     const profile = await getProfileByEmail(email);
     const userRole = profile?.role;
 
     if (userRole === "Agent") {
       const subAgents = await getSubAgentsByEmail(email);
+
       const adminEmails = (
         await Promise.all(
           allUsers.map(async (u) => ((await isAdmin(u.email)) ? u.email : null))
@@ -162,34 +173,38 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     }
 
     return [];
-  }, [allUsers, email]);
+  }, [allUsers, email, isAdminUser]);
 
   useEffect(() => {
     const fetchAvailable = async () => {
       const users = await getAvailableUsers();
       setAvailableUsers(users);
     };
+
     if (allUsers.length > 0) fetchAvailable();
   }, [allUsers, getAvailableUsers]);
 
-  // Scroll to latest message
+  // ====== AUTO SCROLL ======
   useEffect(() => {
     if (scrollRef.current)
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
   }, [selectedThread, threads]);
 
+  // ====== UI RENDER ======
   return (
     <div className="space-y-6">
       <div className="flex h-[calc(100vh-10rem)] w-full lg:bg-white lg:dark:bg-gray-800 rounded-2xl overflow-hidden lg:p-4 gap-4">
-        {/* Left sidebar */}
+        {/* LEFT SIDEBAR */}
         <div className="hidden lg:block w-[320px] flex-shrink-0 bg-gray-100 dark:bg-gray-700 h-full overflow-y-auto p-4 space-y-4 rounded-2xl">
           <h3 className="text-lg font-semibold">Threads</h3>
+
           <Input
             placeholder="Search by email..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-2xl"
           />
+
           <Table>
             <TableBody>
               {threads
@@ -200,6 +215,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
                   const lastMsg =
                     thread.messages[thread.messages.length - 1]?.text ||
                     "No messages yet";
+
                   return (
                     <TableRow
                       key={thread._id.toString()}
@@ -220,6 +236,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
                           height={40}
                           className="rounded-full object-cover w-10 h-10"
                         />
+
                         <div className="truncate">
                           <p className="font-bold truncate">
                             {agencyProfiles[thread.userEmail]?.name ||
@@ -237,7 +254,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
           </Table>
         </div>
 
-        {/* Conversation panel */}
+        {/* MIDDLE PANEL */}
         <div className="flex-1 bg-gray-100 dark:bg-gray-700 p-4 flex flex-col h-full overflow-hidden rounded-2xl">
           {!selectedThread && !newMessageUser ? (
             <div className="h-full flex items-center justify-center text-gray-500">
@@ -252,6 +269,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
                 {(selectedThread ? selectedThread.messages : []).map((msg) => {
                   const isAdminMsg = msg.senderRole === "Admin";
                   const isOwnMsg = msg.senderEmail === email;
+
                   return (
                     <div
                       key={msg._id.toString()}
@@ -270,6 +288,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
                       >
                         {msg.text}
                       </div>
+
                       <span
                         className={`text-xs text-gray-500 ${
                           isAdminMsg || isOwnMsg ? "text-right" : "text-left"
@@ -281,6 +300,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
                   );
                 })}
               </div>
+
               <div className="flex items-center gap-2 pt-2 border-t">
                 <Input
                   value={newMessageText}
@@ -302,7 +322,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
           )}
         </div>
 
-        {/* Right sidebar */}
+        {/* RIGHT SIDEBAR */}
         <div className="hidden lg:block w-[320px] flex-shrink-0 bg-gray-100 dark:bg-gray-700 h-full overflow-y-auto p-4 rounded-2xl">
           <NewMessageForm
             allUsers={availableUsers}

@@ -20,18 +20,23 @@ const Page = async () => {
 
   if (adminStatus) {
     const rolePermissions = await getAdminRolePermissionsByEmail(email);
+
     if (!rolePermissions.includes("messages")) {
       redirect("/");
     }
-    role = "Admin"; // must match Role type
+
+    role = "Admin"; // EXACT Role type ✓
   } else {
-    // Non-admin logic: get from profile
+    // Non-admin -> resolve via profile
     const profile = await getProfileByEmail(email);
+
     const allowedRoles: Role[] = ["Agent", "Sub Agent", "Student"];
+
     if (!profile?.role || !allowedRoles.includes(profile.role)) {
       redirect("/");
     }
-    role = profile.role;
+
+    role = profile.role; // EXACT Role type ✓
   }
 
   return (
