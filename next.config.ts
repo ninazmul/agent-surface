@@ -1,4 +1,5 @@
 import { NextConfig } from 'next';
+import type { Configuration } from 'webpack';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -39,6 +40,11 @@ const nextConfig: NextConfig = {
         ],
       },
     ];
+  },
+
+  webpack: (config: Configuration) => {
+    // Add custom webpack tweaks here if needed
+    return config;
   },
 };
 
