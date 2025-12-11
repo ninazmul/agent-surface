@@ -1,5 +1,5 @@
 {
-  "name": "academic-bridge-dashboard",
+  "name": "agent-surface",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -143,5 +143,5 @@
   "main": "index.js",
   "author": "ninazmul <nazmulsaw@gmail.com>",
   "license": "MIT",
-  "repository": "https://github.com/ninazmul/suffah-institute-australia.git"
+  "repository": "https://github.com/ninazmul/agent-surface.git"
 }
