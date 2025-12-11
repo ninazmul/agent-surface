@@ -320,14 +320,51 @@ export default function ProfilePage({
                   <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
                     Your Sub Agents
                   </h3>
-                  <a href={"/profile/create"} className="w-full sm:w-auto">
+                  <div className="flex flex-wrap items-center justify-around gap-2">
+                    <a href={"/profile/create"} className="w-full sm:w-auto">
+                      <Button
+                        size="sm"
+                        className="rounded-xl w-full sm:w-auto bg-purple-500 hover:bg-purple-600 text-white flex items-center gap-1"
+                      >
+                        Add Sub Agent <Plus />
+                      </Button>
+                    </a>
+                    {/* Copy Link */}
                     <Button
                       size="sm"
-                      className="rounded-xl w-full sm:w-auto bg-purple-500 hover:bg-purple-600 text-white flex items-center gap-1"
+                      variant="outline"
+                      className="rounded-xl flex items-center gap-1"
+                      onClick={() => {
+                        navigator.clipboard.writeText(
+                          `${window.location.origin}/profile/create`
+                        );
+                        toast.success("Link copied");
+                      }}
                     >
-                      Add Sub Agent <Plus />
+                      <Copy size={16} />
                     </Button>
-                  </a>
+
+                    {/* Share Link */}
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="rounded-xl flex items-center gap-1"
+                      onClick={async () => {
+                        const link = `${window.location.origin}/profile/create`;
+                        if (navigator.share) {
+                          await navigator.share({
+                            title: "Create Profile",
+                            url: link,
+                          });
+                        } else {
+                          navigator.clipboard.writeText(link);
+                          toast.success("Link copied (Share unavailable)");
+                        }
+                      }}
+                    >
+                      <Share2 size={16} />
+                    </Button>
+                  </div>
                 </div>
                 <div className="grid grid-cols-1 gap-4">
                   {subAgents.map((agent) => (
