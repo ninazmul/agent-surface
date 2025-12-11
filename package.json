@@ -76,7 +76,6 @@
     "react-day-picker": "^9.8.1",
     "react-dom": "^19.0.0",
     "react-dropzone": "^14.3.8",
-    "react-excel-export": "^1.0.6",
     "react-file-viewer": "^1.2.1",
     "react-grid-gallery": "^1.0.1",
     "react-hook-form": "^7.54.1",
