@@ -316,7 +316,7 @@ export default function ProfilePage({
                 )}
               </div>
               <div className="col-span-3 lg:col-span-2 space-y-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex flex-wrap items-center justify-between gap-4">
                   <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
                     Your Sub Agents
                   </h3>
