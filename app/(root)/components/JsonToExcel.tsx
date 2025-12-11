@@ -13,77 +13,89 @@ interface JsonToExcelProps {
 }
 
 /**
- * Flattens a nested object into dot notation
- * Example: { user: { name: "Alice" } } -> { "user.name": "Alice" }
+ * Flattens nested objects safely
  */
-const flattenObject = (obj: any, parentKey = "", res: Record<string, any> = {}) => {
-  for (const key in obj) {
-    if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+const flattenObject = (
+  obj: Record<string, any>,
+  parentKey = "",
+  out: Record<string, any> = {}
+) => {
+  for (const key of Object.keys(obj)) {
     const newKey = parentKey ? `${parentKey}.${key}` : key;
+    const value = obj[key];
 
-    if (Array.isArray(obj[key])) {
-      if (obj[key].every((item: any) => typeof item !== "object")) {
-        // Array of primitives -> join as string
-        res[newKey] = obj[key].join(", ");
-      } else {
-        // Array of objects -> stringify (expanded later)
-        res[newKey] = obj[key].map((item: any) => JSON.stringify(item)).join(" | ");
-      }
-    } else if (typeof obj[key] === "object" && obj[key] !== null) {
-      flattenObject(obj[key], newKey, res);
-    } else {
-      res[newKey] = obj[key];
+    if (value === null || value === undefined) {
+      out[newKey] = "";
+      continue;
     }
+
+    if (Array.isArray(value)) {
+      if (value.every((el) => typeof el !== "object")) {
+        out[newKey] = value.join(", ");
+      } else {
+        out[newKey] = JSON.stringify(value);
+      }
+      continue;
+    }
+
+    if (typeof value === "object") {
+      flattenObject(value, newKey, out);
+      continue;
+    }
+
+    out[newKey] = value;
   }
-  return res;
+
+  return out;
 };
 
 /**
- * Expands arrays of objects into multiple rows
+ * Converts nested array rows into clean tabular format.
  */
 const normalizeData = (data: any[]) => {
-  const result: any[] = [];
+  const output: any[] = [];
 
-  data.forEach((item) => {
-    let hasNestedArray = false;
+  for (const row of data) {
+    const nestedKeys = Object.entries(row).filter(
+      ([, v]) => Array.isArray(v) && v.every((el) => typeof el === "object")
+    );
 
-    for (const key in item) {
-      if (Array.isArray(item[key]) && item[key].every((el: any) => typeof el === "object")) {
-        hasNestedArray = true;
+    // If no nested arrays → push flattened row
+    if (nestedKeys.length === 0) {
+      output.push(flattenObject(row));
+      continue;
+    }
 
-        item[key].forEach((nestedObj: any) => {
-          const flattenedMain = flattenObject(item);
-          const flattenedNested = flattenObject(nestedObj, key);
-          result.push({ ...flattenedMain, ...flattenedNested });
-        });
+    // For rows with nested array-objects:
+    for (const [key, arr] of nestedKeys) {
+      for (const nestedObj of arr as any[]) {
+        const base = flattenObject(row);
+        const nested = flattenObject(nestedObj, key);
+        output.push({ ...base, ...nested });
       }
     }
+  }
 
-    if (!hasNestedArray) {
-      result.push(flattenObject(item));
-    }
-  });
-
-  return result;
+  return output;
 };
 
 const JsonToExcel = ({ data, fileName, sheetName }: JsonToExcelProps) => {
   const handleDownloadExcel = () => {
-    const normalizedData = normalizeData(data);
+    if (!data || data.length === 0) {
+      console.warn("JsonToExcel: No data to export.");
+      return;
+    }
 
-    const worksheet = XLSX.utils.json_to_sheet(normalizedData);
+    const normalized = normalizeData(data);
+    const worksheet = XLSX.utils.json_to_sheet(normalized);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName || "Sheet1");
 
+    XLSX.utils.book_append_sheet(workbook, worksheet, sheetName || "Sheet1");
     XLSX.writeFile(workbook, fileName || "data.xlsx");
   };
 
   return (
-    <Button
-      variant="outline"
-      className="rounded-full"
-      onClick={handleDownloadExcel}
-    >
+    <Button variant="outline" className="rounded-full" onClick={handleDownloadExcel}>
       <Download className="w-4 h-4" />
     </Button>
   );
