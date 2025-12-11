@@ -320,7 +320,7 @@ export default function ProfilePage({
                   <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
                     Your Sub Agents
                   </h3>
-                  <div className="flex flex-wrap items-center justify-around gap-2">
+                  <div className="flex items-center justify-around gap-2">
                     <a href={"/profile/create"} className="w-full sm:w-auto">
                       <Button
                         size="sm"
