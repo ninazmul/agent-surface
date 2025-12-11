@@ -66,10 +66,13 @@ export const getMessagesForUser = async (
 ): Promise<IMessage[]> => {
   try {
     await connectToDatabase();
-    let threads: IMessage[] = [];
+
+    // Fetch all messages as plain objects
     const allMessages = (await Message.find()
       .sort({ updatedAt: -1 })
-      .lean()) as unknown as IMessage[];
+      .lean()) as unknown as IMessage[]; // cast via unknown first
+
+    let threads: IMessage[] = [];
 
     if (role === "Admin") {
       const adminCountries = await getAdminCountriesByEmail(email);
@@ -84,11 +87,11 @@ export const getMessagesForUser = async (
 
       threads = allMessages.filter(
         (m) =>
-          m.userEmail === profile?.email || // thread belongs to agent
-          subAgents.includes(m.userEmail) || // thread belongs to sub-agent
+          m.userEmail === profile?.email ||
+          subAgents.includes(m.userEmail) ||
           m.messages.some(
             (msg) => msg.senderRole === "Admin" || msg.senderEmail === email
-          ) // admin or me sent message
+          )
       );
     } else if (role === "Sub Agent") {
       const profile = await getProfileByEmail(email);
@@ -96,7 +99,7 @@ export const getMessagesForUser = async (
 
       threads = allMessages.filter(
         (m) =>
-          m.userEmail === profile.agentEmail || // agent thread
+          m.userEmail === profile.agentEmail ||
           m.messages.some((msg) => msg.senderEmail === email)
       );
     } else if (role === "Student") {
