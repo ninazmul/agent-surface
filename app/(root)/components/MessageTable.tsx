@@ -267,31 +267,33 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
                 className="flex-1 overflow-y-auto space-y-3 pr-2"
               >
                 {(selectedThread ? selectedThread.messages : []).map((msg) => {
-                  const isAdminMsg = msg.senderRole === "Admin";
                   const isOwnMsg = msg.senderEmail === email;
+                  const isAdminMsg = msg.senderRole === "Admin";
 
                   return (
                     <div
                       key={msg._id.toString()}
                       className={`flex flex-col ${
-                        isAdminMsg || isOwnMsg ? "items-end" : "items-start"
+                        isOwnMsg ? "items-end" : "items-start"
                       } space-y-1`}
                     >
                       <div
-                        className={`max-w-[75%] px-4 py-2 rounded-2xl shadow-sm text-sm ${
-                          isAdminMsg
-                            ? "bg-purple-600 text-white rounded-br-none"
-                            : isOwnMsg
-                            ? "bg-blue-500 text-white rounded-br-none"
-                            : "bg-gray-200 text-black rounded-bl-none"
-                        }`}
+                        className={`max-w-[75%] px-4 py-2 rounded-2xl shadow-sm text-sm
+                      ${
+                        isAdminMsg
+                          ? "bg-purple-600 text-white rounded-br-none"
+                          : isOwnMsg
+                          ? "bg-gray-600 text-white rounded-br-none"
+                          : "bg-gray-200 text-black rounded-bl-none"
+                      }
+                    `}
                       >
                         {msg.text}
                       </div>
 
                       <span
                         className={`text-xs text-gray-500 ${
-                          isAdminMsg || isOwnMsg ? "text-right" : "text-left"
+                          isOwnMsg ? "text-right" : "text-left"
                         }`}
                       >
                         {timeAgo(msg.timestamp)} {isAdminMsg ? "(Admin)" : ""}
