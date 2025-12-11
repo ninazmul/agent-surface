@@ -67,13 +67,12 @@ export const getMessagesForUser = async (
   try {
     await connectToDatabase();
     let threads: IMessage[] = [];
+    const allMessages = (await Message.find()
+      .sort({ updatedAt: -1 })
+      .lean()) as unknown as IMessage[];
 
     if (role === "Admin") {
       const adminCountries = await getAdminCountriesByEmail(email);
-      const allMessages = (await Message.find()
-        .sort({ updatedAt: -1 })
-        .lean()) as unknown as IMessage[];
-
       threads = adminCountries.length
         ? allMessages.filter(
             (m) => !m.country || adminCountries.includes(m.country)
@@ -82,33 +81,29 @@ export const getMessagesForUser = async (
     } else if (role === "Agent") {
       const profile = await getProfileByEmail(email);
       const subAgents = profile?.subAgents || [];
-      const allMessages = (await Message.find()
-        .sort({ updatedAt: -1 })
-        .lean()) as unknown as IMessage[];
 
       threads = allMessages.filter(
         (m) =>
-          m.userEmail === profile?.email ||
-          subAgents.includes(m.userEmail) ||
-          m.messages.some((msg) => msg.senderRole === "Admin")
+          m.userEmail === profile?.email || // thread belongs to agent
+          subAgents.includes(m.userEmail) || // thread belongs to sub-agent
+          m.messages.some(
+            (msg) => msg.senderRole === "Admin" || msg.senderEmail === email
+          ) // admin or me sent message
       );
     } else if (role === "Sub Agent") {
       const profile = await getProfileByEmail(email);
       if (!profile?.agentEmail) return [];
-      const agentThread = await Message.findOne({
-        userEmail: profile.agentEmail,
-      })
-        .sort({ updatedAt: -1 })
-        .lean();
 
-      threads = agentThread ? ([agentThread] as unknown as IMessage[]) : [];
+      threads = allMessages.filter(
+        (m) =>
+          m.userEmail === profile.agentEmail || // agent thread
+          m.messages.some((msg) => msg.senderEmail === email)
+      );
     } else if (role === "Student") {
-      const allMessages = (await Message.find()
-        .sort({ updatedAt: -1 })
-        .lean()) as unknown as IMessage[];
-
       threads = allMessages.filter((m) =>
-        m.messages.some((msg) => msg.senderRole === "Admin")
+        m.messages.some(
+          (msg) => msg.senderRole === "Admin" || msg.senderEmail === email
+        )
       );
     }
 
