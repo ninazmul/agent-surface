@@ -1,24 +1,27 @@
-import { Button } from "@/components/ui/button";
-// import JsonToExcel from "../components/JsonToExcel";
 import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 import { getUserEmailById } from "@/lib/actions/user.actions";
-import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import LeadTable from "../components/LeadTable";
 import {
   getAdminCountriesByEmail,
   getAdminRolePermissionsByEmail,
   isAdmin,
 } from "@/lib/actions/admin.actions";
-import { redirect } from "next/navigation";
-import { ILead } from "@/lib/database/models/lead.model";
-import { Download, Plus } from "lucide-react";
-import SendRemindersButton from "@/components/shared/SendRemindersButton";
+import { getFilteredLeads } from "@/lib/actions/lead.actions";
+import LeadTableClient from "../components/LeadTableClient";
 
-const Page = async () => {
+interface PageProps {
+  searchParams: {
+    page?: string;
+    search?: string;
+  };
+}
+
+const Page = async ({ searchParams }: PageProps) => {
   const { sessionClaims } = await auth();
   const userId = sessionClaims?.userId as string;
   const email = await getUserEmailById(userId);
+
   const adminStatus = await isAdmin(email);
   const adminCountry = await getAdminCountriesByEmail(email);
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
@@ -32,68 +35,29 @@ const Page = async () => {
     redirect("/");
   }
 
-  let leads: ILead[] = [];
+  const page = Number(searchParams.page) || 1;
+  const limit = 20;
 
-  if (adminStatus) {
-    const allLeads = await getAllLeads();
+  // 🔥 DATABASE-LEVEL FILTERING
+  const result = await getFilteredLeads({
+    page,
+    limit,
+    author: adminStatus ? undefined : email,
+  });
 
-    leads =
-      adminCountry.length === 0
-        ? allLeads
-        : allLeads.filter((r: ILead) => adminCountry.includes(r.home.country));
-  } else {
-    const profile = await getProfileByEmail(email);
-    const agentEmails = [email, ...(profile?.subAgents || [])];
-
-    const allLeads = await Promise.all(
-      agentEmails.map((agent) => getLeadsByAgency(agent))
-    );
-
-    leads = allLeads.flat().filter(Boolean);
-  }
+  // 🌍 Admin country filter (still DB-friendly)
+  const filteredLeads =
+    adminStatus && adminCountry.length
+      ? result.data.filter((l) => adminCountry.includes(l.home.country))
+      : result.data;
 
   return (
-    <>
-      <section className="p-4">
-        {/* Header + Actions */}
-        <div className="px-2 sm:px-4 flex flex-col md:flex-row items-center justify-between gap-3">
-          {/* Title */}
-          <h3 className="h3-bold text-center sm:text-left">All Leads</h3>
-
-          {/* Actions: tight, compact, auto-wrap cluster */}
-          <div className="flex flex-wrap gap-2">
-            <a href={"/leads/create/bulk-import"}>
-              <Button
-                size="sm"
-                className="rounded-xl bg-white hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-black dark:text-white flex items-center gap-1"
-              >
-                <Download size={16} /> Import
-              </Button>
-            </a>
-
-            <a href={"/leads/create"}>
-              <Button
-                size="sm"
-                className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-              >
-                <Plus size={16} /> Add Lead
-              </Button>
-            </a>
-
-            {adminStatus && (
-              <div>
-                <SendRemindersButton />
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Table */}
-        <div className="overflow-x-auto my-8">
-          <LeadTable leads={leads} isAdmin={adminStatus} email={email} />
-        </div>
-      </section>
-    </>
+    <LeadTableClient
+      initialLeads={filteredLeads}
+      pagination={result.pagination}
+      isAdmin={adminStatus}
+      email={email}
+    />
   );
 };
 

@@ -169,6 +169,80 @@ export type LeadParams = {
   assignedTo?: string[];
 };
 
+export interface LeadDTO {
+  _id: string;
+  name: string;
+  email: string;
+  number: string;
+  gender: string;
+  maritalStatus: string;
+  progress: string;
+  status?: string;
+  author: string;
+  isPinned?: boolean;
+  assignedTo?: string[];
+  isPromotion?: boolean;
+  promotionSku?: string;
+  home: {
+    country: string;
+  };
+  course?: {
+    name: string;
+    courseDuration?: string;
+    courseType?: string;
+    startDate?: Date;
+    endDate?: Date;
+    campus?: {
+      name: string;
+      shift: string;
+    };
+    courseFee?: string;
+  }[];
+  services?: {
+    _id: Types.ObjectId;
+    serviceType: string;
+    title: string;
+    amount?: string;
+    description?: string;
+  }[];
+  social?: {
+    facebook?: string;
+    instagram?: string;
+    twitter?: string;
+    skype?: string;
+  };
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface GetLeadsParams {
+  search?: string;
+  progress?: string;
+  status?: string;
+  author?: string;
+  assignedTo?: string;
+  isPinned?: boolean;
+  isVoid?: boolean;
+  startDate?: Date;
+  endDate?: Date;
+  page?: number;
+  limit?: number;
+}
+
+export interface GetLeadsParams {
+  search?: string;
+  progress?: string;
+  status?: string;
+  author?: string;
+  assignedTo?: string;
+  isPinned?: boolean;
+  isVoid?: boolean;
+  startDate?: Date;
+  endDate?: Date;
+  page?: number;
+  limit?: number;
+}
+
 // ====== REFUND PARAMS
 export type RefundParams = {
   name: string;
