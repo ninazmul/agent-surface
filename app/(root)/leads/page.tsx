@@ -10,14 +10,19 @@ import {
 import { getFilteredLeads } from "@/lib/actions/lead.actions";
 import LeadTableClient from "../components/LeadTableClient";
 
-interface PageProps {
-  searchParams: {
-    page?: string;
-    search?: string;
-  };
-}
+type SearchParams = {
+  page?: string;
+  search?: string;
+};
 
-const Page = async ({ searchParams }: PageProps) => {
+const Page = async ({
+  searchParams,
+}: {
+  searchParams: Promise<SearchParams>;
+}) => {
+  // ✅ REQUIRED for Next.js 16
+  const { page = "1", search } = await searchParams;
+
   const { sessionClaims } = await auth();
   const userId = sessionClaims?.userId as string;
   const email = await getUserEmailById(userId);
@@ -27,6 +32,7 @@ const Page = async ({ searchParams }: PageProps) => {
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
+  // 🔐 Access control
   if (!adminStatus && myProfile?.role === "Student") {
     redirect("/profile");
   }
@@ -35,19 +41,18 @@ const Page = async ({ searchParams }: PageProps) => {
     redirect("/");
   }
 
-  const page = Number(searchParams.page) || 1;
+  const pageNumber = Number(page) || 1;
   const limit = 20;
 
-  // 🔥 DATABASE-LEVEL FILTERING
   const result = await getFilteredLeads({
-    page,
+    page: pageNumber,
     limit,
     author: adminStatus ? undefined : email,
+    search,
   });
 
-  // 🌍 Admin country filter (still DB-friendly)
   const filteredLeads =
-    adminStatus && adminCountry.length
+    adminStatus && adminCountry.length > 0
       ? result.data.filter((l) => adminCountry.includes(l.home.country))
       : result.data;
 
