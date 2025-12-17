@@ -33,7 +33,7 @@ const LeadTableClient = ({
       <LeadTable leads={initialLeads} isAdmin={isAdmin} email={email} />
 
       {/* Pagination */}
-      <div className="flex justify-between items-center mt-6 w-2/3">
+      <div className="flex justify-between items-center mt-6 max-w-3xl mx-auto">
         <Button
           disabled={!pagination.hasPrevPage}
           onClick={() => goToPage(page - 1)}
