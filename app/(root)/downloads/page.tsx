@@ -23,9 +23,20 @@ const Page = async () => {
   const adminStatus = await isAdmin(email);
   const adminCountry = await getAdminCountriesByEmail(email);
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
+  const myProfile = await getProfileByEmail(email);
 
-  if (adminStatus && !rolePermissions.includes("downloads")) {
-    redirect("/");
+  // ====== ADMIN PATH (profile not required)
+  if (adminStatus) {
+    if (!rolePermissions.includes("downloads")) {
+      redirect("/");
+    }
+  } 
+  // ====== NON-ADMIN PATH (profile required)
+  else {
+    // Profile must be Approved
+    if (myProfile?.status !== "Approved") {
+      redirect("/profile");
+    }
   }
 
   let downloads: IDownload[] = [];

@@ -17,12 +17,23 @@ const Page = async () => {
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
-  if (!adminStatus && myProfile?.role === "Student") {
-    redirect("/profile");
-  }
+  // ====== ADMIN PATH (profile not required)
+  if (adminStatus) {
+    if (!rolePermissions.includes("users")) {
+      redirect("/");
+    }
+  } 
+  // ====== NON-ADMIN PATH (profile required)
+  else {
+    // Profile must be Approved
+    if (myProfile?.status !== "Approved") {
+      redirect("/profile");
+    }
 
-  if (!adminStatus || (adminStatus && !rolePermissions.includes("users"))) {
-    redirect("/");
+    // Students are blocked
+    if (myProfile?.role === "Student") {
+      redirect("/profile");
+    }
   }
 
   const users = await getAllUsers();

@@ -61,12 +61,23 @@ const Page = async () => {
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
-  if (!adminStatus && myProfile?.role === "Student") {
-    redirect("/profile");
-  }
+  // ====== ADMIN PATH (profile not required)
+  if (adminStatus) {
+    if (!rolePermissions.includes("invoices")) {
+      redirect("/");
+    }
+  } 
+  // ====== NON-ADMIN PATH (profile required)
+  else {
+    // Profile must be Approved
+    if (myProfile?.status !== "Approved") {
+      redirect("/profile");
+    }
 
-  if (adminStatus && !rolePermissions.includes("leads")) {
-    redirect("/");
+    // Students are blocked
+    if (myProfile?.role === "Student") {
+      redirect("/profile");
+    }
   }
 
   let leads: ILead[] = [];

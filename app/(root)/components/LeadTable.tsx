@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   assignLeadToUser,
   deleteLead,
   updateLead,
 } from "@/lib/actions/lead.actions";
+import { ILead } from "@/lib/database/models/lead.model";
 import {
   Table,
   TableBody,
@@ -18,6 +19,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
   Trash,
+  SortAsc,
+  SortDesc,
   Pencil,
   PinOff,
   Pin,
@@ -59,23 +62,28 @@ import { createTrack, getTracksByStudent } from "@/lib/actions/track.actions";
 import { IStudentEvent, ITrack } from "@/lib/database/models/track.model";
 import { getAllAdmins } from "@/lib/actions/admin.actions";
 import Image from "next/image";
-import { LeadDTO } from "@/types";
 
-type PinUnpinStatus = LeadDTO & { isPinned: "pinned" | "unpinned" };
+type PinUnpinStatus = ILead & { isPinned: "pinned" | "unpinned" };
 
 const LeadTable = ({
   leads,
   isAdmin,
   email,
 }: {
-  leads: LeadDTO[];
+  leads: ILead[];
   isAdmin?: boolean;
   email: string;
 }) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
+  const [sortKey, setSortKey] = useState<
+    "name" | "date" | "progress" | "status" | null
+  >(null);
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-  const [localLeads, setLocalLeads] = useState<LeadDTO[]>(leads);
+  const [localLeads, setLocalLeads] = useState<ILead[]>(leads);
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
   const [profiles, setProfiles] = useState<Record<string, IProfile>>({});
 
@@ -140,6 +148,76 @@ const LeadTable = ({
     fetchPromotions();
   }, []);
 
+  // Filter and Sort
+  const filteredLeads = useMemo(() => {
+    let filtered = localLeads.filter((lead) =>
+      [lead.name, lead.email, lead.number, lead.home?.country, lead.progress]
+        .filter(Boolean)
+        .some((value) =>
+          value.toString().toLowerCase().includes(searchQuery.toLowerCase())
+        )
+    );
+
+    // Promotion type filter
+    if (promotionFilter === "promotion")
+      filtered = filtered.filter((lead) => lead.isPromotion);
+    else if (promotionFilter === "general")
+      filtered = filtered.filter((lead) => !lead.isPromotion);
+
+    // --- NEW: Filter by promotion SKU ---
+    if (promotionSkuFilter !== "all") {
+      filtered = filtered.filter(
+        (lead) => lead.promotionSku === promotionSkuFilter
+      );
+    }
+
+    // Pinned leads first
+    filtered.sort((a, b) => {
+      if (a.isPinned && !b.isPinned) return -1;
+      if (!a.isPinned && b.isPinned) return 1;
+      return 0;
+    });
+
+    // Sort by selected key
+    if (sortKey) {
+      filtered.sort((a, b) => {
+        const valueA =
+          sortKey === "date"
+            ? new Date(a.date).getTime()
+            : a[sortKey]?.toLowerCase?.() || "";
+        const valueB =
+          sortKey === "date"
+            ? new Date(b.date).getTime()
+            : b[sortKey]?.toLowerCase?.() || "";
+        if (valueA < valueB) return sortOrder === "asc" ? -1 : 1;
+        if (valueA > valueB) return sortOrder === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+
+    return filtered;
+  }, [
+    localLeads,
+    searchQuery,
+    sortKey,
+    sortOrder,
+    promotionFilter,
+    promotionSkuFilter,
+  ]);
+
+  const paginatedLeads = useMemo(() => {
+    const start = (currentPage - 1) * itemsPerPage;
+    return filteredLeads.slice(start, start + itemsPerPage);
+  }, [filteredLeads, currentPage]);
+
+  const handleSort = (key: typeof sortKey) => {
+    if (sortKey === key) setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    else {
+      setSortKey(key);
+      setSortOrder("asc");
+    }
+  };
+
   const handleDeleteLead = async (id: string) => {
     try {
       const res = await deleteLead(id);
@@ -154,7 +232,7 @@ const LeadTable = ({
 
   const handleProgressChange = async (leadId: string, newProgress: string) => {
     try {
-      const updatedLead: LeadDTO | null = await updateLead(leadId, {
+      const updatedLead: ILead | null = await updateLead(leadId, {
         progress: newProgress,
       });
 
@@ -171,7 +249,7 @@ const LeadTable = ({
         setLocalLeads((prev) =>
           prev.map((lead) =>
             lead._id.toString() === leadId
-              ? ({ ...lead, progress: newProgress } as LeadDTO)
+              ? ({ ...lead, progress: newProgress } as ILead)
               : lead
           )
         );
@@ -186,7 +264,7 @@ const LeadTable = ({
 
   const handleStatusChange = async (leadId: string, newStatus: string) => {
     try {
-      const updatedLead: LeadDTO | null = await updateLead(leadId, {
+      const updatedLead: ILead | null = await updateLead(leadId, {
         status: newStatus,
       });
 
@@ -203,7 +281,7 @@ const LeadTable = ({
         setLocalLeads((prev) =>
           prev.map((lead) =>
             lead._id.toString() === leadId
-              ? ({ ...lead, status: newStatus } as LeadDTO)
+              ? ({ ...lead, status: newStatus } as ILead)
               : lead
           )
         );
@@ -422,16 +500,23 @@ const LeadTable = ({
               <TableHead className="text-white cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={selectedLeads.length === leads.length}
+                  checked={selectedLeads.length === paginatedLeads.length}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setSelectedLeads(leads.map((r) => r._id.toString()));
+                      setSelectedLeads(
+                        paginatedLeads.map((r) => r._id.toString())
+                      );
                     } else setSelectedLeads([]);
                   }}
                 />
               </TableHead>
-              <TableHead className="text-white cursor-pointer">
-                Name & Email
+              <TableHead
+                className="text-white cursor-pointer"
+                onClick={() => handleSort("name")}
+              >
+                Name & Email{" "}
+                {sortKey === "name" &&
+                  (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead className="text-white cursor-pointer">
                 Agency
@@ -439,13 +524,30 @@ const LeadTable = ({
               <TableHead className="text-white cursor-pointer">
                 Course & Services
               </TableHead>
-              <TableHead className="text-white cursor-pointer">
+              <TableHead
+                className="text-white cursor-pointer"
+                onClick={() => handleSort("progress")}
+              >
                 Progress{" "}
+                {sortKey === "progress" &&
+                  (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead className="text-white cursor-pointer">
+              <TableHead
+                className="text-white cursor-pointer"
+                onClick={() => handleSort("status")}
+              >
                 Status{" "}
+                {sortKey === "status" &&
+                  (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead className="text-white cursor-pointer">Date </TableHead>
+              <TableHead
+                className="text-white cursor-pointer"
+                onClick={() => handleSort("date")}
+              >
+                Date{" "}
+                {sortKey === "date" &&
+                  (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
+              </TableHead>
               <TableHead className="text-white cursor-pointer">
                 Social Media
               </TableHead>
@@ -455,7 +557,7 @@ const LeadTable = ({
             </TableRow>
           </TableHeader>
           <TableBody>
-            {leads.map((lead, idx) => {
+            {paginatedLeads.map((lead, idx) => {
               return (
                 <>
                   <TableRow
@@ -910,7 +1012,9 @@ const LeadTable = ({
                             onClick={() => {
                               if (selectedLeads.length === 0) {
                                 setSelectedLeads(
-                                  leads.map((lead) => lead._id.toString())
+                                  paginatedLeads.map((lead) =>
+                                    lead._id.toString()
+                                  )
                                 );
                               }
                               setAssignModalOpen(true);
@@ -961,6 +1065,34 @@ const LeadTable = ({
             })}
           </TableBody>
         </Table>
+      </div>
+
+      {/* Pagination */}
+      <div className="flex flex-col sm:flex-row justify-between items-center gap-2 mt-4">
+        <span className="text-sm text-muted-foreground">
+          Showing {Math.min(itemsPerPage * currentPage, filteredLeads.length)}{" "}
+          of {filteredLeads.length} leads
+        </span>
+        <div className="flex gap-2">
+          <Button
+            size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p - 1)}
+            disabled={currentPage === 1}
+          >
+            Previous
+          </Button>
+          <Button
+            size="sm"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            onClick={() => setCurrentPage((p) => p + 1)}
+            disabled={
+              currentPage === Math.ceil(filteredLeads.length / itemsPerPage)
+            }
+          >
+            Next
+          </Button>
+        </div>
       </div>
 
       {/* Delete Confirmation */}

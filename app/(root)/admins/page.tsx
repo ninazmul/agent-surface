@@ -10,7 +10,6 @@ import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
 import { IAdmin } from "@/lib/database/models/admin.model";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { Plus } from "lucide-react";
 
 const Page = async () => {
@@ -20,13 +19,14 @@ const Page = async () => {
   const adminStatus = await isAdmin(email);
   const adminCountries = await getAdminCountriesByEmail(email);
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
 
-  if (!adminStatus && myProfile?.role === "Student") {
-    redirect("/profile");
+  // ====== HARD BLOCK: Non-admins (Agent / Sub Agent / Student)
+  if (!adminStatus) {
+    redirect("/profile"); // or "/"
   }
 
-  if (!adminStatus || (adminStatus && !rolePermissions.includes("admins"))) {
+  // ====== ADMIN PERMISSION CHECK
+  if (!rolePermissions.includes("admins")) {
     redirect("/");
   }
 

@@ -19,12 +19,23 @@ const Page = async () => {
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
-  if (!adminStatus && myProfile?.role === "Student") {
-    redirect("/profile");
-  }
+  // ====== ADMIN PATH (profile not required)
+  if (adminStatus) {
+    if (!rolePermissions.includes("services")) {
+      redirect("/");
+    }
+  } 
+  // ====== NON-ADMIN PATH (profile required)
+  else {
+    // Profile must be Approved
+    if (myProfile?.status !== "Approved") {
+      redirect("/profile");
+    }
 
-  if (!adminStatus || (adminStatus && !rolePermissions.includes("services"))) {
-    redirect("/");
+    // Students are blocked
+    if (myProfile?.role === "Student") {
+      redirect("/profile");
+    }
   }
 
   const services = await getAllServices();
@@ -33,7 +44,7 @@ const Page = async () => {
     <>
       <section className="p-4">
         {/* Header + Actions */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4 mb-6">
           <h3 className="h3-bold text-center sm:text-left">All Services</h3>
 
           {adminStatus && (

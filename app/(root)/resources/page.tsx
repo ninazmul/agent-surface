@@ -7,6 +7,7 @@ import {
   getAdminRolePermissionsByEmail,
   isAdmin,
 } from "@/lib/actions/admin.actions";
+import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { redirect } from "next/navigation";
 import { Plus } from "lucide-react";
 
@@ -16,9 +17,20 @@ const Page = async () => {
   const email = await getUserEmailById(userId);
   const adminStatus = await isAdmin(email);
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
+  const myProfile = await getProfileByEmail(email);
 
-  if (adminStatus && !rolePermissions.includes("resources")) {
-    redirect("/");
+  // ====== ADMIN PATH (profile not required)
+  if (adminStatus) {
+    if (!rolePermissions.includes("resources")) {
+      redirect("/");
+    }
+  } 
+  // ====== NON-ADMIN PATH (profile required)
+  else {
+    // Profile must be Approved
+    if (myProfile?.status !== "Approved") {
+      redirect("/profile");
+    }
   }
 
   const resources = await getAllResources();

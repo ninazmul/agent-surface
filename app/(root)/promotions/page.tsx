@@ -24,14 +24,31 @@ const Page = async () => {
   const email = await getUserEmailById(userId);
 
   const adminStatus = await isAdmin(email);
+  const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const allPromotions = await getAllPromotions();
   const myProfile = await getProfileByEmail(email);
 
-  if (!adminStatus && myProfile?.role === "Student") {
-    redirect("/profile");
+  // ====== ADMIN PATH (profile not required)
+  if (adminStatus) {
+    if (!rolePermissions.includes("promotions")) {
+      redirect("/");
+    }
+  } 
+  // ====== NON-ADMIN PATH (profile required)
+  else {
+    // Profile must be Approved
+    if (myProfile?.status !== "Approved") {
+      redirect("/profile");
+    }
+
+    // Students are blocked
+    if (myProfile?.role === "Student") {
+      redirect("/profile");
+    }
   }
 
   let agency = [];
+
   if (adminStatus) {
     agency = await getAllProfiles();
   } else {

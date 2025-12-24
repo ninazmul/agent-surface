@@ -65,12 +65,23 @@ const Page = async () => {
   const notAcceptedOrMissing = (status?: string | null) =>
     !status || status !== "Accepted";
 
-  if (!adminStatus && myProfile?.role === "Student") {
-    redirect("/profile");
-  }
+  // ====== ADMIN PATH (profile not required)
+  if (adminStatus) {
+    if (!rolePermissions.includes("finance")) {
+      redirect("/");
+    }
+  } 
+  // ====== NON-ADMIN PATH (profile required)
+  else {
+    // Profile must be Approved
+    if (myProfile?.status !== "Approved") {
+      redirect("/profile");
+    }
 
-  if (adminStatus && !rolePermissions.includes("finance")) {
-    redirect("/");
+    // Students are blocked
+    if (myProfile?.role === "Student") {
+      redirect("/profile");
+    }
   }
 
   let leads: ILead[] = [];
