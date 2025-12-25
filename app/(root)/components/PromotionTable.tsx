@@ -204,7 +204,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
+                          className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border text-center"
                         >
                           View Details
                         </Button>
@@ -253,7 +253,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
+                          className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border text-center"
                         >
                           {promotion.countries.length} Countries
                         </Button>
@@ -284,7 +284,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
+                          className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border text-center"
                         >
                           {promotion.agencies.length} Agencies
                         </Button>

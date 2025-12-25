@@ -202,7 +202,7 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
                 <TableCell>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <span className="flex gap-2 items-center px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center">
+                      <span className="flex gap-2 items-center px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border text-center">
                         <Info className="w-4 h-4" />
                         View
                       </span>

@@ -360,7 +360,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             <Button
                               variant="outline"
                               size="sm"
-                              className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
+                              className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
                             >
                               View Courses & Services
                             </Button>
@@ -440,7 +440,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
-                              size="sm" className="w-48 justify-center px-4 py-2 text-xs font-medium rounded-full bg-gray-100">
+                              size="sm" className="w-48 justify-center px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
                               Documents <ChevronDown className="ml-1 w-4 h-4" />
                             </Button>
                           </PopoverTrigger>
@@ -453,7 +453,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                               <Button
                                 size={"sm"}
                                 variant="outline"
-                                className="w-full justify-start px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
+                                className="w-full justify-start px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
                               >
                                 <FileText className="w-5 h-5 text-blue-600" />
                                 View Invoice
@@ -467,7 +467,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                               <Button
                                 size={"sm"}
                                 variant="outline"
-                                className="w-full justify-start px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
+                                className="w-full justify-start px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
                               >
                                 <FileCheck className="w-5 h-5 text-green-600" />
                                 View Offer Letter

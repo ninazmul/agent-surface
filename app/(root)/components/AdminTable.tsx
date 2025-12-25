@@ -170,7 +170,7 @@ const AdminTable = ({
                 <TableCell>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <span className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center">
+                      <span className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border text-center">
                         {admin.rolePermissions?.length || 0} Permissions
                       </span>
                     </PopoverTrigger>
@@ -189,7 +189,7 @@ const AdminTable = ({
                 <TableCell>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <span className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center">
+                      <span className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border text-center">
                         {admin.countries?.length || 0} Country
                       </span>
                     </PopoverTrigger>

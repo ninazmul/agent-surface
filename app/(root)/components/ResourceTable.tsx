@@ -183,7 +183,7 @@ const ResourceTable = ({
                 </TableCell>
                 <TableCell>
                   <a href={resource.link} target="_blank">
-                    <span className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center">
+                    <span className="w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border text-center">
                       Download File
                     </span>
                   </a>

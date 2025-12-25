@@ -665,7 +665,7 @@ const AssignedLeadTable = ({
                             <Button
                               variant="outline"
                               size="sm"
-                              className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100"
+                              className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
                             >
                               View Courses & Services
                             </Button>

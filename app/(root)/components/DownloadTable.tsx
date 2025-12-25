@@ -215,7 +215,7 @@ const DownloadTable = ({
                   </a>
                 </TableCell>
                 <TableCell className="w-52">
-                  <span className="block w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border">
+                  <span className="block w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border">
                     {formatDateTime(download.date).dateOnly}
                   </span>
                 </TableCell>
@@ -227,7 +227,7 @@ const DownloadTable = ({
                         const selectedUrl = e.target.value;
                         if (selectedUrl) window.open(selectedUrl, "_blank");
                       }}
-                      className="block w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center"
+                      className="block w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border text-center"
                     >
                       <option value="">Select Document</option>
                       {download.documents.map((doc, idx) => (
@@ -237,7 +237,7 @@ const DownloadTable = ({
                       ))}
                     </select>
                   ) : (
-                    <span className="block w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 border text-center">
+                    <span className="block w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border text-center">
                       No documents
                     </span>
                   )}
