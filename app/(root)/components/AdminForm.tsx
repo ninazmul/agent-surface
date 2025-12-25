@@ -43,6 +43,7 @@ const rolePermissionOptions = [
   { value: "services", label: "Services" },
   { value: "profile", label: "Profile" },
   { value: "admins", label: "Admins" },
+  { value: "about", label: "About Us" },
 ];
 
 const countryOptions = countries
