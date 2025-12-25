@@ -36,6 +36,7 @@ import {
   MessageCircle,
   LibraryBig,
   ChevronRight,
+  BookOpen,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -131,6 +132,7 @@ const sidebarItems = [
   { key: "courses", title: "Courses", url: "/courses", icon: LibraryBig },
   { key: "services", title: "Services", url: "/services", icon: Megaphone },
   { key: "admins", title: "Admins", url: "/admins", icon: Shield },
+  { key: "about", title: "About Us", url: "/about", icon: BookOpen },
 ];
 
 type HomeSidebarProps = {
@@ -165,6 +167,7 @@ const HomeSidebar = ({
     "messages",
     "notifications",
     "profile",
+    "about",
   ];
 
   const filteredSidebarItems = sidebarItems.filter((item) => {
@@ -174,7 +177,7 @@ const HomeSidebar = ({
         : allowedForNonAdmins.includes(item.key);
     }
     if (role === "Student") {
-      return ["profile", "messages", "resources", "downloads"].includes(
+      return ["profile", "messages", "resources", "downloads", "about"].includes(
         item.key
       );
     }
