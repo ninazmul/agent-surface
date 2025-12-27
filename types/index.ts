@@ -450,3 +450,18 @@ export interface TrackParams {
   route?: string;
   status?: string;
 }
+
+export type CampaignFieldType =
+  | "text"
+  | "email"
+  | "number"
+  | "textarea"
+  | "select";
+
+export interface CampaignField {
+  _id: string;
+  label: string;
+  name: string;
+  type: CampaignFieldType;
+  required: boolean;
+}
