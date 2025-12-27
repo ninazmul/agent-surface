@@ -1,15 +1,18 @@
 "use server";
 
 import { connectToDatabase } from "../database";
-import CampaignFieldModel from "../database/models/campaignField.model";
-import CampaignFormModel from "../database/models/campaignForm.model";
-import CampaignSubmissionModel from "../database/models/campaignSubmission.model";
+import {
+  CampaignField,
+  CampaignForm,
+  CampaignSubmission,
+} from "../database/models/campaign.model";
+import mongoose from "mongoose";
 
 /* -------------------------------------------------------------------------- */
 /*                               CREATE FORM                                  */
 /* -------------------------------------------------------------------------- */
 
-interface FieldInput {
+export interface FieldInput {
   label: string;
   name: string;
   type?: "text" | "email" | "number" | "textarea" | "select";
@@ -39,29 +42,51 @@ export async function createCampaignForm({
 
   await connectToDatabase();
 
-  const existing = await CampaignFormModel.findOne({ slug });
+  const existing = await CampaignForm.findOne({ slug });
   if (existing) {
     throw new Error("Form slug already exists");
   }
 
-  const form = await CampaignFormModel.create({
-    title,
-    description,
-    slug,
-    author,
-  });
+  // Start Mongoose session for atomic creation
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  const fieldDocs = fields.map((field) => ({
-    ...field,
-    formId: form._id,
-  }));
+  try {
+    const form = await CampaignForm.create(
+      [
+        {
+          title,
+          description,
+          slug,
+          author,
+        },
+      ],
+      { session }
+    );
 
-  await CampaignFieldModel.insertMany(fieldDocs);
+    const fieldDocs = fields.map((field) => ({
+      formId: form[0]._id,
+      label: field.label,
+      name: field.name,
+      type: field.type || "text",
+      required: !!field.required,
+    }));
 
-  return {
-    success: true,
-    formId: form._id.toString(),
-  };
+    await CampaignField.insertMany(fieldDocs, { session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return {
+      success: true,
+      formId: form[0]._id.toString(),
+    };
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error(err);
+    throw new Error("Failed to create campaign form");
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -81,12 +106,10 @@ export async function submitCampaignForm({
 
   await connectToDatabase();
 
-  const form = await CampaignFormModel.findOne({ slug });
-  if (!form) {
-    throw new Error("Campaign form not found");
-  }
+  const form = await CampaignForm.findOne({ slug });
+  if (!form) throw new Error("Campaign form not found");
 
-  await CampaignSubmissionModel.create({
+  await CampaignSubmission.create({
     formId: form._id,
     answers,
   });
@@ -99,13 +122,11 @@ export async function submitCampaignForm({
 /* -------------------------------------------------------------------------- */
 
 export async function getCampaignFormsByAuthor(author: string) {
-  if (!author) {
-    throw new Error("Author email is required");
-  }
+  if (!author) throw new Error("Author email is required");
 
   await connectToDatabase();
 
-  return CampaignFormModel.find({ author }).sort({ createdAt: -1 });
+  return CampaignForm.find({ author }).sort({ createdAt: -1 });
 }
 
 /* -------------------------------------------------------------------------- */
@@ -117,10 +138,10 @@ export async function getCampaignFormBySlug(slug: string) {
 
   await connectToDatabase();
 
-  const form = await CampaignFormModel.findOne({ slug });
+  const form = await CampaignForm.findOne({ slug });
   if (!form) return null;
 
-  const fields = await CampaignFieldModel.find({ formId: form._id });
+  const fields = await CampaignField.find({ formId: form._id });
 
   return { form, fields };
 }
@@ -136,22 +157,12 @@ export async function getCampaignSubmissions({
   formId: string;
   author: string;
 }) {
-  if (!formId || !author) {
-    throw new Error("Unauthorized access");
-  }
+  if (!formId || !author) throw new Error("Unauthorized access");
 
   await connectToDatabase();
 
-  const form = await CampaignFormModel.findOne({
-    _id: formId,
-    author,
-  });
+  const form = await CampaignForm.findOne({ _id: formId, author });
+  if (!form) throw new Error("Access denied");
 
-  if (!form) {
-    throw new Error("Access denied");
-  }
-
-  return CampaignSubmissionModel.find({ formId }).sort({
-    submittedAt: -1,
-  });
+  return CampaignSubmission.find({ formId }).sort({ submittedAt: -1 });
 }
