@@ -134,17 +134,17 @@ const CampaignFormsTable = ({ forms }: { forms: CampaignForm[] }) => {
                   <TableCell>
                     {(currentPage - 1) * itemsPerPage + index + 1}
                   </TableCell>
-
-                  <TableCell className="font-medium">{form.title}</TableCell>
-
+                  <TableCell className="font-medium hover:underline">
+                    <a href={`/leads/campaigns/${form._id}`}>{form.title}</a>
+                  </TableCell>
+                  a
                   <TableCell className="text-sm text-gray-500">
                     {form.slug}
                   </TableCell>
-
+                  a
                   <TableCell>
                     {new Date(form.createdAt).toLocaleDateString("en-GB")}
                   </TableCell>
-
                   <TableCell className="flex items-center gap-2">
                     {/* Open */}
                     <a href={shareUrl} target="_blank">

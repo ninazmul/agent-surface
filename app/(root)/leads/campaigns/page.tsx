@@ -1,6 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { getUserEmailById } from "@/lib/actions";
-import { getCampaignFormsByAuthor } from "@/lib/actions/campaign.actions";
+import { getUserEmailById, isAdmin } from "@/lib/actions";
+import {
+  getAllCampaignForms,
+  getCampaignFormsByAuthor,
+} from "@/lib/actions/campaign.actions";
 import { auth } from "@clerk/nextjs/server";
 import { Plus } from "lucide-react";
 import CampaignFormsTable from "../../components/CampaignFormsTable";
@@ -9,7 +12,11 @@ export default async function CampaignDashboard() {
   const { sessionClaims } = await auth();
   const userId = sessionClaims?.userId as string;
   const email = await getUserEmailById(userId);
-  const forms = await getCampaignFormsByAuthor(email);
+  const adminStatus = await isAdmin(email);
+
+  const forms = adminStatus
+    ? (await getAllCampaignForms())?.forms || []
+    : await getCampaignFormsByAuthor(email);
 
   return (
     <section className="p-4">

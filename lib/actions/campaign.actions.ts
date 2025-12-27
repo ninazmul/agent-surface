@@ -150,19 +150,49 @@ export async function getCampaignFormBySlug(slug: string) {
 /*                       GET SUBMISSIONS (OWNER ONLY)                          */
 /* -------------------------------------------------------------------------- */
 
-export async function getCampaignSubmissions({
-  formId,
-  author,
-}: {
-  formId: string;
-  author: string;
-}) {
-  if (!formId || !author) throw new Error("Unauthorized access");
+export async function getCampaignSubmissionsByFormId(formId: string) {
+  if (!formId) throw new Error("Form ID is required");
 
   await connectToDatabase();
 
-  const form = await CampaignForm.findOne({ _id: formId, author });
-  if (!form) throw new Error("Access denied");
-
   return CampaignSubmission.find({ formId }).sort({ submittedAt: -1 });
+}
+
+interface GetAllFormsOptions {
+  page?: number;
+  limit?: number;
+  sortBy?: "createdAt" | "title";
+  sortOrder?: "asc" | "desc";
+  author?: string; // optional filter by author
+}
+
+export async function getAllCampaignForms(options?: GetAllFormsOptions) {
+  await connectToDatabase();
+
+  const page = options?.page && options.page > 0 ? options.page : 1;
+  const limit = options?.limit && options.limit > 0 ? options.limit : 50;
+  const skip = (page - 1) * limit;
+
+  const sortKey = options?.sortBy || "createdAt";
+  const sortOrder = options?.sortOrder === "asc" ? 1 : -1;
+
+  const query: Record<string, unknown> = {};
+  if (options?.author) {
+    query.author = options.author;
+  }
+
+  const [forms, total] = await Promise.all([
+    CampaignForm.find(query)
+      .sort({ [sortKey]: sortOrder })
+      .skip(skip)
+      .limit(limit),
+    CampaignForm.countDocuments(query),
+  ]);
+
+  return {
+    forms,
+    total,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 }
