@@ -137,11 +137,9 @@ const CampaignFormsTable = ({ forms }: { forms: CampaignForm[] }) => {
                   <TableCell className="font-medium hover:underline">
                     <a href={`/leads/campaigns/${form._id}`}>{form.title}</a>
                   </TableCell>
-                  a
                   <TableCell className="text-sm text-gray-500">
                     {form.slug}
                   </TableCell>
-                  a
                   <TableCell>
                     {new Date(form.createdAt).toLocaleDateString("en-GB")}
                   </TableCell>
