@@ -1,16 +1,14 @@
 import CampaignFormRenderer from "@/components/shared/CampaignFormRenderer";
 import { getCampaignFormBySlug } from "@/lib/actions/campaign.actions";
 
-export default async function CampaignPage({
-  params,
-}: {
-  params: { slug: string };
-}) {
-  const data = await getCampaignFormBySlug(params.slug);
+type PageParams = Promise<{ slug: string }>; 
 
-  if (!data) {
-    return <div className="p-6 text-center">Form not found</div>;
-  }
+export default async function CampaignPage({ params }: { params: PageParams }) {
+  const { slug } = await params; 
+  
+  const data = await getCampaignFormBySlug(slug);
+
+  if (!data) return <div className="p-6 text-center">Form not found</div>;
 
   return (
     <div className="max-w-xl mx-auto p-6">
@@ -18,8 +16,8 @@ export default async function CampaignPage({
       {data.form.description && (
         <p className="text-gray-600 mb-4">{data.form.description}</p>
       )}
-
-      <CampaignFormRenderer slug={params.slug} fields={data.fields} />
+      <CampaignFormRenderer slug={slug} fields={data.fields} />
     </div>
   );
 }
+
