@@ -19,7 +19,6 @@ const CampaignSubmissionsPage = async ({ params }: Props) => {
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white">#</TableHead>
-              <TableHead className="text-white">Submission ID</TableHead>
               <TableHead className="text-white">Submitted At</TableHead>
               <TableHead className="text-white">Answers</TableHead>
             </TableRow>
@@ -32,7 +31,6 @@ const CampaignSubmissionsPage = async ({ params }: Props) => {
                 className="hover:bg-gray-100 dark:hover:bg-gray-700 border-b-0"
               >
                 <TableCell>{idx + 1}</TableCell>
-                <TableCell className="font-medium">{sub._id.toString()}</TableCell>
                 <TableCell>
                   {new Date(sub.submittedAt).toLocaleString()}
                 </TableCell>
