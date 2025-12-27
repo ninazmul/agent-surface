@@ -16,48 +16,69 @@ export default function CampaignFormRenderer({
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  function handleChange(name: string, value: string) {
+  const handleChange = (name: string, value: string) => {
     setValues((prev) => ({ ...prev, [name]: value }));
-  }
+  };
 
-  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
 
     try {
       await submitCampaignForm({ slug, answers: values });
       setSuccess(true);
-    } catch {
-      toast.error("Submission failed");
+    } catch (err) {
+      console.error(err);
+      toast.error("Submission failed. Please try again.");
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   if (success) {
-    return <p className="text-green-600">Thank you for your response!</p>;
+    return (
+      <div className="p-6 bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg text-center font-medium shadow-sm">
+        Thank you for your response!
+      </div>
+    );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-lg max-w-lg mx-auto"
+    >
       {fields.map((field) => (
-        <div key={field._id}>
-          <label className="block mb-1 font-medium">
+        <div key={field._id} className="space-y-1">
+          <label className="block font-medium text-gray-900 dark:text-gray-100">
             {field.label}
-            {field.required && <span className="text-red-500"> *</span>}
+            {field.required && <span className="text-red-500 ml-1">*</span>}
           </label>
 
           {field.type === "textarea" ? (
             <textarea
+              className="w-full border border-gray-300 dark:border-gray-700 rounded p-3 bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+              placeholder={`Enter ${field.label.toLowerCase()}`}
               required={field.required}
-              className="w-full border rounded p-2"
               onChange={(e) => handleChange(field.name, e.target.value)}
             />
+          ) : field.type === "select" ? (
+            <select
+              className="w-full border border-gray-300 dark:border-gray-700 rounded p-3 bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+              required={field.required}
+              onChange={(e) => handleChange(field.name, e.target.value)}
+            >
+              <option value="">Select {field.label}</option>
+              {/* Example placeholder options, ideally dynamic */}
+              <option value="Option 1">Option 1</option>
+              <option value="Option 2">Option 2</option>
+            </select>
           ) : (
             <input
               type={field.type}
+              className="w-full border border-gray-300 dark:border-gray-700 rounded p-3 bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+              placeholder={`Enter ${field.label.toLowerCase()}`}
               required={field.required}
-              className="w-full border rounded p-2"
               onChange={(e) => handleChange(field.name, e.target.value)}
             />
           )}
@@ -67,7 +88,7 @@ export default function CampaignFormRenderer({
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-black text-white py-2 rounded"
+        className="w-full py-3 rounded-xl bg-black text-white dark:bg-white dark:text-black font-semibold shadow hover:opacity-90 transition"
       >
         {loading ? "Submitting..." : "Submit"}
       </button>
