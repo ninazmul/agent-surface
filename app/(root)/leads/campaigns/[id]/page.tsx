@@ -2,11 +2,11 @@ import { getCampaignSubmissionsByFormId } from "@/lib/actions/campaign.actions";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
 type Props = {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 };
 
 const CampaignSubmissionsPage = async ({ params }: Props) => {
-  const { id } = params;
+  const { id } = await params;
 
   const submissions = await getCampaignSubmissionsByFormId(id);
 
