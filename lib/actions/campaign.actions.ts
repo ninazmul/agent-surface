@@ -196,3 +196,38 @@ export async function getAllCampaignForms(options?: GetAllFormsOptions) {
     totalPages: Math.ceil(total / limit),
   };
 }
+
+export async function deleteCampaignFormById(formId: string) {
+  if (!formId) {
+    throw new Error("Form ID is required");
+  }
+
+  await connectToDatabase();
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    // Delete all related submissions
+    await CampaignSubmission.deleteMany({ formId }).session(session);
+
+    // Delete all related fields
+    await CampaignField.deleteMany({ formId }).session(session);
+
+    // Delete the form itself
+    const result = await CampaignForm.deleteOne({ _id: formId }).session(session);
+    if (result.deletedCount === 0) {
+      throw new Error("Form not found");
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return { success: true };
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    console.error(err);
+    throw new Error("Failed to delete campaign form");
+  }
+}
