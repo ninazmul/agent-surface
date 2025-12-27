@@ -37,6 +37,7 @@ import {
   LibraryBig,
   ChevronRight,
   BookOpen,
+  UserRoundCog,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -57,6 +58,12 @@ const sidebarItems = [
         title: "Assigned Leads",
         url: "/leads/assigned",
         icon: UserRoundPlus,
+      },
+      {
+        key: "campaign-leads",
+        title: "Campaign Leads",
+        url: "/leads/campaigns",
+        icon: UserRoundCog,
       },
     ],
   },
