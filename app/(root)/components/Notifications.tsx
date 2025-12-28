@@ -5,17 +5,11 @@ import { isAdmin } from "@/lib/actions/admin.actions";
 import {
   getAllNotifications,
   getNotificationsByAgency,
+  toggleReadStatusForUser,
 } from "@/lib/actions/notification.actions";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
 import { useUser } from "@clerk/nextjs";
-import {
-  Bell,
-  Circle,
-  X,
-  Volume2,
-  VolumeX,
-  CheckCheck,
-} from "lucide-react";
+import { Bell, Circle, X, Volume2, VolumeX, CheckCheck } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 
@@ -40,12 +34,14 @@ export type NotificationDTO = {
 
 export default function NotificationsDropdown() {
   const { user } = useUser();
-  const userId: string = user?.id ?? "";
+  const userId = user?.id ?? "";
 
   const [notifications, setNotifications] = useState<NotificationDTO[]>([]);
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [open, setOpen] = useState<boolean>(false);
   const [firstLoad, setFirstLoad] = useState<boolean>(true);
+  const [isReadingAll, setIsReadingAll] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>("");
 
   const [muted, setMuted] = useState<boolean>(() => {
     if (typeof window === "undefined") return false;
@@ -67,7 +63,7 @@ export default function NotificationsDropdown() {
 
   // Close on outside click / escape
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent): void => {
+    const handleClickOutside = (e: MouseEvent) => {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(e.target as Node)
@@ -76,7 +72,7 @@ export default function NotificationsDropdown() {
       }
     };
 
-    const handleEscape = (e: KeyboardEvent): void => {
+    const handleEscape = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
 
@@ -95,25 +91,25 @@ export default function NotificationsDropdown() {
 
     let mounted = true;
 
-    const fetchNotifications = async (): Promise<void> => {
+    const fetchNotifications = async () => {
       try {
-        const userMongoId: string = await getUserByClerkId(userId);
-        const email: string = await getUserEmailById(userMongoId);
-        const adminStatus: boolean = await isAdmin(email);
+        const userMongoId = await getUserByClerkId(userId);
+        const userEmail = await getUserEmailById(userMongoId);
+        const adminStatus = await isAdmin(userEmail);
 
-        if (!email) return;
+        if (!userEmail) return;
+
+        setEmail(userEmail);
 
         const data: NotificationDTO[] = adminStatus
           ? await getAllNotifications()
-          : await getNotificationsByAgency(email);
+          : await getNotificationsByAgency(userEmail);
 
         if (!mounted) return;
 
-        const unread: NotificationDTO[] = data.filter(
-          (n: NotificationDTO) =>
-            !n.readBy?.some(
-              (r) => r.email === email && r.status === "read"
-            )
+        const unread = data.filter(
+          (n) =>
+            !n.readBy?.some((r) => r.email === userEmail && r.status === "read")
         );
 
         if (!muted && unread.length > previousUnreadCount.current) {
@@ -126,9 +122,16 @@ export default function NotificationsDropdown() {
         setUnreadCount(unread.length);
 
         if (firstLoad && unread.length > 0) {
-          toast(`You have ${unread.length} unread notifications`, {
-            icon: "🔔",
-          });
+          toast(
+            `Welcome back! You have ${unread.length} unread notification${
+              unread.length > 1 ? "s" : ""
+            }`,
+            {
+              position: "top-right",
+              duration: 3000,
+              icon: "🔔",
+            }
+          );
           setFirstLoad(false);
         }
       } catch (error) {
@@ -147,17 +150,42 @@ export default function NotificationsDropdown() {
 
   /* ======================= ACTIONS ======================= */
 
-  const markAllSeen = (): void => {
-    setNotifications([]);
-    setUnreadCount(0);
-    previousUnreadCount.current = 0;
-    toast.success("All notifications marked as seen");
+  const handleReadAll = async () => {
+    if (!email) return toast.error("User email not found");
+
+    setIsReadingAll(true);
+
+    try {
+      const unread = notifications.filter(
+        (n) => !n.readBy?.some((r) => r.email === email && r.status === "read")
+      );
+
+      await Promise.all(
+        unread.map((n) => toggleReadStatusForUser(n._id, email, "Unread"))
+      );
+
+      toast.success("All notifications marked as read");
+
+      // Optimistic UI update
+      setNotifications((prev) =>
+        prev.map((n) => ({
+          ...n,
+          readBy: [...(n.readBy ?? []), { email, status: "read" }],
+        }))
+      );
+
+      setUnreadCount(0);
+      previousUnreadCount.current = 0;
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to mark all as read");
+    } finally {
+      setIsReadingAll(false);
+    }
   };
 
-  const dismissNotification = (id: string): void => {
-    setNotifications((prev: NotificationDTO[]) =>
-      prev.filter((n: NotificationDTO) => n._id !== id)
-    );
+  const dismissNotification = (id: string) => {
+    setNotifications((prev) => prev.filter((n) => n._id !== id));
     setUnreadCount((c) => Math.max(0, c - 1));
   };
 
@@ -181,11 +209,9 @@ export default function NotificationsDropdown() {
         <div className="absolute right-0 mt-2 w-[340px] bg-white text-black rounded-2xl shadow-2xl z-50 border">
           {/* Header */}
           <div className="p-3 border-b flex justify-between items-center">
-            <span className="font-semibold text-sm">
-              Unread Notifications
-            </span>
+            <span className="font-semibold text-sm">Unread Notifications</span>
 
-            <div className="flex items-center justify-around gap-1">
+            <div className="flex gap-1">
               <Button
                 size="icon"
                 variant="ghost"
@@ -201,10 +227,12 @@ export default function NotificationsDropdown() {
               <Button
                 size="icon"
                 variant="ghost"
-                onClick={markAllSeen}
-                disabled={unreadCount === 0}
+                onClick={handleReadAll}
+                disabled={unreadCount === 0 || isReadingAll}
               >
-                <CheckCheck className="w-4 h-4" />
+                <CheckCheck
+                  className={`w-4 h-4 ${isReadingAll ? "animate-pulse" : ""}`}
+                />
               </Button>
 
               <Button
@@ -223,7 +251,7 @@ export default function NotificationsDropdown() {
               🎉 You’re all caught up!
             </div>
           ) : (
-            notifications.map((n: NotificationDTO) => (
+            notifications.map((n) => (
               <div
                 key={n._id}
                 className="px-4 py-3 border-b flex gap-2 hover:bg-gray-50"
@@ -238,9 +266,7 @@ export default function NotificationsDropdown() {
                   className="flex-1 text-sm"
                   onClick={() => setOpen(false)}
                 >
-                  <div className="font-medium line-clamp-2">
-                    {n.title}
-                  </div>
+                  <div className="font-medium line-clamp-2">{n.title}</div>
                   <div className="text-xs text-gray-500">
                     {n.agency} • {n.country}
                   </div>
