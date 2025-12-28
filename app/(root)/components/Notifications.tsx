@@ -122,16 +122,29 @@ export default function NotificationsDropdown() {
         setUnreadCount(unread.length);
 
         if (firstLoad && unread.length > 0) {
-          toast(
-            `Welcome back! You have ${unread.length} unread notification${
-              unread.length > 1 ? "s" : ""
-            }`,
+          toast.custom(
+            (t) => (
+              <div className="relative flex items-start gap-3 px-4 py-3 rounded-xl shadow-lg bg-white text-black border border-gray-200">
+                <span className="text-lg">🔔</span>
+                <p className="text-sm pr-6">
+                  Welcome back! You have {unread.length} unread notification
+                  {unread.length > 1 ? "s" : ""}
+                </p>
+                <button
+                  onClick={() => toast.dismiss(t.id)}
+                  className="absolute top-2 right-2 p-1 rounded-md hover:bg-gray-100"
+                  aria-label="Close notification"
+                >
+                  <X className="w-4 h-4 text-gray-500" />
+                </button>
+              </div>
+            ),
             {
               position: "top-right",
               duration: 3000,
-              icon: "🔔",
             }
           );
+
           setFirstLoad(false);
         }
       } catch (error) {
