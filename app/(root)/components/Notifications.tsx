@@ -178,14 +178,14 @@ export default function NotificationsDropdown() {
       </Button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-[340px] bg-white rounded-2xl shadow-2xl z-50 border">
+        <div className="absolute right-0 mt-2 w-[340px] bg-white text-black rounded-2xl shadow-2xl z-50 border">
           {/* Header */}
           <div className="p-3 border-b flex justify-between items-center">
             <span className="font-semibold text-sm">
               Unread Notifications
             </span>
 
-            <div className="flex items-center gap-1 text-black">
+            <div className="flex items-center justify-around gap-1">
               <Button
                 size="icon"
                 variant="ghost"
