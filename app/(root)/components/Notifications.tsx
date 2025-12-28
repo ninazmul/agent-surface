@@ -185,7 +185,7 @@ export default function NotificationsDropdown() {
               Unread Notifications
             </span>
 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 text-black">
               <Button
                 size="icon"
                 variant="ghost"
