@@ -8,9 +8,23 @@ import {
 } from "@/lib/actions/notification.actions";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
 import { useUser } from "@clerk/nextjs";
-import { Bell, Circle } from "lucide-react";
-import React, { useEffect, useState, useRef } from "react";
+import {
+  Bell,
+  Circle,
+  X,
+  Volume2,
+  VolumeX,
+  CheckCheck,
+} from "lucide-react";
+import React, { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+
+/* ======================= TYPES ======================= */
+
+export type NotificationReadStatus = {
+  email?: string;
+  status: "read" | "unread";
+};
 
 export type NotificationDTO = {
   _id: string;
@@ -18,194 +32,234 @@ export type NotificationDTO = {
   route?: string;
   agency: string;
   country: string;
-  readBy?: { email?: string; status: "read" | "unread" }[];
+  readBy?: NotificationReadStatus[];
   createdAt: string;
 };
 
+/* ======================= COMPONENT ======================= */
+
 export default function NotificationsDropdown() {
   const { user } = useUser();
-  const userId = user?.id || "";
+  const userId: string = user?.id ?? "";
 
   const [notifications, setNotifications] = useState<NotificationDTO[]>([]);
-  const [unreadCount, setUnreadCount] = useState(0);
-  const [open, setOpen] = useState(false);
-  const [firstLoad, setFirstLoad] = useState(true);
+  const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [open, setOpen] = useState<boolean>(false);
+  const [firstLoad, setFirstLoad] = useState<boolean>(true);
 
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [muted, setMuted] = useState<boolean>(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("notifications-muted") === "true";
+  });
+
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
   const previousUnreadCount = useRef<number>(0);
+  const notificationSound = useRef<HTMLAudioElement>(
+    new Audio("/notification.mp3")
+  );
 
-  // Notification sound
-  const notificationSound = useRef(new Audio("/notification.mp3"));
+  /* ======================= EFFECTS ======================= */
 
-  // Close dropdown when clicking outside
+  // Persist mute state
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
+    localStorage.setItem("notifications-muted", String(muted));
+  }, [muted]);
+
+  // Close on outside click / escape
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent): void => {
       if (
         dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
+        !dropdownRef.current.contains(e.target as Node)
       ) {
         setOpen(false);
       }
-    }
+    };
+
+    const handleEscape = (e: KeyboardEvent): void => {
+      if (e.key === "Escape") setOpen(false);
+    };
 
     document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  // Close dropdown on Escape key
-  useEffect(() => {
-    function handleEscape(event: KeyboardEvent) {
-      if (event.key === "Escape") {
-        setOpen(false);
-      }
-    }
-
-    document.addEventListener("keydown", handleEscape);
-    return () => {
       document.removeEventListener("keydown", handleEscape);
     };
   }, []);
 
-  // Auto-focus dropdown when opened
-  useEffect(() => {
-    if (open && dropdownRef.current) {
-      dropdownRef.current.focus();
-    }
-  }, [open]);
-
+  // Fetch notifications
   useEffect(() => {
     if (!userId) return;
 
-    let isMounted = true;
+    let mounted = true;
 
-    async function fetchNotifications() {
+    const fetchNotifications = async (): Promise<void> => {
       try {
-        const userMongoId = await getUserByClerkId(userId);
-        const email = await getUserEmailById(userMongoId);
-        const adminStatus = await isAdmin(email);
+        const userMongoId: string = await getUserByClerkId(userId);
+        const email: string = await getUserEmailById(userMongoId);
+        const adminStatus: boolean = await isAdmin(email);
 
         if (!email) return;
 
-        let userNotifications: NotificationDTO[];
+        const data: NotificationDTO[] = adminStatus
+          ? await getAllNotifications()
+          : await getNotificationsByAgency(email);
 
-        if (adminStatus) {
-          userNotifications = await getAllNotifications();
-        } else {
-          userNotifications = await getNotificationsByAgency(email);
+        if (!mounted) return;
+
+        const unread: NotificationDTO[] = data.filter(
+          (n: NotificationDTO) =>
+            !n.readBy?.some(
+              (r) => r.email === email && r.status === "read"
+            )
+        );
+
+        if (!muted && unread.length > previousUnreadCount.current) {
+          notificationSound.current.play().catch(() => null);
         }
 
-        if (isMounted && userNotifications) {
-          const unread = userNotifications.filter(
-            (n) =>
-              !n.readBy?.some((r) => r.email === email && r.status === "read")
-          );
+        previousUnreadCount.current = unread.length;
 
-          // Play sound if new notifications arrived
-          if (unread.length > previousUnreadCount.current) {
-            notificationSound.current
-              .play()
-              .catch((err) => console.log("Sound play error:", err));
-          }
-          previousUnreadCount.current = unread.length;
+        setNotifications(unread.slice(0, 5));
+        setUnreadCount(unread.length);
 
-          const formatted: NotificationDTO[] = unread.slice(0, 5).map((n) => ({
-            ...n,
-            createdAt: n.createdAt,
-          }));
-
-          setNotifications(formatted);
-          setUnreadCount(unread.length);
-
-          if (firstLoad && unread.length > 0) {
-            toast(
-              `Welcome back! You have ${unread.length} unread notification${
-                unread.length > 1 ? "s" : ""
-              }`,
-              {
-                position: "top-right",
-                duration: 5000,
-                icon: "🔔",
-              }
-            );
-            setFirstLoad(false);
-          }
+        if (firstLoad && unread.length > 0) {
+          toast(`You have ${unread.length} unread notifications`, {
+            icon: "🔔",
+          });
+          setFirstLoad(false);
         }
       } catch (error) {
-        console.error("Error fetching notifications:", error);
+        console.error("Notification fetch failed:", error);
       }
-    }
+    };
 
     fetchNotifications();
     const interval = setInterval(fetchNotifications, 5000);
 
     return () => {
-      isMounted = false;
+      mounted = false;
       clearInterval(interval);
     };
-  }, [userId, firstLoad]);
+  }, [userId, muted, firstLoad]);
+
+  /* ======================= ACTIONS ======================= */
+
+  const markAllSeen = (): void => {
+    setNotifications([]);
+    setUnreadCount(0);
+    previousUnreadCount.current = 0;
+    toast.success("All notifications marked as seen");
+  };
+
+  const dismissNotification = (id: string): void => {
+    setNotifications((prev: NotificationDTO[]) =>
+      prev.filter((n: NotificationDTO) => n._id !== id)
+    );
+    setUnreadCount((c) => Math.max(0, c - 1));
+  };
+
+  /* ======================= UI ======================= */
 
   return (
     <div className="relative" ref={dropdownRef} tabIndex={-1}>
       <Button
         size="icon"
         variant="ghost"
-        onClick={() => setOpen((prev) => !prev)}
-        aria-label="Toggle notifications dropdown"
-        className="relative w-9 h-9 text-gray-500 dark:text-gray-100 rounded-full transition"
+        onClick={() => setOpen((o) => !o)}
+        className="relative w-9 h-9"
       >
-        <Bell className="w-5 h-5 text-gray-600 dark:text-gray-100" />
+        <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border border-white"></span>
+          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full" />
         )}
       </Button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-[340px] max-h-[420px] overflow-auto bg-white rounded-2xl shadow-2xl z-50 border border-gray-200 animate-in fade-in slide-in-from-top-2">
-          <div className="p-3 border-b font-semibold text-gray-800 flex justify-between items-center">
-            <span>Unread Notifications</span>
-            {unreadCount > 0 && (
-              <span className="text-xs text-gray-500">{unreadCount} total</span>
-            )}
+        <div className="absolute right-0 mt-2 w-[340px] bg-white rounded-2xl shadow-2xl z-50 border">
+          {/* Header */}
+          <div className="p-3 border-b flex justify-between items-center">
+            <span className="font-semibold text-sm">
+              Unread Notifications
+            </span>
+
+            <div className="flex items-center gap-1">
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setMuted((m) => !m)}
+              >
+                {muted ? (
+                  <VolumeX className="w-4 h-4" />
+                ) : (
+                  <Volume2 className="w-4 h-4" />
+                )}
+              </Button>
+
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={markAllSeen}
+                disabled={unreadCount === 0}
+              >
+                <CheckCheck className="w-4 h-4" />
+              </Button>
+
+              <Button
+                size="icon"
+                variant="ghost"
+                onClick={() => setOpen(false)}
+              >
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
 
+          {/* List */}
           {notifications.length === 0 ? (
-            <div className="p-4 text-sm text-gray-500 text-center">
+            <div className="p-4 text-center text-sm text-gray-500">
               🎉 You’re all caught up!
             </div>
           ) : (
-            notifications.map((notification) => (
-              <a
-                key={notification._id.toString()}
-                href={notification.route || "/notifications"}
-                className="block px-4 py-3 text-sm border-b last:border-0 hover:bg-gray-50 transition"
-                onClick={() => setOpen(false)}
+            notifications.map((n: NotificationDTO) => (
+              <div
+                key={n._id}
+                className="px-4 py-3 border-b flex gap-2 hover:bg-gray-50"
               >
-                <div className="flex items-start gap-2">
-                  <Circle
-                    className="w-2 h-2 text-red-500 mt-1"
-                    fill="currentColor"
-                  />
-                  <div className="flex-1">
-                    <div className="font-medium text-gray-800 line-clamp-2">
-                      {notification.title}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-0.5">
-                      {notification.agency} • {notification.country}
-                    </div>
-                    <div className="text-[10px] text-gray-400 mt-1">
-                      {new Date(notification.createdAt).toLocaleString()}
-                    </div>
+                <Circle
+                  className="w-2 h-2 text-red-500 mt-1"
+                  fill="currentColor"
+                />
+
+                <a
+                  href={n.route || "/notifications"}
+                  className="flex-1 text-sm"
+                  onClick={() => setOpen(false)}
+                >
+                  <div className="font-medium line-clamp-2">
+                    {n.title}
                   </div>
-                </div>
-              </a>
+                  <div className="text-xs text-gray-500">
+                    {n.agency} • {n.country}
+                  </div>
+                </a>
+
+                <Button
+                  size="icon"
+                  variant="ghost"
+                  onClick={() => dismissNotification(n._id)}
+                >
+                  <X className="w-3 h-3" />
+                </Button>
+              </div>
             ))
           )}
 
           <a
             href="/notifications"
-            className="block px-4 py-3 text-sm text-center text-blue-600 hover:bg-blue-50 font-medium transition"
+            className="block text-center py-3 text-sm text-blue-600 hover:bg-blue-50"
             onClick={() => setOpen(false)}
           >
             View all
