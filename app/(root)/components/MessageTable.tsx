@@ -176,6 +176,12 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     return () => clearInterval(interval);
   }, [fetchAllUsers, fetchThreads]);
 
+  const currentRecipientName = selectedThread
+    ? agencyProfiles[selectedThread.userEmail]?.name || selectedThread.userEmail
+    : newMessageUser
+    ? agencyProfiles[newMessageUser]?.name || newMessageUser
+    : "";
+
   // ====== RENDER ======
   return (
     <div className="space-y-6">
@@ -244,6 +250,11 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
             </div>
           ) : (
             <>
+              {/* RECIPIENT NAME */}
+              <div className="mb-2 text-lg font-semibold text-gray-700 dark:text-gray-200">
+                {currentRecipientName}
+              </div>
+
               <div
                 ref={scrollRef}
                 className="flex-1 overflow-y-auto space-y-3 pr-2"
@@ -280,6 +291,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
                   );
                 })}
               </div>
+
               <div className="flex items-center gap-2 pt-2 border-t">
                 <Input
                   value={newMessageText}
