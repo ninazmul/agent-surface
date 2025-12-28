@@ -92,6 +92,13 @@ const NotificationTable = ({
       )
     );
 
+    // Sort unread first
+    filtered.sort((a, b) => {
+      if (a.userStatus === b.userStatus) return 0;
+      return a.userStatus === "Unread" ? -1 : 1;
+    });
+
+    // Then apply additional sorting if sortKey is selected
     if (sortKey) {
       filtered.sort((a, b) => {
         const valueA = a[sortKey]?.toLowerCase?.() || "";
