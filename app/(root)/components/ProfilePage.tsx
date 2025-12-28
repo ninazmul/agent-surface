@@ -97,9 +97,7 @@ export default function ProfilePage({
                   {/* Profile Image */}
                   <div className="flex-shrink-0 mx-auto sm:mx-0">
                     <Image
-                      src={
-                        myProfile?.logo || "/assets/images/default-profile.png"
-                      }
+                      src={myProfile?.logo || "/assets/images/profile.png"}
                       alt={myProfile?.name || "N/A"}
                       width={150}
                       height={200}
@@ -163,7 +161,9 @@ export default function ProfilePage({
                     </div>
                     <div>
                       <p className="text-lg text-gray-700">Email:</p>
-                      <p>{myProfile?.email}</p>
+                      <p className="break-words whitespace-normal">
+                        {myProfile?.email}
+                      </p>
                     </div>
                     <div>
                       <p className="text-lg text-gray-700">Phone:</p>
@@ -184,12 +184,12 @@ export default function ProfilePage({
                     <div>
                       <p className="text-lg text-gray-700">Country Agent:</p>
                       {countryAgent?.name ? (
-                        <>
+                        <p className="break-words whitespace-normal">
                           {countryAgent.name}{" "}
                           <span className="text-indigo-500 text-xs">
                             ({countryAgent.email})
                           </span>
-                        </>
+                        </p>
                       ) : (
                         "N/A"
                       )}
