@@ -19,6 +19,7 @@ import {
   createEventCalendar,
   updateEventCalendar,
 } from "@/lib/actions/eventCalender.actions";
+import toast from "react-hot-toast";
 
 // Zod schema
 const EventCalendarFormSchema = z.object({
@@ -81,12 +82,28 @@ const EventCalendarForm = ({
         const created = await createEventCalendar(payload);
         if (created) {
           form.reset();
-          router.push("/events");
+          toast.success("Event created Successfully!");
+          const navigate = () => {
+            router.replace("/events");
+            router.refresh();
+          };
+
+          if (created) {
+            navigate();
+          }
         }
       } else if (type === "Update" && EventId) {
         const updated = await updateEventCalendar(EventId, payload);
         if (updated) {
-          router.push("/events");
+          toast.success("Event updated Successfully!");
+          const navigate = () => {
+            router.replace("/events");
+            router.refresh();
+          };
+
+          if (updated) {
+            navigate();
+          }
         }
       }
     } catch (error) {

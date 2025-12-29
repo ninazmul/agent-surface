@@ -185,7 +185,14 @@ const ProfileForm = ({
           });
           form.reset();
           toast.success("Profile created! Your account is pending approval.");
-          router.push(`/profile`);
+          const navigate = () => {
+            router.replace("/profile");
+            router.refresh();
+          };
+
+          if (newProfile) {
+            navigate();
+          }
         }
       } else if (type === "Update" && profileId) {
         const updatedProfile = await updateProfile(profileId, {
@@ -211,8 +218,15 @@ const ProfileForm = ({
           });
 
           form.reset();
-          toast.success("Profile updated successfully.");
-          router.push(`/profile`);
+          toast.success("Profile updated successfully!");
+          const navigate = () => {
+            router.replace("/profile");
+            router.refresh();
+          };
+
+          if (updatedProfile) {
+            navigate();
+          }
         }
       }
     } catch (error) {

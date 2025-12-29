@@ -16,6 +16,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { IServices } from "@/lib/database/models/service.model";
 import { createService, updateService } from "@/lib/actions/service.actions";
+import toast from "react-hot-toast";
 
 // Zod schema
 const ServiceFormSchema = z.object({
@@ -71,12 +72,28 @@ const ServiceForm = ({ type, Service, ServiceId }: ServiceFormProps) => {
         const created = await createService(payload);
         if (created) {
           form.reset();
-          router.push("/services");
+          toast.success("Service added successfully!");
+          const navigate = () => {
+            router.replace("/services");
+            router.refresh();
+          };
+
+          if (created) {
+            navigate();
+          }
         }
       } else if (type === "Update" && ServiceId) {
         const updated = await updateService(ServiceId, payload);
         if (updated) {
-          router.push("/services");
+          toast.success("Service updated successfully!");
+          const navigate = () => {
+            router.replace("/services");
+            router.refresh();
+          };
+
+          if (updated) {
+            navigate();
+          }
         }
       }
     } catch (error) {

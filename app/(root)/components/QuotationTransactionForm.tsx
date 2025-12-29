@@ -67,6 +67,10 @@ const QuotationTranscriptForm = ({
     values: z.infer<typeof QuotationTranscriptFormSchema>
   ) {
     try {
+      const navigate = () => {
+        router.replace("/finance");
+        router.refresh();
+      };
       if (type === "Update" && quotationId && quotation) {
         const updatedQuotation = await updateQuotation(quotationId, {
           transcript: values.transcript || [],
@@ -90,7 +94,7 @@ const QuotationTranscriptForm = ({
 
           form.reset({ transcript: values.transcript || [] });
           toast.success("Quotation updated successfully!");
-          router.push("/finance");
+          navigate();
         }
       }
     } catch (error) {

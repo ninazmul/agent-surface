@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { createEvent, updateEvent } from "@/lib/actions/event.actions";
 import { IEvent } from "@/lib/database/models/event.model";
+import toast from "react-hot-toast";
 
 const EventFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters."),
@@ -57,12 +58,28 @@ const EventForm = ({ type, Event, EventId, email }: EventFormProps) => {
         const created = await createEvent(eventData);
         if (created) {
           form.reset();
-          router.push("/events");
+          toast.success("Event created Successfully!");
+          const navigate = () => {
+            router.replace("/events");
+            router.refresh();
+          };
+
+          if (created) {
+            navigate();
+          }
         }
       } else if (type === "Update" && EventId) {
         const updated = await updateEvent(EventId, eventData);
         if (updated) {
-          router.push("/events");
+          toast.success("Event updated Successfully!");
+          const navigate = () => {
+            router.replace("/events");
+            router.refresh();
+          };
+
+          if (updated) {
+            navigate();
+          }
         }
       }
     } catch (error) {

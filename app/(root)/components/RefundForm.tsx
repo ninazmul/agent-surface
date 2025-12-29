@@ -20,6 +20,7 @@ import { ILead } from "@/lib/database/models/lead.model";
 import { useEffect } from "react";
 import { createNotification } from "@/lib/actions/notification.actions";
 import Select from "react-select";
+import toast from "react-hot-toast";
 
 const RefundFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters."),
@@ -74,7 +75,15 @@ const RefundForm = ({ type, Refund, RefundId, leads }: RefundFormProps) => {
             route: `/applications`,
           });
           form.reset();
-          router.push("/applications/refund");
+          toast.success("Refund request created successfully!");
+          const navigate = () => {
+            router.replace("/applications/refund");
+            router.refresh();
+          };
+
+          if (created) {
+            navigate();
+          }
         }
       } else if (type === "Update" && RefundId) {
         const updated = await updateRefund(RefundId, refundData);
@@ -85,7 +94,15 @@ const RefundForm = ({ type, Refund, RefundId, leads }: RefundFormProps) => {
             country: values.country,
             route: `/applications`,
           });
-          router.refresh();
+          toast.success("Refund request updated successfully!");
+          const navigate = () => {
+            router.replace("/applications/refund");
+            router.refresh();
+          };
+
+          if (updated) {
+            navigate();
+          }
         }
       }
     } catch (error) {

@@ -28,6 +28,7 @@ import { IServices } from "@/lib/database/models/service.model";
 import { courseKey, expandCourses } from "@/lib/course.utils";
 import { createTrack } from "@/lib/actions/track.actions";
 import { Types } from "mongoose";
+import toast from "react-hot-toast";
 
 // ✅ Schema
 const LeadFormSchema = z.object({
@@ -283,7 +284,16 @@ const LeadForm = ({
             route: `/leads/${created._id.toString()}`,
             status: "created",
           });
-          router.push("/leads");
+
+          toast.success("Lead created successfully!");
+          const navigate = () => {
+            router.replace("/leads");
+            router.refresh();
+          };
+
+          if (created) {
+            navigate();
+          }
         }
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
@@ -317,7 +327,15 @@ const LeadForm = ({
             route: `/leads/${updated._id.toString()}`,
             status: "updated",
           });
-          router.push("/leads");
+          toast.success("Lead updated successfully!");
+          const navigate = () => {
+            router.replace("/leads");
+            router.refresh();
+          };
+
+          if (updated) {
+            navigate();
+          }
         }
       }
     } catch (error) {

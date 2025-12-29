@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { createLead, updateLead } from "@/lib/actions/lead.actions";
 import { ILead } from "@/lib/database/models/lead.model";
 import { IProfile } from "@/lib/database/models/profile.model";
@@ -146,6 +146,8 @@ const PromotionLeadForm = ({
   email,
   promotion,
 }: PromotionLeadFormProps) => {
+  const router = useRouter();
+
   const { startUpload } = useUploadThing("mediaUploader");
 
   const [passportFile, setPassportFile] = useState<File[]>([]);
@@ -273,7 +275,14 @@ const PromotionLeadForm = ({
             route: `/leads`,
           });
           toast.success(`Leads created for ${values.name}`);
-          redirect("/leads");
+          const navigate = () => {
+            router.replace("/promotions");
+            router.refresh();
+          };
+
+          if (created) {
+            navigate();
+          }
         }
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
@@ -301,7 +310,15 @@ const PromotionLeadForm = ({
             country: values.home.country,
             route: `/leads`,
           });
-          redirect("/leads");
+          toast.success("Lead updated successfully!");
+          const navigate = () => {
+            router.replace("/promotions");
+            router.refresh();
+          };
+
+          if (updated) {
+            navigate();
+          }
         }
       }
     } catch (error) {

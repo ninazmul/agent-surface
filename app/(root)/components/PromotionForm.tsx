@@ -235,7 +235,14 @@ const PromotionForm = ({
             values.agencies || [],
             newPromotion.title
           );
-          router.push(`/promotions`);
+          const navigate = () => {
+            router.replace("/promotions");
+            router.refresh();
+          };
+
+          if (newPromotion) {
+            navigate();
+          }
         }
       } else if (type === "Update" && promotionId && promotion) {
         const updatedPromotion = await updatePromotion(promotionId, {
@@ -261,7 +268,14 @@ const PromotionForm = ({
           // Notify only newly added agencies
           await notifyAgencies(newAgencies, updatedPromotion.title);
           await notifyAgenciesViaWhatsApp(newAgencies, updatedPromotion.title);
-          router.push(`/promotions`);
+          const navigate = () => {
+            router.replace("/promotions");
+            router.refresh();
+          };
+
+          if (updatedPromotion) {
+            navigate();
+          }
         }
       }
     } catch (error) {

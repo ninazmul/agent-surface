@@ -18,6 +18,7 @@ import { IPayment } from "@/lib/database/models/payment.model";
 import { createNotification } from "@/lib/actions/notification.actions";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
 const PaymentFormSchema = z.object({
   agency: z.string().min(3, "Agency must be at least 3 characters."),
@@ -79,7 +80,15 @@ const PaymentForm = ({
             route: `/finance`,
           });
           form.reset();
-          router.push("/finance");
+          toast.success("Payment request created successfully!");
+          const navigate = () => {
+            router.replace("/finance");
+            router.refresh();
+          };
+
+          if (created) {
+            navigate();
+          }
         }
       } else if (type === "Update" && PaymentId) {
         const updated = await updatePayment(PaymentId, {
@@ -93,7 +102,15 @@ const PaymentForm = ({
             country: values.country,
             route: `/finance`,
           });
-          router.push("/finance");
+          toast.success("Payment request updated successfully!");
+          const navigate = () => {
+            router.replace("/finance");
+            router.refresh();
+          };
+
+          if (updated) {
+            navigate();
+          }
         }
       }
     } catch (error) {

@@ -85,15 +85,29 @@ const StudentResourceForm = ({ type, resource, resourceId }: StudentResourceForm
         });
         if (newResource) {
           form.reset();
-          toast.success("Docs upload successful!!");
-          router.push(`/resources`);
+          toast.success("Resource upload successfully!");
+          const navigate = () => {
+            router.replace("/resources/student");
+            router.refresh();
+          };
+
+          if (newResource) {
+            navigate();
+          }
         }
       } else if (type === "Update" && resourceId) {
         const updatedResource = await updateStudentResource(resourceId, resourceData);
         if (updatedResource) {
           form.reset();
-          toast.success("Updated Successfully!");
-          router.push(`/resources`);
+          toast.success("Resource updated Successfully!");
+          const navigate = () => {
+            router.replace("/resources/student");
+            router.refresh();
+          };
+
+          if (updatedResource) {
+            navigate();
+          }
         }
       }
     } catch (error) {

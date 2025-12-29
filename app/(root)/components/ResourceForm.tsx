@@ -86,14 +86,28 @@ const ResourceForm = ({ type, resource, resourceId }: ResourceFormProps) => {
         if (newResource) {
           form.reset();
           toast.success("Docs upload successful!!");
-          router.push(`/resources`);
+          const navigate = () => {
+            router.replace("/resources");
+            router.refresh();
+          };
+
+          if (newResource) {
+            navigate();
+          }
         }
       } else if (type === "Update" && resourceId) {
         const updatedResource = await updateResource(resourceId, resourceData);
         if (updatedResource) {
           form.reset();
           toast.success("Updated Successfully!");
-          router.push(`/resources`);
+          const navigate = () => {
+            router.replace("/resources");
+            router.refresh();
+          };
+
+          if (updatedResource) {
+            navigate();
+          }
         }
       }
     } catch (error) {
