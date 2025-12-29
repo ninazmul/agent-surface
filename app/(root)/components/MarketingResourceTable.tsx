@@ -12,10 +12,10 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash, SortAsc, SortDesc, Pencil } from "lucide-react";
-import { deleteResource } from "@/lib/actions/resource.actions";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { IMarketingResource } from "@/lib/database/models/marketing-resource.model";
+import { deleteMarketingResource } from "@/lib/actions/marketing-resource.actions";
 
 interface Props {
   resources: IMarketingResource[];
@@ -85,7 +85,7 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
 
   const handleDeleteResource = async (resourceId: string) => {
     try {
-      const response = await deleteResource(resourceId);
+      const response = await deleteMarketingResource(resourceId);
       if (response) toast.success("Resource deleted successfully");
       router.refresh();
     } catch (error) {
