@@ -1,3 +1,4 @@
+import { ICountryPrice } from "@/lib/database/models/marketing-resource.model";
 import { Types } from "mongoose";
 
 // ====== USER PARAMS
@@ -465,3 +466,11 @@ export interface CampaignField {
   type: CampaignFieldType;
   required: boolean;
 }
+
+export type MarketingResourceParams = {
+  category: string;
+  fileName: string;
+  link: string;
+  priceList: ICountryPrice[];
+  createdAt?: Date;
+};

@@ -38,6 +38,7 @@ import {
   ChevronRight,
   BookOpen,
   UserRoundCog,
+  DatabaseZap,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -101,7 +102,20 @@ const sidebarItems = [
     ],
   },
   { key: "downloads", title: "Documents", url: "/downloads", icon: FileIcon },
-  { key: "resources", title: "Resources", url: "/resources", icon: Database },
+  {
+    key: "resources",
+    title: "Resources",
+    url: "/resources",
+    icon: Database,
+    children: [
+      {
+        key: "marketing-resources",
+        title: "Marketing Resources",
+        url: "/resources/marketing",
+        icon: DatabaseZap,
+      },
+    ],
+  },
   {
     key: "events",
     title: "Events",
@@ -184,9 +198,13 @@ const HomeSidebar = ({
         : allowedForNonAdmins.includes(item.key);
     }
     if (role === "Student") {
-      return ["profile", "messages", "resources", "downloads", "about"].includes(
-        item.key
-      );
+      return [
+        "profile",
+        "messages",
+        "resources",
+        "downloads",
+        "about",
+      ].includes(item.key);
     }
     return allowedForNonAdmins.includes(item.key);
   });
