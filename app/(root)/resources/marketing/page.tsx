@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { getAllResources } from "@/lib/actions/resource.actions";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import {
@@ -12,6 +11,7 @@ import { redirect } from "next/navigation";
 import { Plus } from "lucide-react";
 import MarketingResourceTable from "../../components/MarketingResourceTable";
 import { IMarketingResource } from "@/lib/database/models/marketing-resource.model";
+import { getAllMarketingResources } from "@/lib/actions/marketing-resource.actions";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -33,7 +33,7 @@ const Page = async () => {
     redirect("/profile");
   }
 
-  const allResources = await getAllResources();
+  const allResources = await getAllMarketingResources();
 
   let resources: IMarketingResource[] = [];
 
