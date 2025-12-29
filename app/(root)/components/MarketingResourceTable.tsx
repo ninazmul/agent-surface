@@ -34,12 +34,11 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
   const [itemsPerPage] = useState(10);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
-  // filter and sort
   const filteredResources = useMemo(() => {
-    const filtered = resources.filter(
+    const filtered = (resources || []).filter(
       (resource) =>
-        resource.fileName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        resource.category.toLowerCase().includes(searchQuery.toLowerCase())
+        resource.fileName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        resource.category?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     if (sortKey) {
@@ -49,23 +48,22 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
 
         switch (sortKey) {
           case "fileName":
-            valueA = a.fileName.toLowerCase();
-            valueB = b.fileName.toLowerCase();
+            valueA = a.fileName?.toLowerCase() || "";
+            valueB = b.fileName?.toLowerCase() || "";
             break;
           case "category":
-            valueA = a.category.toLowerCase();
-            valueB = b.category.toLowerCase();
+            valueA = a.category?.toLowerCase() || "";
+            valueB = b.category?.toLowerCase() || "";
             break;
           case "price":
-            if (isAdmin) {
-              valueA = a.priceList[0]?.price || 0;
-              valueB = b.priceList[0]?.price || 0;
-            } else {
-              valueA =
-                a.priceList.find((p) => p.country === userCountry)?.price || 0;
-              valueB =
-                b.priceList.find((p) => p.country === userCountry)?.price || 0;
-            }
+            const aPrice = isAdmin
+              ? a.priceList?.[0]?.price || 0
+              : a.priceList?.find((p) => p.country === userCountry)?.price || 0;
+            const bPrice = isAdmin
+              ? b.priceList?.[0]?.price || 0
+              : b.priceList?.find((p) => p.country === userCountry)?.price || 0;
+            valueA = aPrice;
+            valueB = bPrice;
             break;
           default:
             return 0;
@@ -78,7 +76,7 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
     }
 
     return filtered;
-  }, [isAdmin, resources, searchQuery, sortKey, sortOrder, userCountry]);
+  }, [resources, searchQuery, sortKey, sortOrder, isAdmin, userCountry]);
 
   const paginatedResources = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;

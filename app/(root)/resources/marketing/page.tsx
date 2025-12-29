@@ -76,7 +76,7 @@ const Page = async () => {
 
       <div className="overflow-x-auto my-8">
         <MarketingResourceTable
-          resources={resources}
+          resources={resources || []}
           isAdmin={adminStatus}
           userCountry={agentCountry}
         />
