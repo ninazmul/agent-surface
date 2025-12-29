@@ -474,3 +474,11 @@ export type MarketingResourceParams = {
   priceList: ICountryPrice[];
   createdAt?: Date;
 };
+
+// ====== StudentResourceParams PARAMS
+export type StudentResourceParams = {
+  category: string;
+  fileName: string;
+  link: string;
+  createdAt: Date;
+};

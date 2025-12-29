@@ -39,6 +39,7 @@ import {
   BookOpen,
   UserRoundCog,
   DatabaseZap,
+  DatabaseIcon,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -119,6 +120,12 @@ const sidebarItems = [
         title: "Marketing Resources",
         url: "/resources/marketing",
         icon: DatabaseZap,
+      },
+      {
+        key: "student-resources",
+        title: "Student Resources",
+        url: "/resources/student",
+        icon: DatabaseIcon,
       },
     ],
   },
