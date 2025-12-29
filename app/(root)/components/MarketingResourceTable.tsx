@@ -20,7 +20,7 @@ import { IMarketingResource } from "@/lib/database/models/marketing-resource.mod
 interface Props {
   resources: IMarketingResource[];
   isAdmin: boolean;
-  userCountry: string; // user's country
+  userCountry?: string;
 }
 
 const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
@@ -57,10 +57,15 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
             valueB = b.category.toLowerCase();
             break;
           case "price":
-            valueA =
-              a.priceList.find((p) => p.country === userCountry)?.price || 0;
-            valueB =
-              b.priceList.find((p) => p.country === userCountry)?.price || 0;
+            if (isAdmin) {
+              valueA = a.priceList[0]?.price || 0;
+              valueB = b.priceList[0]?.price || 0;
+            } else {
+              valueA =
+                a.priceList.find((p) => p.country === userCountry)?.price || 0;
+              valueB =
+                b.priceList.find((p) => p.country === userCountry)?.price || 0;
+            }
             break;
           default:
             return 0;
@@ -73,7 +78,7 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
     }
 
     return filtered;
-  }, [resources, searchQuery, sortKey, sortOrder, userCountry]);
+  }, [isAdmin, resources, searchQuery, sortKey, sortOrder, userCountry]);
 
   const paginatedResources = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
@@ -150,10 +155,6 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
           </TableHeader>
           <TableBody>
             {paginatedResources.map((resource, index) => {
-              const userPrice = resource.priceList.find(
-                (p) => p.country === userCountry
-              );
-
               return (
                 <TableRow
                   key={resource._id.toString()}
@@ -173,8 +174,14 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
                           </option>
                         ))}
                       </select>
-                    ) : userPrice ? (
-                      `${userPrice.price} €`
+                    ) : resource.priceList.find(
+                        (p) => p.country === userCountry
+                      ) ? (
+                      `${
+                        resource.priceList.find(
+                          (p) => p.country === userCountry
+                        )?.price
+                      } €`
                     ) : (
                       "-"
                     )}
