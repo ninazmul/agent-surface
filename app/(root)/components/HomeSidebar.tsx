@@ -109,6 +109,12 @@ const sidebarItems = [
     icon: Database,
     children: [
       {
+        key: "resources",
+        title: "Global Resources",
+        url: "/resources",
+        icon: Database,
+      },
+      {
         key: "marketing-resources",
         title: "Marketing Resources",
         url: "/resources/marketing",
