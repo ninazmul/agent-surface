@@ -166,13 +166,13 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
                   <TableCell>
                     {isAdmin ? (
                       <select className="border rounded px-2 py-1 text-sm">
-                        {resource.priceList.map((p) => (
+                        {(resource.priceList || []).map((p) => (
                           <option key={p.country} value={p.price}>
                             {p.country}: {p.price} €
                           </option>
                         ))}
                       </select>
-                    ) : resource.priceList.find(
+                    ) : resource.priceList?.find(
                         (p) => p.country === userCountry
                       ) ? (
                       `${

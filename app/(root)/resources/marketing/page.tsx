@@ -49,7 +49,7 @@ const Page = async () => {
     // Normal agent: show only resources where agent's country matches any resource price country
     if (agentCountry) {
       resources = allResources.filter((r: IMarketingResource) =>
-        r.priceList.some((price) => price.country === agentCountry)
+        (r.priceList || []).some((price) => price.country === agentCountry)
       );
     }
   }
