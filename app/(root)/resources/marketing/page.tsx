@@ -38,9 +38,9 @@ const Page = async () => {
   let resources: IMarketingResource[] = [];
 
   if (adminStatus) {
-    // Admin sees all resources in their allowed countries
+    // Admin sees all resources if no country restrictions
     resources =
-      adminCountry.length === 0
+      !adminCountry || adminCountry.length === 0
         ? allResources
         : allResources.filter((r: IMarketingResource) =>
             r.priceList.some((price) => adminCountry.includes(price.country))
