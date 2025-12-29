@@ -162,10 +162,49 @@ const MarketingResourceForm = ({ type, resource, resourceId }: Props) => {
           name="category"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Category</FormLabel>
+              <FormLabel>Select Category</FormLabel>
               <FormControl>
-                <Input {...field} placeholder="Select or leave empty" />
+                <select
+                  {...field}
+                  className="w-full rounded-md border border-input bg-background dark:bg-gray-700 px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  onChange={(e) => {
+                    const selected = e.target.value;
+                    field.onChange(selected);
+                    if (selected) form.setValue("customCategory", "");
+                  }}
+                >
+                  <option value="">Select a category</option>
+                  <option value="Marketing Materials">
+                    Marketing Materials
+                  </option>
+                  <option value="Guidelines & Admission Requirements">
+                    Guidelines & Admission Requirements
+                  </option>
+                </select>
               </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="customCategory"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Or Add New Category</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Enter custom category"
+                  {...field}
+                  onChange={(e) => {
+                    field.onChange(e.target.value);
+                    if (e.target.value) form.setValue("category", "");
+                  }}
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                />
+              </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
