@@ -205,6 +205,7 @@ const ResourcePriceListCards = ({
             size="sm"
             onClick={() => setCurrentPage((p) => p - 1)}
             disabled={currentPage === 1}
+            className="rounded-2xl"
           >
             Previous
           </Button>
@@ -214,6 +215,7 @@ const ResourcePriceListCards = ({
             disabled={
               currentPage === Math.ceil(filteredResources.length / itemsPerPage)
             }
+            className="rounded-2xl"
           >
             Next
           </Button>
