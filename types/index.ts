@@ -482,3 +482,11 @@ export type StudentResourceParams = {
   link: string;
   createdAt: Date;
 };
+
+// ====== Resource Price List Params PARAMS
+export type ResourcePriceListParams = {
+  country: string;
+  fileName: string;
+  link: string;
+  createdAt: Date;
+};

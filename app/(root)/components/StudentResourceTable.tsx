@@ -12,16 +12,16 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Trash, SortAsc, SortDesc, Pencil } from "lucide-react";
-import { IResource } from "@/lib/database/models/resource.model";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { deleteStudentResource } from "@/lib/actions/student-resource.actions";
+import { IStudentResource } from "@/lib/database/models/student-resource.model";
 
 const StudentResourceTable = ({
   resources,
   isAdmin,
 }: {
-  resources: Array<IResource>;
+  resources: Array<IStudentResource>;
   isAdmin: boolean;
 }) => {
   const router = useRouter();

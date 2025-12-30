@@ -40,6 +40,7 @@ import {
   UserRoundCog,
   DatabaseZap,
   DatabaseIcon,
+  DatabaseBackup,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -126,6 +127,12 @@ const sidebarItems = [
         title: "Student Resources",
         url: "/resources/student",
         icon: DatabaseIcon,
+      },
+      {
+        key: "resources-pricelist",
+        title: "Resource Price List",
+        url: "/resources/pricelist",
+        icon: DatabaseBackup,
       },
     ],
   },
