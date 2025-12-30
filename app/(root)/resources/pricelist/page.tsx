@@ -63,7 +63,7 @@ const Page = async () => {
 
           {/* Action Button */}
           {adminStatus && (
-            <a href="/resources/create" className="w-full sm:w-auto">
+            <a href="/resources/pricelist/create" className="w-full sm:w-auto">
               <Button
                 size="sm"
                 className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
