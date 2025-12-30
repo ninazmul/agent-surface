@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
-import { getResourceById } from "@/lib/actions/resource.actions";
 import MarketingResourceForm from "@/app/(root)/components/MarketingResourceForm";
+import { getMarketingResourceById } from "@/lib/actions/marketing-resource.actions";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -8,7 +8,7 @@ type PageProps = {
 const UpdatePage = async ({ params }: PageProps) => {
   const { id } = await params;
 
-  const resource = await getResourceById(id);
+  const resource = await getMarketingResourceById(id);
   if (!resource) redirect("/resources");
 
   return (
