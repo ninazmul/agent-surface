@@ -82,7 +82,8 @@ const ResourcePriceListCards = ({
       await deleteStudentResource(id);
       toast.success("Resource deleted successfully");
       router.refresh();
-    } catch {
+    } catch (err) {
+      console.error(err);
       toast.error("Failed to delete resource");
     } finally {
       setConfirmDeleteId(null);
@@ -167,6 +168,7 @@ const ResourcePriceListCards = ({
               <a
                 href={resource.link}
                 target="_blank"
+                rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
                 className="text-xs px-3 py-1 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
               >
@@ -178,7 +180,10 @@ const ResourcePriceListCards = ({
                   className="flex items-center gap-2"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <a href={`/resources/${resource._id.toString()}/update`}>
+                  <a
+                    href={`/resources/${resource._id.toString()}/update`}
+                    className="text-gray-700 dark:text-gray-200"
+                  >
                     <Pencil className="w-4 h-4" />
                   </a>
                   <Trash
@@ -203,7 +208,7 @@ const ResourcePriceListCards = ({
         <div className="flex gap-2">
           <Button
             size="sm"
-            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p - 1)}
             disabled={currentPage === 1}
           >
@@ -211,7 +216,7 @@ const ResourcePriceListCards = ({
           </Button>
           <Button
             size="sm"
-            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
+            className="rounded-2xl bg-black disabled:bg-muted-foreground hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
             onClick={() => setCurrentPage((p) => p + 1)}
             disabled={
               currentPage === Math.ceil(filteredResources.length / itemsPerPage)
@@ -228,7 +233,7 @@ const ResourcePriceListCards = ({
           <div className="relative bg-white dark:bg-gray-900 rounded-2xl max-w-4xl w-full p-6">
             <button
               onClick={() => setPreviewResource(null)}
-              className="absolute top-4 right-4"
+              className="absolute top-4 right-4 text-gray-700 dark:text-gray-200"
             >
               <X />
             </button>
@@ -241,18 +246,22 @@ const ResourcePriceListCards = ({
                 className="w-full h-[70vh] rounded-xl"
               />
             ) : (
-              <Image
-                src={previewResource.link}
-                alt={previewResource.fileName}
-                fill
-                className="w-full max-h-[70vh] object-contain rounded-xl"
-              />
+              <div className="relative w-full h-[70vh]">
+                <Image
+                  src={previewResource.link}
+                  alt={previewResource.fileName}
+                  fill
+                  className="object-contain rounded-xl"
+                  sizes="100vw"
+                />
+              </div>
             )}
 
             <div className="flex justify-end mt-4">
               <a
                 href={previewResource.link}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="px-4 py-2 rounded-xl bg-black text-white"
               >
                 Open / Download

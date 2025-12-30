@@ -99,7 +99,7 @@ const ResourcePriceListForm = ({
           form.reset();
           toast.success("Resource upload successfully!");
           const navigate = () => {
-            router.replace("/resources/student");
+            router.replace("/resources/pricelist");
             router.refresh();
           };
 
@@ -116,7 +116,7 @@ const ResourcePriceListForm = ({
           form.reset();
           toast.success("Resource updated Successfully!");
           const navigate = () => {
-            router.replace("/resources/student");
+            router.replace("/resources/pricelist");
             router.refresh();
           };
 
@@ -168,6 +168,7 @@ const ResourcePriceListForm = ({
             name="country"
             render={({ field }) => (
               <FormItem>
+                <FormLabel>Country</FormLabel>
                 <FormControl>
                   <Select
                     options={countryOptions}
