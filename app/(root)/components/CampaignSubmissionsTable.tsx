@@ -40,8 +40,10 @@ const pickField = (
 
 export default function CampaignSubmissionsTable({
   submissions,
+  author,
 }: {
   submissions: Submission[];
+  author: string;
 }) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeSubmission, setActiveSubmission] = useState<Submission | null>(
@@ -68,7 +70,7 @@ export default function CampaignSubmissionsTable({
       .filter((s) => selectedIds.includes(s._id))
       .map((s) => ({
         answers: s.answers,
-        author: "system", // replace with session.user.id if needed
+        author: author, // replace with session.user.id if needed
       }));
 
     if (!payload.length) {
