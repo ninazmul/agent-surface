@@ -10,10 +10,10 @@ export default async function CampaignPage({ params }: { params: PageParams }) {
   if (!data) return <div className="p-6 text-center">Form not found</div>;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-12">
       <div className="max-w-5xl mx-auto px-4">
         <header className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+          <h1 className="text-2xl font-bold text-black dark:text-white leading-tight">
             {data.form.title}
           </h1>
           {data.form.description && (

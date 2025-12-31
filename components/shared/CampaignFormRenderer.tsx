@@ -35,7 +35,7 @@ export default function CampaignFormRenderer({
 
   if (success) {
     return (
-      <div className="max-w-5xl mx-auto bg-white dark:bg-gray-900 p-10 rounded-xl shadow-lg text-center animate-fadeIn">
+      <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 p-10 rounded-xl shadow-lg text-center animate-fadeIn">
         <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
           Thank you!
         </h2>
