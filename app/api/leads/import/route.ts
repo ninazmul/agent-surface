@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import * as XLSX from "xlsx";
+import { Types } from "mongoose";
 import { connectToDatabase } from "@/lib/database";
 import Lead from "@/lib/database/models/lead.model";
+import { LeadParams } from "@/types";
 
+// Type for Excel row
 type ExcelLeadRow = {
   name: string;
   email: string;
@@ -44,27 +47,64 @@ type ExcelLeadRow = {
   campus_shift?: string;
   course_fee?: string;
 
-  services?: string; // JSON string
-
+  services?: string; // JSON string or string[] JSON
   note?: string;
-  progress?: "Open" | "Contacted" | "Converted" | "Closed";
+  progress?: string;
   date?: string;
   author_email?: string;
-
   isPinned?: boolean;
-
-  others?: string; // JSON string
-
+  others?: string; // JSON string or string[]
   social_facebook?: string;
   social_instagram?: string;
   social_twitter?: string;
   social_skype?: string;
-
   discount?: string;
   quotationStatus?: boolean;
-  paymentStatus?: boolean;
-  transcript?: string;
+  paymentStatus?: string;
+  transcript?: string; // JSON string or string[]
 };
+
+// Safe JSON parser
+function parseStringArray(str?: string): string[] {
+  if (!str) return [];
+  try {
+    const parsed = JSON.parse(str);
+    if (Array.isArray(parsed)) return parsed.map(String);
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+// Map Excel services string[] to schema objects
+function mapServices(servicesStr?: string) {
+  const arr = parseStringArray(servicesStr);
+  return arr.map((title) => ({
+    _id: new Types.ObjectId(), // <-- ObjectId now, not string
+    serviceType: "Other",
+    title,
+    amount: "",
+    description: "",
+  }));
+}
+
+
+// Map Excel others string[] to schema objects
+function mapOthers(othersStr?: string) {
+  return parseStringArray(othersStr).map((fileUrl) => ({
+    fileName: fileUrl.split("/").pop() || "file",
+    fileUrl,
+  }));
+}
+
+// Map Excel transcript string[] to schema objects
+function mapTranscript(transcriptStr?: string) {
+  return parseStringArray(transcriptStr).map((fileUrl) => ({
+    amount: "",
+    method: "",
+    fileUrl,
+  }));
+}
 
 export async function POST(req: Request) {
   try {
@@ -77,19 +117,19 @@ export async function POST(req: Request) {
     const arrayBuffer = await file.arrayBuffer();
     const workbook = XLSX.read(arrayBuffer, { type: "array" });
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const rows: ExcelLeadRow[] = XLSX.utils.sheet_to_json(sheet, { defval: "" });
 
-    const rows = XLSX.utils.sheet_to_json<ExcelLeadRow>(sheet, { defval: "" });
     if (!rows.length) {
       return NextResponse.json({ success: false, error: "No valid leads found" });
     }
 
-    const leads = rows.map((row) => ({
+    const leads: LeadParams[] = rows.map((row) => ({
       name: row.name,
       email: row.email,
       number: row.number,
       gender: row.gender || "Unknown",
       maritalStatus: row.maritalStatus || "Unknown",
-      dateOfBirth: row.dateOfBirth ? new Date(row.dateOfBirth) : undefined,
+      dateOfBirth: row.dateOfBirth ? new Date(row.dateOfBirth) : new Date(),
 
       home: {
         address: row.home_address || "",
@@ -99,62 +139,72 @@ export async function POST(req: Request) {
         city: row.home_city || "",
       },
 
-      irish: {
-        address: row.irish_address || "",
-        zip: row.irish_zip || "",
-        country: row.irish_country || "",
-        state: row.irish_state || "",
-        city: row.irish_city || "",
-      },
+      irish: row.irish_address || row.irish_zip || row.irish_country || row.irish_state || row.irish_city
+        ? {
+            address: row.irish_address || "",
+            zip: row.irish_zip || "",
+            country: row.irish_country || "",
+            state: row.irish_state || "",
+            city: row.irish_city || "",
+          }
+        : undefined,
 
-      passport: {
-        visa: row.passport_visa ?? false,
-        number: row.passport_number || "",
-        country: row.passport_country || "",
-        file: row.passport_file || "",
-        issueDate: row.passport_issueDate ? new Date(row.passport_issueDate) : undefined,
-        expirationDate: row.passport_expirationDate ? new Date(row.passport_expirationDate) : undefined,
-      },
+      passport: row.passport_number || row.passport_country
+        ? {
+            visa: row.passport_visa ?? false,
+            number: row.passport_number || "",
+            country: row.passport_country || "",
+            file: row.passport_file || "",
+            issueDate: row.passport_issueDate ? new Date(row.passport_issueDate) : undefined,
+            expirationDate: row.passport_expirationDate ? new Date(row.passport_expirationDate) : undefined,
+          }
+        : undefined,
 
-      arrival: {
-        flight: row.arrival_flight || "",
-        file: row.arrival_file || "",
-        date: row.arrival_date ? new Date(row.arrival_date) : undefined,
-        time: row.arrival_time ? new Date(row.arrival_time) : undefined,
-      },
+      arrival: row.arrival_flight || row.arrival_date
+        ? {
+            flight: row.arrival_flight || "",
+            file: row.arrival_file || "",
+            date: row.arrival_date ? new Date(row.arrival_date) : undefined,
+            time: row.arrival_time ? new Date(row.arrival_time) : undefined,
+          }
+        : undefined,
 
-      course: {
-        name: row.course_name || "",
-        courseDuration: row.course_duration || "",
-        courseType: row.course_type || "",
-        startDate: row.course_start_date ? new Date(row.course_start_date) : undefined,
-        endDate: row.course_end_date ? new Date(row.course_end_date) : undefined,
-        campus: {
-          name: row.campus_name || "",
-          shift: row.campus_shift || "",
-        },
-        courseFee: row.course_fee || "",
-      },
+      course: row.course_name
+        ? [
+            {
+              name: row.course_name || "",
+              courseDuration: row.course_duration || "",
+              courseType: row.course_type || "",
+              startDate: row.course_start_date ? new Date(row.course_start_date) : undefined,
+              endDate: row.course_end_date ? new Date(row.course_end_date) : undefined,
+              campus: {
+                name: row.campus_name || "",
+                shift: row.campus_shift || "",
+              },
+              courseFee: row.course_fee || "",
+            },
+          ]
+        : [],
 
-      services: row.services ? JSON.parse(row.services) : [],
+      services: mapServices(row.services),
       note: row.note || "",
       progress: row.progress || "Open",
       date: row.date ? new Date(row.date) : new Date(),
       author: row.author_email || "Unknown",
       isPinned: row.isPinned ?? false,
-      others: row.others ? JSON.parse(row.others) : [],
-
+      others: mapOthers(row.others),
       social: {
         facebook: row.social_facebook || "",
         instagram: row.social_instagram || "",
         twitter: row.social_twitter || "",
         skype: row.social_skype || "",
       },
-
       discount: row.discount || "0",
       quotationStatus: row.quotationStatus ?? false,
-      paymentStatus: row.paymentStatus ?? false,
-      transcript: row.transcript || "",
+      paymentStatus: ["Pending", "Accepted", "Rejected"].includes(row.paymentStatus || "")
+        ? (row.paymentStatus as "Pending" | "Accepted" | "Rejected")
+        : "Pending",
+      transcript: mapTranscript(row.transcript),
     }));
 
     await connectToDatabase();
