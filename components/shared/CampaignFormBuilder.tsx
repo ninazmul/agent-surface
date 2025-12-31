@@ -26,16 +26,36 @@ interface CampaignFormBuilderProps {
   author: string;
 }
 
-export default function CampaignFormBuilder({ author }: CampaignFormBuilderProps) {
+export default function CampaignFormBuilder({
+  author,
+}: CampaignFormBuilderProps) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [slug, setSlug] = useState("");
   const [loading, setLoading] = useState(false);
   const [fields, setFields] = useState<Field[]>([
-    { label: "Name", name: "name", type: "text", required: true, isDefault: true },
-    { label: "Email", name: "email", type: "email", required: true, isDefault: true },
-    { label: "Number", name: "number", type: "number", required: true, isDefault: true },
+    {
+      label: "Name",
+      name: "name",
+      type: "text",
+      required: true,
+      isDefault: true,
+    },
+    {
+      label: "Email",
+      name: "email",
+      type: "email",
+      required: true,
+      isDefault: true,
+    },
+    {
+      label: "Number",
+      name: "number",
+      type: "number",
+      required: true,
+      isDefault: true,
+    },
     {
       label: "Gender",
       name: "gender",
@@ -61,16 +81,90 @@ export default function CampaignFormBuilder({ author }: CampaignFormBuilderProps
         { label: "Widowed", value: "Widowed" },
       ],
     },
-    { label: "Date of Birth", name: "dateOfBirth", type: "date", required: true, isDefault: true },
-    { label: "Address", name: "address", type: "textarea", required: false, isDefault: true },
-    { label: "City", name: "city", type: "textarea", required: false, isDefault: true },
-    { label: "State", name: "state", type: "textarea", required: false, isDefault: true },
-    { label: "Zip", name: "zip", type: "textarea", required: false, isDefault: true },
-    { label: "Country", name: "country", type: "textarea", required: false, isDefault: true },
-    { label: "Facebook", name: "facebook", type: "text", required: false, isDefault: true },
-    { label: "Instagram", name: "instagram", type: "text", required: false, isDefault: true },
-    { label: "Twitter", name: "twitter", type: "text", required: false, isDefault: true },
-    { label: "Skype", name: "skype", type: "text", required: false, isDefault: true },
+    {
+      label: "Date of Birth",
+      name: "dateOfBirth",
+      type: "date",
+      required: true,
+      isDefault: true,
+    },
+    {
+      label: "Address",
+      name: "address",
+      type: "textarea",
+      required: false,
+      isDefault: true,
+    },
+    {
+      label: "City",
+      name: "city",
+      type: "textarea",
+      required: false,
+      isDefault: true,
+    },
+    {
+      label: "State",
+      name: "state",
+      type: "textarea",
+      required: false,
+      isDefault: true,
+    },
+    {
+      label: "Zip",
+      name: "zip",
+      type: "textarea",
+      required: false,
+      isDefault: true,
+    },
+    {
+      label: "Country",
+      name: "country",
+      type: "textarea",
+      required: false,
+      isDefault: true,
+    },
+    {
+      label: "Facebook",
+      name: "facebook",
+      type: "text",
+      required: false,
+      isDefault: true,
+    },
+    {
+      label: "Instagram",
+      name: "instagram",
+      type: "text",
+      required: false,
+      isDefault: true,
+    },
+    {
+      label: "Twitter",
+      name: "twitter",
+      type: "text",
+      required: false,
+      isDefault: true,
+    },
+    {
+      label: "Skype",
+      name: "skype",
+      type: "text",
+      required: false,
+      isDefault: true,
+    },
+    {
+      label: "How did you hear about us?",
+      name: "source",
+      type: "select",
+      required: true,
+      isDefault: true,
+      options: [
+        { label: "Google", value: "google" },
+        { label: "Facebook", value: "facebook" },
+        { label: "Instagram", value: "instagram" },
+        { label: "Friend / Referral", value: "referral" },
+        { label: "Other", value: "other" },
+      ],
+    },
   ]);
 
   const addField = () => {
@@ -99,7 +193,14 @@ export default function CampaignFormBuilder({ author }: CampaignFormBuilderProps
     setLoading(true);
 
     try {
-      const payload = { title, description, slug, author, progress: "Open", fields };
+      const payload = {
+        title,
+        description,
+        slug,
+        author,
+        progress: "Open",
+        fields,
+      };
       await createCampaignForm(payload);
       toast.success("Form created successfully!");
       router.push("/leads/campaigns");
@@ -191,7 +292,9 @@ export default function CampaignFormBuilder({ author }: CampaignFormBuilderProps
               <input
                 type="checkbox"
                 checked={field.required}
-                onChange={(e) => updateField(index, "required", e.target.checked)}
+                onChange={(e) =>
+                  updateField(index, "required", e.target.checked)
+                }
               />
               Required
             </label>
