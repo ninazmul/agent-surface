@@ -14,13 +14,31 @@ interface Field {
   required: boolean;
 }
 
-export default function CampaignFormBuilder({ author }: { author: string }) {
+interface CampaignFormBuilderProps {
+  author: string;
+}
+
+export default function CampaignFormBuilder({ author }: CampaignFormBuilderProps) {
   const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [slug, setSlug] = useState("");
-  const [fields, setFields] = useState<Field[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [fields, setFields] = useState<Field[]>([
+    { label: "Name", name: "name", type: "text", required: true },
+    { label: "Email", name: "email", type: "email", required: true },
+    { label: "Number", name: "number", type: "text", required: true },
+    { label: "Gender", name: "gender", type: "text", required: false },
+    { label: "Marital Status", name: "maritalStatus", type: "text", required: false },
+    { label: "Date of Birth", name: "dateOfBirth", type: "text", required: false },
+    { label: "Home Address", name: "home", type: "textarea", required: false },
+    { label: "Passport", name: "passport", type: "textarea", required: false },
+    { label: "Note", name: "note", type: "textarea", required: false },
+    { label: "Progress", name: "progress", type: "text", required: true },
+    { label: "Status", name: "status", type: "text", required: false },
+    { label: "Date", name: "date", type: "text", required: true },
+    { label: "Author", name: "author", type: "text", required: true },
+    { label: "Social", name: "social", type: "textarea", required: false },
+  ]);
 
   const addField = () => {
     setFields((prev) => [
@@ -48,10 +66,16 @@ export default function CampaignFormBuilder({ author }: { author: string }) {
     setLoading(true);
 
     try {
-      await createCampaignForm({ title, description, slug, author, fields });
+      const payload = {
+        title,
+        description,
+        slug,
+        author,
+        progress: "Open",
+        fields,
+      };
+      await createCampaignForm(payload);
       toast.success("Form created successfully!");
-
-      // Redirect to campaigns dashboard after success
       router.push("/leads/campaigns");
     } catch (err) {
       console.error(err);
@@ -60,6 +84,8 @@ export default function CampaignFormBuilder({ author }: { author: string }) {
       setLoading(false);
     }
   };
+
+  const [loading, setLoading] = useState(false);
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto p-4">

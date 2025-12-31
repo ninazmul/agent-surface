@@ -37,7 +37,7 @@ export default function CampaignFormRenderer({
 
   if (success) {
     return (
-      <div className="p-6 bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-lg text-center font-medium shadow-sm">
+      <div className="p-6 bg-green-50 dark:bg-green-900 text-green-800 dark:text-green-200 rounded-2xl text-center font-medium shadow-md">
         Thank you for your response!
       </div>
     );
@@ -46,37 +46,40 @@ export default function CampaignFormRenderer({
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-6 bg-white dark:bg-gray-900 p-6 rounded-2xl shadow-lg max-w-lg mx-auto"
+      className="space-y-6 bg-white dark:bg-gray-900 p-8 rounded-3xl shadow-xl max-w-xl mx-auto"
     >
       {fields.map((field) => (
-        <div key={field._id} className="space-y-1">
-          <label className="block font-medium text-gray-900 dark:text-gray-100">
+        <div
+          key={field._id}
+          className="flex flex-col space-y-2 bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm"
+        >
+          <label className="font-semibold text-gray-900 dark:text-gray-100 flex items-center gap-1">
             {field.label}
-            {field.required && <span className="text-red-500 ml-1">*</span>}
+            {field.required && <span className="text-red-500">*</span>}
           </label>
 
           {field.type === "textarea" ? (
             <textarea
-              className="w-full border border-gray-300 dark:border-gray-700 rounded p-3 bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-3 bg-white dark:bg-gray-900 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition"
               placeholder={`Enter ${field.label.toLowerCase()}`}
               required={field.required}
               onChange={(e) => handleChange(field.name, e.target.value)}
             />
           ) : field.type === "select" ? (
             <select
-              className="w-full border border-gray-300 dark:border-gray-700 rounded p-3 bg-white dark:bg-gray-800 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-3 bg-white dark:bg-gray-900 text-black dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition"
               required={field.required}
               onChange={(e) => handleChange(field.name, e.target.value)}
             >
               <option value="">Select {field.label}</option>
-              {/* Example placeholder options, ideally dynamic */}
+              {/* Placeholder options */}
               <option value="Option 1">Option 1</option>
               <option value="Option 2">Option 2</option>
             </select>
           ) : (
             <input
               type={field.type}
-              className="w-full border border-gray-300 dark:border-gray-700 rounded p-3 bg-white dark:bg-gray-800 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-black dark:focus:ring-white"
+              className="w-full border border-gray-300 dark:border-gray-700 rounded-lg p-3 bg-white dark:bg-gray-900 text-black dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 transition"
               placeholder={`Enter ${field.label.toLowerCase()}`}
               required={field.required}
               onChange={(e) => handleChange(field.name, e.target.value)}
@@ -88,7 +91,7 @@ export default function CampaignFormRenderer({
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 rounded-xl bg-black text-white dark:bg-white dark:text-black font-semibold shadow hover:opacity-90 transition"
+        className="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-500 dark:to-indigo-500 text-white font-semibold shadow-lg hover:opacity-95 focus:outline-none focus:ring-4 focus:ring-blue-400 transition"
       >
         {loading ? "Submitting..." : "Submit"}
       </button>
