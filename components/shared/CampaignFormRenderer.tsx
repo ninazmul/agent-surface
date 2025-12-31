@@ -35,7 +35,7 @@ export default function CampaignFormRenderer({
 
   if (success) {
     return (
-      <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 p-10 rounded-xl shadow-lg text-center animate-fadeIn">
+      <div className="max-w-5xl mx-auto p-10 text-center animate-fadeIn">
         <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
           Thank you!
         </h2>
@@ -49,80 +49,80 @@ export default function CampaignFormRenderer({
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-5xl mx-auto bg-white dark:bg-gray-900 shadow-lg rounded-xl border border-gray-200 dark:border-gray-700 animate-fadeIn overflow-hidden"
+      className="max-w-5xl mx-auto p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-6"
     >
-      <div className="p-8 md:p-10">
-        {/* Grid Layout */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          {fields.map((field) => (
-            <div
-              key={field._id}
-              className="relative group bg-gray-50 dark:bg-gray-800 p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow"
-            >
-              {/* Floating label */}
-              <label className="absolute -top-2 left-3 px-1 text-xs font-medium text-gray-500 dark:text-gray-300 bg-white dark:bg-gray-800 group-focus-within:text-blue-500 transition-all">
-                {field.label} {field.required && <span className="text-red-500">*</span>}
-              </label>
+      {fields.map((field) => {
+        // Determine col span
+        let colSpan = 1;
+        if (
+          field.type === "textarea" ||
+          field.type === "select" ||
+          field.type === "text" ||
+          field.type === "number" ||
+          field.type === "date"
+        ) {
+          colSpan = 2;
+        }
 
-              {/* Input */}
-              {field.type === "textarea" ? (
-                <textarea
-                  rows={3}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-3 pt-5 text-gray-800 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  required={field.required}
-                  placeholder={field.label}
-                  value={values[field.name] || ""}
-                  onChange={(e) => handleChange(field.name, e.target.value)}
-                />
-              ) : field.type === "select" && field.options ? (
-                <select
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-3 pt-5 text-gray-800 dark:text-white bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none"
-                  required={field.required}
-                  value={values[field.name] || ""}
-                  onChange={(e) => handleChange(field.name, e.target.value)}
-                >
-                  <option value="" disabled>
-                    Select {field.label}
-                  </option>
-                  {field.options.map((opt: Option, idx: number) => (
-                    <option key={idx} value={opt.value}>
-                      {opt.label}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <input
-                  type={field.type}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-3 pt-5 text-gray-800 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  placeholder={field.label}
-                  required={field.required}
-                  value={values[field.name] || ""}
-                  onChange={(e) => handleChange(field.name, e.target.value)}
-                />
-              )}
-
-              {/* Optional guidance text */}
-              {field.type === "select" &&
-                field.options &&
-                field.options.length > 0 && (
-                  <span className="text-xs text-gray-400 dark:text-gray-400 mt-1">
-                    Choose one option
-                  </span>
-                )}
-            </div>
-          ))}
-        </div>
-
-        {/* Submit Button */}
-        <div className="mt-8">
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-all disabled:bg-gray-300 disabled:cursor-not-allowed uppercase tracking-wide text-lg"
+        return (
+          <div
+            key={field._id}
+            className={`flex flex-col ${colSpan === 2 ? "md:col-span-2" : ""}`}
           >
-            {loading ? "Processing..." : "Submit Response"}
-          </button>
-        </div>
+            <label className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+              {field.label}{" "}
+              {field.required && <span className="text-red-500">*</span>}
+            </label>
+
+            {/* Input Types */}
+            {field.type === "textarea" ? (
+              <textarea
+                rows={3}
+                className="w-full border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors px-0 py-1 text-gray-800 dark:text-white"
+                required={field.required}
+                placeholder={field.label}
+                value={values[field.name] || ""}
+                onChange={(e) => handleChange(field.name, e.target.value)}
+              />
+            ) : field.type === "select" && field.options ? (
+              <select
+                className="w-full border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors px-0 py-1 text-gray-800 dark:text-white"
+                required={field.required}
+                value={values[field.name] || ""}
+                onChange={(e) => handleChange(field.name, e.target.value)}
+              >
+                <option value="" disabled>
+                  Select {field.label}
+                </option>
+                {field.options.map((opt: Option, idx: number) => (
+                  <option key={idx} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type={field.type}
+                className="w-full border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors px-0 py-1 text-gray-800 dark:text-white"
+                placeholder={field.label}
+                required={field.required}
+                value={values[field.name] || ""}
+                onChange={(e) => handleChange(field.name, e.target.value)}
+              />
+            )}
+          </div>
+        );
+      })}
+
+      {/* Submit Button */}
+      <div className="md:col-span-2 mt-6">
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed uppercase tracking-wide"
+        >
+          {loading ? "Processing..." : "Submit Response"}
+        </button>
       </div>
     </form>
   );
