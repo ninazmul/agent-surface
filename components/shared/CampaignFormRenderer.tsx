@@ -48,7 +48,7 @@ export default function CampaignFormRenderer({
     <div className="min-h-screen bg-gray-50 py-10 px-4">
       <form
         onSubmit={handleSubmit}
-        className="max-w-4xl mx-auto bg-white p-10 shadow-sm border-t-4 border-t-blue-600 rounded-t-sm"
+        className="max-w-5xl mx-auto bg-white p-10 shadow-sm border-t-4 border-t-blue-600 rounded-t-sm"
       >
         <div className="mb-10 border-b border-gray-100 pb-6">
           <h1 className="text-3xl font-normal text-gray-800 uppercase tracking-tight">
