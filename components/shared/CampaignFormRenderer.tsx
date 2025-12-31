@@ -53,7 +53,7 @@ export default function CampaignFormRenderer({
     >
       {fields.map((field) => {
         // Determine col span
-        let colSpan = 1;
+        let colSpanClass = "";
         if (
           field.type === "textarea" ||
           field.type === "select" ||
@@ -61,24 +61,22 @@ export default function CampaignFormRenderer({
           field.type === "number" ||
           field.type === "date"
         ) {
-          colSpan = 2;
+          colSpanClass = "md:col-span-2";
         }
 
         return (
           <div
             key={field._id}
-            className={`flex flex-col ${colSpan === 2 ? "md:col-span-2" : ""}`}
+            className={`flex flex-col ${colSpanClass}`}
           >
             <label className="text-sm text-gray-600 dark:text-gray-300 mb-1">
-              {field.label}{" "}
-              {field.required && <span className="text-red-500">*</span>}
+              {field.label} {field.required && <span className="text-red-500">*</span>}
             </label>
 
-            {/* Input Types */}
             {field.type === "textarea" ? (
               <textarea
                 rows={3}
-                className="w-full border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors px-0 py-1 text-gray-800 dark:text-white"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-md bg-transparent focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 px-3 py-2 text-gray-800 dark:text-white transition-colors"
                 required={field.required}
                 placeholder={field.label}
                 value={values[field.name] || ""}
@@ -86,7 +84,7 @@ export default function CampaignFormRenderer({
               />
             ) : field.type === "select" && field.options ? (
               <select
-                className="w-full border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors px-0 py-1 text-gray-800 dark:text-white"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-md bg-transparent focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 px-3 py-2 text-gray-800 dark:text-white transition-colors"
                 required={field.required}
                 value={values[field.name] || ""}
                 onChange={(e) => handleChange(field.name, e.target.value)}
@@ -103,7 +101,7 @@ export default function CampaignFormRenderer({
             ) : (
               <input
                 type={field.type}
-                className="w-full border-b border-gray-300 dark:border-gray-600 bg-transparent focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 transition-colors px-0 py-1 text-gray-800 dark:text-white"
+                className="w-full border border-gray-300 dark:border-gray-600 rounded-md bg-transparent focus:outline-none focus:border-blue-500 dark:focus:border-blue-400 px-3 py-2 text-gray-800 dark:text-white transition-colors"
                 placeholder={field.label}
                 required={field.required}
                 value={values[field.name] || ""}
