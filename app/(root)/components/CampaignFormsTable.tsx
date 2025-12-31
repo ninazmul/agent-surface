@@ -20,6 +20,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { deleteCampaignFormById } from "@/lib/actions/campaign.actions";
 
 interface CampaignForm {
   _id: string;
@@ -33,7 +34,10 @@ interface CampaignFormsTableProps {
   onDeleted?: () => void;
 }
 
-const CampaignFormsTable = ({ forms: initialForms, onDeleted }: CampaignFormsTableProps) => {
+const CampaignFormsTable = ({
+  forms: initialForms,
+  onDeleted,
+}: CampaignFormsTableProps) => {
   const [forms, setForms] = useState(initialForms);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState<"title" | "createdAt" | null>(null);
@@ -88,19 +92,17 @@ const CampaignFormsTable = ({ forms: initialForms, onDeleted }: CampaignFormsTab
     }
   };
 
-  /* ----------------------------- delete form ----------------------------- */
   const handleDelete = async () => {
     if (!selectedFormId) return;
 
     try {
-      const res = await fetch(`/api/campaigns/${selectedFormId}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete");
-
+      await deleteCampaignFormById(selectedFormId); // assume it throws if fails
       toast.success("Form deleted successfully");
 
       // Remove deleted form from state
       setForms((prev) => prev.filter((f) => f._id !== selectedFormId));
 
+      // Close modal and reset
       setShowConfirm(false);
       setSelectedFormId(null);
 
@@ -111,8 +113,6 @@ const CampaignFormsTable = ({ forms: initialForms, onDeleted }: CampaignFormsTab
       console.error(err);
     }
   };
-
-  /* -------------------------------------------------------------------------- */
 
   return (
     <div className="space-y-6">
@@ -177,7 +177,9 @@ const CampaignFormsTable = ({ forms: initialForms, onDeleted }: CampaignFormsTab
                   <TableCell className="font-medium hover:underline">
                     <a href={`/leads/campaigns/${form._id}`}>{form.title}</a>
                   </TableCell>
-                  <TableCell className="text-sm text-gray-500">{form.slug}</TableCell>
+                  <TableCell className="text-sm text-gray-500">
+                    {form.slug}
+                  </TableCell>
                   <TableCell>
                     {new Date(form.createdAt).toLocaleDateString("en-GB")}
                   </TableCell>
@@ -223,7 +225,8 @@ const CampaignFormsTable = ({ forms: initialForms, onDeleted }: CampaignFormsTab
       {/* Pagination */}
       <div className="flex justify-between items-center mt-4">
         <span className="text-sm text-muted-foreground">
-          Showing {Math.min(itemsPerPage * currentPage, filteredForms.length)} of {filteredForms.length} forms
+          Showing {Math.min(itemsPerPage * currentPage, filteredForms.length)}{" "}
+          of {filteredForms.length} forms
         </span>
 
         <div className="flex gap-2">
@@ -240,7 +243,9 @@ const CampaignFormsTable = ({ forms: initialForms, onDeleted }: CampaignFormsTab
             size="sm"
             className="rounded-2xl bg-black disabled:bg-muted-foreground hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white"
             onClick={() => setCurrentPage((p) => p + 1)}
-            disabled={currentPage === Math.ceil(filteredForms.length / itemsPerPage)}
+            disabled={
+              currentPage === Math.ceil(filteredForms.length / itemsPerPage)
+            }
           >
             Next
           </Button>
@@ -253,7 +258,10 @@ const CampaignFormsTable = ({ forms: initialForms, onDeleted }: CampaignFormsTab
           <DialogHeader>
             <DialogTitle>Delete Form</DialogTitle>
           </DialogHeader>
-          <p>Are you sure you want to delete this form? This action cannot be undone.</p>
+          <p>
+            Are you sure you want to delete this form? This action cannot be
+            undone.
+          </p>
           <DialogFooter className="flex gap-2 justify-end">
             <Button variant="outline" onClick={() => setShowConfirm(false)}>
               Cancel
