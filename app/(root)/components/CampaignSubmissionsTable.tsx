@@ -90,8 +90,12 @@ export default function CampaignSubmissionsTable({
   return (
     <>
       {selectedIds.length > 0 && (
-        <div className="mb-3 flex gap-2">
-          <Button onClick={handleCreateLeads} disabled={isPending}>
+        <div className="mb-3 flex justify-end place-content-end gap-2">
+          <Button
+            onClick={handleCreateLeads}
+            disabled={isPending}
+            className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+          >
             {isPending
               ? "Creating Leads..."
               : `Create Leads (${selectedIds.length})`}
