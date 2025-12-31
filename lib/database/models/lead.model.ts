@@ -85,6 +85,7 @@ export interface ILead extends Document {
     fileUrl: string;
   }[];
   assignedTo?: string[];
+  source?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -204,6 +205,7 @@ const LeadSchema = new Schema<ILead>(
       default: [],
     },
     assignedTo: { type: [String], default: undefined },
+    source: { type: String },
   },
   { timestamps: true }
 );

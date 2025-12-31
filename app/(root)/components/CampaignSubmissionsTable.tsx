@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import {
   Table,
   TableBody,
@@ -17,11 +17,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import toast from "react-hot-toast";
+import { CampaignSubmission } from "@/types";
+import { bulkCreateLeadsFromSubmissions } from "@/lib/actions";
 
 type Submission = {
   _id: string;
   submittedAt: string;
-  answers: Record<string, unknown>;
+  answers: CampaignSubmission["answers"];
 };
 
 const pickField = (
@@ -29,8 +32,8 @@ const pickField = (
   keys: string[]
 ): string => {
   for (const key of keys) {
-    const value = answers?.[key];
-    if (value) return String(value);
+    const value = answers[key];
+    if (typeof value === "string" && value.trim()) return value;
   }
   return "—";
 };
@@ -41,8 +44,10 @@ export default function CampaignSubmissionsTable({
   submissions: Submission[];
 }) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [activeSubmission, setActiveSubmission] =
-    useState<Submission | null>(null);
+  const [activeSubmission, setActiveSubmission] = useState<Submission | null>(
+    null
+  );
+  const [isPending, startTransition] = useTransition();
 
   const toggleSelect = (id: string) => {
     setSelectedIds((prev) =>
@@ -58,8 +63,42 @@ export default function CampaignSubmissionsTable({
     );
   };
 
+  const handleCreateLeads = () => {
+    const payload: CampaignSubmission[] = submissions
+      .filter((s) => selectedIds.includes(s._id))
+      .map((s) => ({
+        answers: s.answers,
+        author: "system", // replace with session.user.id if needed
+      }));
+
+    if (!payload.length) {
+      toast.error("No submissions selected");
+      return;
+    }
+
+    startTransition(async () => {
+      try {
+        await bulkCreateLeadsFromSubmissions(payload);
+        toast.success("Leads created successfully");
+        setSelectedIds([]);
+      } catch {
+        toast.error("Failed to create leads");
+      }
+    });
+  };
+
   return (
     <>
+      {selectedIds.length > 0 && (
+        <div className="mb-3 flex gap-2">
+          <Button onClick={handleCreateLeads} disabled={isPending}>
+            {isPending
+              ? "Creating Leads..."
+              : `Create Leads (${selectedIds.length})`}
+          </Button>
+        </div>
+      )}
+
       <div className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800">
         <Table>
           <TableHeader className="bg-gray-900">
@@ -74,10 +113,8 @@ export default function CampaignSubmissionsTable({
               <TableHead className="text-white">Name</TableHead>
               <TableHead className="text-white">Email</TableHead>
               <TableHead className="text-white">Country</TableHead>
-              <TableHead className="text-white">Submitted At</TableHead>
-              <TableHead className="text-white text-right">
-                Action
-              </TableHead>
+              <TableHead className="text-white">Submitted</TableHead>
+              <TableHead className="text-white text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
 
@@ -97,29 +134,12 @@ export default function CampaignSubmissionsTable({
                 <TableCell>{idx + 1}</TableCell>
 
                 <TableCell className="font-medium">
-                  {pickField(sub.answers, [
-                    "name",
-                    "fullName",
-                    "full_name",
-                    "Name",
-                  ])}
+                  {pickField(sub.answers, ["name"])}
                 </TableCell>
 
-                <TableCell>
-                  {pickField(sub.answers, [
-                    "email",
-                    "emailAddress",
-                    "Email",
-                  ])}
-                </TableCell>
+                <TableCell>{pickField(sub.answers, ["email"])}</TableCell>
 
-                <TableCell>
-                  {pickField(sub.answers, [
-                    "country",
-                    "Country",
-                    "nation",
-                  ])}
-                </TableCell>
+                <TableCell>{pickField(sub.answers, ["country"])}</TableCell>
 
                 <TableCell>
                   {new Date(sub.submittedAt).toLocaleDateString()}
@@ -129,9 +149,10 @@ export default function CampaignSubmissionsTable({
                   <Button
                     size="sm"
                     variant="outline"
+                    className="rounded-full"
                     onClick={() => setActiveSubmission(sub)}
                   >
-                    View
+                    View Details
                   </Button>
                 </TableCell>
               </TableRow>
@@ -140,7 +161,7 @@ export default function CampaignSubmissionsTable({
         </Table>
       </div>
 
-      {/* Submission Details Modal */}
+      {/* DETAILS MODAL */}
       <Dialog
         open={!!activeSubmission}
         onOpenChange={() => setActiveSubmission(null)}
@@ -152,19 +173,17 @@ export default function CampaignSubmissionsTable({
 
           <div className="space-y-3 max-h-[60vh] overflow-y-auto">
             {activeSubmission &&
-              Object.entries(activeSubmission.answers).map(
-                ([key, value]) => (
-                  <div
-                    key={key}
-                    className="flex justify-between gap-6 border-b pb-1"
-                  >
-                    <span className="font-semibold">{key}</span>
-                    <span className="text-right text-gray-600 dark:text-gray-300">
-                      {String(value)}
-                    </span>
-                  </div>
-                )
-              )}
+              Object.entries(activeSubmission.answers).map(([key, value]) => (
+                <div
+                  key={key}
+                  className="flex justify-between gap-6 border-b pb-1"
+                >
+                  <span className="font-semibold">{key}</span>
+                  <span className="text-right text-gray-600 dark:text-gray-300">
+                    {String(value)}
+                  </span>
+                </div>
+              ))}
           </div>
         </DialogContent>
       </Dialog>

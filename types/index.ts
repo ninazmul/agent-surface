@@ -168,6 +168,7 @@ export type LeadParams = {
     fileUrl: string;
   }[];
   assignedTo?: string[];
+  source?: string;
 };
 
 export interface LeadDTO {
@@ -212,9 +213,37 @@ export interface LeadDTO {
     twitter?: string;
     skype?: string;
   };
+  source?: string;
   createdAt: string;
   updatedAt?: string;
 }
+
+export type CampaignAnswers = {
+  name: string;
+  email: string;
+  number: string;
+  gender: "Male" | "Female" | "Other";
+  maritalStatus: "Single" | "Married" | "Divorced" | "Widowed";
+  dateOfBirth: string | Date;
+
+  address?: string;
+  city?: string;
+  state?: string;
+  zip?: string;
+  country?: string;
+
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
+  skype?: string;
+
+  source: "google" | "facebook" | "instagram" | "referral" | "other";
+};
+
+export type CampaignSubmission = {
+  answers: CampaignAnswers;
+  author: string;
+};
 
 export interface GetLeadsParams {
   search?: string;

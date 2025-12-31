@@ -3,9 +3,7 @@
 import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Lead from "../database/models/lead.model";
-import { GetLeadsParams, LeadDTO, LeadParams } from "@/types";
-import { FilterQuery } from "mongoose";
-import { PaginationMeta } from "@/types/pagination";
+import { CampaignSubmission, LeadParams } from "@/types";
 
 // ====== CREATE LEAD
 export const createLead = async (params: LeadParams) => {
@@ -30,6 +28,42 @@ export const bulkCreateLeads = async (leads: LeadParams[]) => {
   } catch (error) {
     handleError(error);
   }
+};
+
+
+export const bulkCreateLeadsFromSubmissions = async (
+  submissions: CampaignSubmission[]
+) => {
+  const leads: LeadParams[] = submissions.map(({ answers, author }) => ({
+    name: answers.name,
+    email: answers.email,
+    number: answers.number,
+    gender: answers.gender,
+    maritalStatus: answers.maritalStatus,
+    dateOfBirth: new Date(answers.dateOfBirth),
+
+    home: {
+      address: answers.address ?? "",
+      city: answers.city ?? "",
+      state: answers.state ?? "",
+      zip: answers.zip ?? "",
+      country: answers.country ?? "",
+    },
+
+    social: {
+      facebook: answers.facebook ?? "",
+      instagram: answers.instagram ?? "",
+      twitter: answers.twitter ?? "",
+      skype: answers.skype ?? "",
+    },
+
+    progress: "Open",
+    date: new Date(),
+    source: answers.source,
+    author,
+  }));
+
+  return bulkCreateLeads(leads);
 };
 
 // ====== GET ALL LEADS
@@ -161,105 +195,6 @@ export const getAllAssignedLeads = async () => {
     handleError(error);
     return [];
   }
-};
-
-interface GetLeadsResponse {
-  data: LeadDTO[];
-  pagination: PaginationMeta;
-}
-
-export const getFilteredLeads = async (
-  params: GetLeadsParams
-): Promise<GetLeadsResponse> => {
-  await connectToDatabase();
-
-  const {
-    search,
-    progress,
-    status,
-    author,
-    assignedTo,
-    isPinned,
-    isVoid = false,
-    startDate,
-    endDate,
-    page = 1,
-    limit = 20,
-  } = params;
-
-  const skip = (page - 1) * limit;
-
-  // 🔍 Build filter safely
-  const filter: FilterQuery<Record<string, unknown>> = {
-    isVoid,
-  };
-
-  if (search) {
-    filter.$or = [
-      { name: { $regex: search, $options: "i" } },
-      { email: { $regex: search, $options: "i" } },
-      { number: { $regex: search, $options: "i" } },
-    ];
-  }
-
-  if (progress) filter.progress = progress;
-  if (status) filter.status = status;
-  if (author) filter.author = author;
-  if (assignedTo) filter.assignedTo = assignedTo;
-  if (typeof isPinned === "boolean") filter.isPinned = isPinned;
-
-  if (startDate || endDate) {
-    filter.createdAt = {};
-    if (startDate) filter.createdAt.$gte = startDate;
-    if (endDate) filter.createdAt.$lte = endDate;
-  }
-
-  // 🚀 Query + count in parallel
-  const [rawLeads, total] = await Promise.all([
-    Lead.find(filter)
-      .select(
-        "name email number gender maritalStatus progress status author isPinned assignedTo home.country createdAt"
-      )
-      .sort({ isPinned: -1, createdAt: -1 })
-      .skip(skip)
-      .limit(limit)
-      .lean(),
-
-    Lead.countDocuments(filter),
-  ]);
-
-  // 🔄 Serialize to DTO (important)
-  const leads: LeadDTO[] = rawLeads.map((lead) => ({
-    _id: lead._id as string,
-    name: lead.name,
-    email: lead.email,
-    number: lead.number,
-    gender: lead.gender,
-    maritalStatus: lead.maritalStatus,
-    progress: lead.progress,
-    status: lead.status,
-    author: lead.author,
-    isPinned: lead.isPinned,
-    assignedTo: lead.assignedTo,
-    home: {
-      country: lead.home.country,
-    },
-    createdAt: lead.createdAt.toISOString(),
-  }));
-
-  const pagination: PaginationMeta = {
-    total,
-    page,
-    limit,
-    totalPages: Math.ceil(total / limit),
-    hasNextPage: page * limit < total,
-    hasPrevPage: page > 1,
-  };
-
-  return {
-    data: leads,
-    pagination,
-  };
 };
 
 // ====== UPDATE LEAD
