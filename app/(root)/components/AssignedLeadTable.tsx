@@ -571,15 +571,22 @@ const AssignedLeadTable = ({
                           <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold border">
                             {lead.home.country}
                           </span>
-                          {lead.isPromotion ? (
-                            <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold bg-purple-100 text-purple-700 border border-purple-300">
-                              Promotion
-                            </span>
-                          ) : (
-                            <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold bg-gray-100 text-gray-700 border border-gray-300">
-                              General
-                            </span>
-                          )}
+                          <span
+                            className={`px-3 py-1 w-full rounded-full text-center text-xs font-semibold border ${
+                              lead.isPromotion
+                                ? "bg-purple-100 text-purple-700 border-purple-300"
+                                : lead.source
+                                ? "bg-blue-100 text-blue-700 border-blue-300"
+                                : "bg-gray-100 text-gray-700 border-gray-300"
+                            }`}
+                          >
+                            {lead.isPromotion
+                              ? "Promotion"
+                              : lead.source
+                              ? lead.source.charAt(0).toUpperCase() +
+                                lead.source.slice(1)
+                              : "General"}
+                          </span>
                         </span>
                       </a>
                     </TableCell>
