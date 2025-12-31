@@ -33,10 +33,7 @@ export default function CampaignFormBuilder({ author }: CampaignFormBuilderProps
     { label: "Home Address", name: "home", type: "textarea", required: false },
     { label: "Passport", name: "passport", type: "textarea", required: false },
     { label: "Note", name: "note", type: "textarea", required: false },
-    { label: "Progress", name: "progress", type: "text", required: true },
-    { label: "Status", name: "status", type: "text", required: false },
     { label: "Date", name: "date", type: "text", required: true },
-    { label: "Author", name: "author", type: "text", required: true },
     { label: "Social", name: "social", type: "textarea", required: false },
   ]);
 
