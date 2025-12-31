@@ -49,77 +49,9 @@ export default function CampaignFormRenderer({
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-5xl mx-auto p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-6"
+      className="max-w-5xl mx-auto p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-fr"
     >
-      {/* Grouped Name Fields */}
-      <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-        {["firstName", "middleInitial", "lastName"].map((name) => {
-          const field = fields.find((f) => f.name === name);
-          if (!field) return null;
-          return (
-            <div key={field._id}>
-              <label className="text-sm text-gray-600 dark:text-gray-300 mb-1">
-                {field.label}{" "}
-                {field.required && <span className="text-red-500">*</span>}
-              </label>
-              <input
-                type="text"
-                className="w-full border border-gray-300 dark:border-gray-600 rounded-md bg-transparent px-3 py-2 text-gray-800 dark:text-white"
-                placeholder={field.label}
-                required={field.required}
-                value={values[field.name] || ""}
-                onChange={(e) => handleChange(field.name, e.target.value)}
-              />
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Grouped Birth Date Fields */}
-      <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-4">
-        {["birthMonth", "birthDay", "birthYear"].map((name) => {
-          const field = fields.find((f) => f.name === name);
-          if (!field) return null;
-          return (
-            <div key={field._id}>
-              <label className="text-sm text-gray-600 dark:text-gray-300 mb-1">
-                {field.label}{" "}
-                {field.required && <span className="text-red-500">*</span>}
-              </label>
-              <select
-                className="w-full border border-gray-300 dark:border-gray-600 rounded-md bg-transparent px-3 py-2 text-gray-800 dark:text-white"
-                required={field.required}
-                value={values[field.name] || ""}
-                onChange={(e) => handleChange(field.name, e.target.value)}
-              >
-                <option value="" disabled>
-                  Select {field.label}
-                </option>
-                {field.options?.map((opt: Option, idx: number) => (
-                  <option key={idx} value={opt.value}>
-                    {opt.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          );
-        })}
-      </div>
-
-      {/* Other Fields */}
       {fields.map((field) => {
-        if (
-          [
-            "firstName",
-            "middleInitial",
-            "lastName",
-            "birthMonth",
-            "birthDay",
-            "birthYear",
-          ].includes(field.name)
-        )
-          return null;
-
         const isFullWidth =
           field.type === "textarea" ||
           field.type === "select" ||
