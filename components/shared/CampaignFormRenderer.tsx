@@ -47,7 +47,7 @@ export default function CampaignFormRenderer({
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-2xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200"
+      className="max-w-5xl mx-auto bg-white shadow-lg rounded-lg overflow-hidden border border-gray-200"
     >
       <div className="p-8 md:p-12 space-y-8">
         {fields.map((field) => {
