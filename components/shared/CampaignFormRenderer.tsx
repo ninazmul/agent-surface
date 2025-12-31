@@ -37,7 +37,7 @@ export default function CampaignFormRenderer({
 
   if (success) {
     return (
-      <div className="max-w-4xl mx-auto p-10 bg-white border border-gray-200 rounded-lg text-center">
+      <div className="max-w-5xl mx-auto p-10 bg-white border border-gray-200 rounded-lg text-center">
         <h2 className="text-xl font-medium text-gray-900">Thank you!</h2>
         <p className="text-gray-500">Your submission has been received.</p>
       </div>
