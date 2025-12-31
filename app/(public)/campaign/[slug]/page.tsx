@@ -5,18 +5,25 @@ type PageParams = Promise<{ slug: string }>;
 
 export default async function CampaignPage({ params }: { params: PageParams }) {
   const { slug } = await params; 
-  
   const data = await getCampaignFormBySlug(slug);
 
   if (!data) return <div className="p-6 text-center">Form not found</div>;
 
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-2">{data.form.title}</h1>
-      {data.form.description && (
-        <p className="text-gray-600 mb-4">{data.form.description}</p>
-      )}
-      <CampaignFormRenderer slug={slug} fields={data.fields} />
+    <div className="min-h-screen bg-gray-50 py-12">
+      <div className="max-w-5xl mx-auto px-4">
+        <header className="mb-8">
+          <h1 className="text-2xl font-bold text-gray-900 leading-tight">
+            {data.form.title}
+          </h1>
+          {data.form.description && (
+            <p className="text-[15px] text-gray-500 mt-1">
+              {data.form.description}
+            </p>
+          )}
+        </header>
+        <CampaignFormRenderer slug={slug} fields={data.fields} />
+      </div>
     </div>
   );
 }
