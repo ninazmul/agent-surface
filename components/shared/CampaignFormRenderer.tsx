@@ -52,15 +52,12 @@ export default function CampaignFormRenderer({
       className="max-w-5xl mx-auto p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-6 [grid-auto-flow:row dense]"
     >
       {fields.map((field) => {
-        const isFullWidth =
-          field.type === "textarea" ||
-          field.type === "select" ||
-          field.name === "email";
+        const isTextarea = field.type === "textarea";
 
         return (
           <div
             key={field._id}
-            className={`flex flex-col ${isFullWidth ? "md:col-span-2" : ""}`}
+            className={`flex flex-col ${isTextarea ? "md:col-span-2" : ""}`}
           >
             <label className="text-sm text-gray-600 dark:text-gray-300 mb-1">
               {field.label}{" "}
