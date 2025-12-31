@@ -36,7 +36,9 @@ export default function CampaignFormRenderer({
   if (success) {
     return (
       <div className="max-w-5xl mx-auto bg-white dark:bg-gray-900 p-10 rounded-xl shadow-lg text-center animate-fadeIn">
-        <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">Thank you!</h2>
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
+          Thank you!
+        </h2>
         <p className="text-gray-500 dark:text-gray-300 text-lg">
           Your submission has been successfully received.
         </p>
@@ -57,7 +59,8 @@ export default function CampaignFormRenderer({
           >
             {/* Floating Label */}
             <label className="absolute -top-3 left-4 px-1 text-xs font-medium text-gray-500 dark:text-gray-300 bg-white dark:bg-gray-800 group-focus-within:text-blue-500 transition-all">
-              {field.label} {field.required && <span className="text-red-500">*</span>}
+              {field.label}{" "}
+              {field.required && <span className="text-red-500">*</span>}
             </label>
 
             {/* Field Input */}
@@ -73,6 +76,7 @@ export default function CampaignFormRenderer({
               <select
                 className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-4 pt-6 text-gray-800 dark:text-white bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none"
                 required={field.required}
+                value={values[field.name] || ""} // controlled value
                 onChange={(e) => handleChange(field.name, e.target.value)}
               >
                 <option value="" disabled>
@@ -99,11 +103,13 @@ export default function CampaignFormRenderer({
             )}
 
             {/* Optional guidance text */}
-            {field.type === "select" && field.options && field.options.length > 0 && (
-              <span className="text-xs text-gray-400 dark:text-gray-400 mt-1">
-                Choose one option
-              </span>
-            )}
+            {field.type === "select" &&
+              field.options &&
+              field.options.length > 0 && (
+                <span className="text-xs text-gray-400 dark:text-gray-400 mt-1">
+                  Choose one option
+                </span>
+              )}
           </div>
         ))}
 

@@ -8,15 +8,17 @@ import {
 } from "../database/models/campaign.model";
 import mongoose from "mongoose";
 
-/* -------------------------------------------------------------------------- */
-/*                               CREATE FORM                                  */
-/* -------------------------------------------------------------------------- */
+export interface Option {
+  label: string;
+  value: string;
+}
 
 export interface FieldInput {
   label: string;
   name: string;
   type?: "text" | "email" | "number" | "textarea" | "select" | "date";
   required?: boolean;
+  options?: Option[]; // only for select fields
 }
 
 export async function createCampaignForm({
@@ -47,7 +49,15 @@ export async function createCampaignForm({
     throw new Error("Form slug already exists");
   }
 
-  // Start Mongoose session for atomic creation
+  // Validate select fields have options
+  for (const field of fields) {
+    if (field.type === "select") {
+      if (!field.options || field.options.length === 0) {
+        throw new Error(`Select field "${field.label}" must have at least one option`);
+      }
+    }
+  }
+
   const session = await mongoose.startSession();
   session.startTransaction();
 
@@ -70,6 +80,7 @@ export async function createCampaignForm({
       name: field.name,
       type: field.type || "text",
       required: !!field.required,
+      options: field.type === "select" ? field.options : undefined,
     }));
 
     await CampaignField.insertMany(fieldDocs, { session });
@@ -89,10 +100,6 @@ export async function createCampaignForm({
   }
 }
 
-/* -------------------------------------------------------------------------- */
-/*                              SUBMIT FORM                                   */
-/* -------------------------------------------------------------------------- */
-
 export async function submitCampaignForm({
   slug,
   answers,
@@ -100,8 +107,9 @@ export async function submitCampaignForm({
   slug: string;
   answers: Record<string, unknown>;
 }) {
-  if (!slug || !answers || Object.keys(answers).length === 0) {
-    throw new Error("Invalid submission data");
+  if (!slug) throw new Error("Form slug is required");
+  if (!answers || Object.keys(answers).length === 0) {
+    throw new Error("Submission data is required");
   }
 
   await connectToDatabase();
@@ -117,10 +125,6 @@ export async function submitCampaignForm({
   return { success: true };
 }
 
-/* -------------------------------------------------------------------------- */
-/*                        GET FORMS BY AUTHOR (DASHBOARD)                      */
-/* -------------------------------------------------------------------------- */
-
 export async function getCampaignFormsByAuthor(author: string) {
   if (!author) throw new Error("Author email is required");
 
@@ -128,10 +132,6 @@ export async function getCampaignFormsByAuthor(author: string) {
 
   return CampaignForm.find({ author }).sort({ createdAt: -1 });
 }
-
-/* -------------------------------------------------------------------------- */
-/*                        GET FORM WITH FIELDS (PUBLIC)                        */
-/* -------------------------------------------------------------------------- */
 
 export async function getCampaignFormBySlug(slug: string) {
   if (!slug) throw new Error("Slug required");
@@ -146,10 +146,6 @@ export async function getCampaignFormBySlug(slug: string) {
   return { form, fields };
 }
 
-/* -------------------------------------------------------------------------- */
-/*                       GET SUBMISSIONS (OWNER ONLY)                          */
-/* -------------------------------------------------------------------------- */
-
 export async function getCampaignSubmissionsByFormId(formId: string) {
   if (!formId) throw new Error("Form ID is required");
 
@@ -163,7 +159,7 @@ interface GetAllFormsOptions {
   limit?: number;
   sortBy?: "createdAt" | "title";
   sortOrder?: "asc" | "desc";
-  author?: string; // optional filter by author
+  author?: string;
 }
 
 export async function getAllCampaignForms(options?: GetAllFormsOptions) {
@@ -177,15 +173,10 @@ export async function getAllCampaignForms(options?: GetAllFormsOptions) {
   const sortOrder = options?.sortOrder === "asc" ? 1 : -1;
 
   const query: Record<string, unknown> = {};
-  if (options?.author) {
-    query.author = options.author;
-  }
+  if (options?.author) query.author = options.author;
 
   const [forms, total] = await Promise.all([
-    CampaignForm.find(query)
-      .sort({ [sortKey]: sortOrder })
-      .skip(skip)
-      .limit(limit),
+    CampaignForm.find(query).sort({ [sortKey]: sortOrder }).skip(skip).limit(limit),
     CampaignForm.countDocuments(query),
   ]);
 
@@ -198,9 +189,7 @@ export async function getAllCampaignForms(options?: GetAllFormsOptions) {
 }
 
 export async function deleteCampaignFormById(formId: string) {
-  if (!formId) {
-    throw new Error("Form ID is required");
-  }
+  if (!formId) throw new Error("Form ID is required");
 
   await connectToDatabase();
 
@@ -208,17 +197,11 @@ export async function deleteCampaignFormById(formId: string) {
   session.startTransaction();
 
   try {
-    // Delete all related submissions
     await CampaignSubmission.deleteMany({ formId }).session(session);
-
-    // Delete all related fields
     await CampaignField.deleteMany({ formId }).session(session);
 
-    // Delete the form itself
     const result = await CampaignForm.deleteOne({ _id: formId }).session(session);
-    if (result.deletedCount === 0) {
-      throw new Error("Form not found");
-    }
+    if (result.deletedCount === 0) throw new Error("Form not found");
 
     await session.commitTransaction();
     session.endSession();

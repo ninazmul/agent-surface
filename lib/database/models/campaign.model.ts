@@ -23,6 +23,11 @@ const CampaignFormSchema = new Schema<ICampaignForm>({
 /* -------------------------------------------------------------------------- */
 /*                               FIELD MODEL                                   */
 /* -------------------------------------------------------------------------- */
+export interface Option {
+  label: string;
+  value: string;
+}
+
 export interface ICampaignField extends Document {
   _id: Types.ObjectId;
   formId: Types.ObjectId;
@@ -30,6 +35,7 @@ export interface ICampaignField extends Document {
   name: string;
   type: "text" | "email" | "number" | "textarea" | "select" | "date";
   required: boolean;
+  options?: Option[]; // Only for select fields
 }
 
 const CampaignFieldSchema = new Schema<ICampaignField>({
@@ -38,10 +44,16 @@ const CampaignFieldSchema = new Schema<ICampaignField>({
   name: { type: String, required: true },
   type: {
     type: String,
-    enum: ["text", "email", "number", "textarea", "select" , "date"],
+    enum: ["text", "email", "number", "textarea", "select", "date"],
     default: "text",
   },
   required: { type: Boolean, default: false },
+  options: [
+    {
+      label: { type: String },
+      value: { type: String },
+    },
+  ],
 });
 
 /* -------------------------------------------------------------------------- */
@@ -61,7 +73,7 @@ const CampaignSubmissionSchema = new Schema<ICampaignSubmission>({
 });
 
 /* -------------------------------------------------------------------------- */
-/*                               EXPORT MODELS                                  */
+/*                               EXPORT MODELS                                 */
 /* -------------------------------------------------------------------------- */
 export const CampaignForm =
   models.CampaignForm || model<ICampaignForm>("CampaignForm", CampaignFormSchema);

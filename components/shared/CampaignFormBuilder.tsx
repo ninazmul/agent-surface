@@ -195,6 +195,7 @@ export default function CampaignFormBuilder({
                 type === "select"
                   ? f.options || [{ label: "", value: "" }]
                   : [],
+              value: type !== "select" ? f.value || "" : undefined,
             }
           : f
       )
@@ -253,9 +254,15 @@ export default function CampaignFormBuilder({
         description,
         slug,
         author,
-        progress: "Open",
-        fields,
+        fields: fields.map((f) => ({
+          label: f.label,
+          name: f.name,
+          type: f.type,
+          required: f.required,
+          ...(f.type === "select" && { options: f.options || [] }), // include options only for select
+        })),
       };
+
       await createCampaignForm(payload);
       toast.success("Form created successfully!");
       router.push("/leads/campaigns");
@@ -268,23 +275,23 @@ export default function CampaignFormBuilder({
   };
 
   return (
-    <div className="space-y-6 max-w-3xl mx-auto p-4">
+    <div className="space-y-6 max-w-4xl mx-auto p-4">
       {/* Form Meta */}
       <div className="space-y-3">
         <input
-          className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
+          className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
           placeholder="Form title"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
         <textarea
-          className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
+          className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
           placeholder="Description (optional)"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
         <input
-          className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
+          className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
           placeholder="Slug (e.g. eid-offer-leads)"
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
@@ -299,6 +306,20 @@ export default function CampaignFormBuilder({
             key={index}
             className="border rounded p-3 space-y-2 bg-gray-50 dark:bg-gray-800"
           >
+            <div className="flex justify-between items-center">
+              <span className="font-medium text-sm text-gray-700 dark:text-gray-200">
+                {field.isDefault ? "Default Field" : "Custom Field"}
+              </span>
+              {!field.isDefault && (
+                <button
+                  onClick={() => removeField(index)}
+                  className="text-red-600 text-sm"
+                >
+                  Remove field
+                </button>
+              )}
+            </div>
+
             <input
               placeholder="Label"
               className="w-full border p-2 rounded"
@@ -330,7 +351,7 @@ export default function CampaignFormBuilder({
             {field.type === "select" && (
               <div className="space-y-1">
                 {(field.options || []).map((opt, i) => (
-                  <div key={i} className="flex gap-2">
+                  <div key={i} className="flex gap-2 items-center">
                     <input
                       placeholder="Label"
                       className="border p-1 rounded flex-1"
@@ -349,7 +370,7 @@ export default function CampaignFormBuilder({
                     />
                     <button
                       onClick={() => removeOption(index, i)}
-                      className="text-red-600"
+                      className="text-red-600 text-sm"
                     >
                       Remove
                     </button>
@@ -364,7 +385,7 @@ export default function CampaignFormBuilder({
               </div>
             )}
 
-            {/* Value input */}
+            {/* Value input for non-select */}
             {field.type !== "select" &&
               (field.type === "textarea" ? (
                 <textarea
@@ -391,15 +412,6 @@ export default function CampaignFormBuilder({
               />
               Required
             </label>
-
-            {!field.isDefault && (
-              <button
-                onClick={() => removeField(index)}
-                className="text-red-600 text-sm"
-              >
-                Remove field
-              </button>
-            )}
           </div>
         ))}
 
@@ -415,7 +427,7 @@ export default function CampaignFormBuilder({
       <button
         onClick={handleCreate}
         disabled={loading}
-        className="w-full py-2 rounded bg-black text-white dark:bg-white dark:text-black"
+        className="w-full py-2 mt-4 rounded bg-black text-white dark:bg-white dark:text-black disabled:bg-gray-400 disabled:cursor-not-allowed"
       >
         {loading ? "Creating..." : "Create Form"}
       </button>
