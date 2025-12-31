@@ -19,7 +19,7 @@ interface Field {
   required: boolean;
   options?: Option[];
   value?: string;
-  isDefault?: boolean; // prevents removal of default fields
+  isDefault?: boolean;
 }
 
 interface CampaignFormBuilderProps {
@@ -170,13 +170,34 @@ export default function CampaignFormBuilder({
   const addField = () => {
     setFields((prev) => [
       ...prev,
-      { label: "", name: "", type: "text", required: false },
+      { label: "", name: "", type: "text", required: false, options: [] },
     ]);
   };
 
-  const updateField = (index: number, key: keyof Field, value: unknown) => {
+  const updateField = (
+    index: number,
+    key: keyof Field,
+    value: string | boolean | Option[]
+  ) => {
     setFields((prev) =>
       prev.map((f, i) => (i === index ? { ...f, [key]: value } : f))
+    );
+  };
+
+  const updateFieldType = (index: number, type: FieldType) => {
+    setFields((prev) =>
+      prev.map((f, i) =>
+        i === index
+          ? {
+              ...f,
+              type,
+              options:
+                type === "select"
+                  ? f.options || [{ label: "", value: "" }]
+                  : [],
+            }
+          : f
+      )
     );
   };
 
@@ -184,14 +205,48 @@ export default function CampaignFormBuilder({
     setFields((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const addOption = (fieldIndex: number) => {
+    setFields((prev) =>
+      prev.map((f, i) =>
+        i === fieldIndex
+          ? { ...f, options: [...(f.options || []), { label: "", value: "" }] }
+          : f
+      )
+    );
+  };
+
+  const updateOption = (
+    fieldIndex: number,
+    optionIndex: number,
+    key: keyof Option,
+    value: string
+  ) => {
+    setFields((prev) =>
+      prev.map((f, i) => {
+        if (i !== fieldIndex) return f;
+        const newOptions = [...(f.options || [])];
+        newOptions[optionIndex] = { ...newOptions[optionIndex], [key]: value };
+        return { ...f, options: newOptions };
+      })
+    );
+  };
+
+  const removeOption = (fieldIndex: number, optionIndex: number) => {
+    setFields((prev) =>
+      prev.map((f, i) =>
+        i === fieldIndex
+          ? { ...f, options: f.options?.filter((_, j) => j !== optionIndex) }
+          : f
+      )
+    );
+  };
+
   const handleCreate = async () => {
     if (!title || !slug || fields.length === 0) {
       toast.error("Title, slug, and at least one field are required");
       return;
     }
-
     setLoading(true);
-
     try {
       const payload = {
         title,
@@ -222,14 +277,12 @@ export default function CampaignFormBuilder({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
         />
-
         <textarea
           className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
           placeholder="Description (optional)"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
         />
-
         <input
           className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
           placeholder="Slug (e.g. eid-offer-leads)"
@@ -241,54 +294,94 @@ export default function CampaignFormBuilder({
       {/* Fields */}
       <div className="space-y-4">
         <h3 className="font-semibold text-black dark:text-white">Fields</h3>
-
         {fields.map((field, index) => (
           <div
             key={index}
             className="border rounded p-3 space-y-2 bg-gray-50 dark:bg-gray-800"
           >
             <input
-              className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
               placeholder="Label"
+              className="w-full border p-2 rounded"
               value={field.label}
               onChange={(e) => updateField(index, "label", e.target.value)}
             />
-
             <input
-              className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
               placeholder="Name (key)"
+              className="w-full border p-2 rounded"
               value={field.name}
               onChange={(e) => updateField(index, "name", e.target.value)}
             />
+            <select
+              className="w-full border p-2 rounded"
+              value={field.type}
+              onChange={(e) =>
+                updateFieldType(index, e.target.value as FieldType)
+              }
+            >
+              <option value="text">Text</option>
+              <option value="email">Email</option>
+              <option value="number">Number</option>
+              <option value="textarea">Textarea</option>
+              <option value="select">Select</option>
+              <option value="date">Date</option>
+            </select>
 
-            {field.type === "select" ? (
-              <select
-                className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
-                value={field.value || ""}
-                onChange={(e) => updateField(index, "value", e.target.value)}
-              >
-                {field.options?.map((opt, i) => (
-                  <option key={i} value={opt.value}>
-                    {opt.label}
-                  </option>
+            {/* Options for select */}
+            {field.type === "select" && (
+              <div className="space-y-1">
+                {(field.options || []).map((opt, i) => (
+                  <div key={i} className="flex gap-2">
+                    <input
+                      placeholder="Label"
+                      className="border p-1 rounded flex-1"
+                      value={opt.label}
+                      onChange={(e) =>
+                        updateOption(index, i, "label", e.target.value)
+                      }
+                    />
+                    <input
+                      placeholder="Value"
+                      className="border p-1 rounded flex-1"
+                      value={opt.value}
+                      onChange={(e) =>
+                        updateOption(index, i, "value", e.target.value)
+                      }
+                    />
+                    <button
+                      onClick={() => removeOption(index, i)}
+                      className="text-red-600"
+                    >
+                      Remove
+                    </button>
+                  </div>
                 ))}
-              </select>
-            ) : field.type === "textarea" ? (
-              <textarea
-                className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
-                value={field.value || ""}
-                onChange={(e) => updateField(index, "value", e.target.value)}
-              />
-            ) : (
-              <input
-                type={field.type}
-                className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
-                value={field.value || ""}
-                onChange={(e) => updateField(index, "value", e.target.value)}
-              />
+                <button
+                  onClick={() => addOption(index)}
+                  className="px-2 py-1 border rounded bg-gray-200"
+                >
+                  + Add Option
+                </button>
+              </div>
             )}
 
-            <label className="flex items-center gap-2 text-sm text-black dark:text-white">
+            {/* Value input */}
+            {field.type !== "select" &&
+              (field.type === "textarea" ? (
+                <textarea
+                  className="w-full border p-2 rounded"
+                  value={field.value || ""}
+                  onChange={(e) => updateField(index, "value", e.target.value)}
+                />
+              ) : (
+                <input
+                  type={field.type}
+                  className="w-full border p-2 rounded"
+                  value={field.value || ""}
+                  onChange={(e) => updateField(index, "value", e.target.value)}
+                />
+              ))}
+
+            <label className="flex items-center gap-2 text-sm">
               <input
                 type="checkbox"
                 checked={field.required}
@@ -302,7 +395,7 @@ export default function CampaignFormBuilder({
             {!field.isDefault && (
               <button
                 onClick={() => removeField(index)}
-                className="text-red-600 dark:text-red-400 text-sm"
+                className="text-red-600 text-sm"
               >
                 Remove field
               </button>
