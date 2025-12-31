@@ -145,7 +145,7 @@ export default function CampaignSubmissionsTable({
         open={!!activeSubmission}
         onOpenChange={() => setActiveSubmission(null)}
       >
-        <DialogContent className="max-w-xl">
+        <DialogContent className="max-w-xl bg-white dark:bg-gray-800">
           <DialogHeader>
             <DialogTitle>Submission Details</DialogTitle>
           </DialogHeader>
