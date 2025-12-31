@@ -35,8 +35,8 @@ export default function CampaignFormRenderer({
 
   if (success) {
     return (
-      <div className="max-w-6xl mx-auto bg-white dark:bg-gray-800 p-12 rounded-2xl shadow-2xl text-center animate-fadeIn">
-        <h2 className="text-4xl font-bold text-gray-800 dark:text-white mb-4">
+      <div className="max-w-5xl mx-auto bg-white dark:bg-gray-800 p-10 rounded-xl shadow-lg text-center animate-fadeIn">
+        <h2 className="text-3xl font-bold text-gray-800 dark:text-white mb-2">
           Thank you!
         </h2>
         <p className="text-gray-500 dark:text-gray-300 text-lg">
@@ -49,25 +49,26 @@ export default function CampaignFormRenderer({
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-6xl mx-auto bg-white dark:bg-gray-900 shadow-2xl rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 animate-fadeIn"
+      className="max-w-5xl mx-auto bg-white dark:bg-gray-900 shadow-lg rounded-xl border border-gray-200 dark:border-gray-700 animate-fadeIn overflow-hidden"
     >
-      <div className="p-8 md:p-12">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="p-8 md:p-10">
+        {/* Grid Layout */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           {fields.map((field) => (
             <div
               key={field._id}
-              className="relative group bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm hover:shadow-lg transition-shadow"
+              className="relative group bg-gray-50 dark:bg-gray-800 p-3 rounded-lg shadow-sm hover:shadow-md transition-shadow"
             >
-              {/* Floating Label */}
-              <label className="absolute -top-3 left-4 px-1 text-xs font-semibold text-gray-500 dark:text-gray-300 bg-white dark:bg-gray-800 group-focus-within:text-blue-500 transition-all">
+              {/* Floating label */}
+              <label className="absolute -top-2 left-3 px-1 text-xs font-medium text-gray-500 dark:text-gray-300 bg-white dark:bg-gray-800 group-focus-within:text-blue-500 transition-all">
                 {field.label} {field.required && <span className="text-red-500">*</span>}
               </label>
 
-              {/* Field Input */}
+              {/* Input */}
               {field.type === "textarea" ? (
                 <textarea
-                  rows={4}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-4 pt-6 text-gray-800 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  rows={3}
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-3 pt-5 text-gray-800 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
                   required={field.required}
                   placeholder={field.label}
                   value={values[field.name] || ""}
@@ -75,7 +76,7 @@ export default function CampaignFormRenderer({
                 />
               ) : field.type === "select" && field.options ? (
                 <select
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-4 pt-6 text-gray-800 dark:text-white bg-white dark:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none"
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-3 pt-5 text-gray-800 dark:text-white bg-white dark:bg-gray-900 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all appearance-none"
                   required={field.required}
                   value={values[field.name] || ""}
                   onChange={(e) => handleChange(field.name, e.target.value)}
@@ -92,12 +93,8 @@ export default function CampaignFormRenderer({
               ) : (
                 <input
                   type={field.type}
-                  className="w-full border border-gray-300 dark:border-gray-600 rounded-lg p-4 pt-6 text-gray-800 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                  placeholder={
-                    field.label.toLowerCase().includes("email")
-                      ? "ex: myname@example.com"
-                      : field.label
-                  }
+                  className="w-full border border-gray-300 dark:border-gray-600 rounded-md p-3 pt-5 text-gray-800 dark:text-white bg-white dark:bg-gray-900 placeholder-gray-400 dark:placeholder-gray-400 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder={field.label}
                   required={field.required}
                   value={values[field.name] || ""}
                   onChange={(e) => handleChange(field.name, e.target.value)}
@@ -117,11 +114,11 @@ export default function CampaignFormRenderer({
         </div>
 
         {/* Submit Button */}
-        <div className="pt-8">
+        <div className="mt-8">
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-4 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-xl shadow-lg transition-all disabled:bg-gray-300 disabled:cursor-not-allowed uppercase tracking-wide text-lg"
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white font-semibold rounded-lg shadow-md transition-all disabled:bg-gray-300 disabled:cursor-not-allowed uppercase tracking-wide text-lg"
           >
             {loading ? "Processing..." : "Submit Response"}
           </button>
