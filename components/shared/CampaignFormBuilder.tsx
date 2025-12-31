@@ -357,7 +357,7 @@ export default function CampaignFormBuilder({
                 ))}
                 <button
                   onClick={() => addOption(index)}
-                  className="px-2 py-1 border rounded bg-gray-200"
+                  className="px-2 py-1 border rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white text-sm"
                 >
                   + Add Option
                 </button>
