@@ -210,9 +210,9 @@ export default function NotificationsDropdown() {
         size="icon"
         variant="ghost"
         onClick={() => setOpen((o) => !o)}
-        className="relative w-9 h-9"
+        className="relative w-9 h-9 text-gray-500 dark:text-gray-100 rounded-full"
       >
-        <Bell className="w-5 h-5" />
+        <Bell className="w-5 h-5 text-gray-500 dark:text-gray-100" />
         {unreadCount > 0 && (
           <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border border-white" />
         )}
