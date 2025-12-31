@@ -24,24 +24,35 @@ type Submission = {
   answers: Record<string, unknown>;
 };
 
+const pickField = (
+  answers: Record<string, unknown>,
+  keys: string[]
+): string => {
+  for (const key of keys) {
+    const value = answers?.[key];
+    if (value) return String(value);
+  }
+  return "—";
+};
+
 export default function CampaignSubmissionsTable({
   submissions,
 }: {
   submissions: Submission[];
 }) {
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [activeSubmission, setActiveSubmission] =
     useState<Submission | null>(null);
 
   const toggleSelect = (id: string) => {
-    setSelected((prev) =>
+    setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
     );
   };
 
   const toggleAll = () => {
-    setSelected(
-      selected.length === submissions.length
+    setSelectedIds(
+      selectedIds.length === submissions.length
         ? []
         : submissions.map((s) => s._id)
     );
@@ -55,11 +66,14 @@ export default function CampaignSubmissionsTable({
             <TableRow>
               <TableHead className="w-10">
                 <Checkbox
-                  checked={selected.length === submissions.length}
+                  checked={selectedIds.length === submissions.length}
                   onCheckedChange={toggleAll}
                 />
               </TableHead>
               <TableHead className="text-white">#</TableHead>
+              <TableHead className="text-white">Name</TableHead>
+              <TableHead className="text-white">Email</TableHead>
+              <TableHead className="text-white">Country</TableHead>
               <TableHead className="text-white">Submitted At</TableHead>
               <TableHead className="text-white text-right">
                 Action
@@ -69,17 +83,48 @@ export default function CampaignSubmissionsTable({
 
           <TableBody>
             {submissions.map((sub, idx) => (
-              <TableRow key={sub._id} className="hover:bg-gray-100 dark:hover:bg-gray-700">
+              <TableRow
+                key={sub._id}
+                className="hover:bg-gray-100 dark:hover:bg-gray-700"
+              >
                 <TableCell>
                   <Checkbox
-                    checked={selected.includes(sub._id)}
+                    checked={selectedIds.includes(sub._id)}
                     onCheckedChange={() => toggleSelect(sub._id)}
                   />
                 </TableCell>
+
                 <TableCell>{idx + 1}</TableCell>
-                <TableCell>
-                  {new Date(sub.submittedAt).toLocaleString()}
+
+                <TableCell className="font-medium">
+                  {pickField(sub.answers, [
+                    "name",
+                    "fullName",
+                    "full_name",
+                    "Name",
+                  ])}
                 </TableCell>
+
+                <TableCell>
+                  {pickField(sub.answers, [
+                    "email",
+                    "emailAddress",
+                    "Email",
+                  ])}
+                </TableCell>
+
+                <TableCell>
+                  {pickField(sub.answers, [
+                    "country",
+                    "Country",
+                    "nation",
+                  ])}
+                </TableCell>
+
+                <TableCell>
+                  {new Date(sub.submittedAt).toLocaleDateString()}
+                </TableCell>
+
                 <TableCell className="text-right">
                   <Button
                     size="sm"
@@ -95,7 +140,7 @@ export default function CampaignSubmissionsTable({
         </Table>
       </div>
 
-      {/* Details Modal */}
+      {/* Submission Details Modal */}
       <Dialog
         open={!!activeSubmission}
         onOpenChange={() => setActiveSubmission(null)}
@@ -105,11 +150,14 @@ export default function CampaignSubmissionsTable({
             <DialogTitle>Submission Details</DialogTitle>
           </DialogHeader>
 
-          <div className="space-y-2 max-h-[60vh] overflow-y-auto">
+          <div className="space-y-3 max-h-[60vh] overflow-y-auto">
             {activeSubmission &&
               Object.entries(activeSubmission.answers).map(
                 ([key, value]) => (
-                  <div key={key} className="flex justify-between gap-4">
+                  <div
+                    key={key}
+                    className="flex justify-between gap-6 border-b pb-1"
+                  >
                     <span className="font-semibold">{key}</span>
                     <span className="text-right text-gray-600 dark:text-gray-300">
                       {String(value)}
