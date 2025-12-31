@@ -49,7 +49,7 @@ export default function CampaignFormRenderer({
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-5xl mx-auto p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-6 auto-rows-fr"
+      className="max-w-5xl mx-auto p-6 md:p-10 grid grid-cols-1 md:grid-cols-2 gap-6 [grid-auto-flow:row dense]"
     >
       {fields.map((field) => {
         const isFullWidth =
