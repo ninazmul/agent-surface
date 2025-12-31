@@ -15,7 +15,7 @@ import mongoose from "mongoose";
 export interface FieldInput {
   label: string;
   name: string;
-  type?: "text" | "email" | "number" | "textarea" | "select";
+  type?: "text" | "email" | "number" | "textarea" | "select" | "date";
   required?: boolean;
 }
 

@@ -28,7 +28,7 @@ export interface ICampaignField extends Document {
   formId: Types.ObjectId;
   label: string;
   name: string;
-  type: "text" | "email" | "number" | "textarea" | "select";
+  type: "text" | "email" | "number" | "textarea" | "select" | "date";
   required: boolean;
 }
 
@@ -38,7 +38,7 @@ const CampaignFieldSchema = new Schema<ICampaignField>({
   name: { type: String, required: true },
   type: {
     type: String,
-    enum: ["text", "email", "number", "textarea", "select"],
+    enum: ["text", "email", "number", "textarea", "select" , "date"],
     default: "text",
   },
   required: { type: Boolean, default: false },

@@ -457,13 +457,20 @@ export type CampaignFieldType =
   | "email"
   | "number"
   | "textarea"
-  | "select";
+  | "select"
+  | "date";
+
+export interface Option {
+  label: string;
+  value: string;
+}
 
 export interface CampaignField {
   _id: string;
   label: string;
   name: string;
   type: CampaignFieldType;
+  options?: Option[];
   required: boolean;
 }
 

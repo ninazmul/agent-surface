@@ -5,13 +5,21 @@ import toast from "react-hot-toast";
 import { createCampaignForm } from "@/lib/actions/campaign.actions";
 import { useRouter } from "next/navigation";
 
-type FieldType = "text" | "email" | "number" | "textarea";
+type FieldType = "text" | "email" | "number" | "textarea" | "select" | "date";
+
+interface Option {
+  label: string;
+  value: string;
+}
 
 interface Field {
   label: string;
   name: string;
   type: FieldType;
   required: boolean;
+  options?: Option[];
+  value?: string;
+  isDefault?: boolean; // prevents removal of default fields
 }
 
 interface CampaignFormBuilderProps {
@@ -23,18 +31,46 @@ export default function CampaignFormBuilder({ author }: CampaignFormBuilderProps
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [slug, setSlug] = useState("");
+  const [loading, setLoading] = useState(false);
   const [fields, setFields] = useState<Field[]>([
-    { label: "Name", name: "name", type: "text", required: true },
-    { label: "Email", name: "email", type: "email", required: true },
-    { label: "Number", name: "number", type: "text", required: true },
-    { label: "Gender", name: "gender", type: "text", required: false },
-    { label: "Marital Status", name: "maritalStatus", type: "text", required: false },
-    { label: "Date of Birth", name: "dateOfBirth", type: "text", required: false },
-    { label: "Home Address", name: "home", type: "textarea", required: false },
-    { label: "Passport", name: "passport", type: "textarea", required: false },
-    { label: "Note", name: "note", type: "textarea", required: false },
-    { label: "Date", name: "date", type: "text", required: true },
-    { label: "Social", name: "social", type: "textarea", required: false },
+    { label: "Name", name: "name", type: "text", required: true, isDefault: true },
+    { label: "Email", name: "email", type: "email", required: true, isDefault: true },
+    { label: "Number", name: "number", type: "number", required: true, isDefault: true },
+    {
+      label: "Gender",
+      name: "gender",
+      type: "select",
+      required: true,
+      isDefault: true,
+      options: [
+        { label: "Male", value: "Male" },
+        { label: "Female", value: "Female" },
+        { label: "Other", value: "Other" },
+      ],
+    },
+    {
+      label: "Marital Status",
+      name: "maritalStatus",
+      type: "select",
+      required: true,
+      isDefault: true,
+      options: [
+        { label: "Single", value: "Single" },
+        { label: "Married", value: "Married" },
+        { label: "Divorced", value: "Divorced" },
+        { label: "Widowed", value: "Widowed" },
+      ],
+    },
+    { label: "Date of Birth", name: "dateOfBirth", type: "date", required: true, isDefault: true },
+    { label: "Address", name: "address", type: "textarea", required: false, isDefault: true },
+    { label: "City", name: "city", type: "textarea", required: false, isDefault: true },
+    { label: "State", name: "state", type: "textarea", required: false, isDefault: true },
+    { label: "Zip", name: "zip", type: "textarea", required: false, isDefault: true },
+    { label: "Country", name: "country", type: "textarea", required: false, isDefault: true },
+    { label: "Facebook", name: "facebook", type: "text", required: false, isDefault: true },
+    { label: "Instagram", name: "instagram", type: "text", required: false, isDefault: true },
+    { label: "Twitter", name: "twitter", type: "text", required: false, isDefault: true },
+    { label: "Skype", name: "skype", type: "text", required: false, isDefault: true },
   ]);
 
   const addField = () => {
@@ -63,14 +99,7 @@ export default function CampaignFormBuilder({ author }: CampaignFormBuilderProps
     setLoading(true);
 
     try {
-      const payload = {
-        title,
-        description,
-        slug,
-        author,
-        progress: "Open",
-        fields,
-      };
+      const payload = { title, description, slug, author, progress: "Open", fields };
       await createCampaignForm(payload);
       toast.success("Form created successfully!");
       router.push("/leads/campaigns");
@@ -81,8 +110,6 @@ export default function CampaignFormBuilder({ author }: CampaignFormBuilderProps
       setLoading(false);
     }
   };
-
-  const [loading, setLoading] = useState(false);
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto p-4">
@@ -133,36 +160,50 @@ export default function CampaignFormBuilder({ author }: CampaignFormBuilderProps
               onChange={(e) => updateField(index, "name", e.target.value)}
             />
 
-            <select
-              className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
-              value={field.type}
-              onChange={(e) =>
-                updateField(index, "type", e.target.value as FieldType)
-              }
-            >
-              <option value="text">Text</option>
-              <option value="email">Email</option>
-              <option value="number">Number</option>
-              <option value="textarea">Textarea</option>
-            </select>
+            {field.type === "select" ? (
+              <select
+                className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
+                value={field.value || ""}
+                onChange={(e) => updateField(index, "value", e.target.value)}
+              >
+                {field.options?.map((opt, i) => (
+                  <option key={i} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            ) : field.type === "textarea" ? (
+              <textarea
+                className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
+                value={field.value || ""}
+                onChange={(e) => updateField(index, "value", e.target.value)}
+              />
+            ) : (
+              <input
+                type={field.type}
+                className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white text-black border-gray-300 dark:border-gray-700"
+                value={field.value || ""}
+                onChange={(e) => updateField(index, "value", e.target.value)}
+              />
+            )}
 
             <label className="flex items-center gap-2 text-sm text-black dark:text-white">
               <input
                 type="checkbox"
                 checked={field.required}
-                onChange={(e) =>
-                  updateField(index, "required", e.target.checked)
-                }
+                onChange={(e) => updateField(index, "required", e.target.checked)}
               />
               Required
             </label>
 
-            <button
-              onClick={() => removeField(index)}
-              className="text-red-600 dark:text-red-400 text-sm"
-            >
-              Remove field
-            </button>
+            {!field.isDefault && (
+              <button
+                onClick={() => removeField(index)}
+                className="text-red-600 dark:text-red-400 text-sm"
+              >
+                Remove field
+              </button>
+            )}
           </div>
         ))}
 
