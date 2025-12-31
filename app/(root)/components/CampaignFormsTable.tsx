@@ -254,7 +254,7 @@ const CampaignFormsTable = ({
 
       {/* Delete Confirmation Modal */}
       <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <DialogContent>
+        <DialogContent className="bg-white text-black">
           <DialogHeader>
             <DialogTitle>Delete Form</DialogTitle>
           </DialogHeader>
