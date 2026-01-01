@@ -93,6 +93,9 @@ const ProfileForm = ({
     value: country.name.common,
   }));
 
+  const formatLabel = (value: string) =>
+    value.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
+
   const initialValues: Partial<z.infer<typeof profileFormSchema>> =
     profile && type === "Update"
       ? {
@@ -421,11 +424,12 @@ const ProfileForm = ({
                 name={fieldName as keyof z.infer<typeof profileFormSchema>}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>
-                      {fieldName.replace(/([A-Z])/g, " $1")}
-                    </FormLabel>
+                    <FormLabel>{formatLabel(fieldName)}</FormLabel>
                     <FormControl>
-                      <Input placeholder={`Enter ${fieldName}`} {...field} />
+                      <Input
+                        placeholder={`Enter ${formatLabel(fieldName)}`}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
