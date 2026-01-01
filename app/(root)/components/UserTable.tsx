@@ -78,7 +78,7 @@ const UserTable = ({ users }: { users: Array<IUser> }) => {
       if (response) {
         toast.success("User deleted successfully");
       }
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       toast.error("Failed to delete user");
       console.error("Error deleting user:", error);

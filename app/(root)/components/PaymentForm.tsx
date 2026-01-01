@@ -82,7 +82,6 @@ const PaymentForm = ({
           form.reset();
           toast.success("Payment request created successfully!");
           router.push("/finance");
-          window.location.reload();
         }
       } else if (type === "Update" && PaymentId) {
         const updated = await updatePayment(PaymentId, {
@@ -98,7 +97,6 @@ const PaymentForm = ({
           });
           toast.success("Payment request updated successfully!");
           router.push("/finance");
-          window.location.reload();
         }
       }
     } catch (error) {

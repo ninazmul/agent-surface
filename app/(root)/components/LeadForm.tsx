@@ -287,7 +287,6 @@ const LeadForm = ({
 
           toast.success("Lead created successfully!");
           router.push("/leads");
-          window.location.reload();
         }
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
@@ -323,7 +322,6 @@ const LeadForm = ({
           });
           toast.success("Lead updated successfully!");
           router.push("/leads");
-          window.location.reload();
         }
       }
     } catch (error) {

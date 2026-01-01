@@ -74,14 +74,12 @@ const ServiceForm = ({ type, Service, ServiceId }: ServiceFormProps) => {
           form.reset();
           toast.success("Service added successfully!");
           router.push("/services");
-          window.location.reload();
         }
       } else if (type === "Update" && ServiceId) {
         const updated = await updateService(ServiceId, payload);
         if (updated) {
           toast.success("Service updated successfully!");
           router.push("/services");
-          window.location.reload();
         }
       }
     } catch (error) {

@@ -81,7 +81,6 @@ const TranscriptForm = ({ type, lead, leadId }: TranscriptFormProps) => {
           form.reset({ transcript: values.transcript || [] });
           toast.success("Lead updated successfully!");
           router.push("/finance");
-          window.location.reload();
         }
       }
     } catch (error) {

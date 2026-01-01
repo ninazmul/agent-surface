@@ -96,7 +96,6 @@ const StudentResourceForm = ({
           form.reset();
           toast.success("Resource upload successfully!");
           router.push("/resources/student");
-          window.location.reload();
         }
       } else if (type === "Update" && resourceId) {
         const updatedResource = await updateStudentResource(
@@ -107,7 +106,6 @@ const StudentResourceForm = ({
           form.reset();
           toast.success("Resource updated Successfully!");
           router.push("/resources/student");
-          window.location.reload();
         }
       }
     } catch (error) {

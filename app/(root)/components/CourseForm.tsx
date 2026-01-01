@@ -101,14 +101,12 @@ const CourseForm = ({ type, Course, CourseId }: CourseFormProps) => {
           form.reset();
           toast.success("Course added successfully!");
           router.push("/courses");
-          window.location.reload();
         }
       } else if (type === "Update" && CourseId) {
         const updated = await updateCourse(CourseId, values);
         if (updated) {
           toast.success("Course updated successfully!");
           router.push("/courses");
-          window.location.reload();
         }
       }
     } catch (error) {

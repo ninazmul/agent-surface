@@ -77,7 +77,6 @@ const RefundForm = ({ type, Refund, RefundId, leads }: RefundFormProps) => {
           form.reset();
           toast.success("Refund request created successfully!");
           router.push("/applications/refund");
-          window.location.reload();
         }
       } else if (type === "Update" && RefundId) {
         const updated = await updateRefund(RefundId, refundData);
@@ -90,7 +89,6 @@ const RefundForm = ({ type, Refund, RefundId, leads }: RefundFormProps) => {
           });
           toast.success("Refund request updated successfully!");
           router.push("/applications/refund");
-          window.location.reload();
         }
       }
     } catch (error) {

@@ -276,7 +276,6 @@ const PromotionLeadForm = ({
           });
           toast.success(`Leads created for ${values.name}`);
           router.push("/promotions");
-          window.location.reload();
         }
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
@@ -306,7 +305,6 @@ const PromotionLeadForm = ({
           });
           toast.success("Lead updated successfully!");
           router.push("/promotions");
-          window.location.reload();
         }
       }
     } catch (error) {

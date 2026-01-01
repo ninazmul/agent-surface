@@ -98,7 +98,6 @@ const DownloadForm = ({
           form.reset();
           toast.success("Docs uploaded successfully!");
           router.push("/downloads");
-          window.location.reload();
         }
       } else if (type === "Update" && downloadId) {
         const updatedDownload = await updateDownload(downloadId, {
@@ -115,7 +114,6 @@ const DownloadForm = ({
           form.reset();
           toast.success("Docs updated successfully!");
           router.push("/downloads");
-          window.location.reload();
         }
       }
     } catch (error) {

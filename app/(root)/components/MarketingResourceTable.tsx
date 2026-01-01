@@ -87,7 +87,7 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
     try {
       const response = await deleteMarketingResource(resourceId);
       if (response) toast.success("Resource deleted successfully");
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       toast.error("Failed to delete resource");
       console.error(error);

@@ -84,7 +84,7 @@ const DownloadTable = ({
       if (response) {
         toast.success("Download deleted successfully");
       }
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       toast.error("Failed to delete download");
       console.error("Error deleting download:", error);

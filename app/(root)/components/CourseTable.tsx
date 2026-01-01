@@ -71,7 +71,7 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
     try {
       await deleteCourse(id);
       toast.success("Course deleted successfully");
-      window.location.reload();
+      router.refresh();
     } catch (error) {
       toast.error("Failed to delete course");
       console.error(error);

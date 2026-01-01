@@ -91,7 +91,6 @@ const QuotationTranscriptForm = ({
           form.reset({ transcript: values.transcript || [] });
           toast.success("Quotation updated successfully!");
           router.push("/finance");
-          window.location.reload();
         }
       }
     } catch (error) {

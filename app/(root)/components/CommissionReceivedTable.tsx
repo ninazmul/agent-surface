@@ -214,7 +214,7 @@ const CommissionReceivedTable = ({
     try {
       const res = await deleteLead(id);
       if (res) toast.success("Lead deleted successfully.");
-      window.location.reload();
+      router.refresh();
     } catch {
       toast.error("Failed to delete lead.");
     } finally {
@@ -573,7 +573,7 @@ const CommissionReceivedTable = ({
                                     status: newStatus,
                                   });
 
-                                  window.location.reload(); // still keep this to sync with DB
+                                  router.refresh(); // still keep this to sync with DB
                                 } catch (err) {
                                   console.error(err);
                                   toast.error(

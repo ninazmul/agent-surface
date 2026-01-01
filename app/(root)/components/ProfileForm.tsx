@@ -189,7 +189,6 @@ const ProfileForm = ({
           form.reset();
           toast.success("Profile created! Your account is pending approval.");
           router.push("/profile");
-          window.location.reload();
         }
       } else if (type === "Update" && profileId) {
         const updatedProfile = await updateProfile(profileId, {
@@ -217,7 +216,6 @@ const ProfileForm = ({
           form.reset();
           toast.success("Profile updated successfully!");
           router.push("/profile");
-          window.location.reload();
         }
       }
     } catch (error) {

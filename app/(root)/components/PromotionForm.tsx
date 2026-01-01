@@ -236,7 +236,6 @@ const PromotionForm = ({
             newPromotion.title
           );
           router.push("/promotions");
-          window.location.reload();
         }
       } else if (type === "Update" && promotionId && promotion) {
         const updatedPromotion = await updatePromotion(promotionId, {
@@ -263,7 +262,6 @@ const PromotionForm = ({
           await notifyAgencies(newAgencies, updatedPromotion.title);
           await notifyAgenciesViaWhatsApp(newAgencies, updatedPromotion.title);
           router.push("/promotions");
-          window.location.reload();
         }
       }
     } catch (error) {

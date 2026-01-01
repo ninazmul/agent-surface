@@ -99,7 +99,6 @@ const ResourcePriceListForm = ({
           form.reset();
           toast.success("Resource upload successfully!");
           router.push("/resources/pricelist");
-          window.location.reload();
         }
       } else if (type === "Update" && resourceId) {
         const updatedResource = await updateResourcePriceList(
@@ -110,7 +109,6 @@ const ResourcePriceListForm = ({
           form.reset();
           toast.success("Resource updated Successfully!");
           router.push("/resources/pricelist");
-          window.location.reload();
         }
       }
     } catch (error) {

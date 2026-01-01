@@ -195,7 +195,7 @@ const AssignedLeadTable = ({
     try {
       const res = await deleteLead(id);
       if (res) toast.success("Lead deleted successfully.");
-      window.location.reload();
+      router.refresh();
     } catch {
       toast.error("Failed to delete lead.");
     } finally {
@@ -227,7 +227,7 @@ const AssignedLeadTable = ({
           )
         );
 
-        window.location.reload();
+        router.refresh();
       }
     } catch (error) {
       toast.error("Failed to update progress");
@@ -259,7 +259,7 @@ const AssignedLeadTable = ({
           )
         );
 
-        window.location.reload();
+        router.refresh();
       }
     } catch (error) {
       toast.error("Failed to update status");

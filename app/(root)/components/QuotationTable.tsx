@@ -197,7 +197,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
     try {
       const res = await deleteLead(id);
       if (res) toast.success("Lead deleted successfully.");
-      window.location.reload();
+      router.refresh();
     } catch {
       toast.error("Failed to delete lead.");
     } finally {

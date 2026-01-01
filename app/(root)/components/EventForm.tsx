@@ -60,14 +60,12 @@ const EventForm = ({ type, Event, EventId, email }: EventFormProps) => {
           form.reset();
           toast.success("Event created Successfully!");
           router.push("/events");
-          window.location.reload();
         }
       } else if (type === "Update" && EventId) {
         const updated = await updateEvent(EventId, eventData);
         if (updated) {
           toast.success("Event updated Successfully!");
           router.push("/events");
-          window.location.reload();
         }
       }
     } catch (error) {

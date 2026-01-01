@@ -97,7 +97,7 @@ const PaymentTable = ({
     try {
       const res = await deletePayment(id);
       if (res) toast.success("Payment deleted successfully.");
-      window.location.reload();
+      router.refresh();
     } catch {
       toast.error("Failed to delete payment.");
     } finally {
@@ -112,7 +112,7 @@ const PaymentTable = ({
     try {
       await updatePayment(id, { progress: nextStatus });
       toast.success(`Progress updated to "${nextStatus}"`);
-      window.location.reload();
+      router.refresh();
     } catch {
       toast.error("Failed to update progress.");
     }
