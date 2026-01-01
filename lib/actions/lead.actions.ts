@@ -4,12 +4,16 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Lead from "../database/models/lead.model";
 import { CampaignSubmission, LeadParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE LEAD
 export const createLead = async (params: LeadParams) => {
   try {
     await connectToDatabase();
     const newLead = await Lead.create(params);
+
+    revalidatePath("/leads");
+
     return JSON.parse(JSON.stringify(newLead));
   } catch (error) {
     handleError(error);
@@ -23,6 +27,8 @@ export const bulkCreateLeads = async (leads: LeadParams[]) => {
 
     const newLeads = await Lead.insertMany(leads, { ordered: false });
     // ordered:false → continues inserting even if some fail
+
+    revalidatePath("/leads");
 
     return JSON.parse(JSON.stringify(newLeads));
   } catch (error) {
@@ -214,6 +220,8 @@ export const updateLead = async (
       throw new Error("Lead not found");
     }
 
+    revalidatePath("/leads");
+
     return JSON.parse(JSON.stringify(updatedLead));
   } catch (error) {
     handleError(error);
@@ -237,6 +245,8 @@ export const assignLeadToUser = async (leadId: string, email: string) => {
       throw new Error("Lead not found");
     }
 
+    revalidatePath("/leads/assigned");
+
     return JSON.parse(JSON.stringify(updatedLead));
   } catch (error) {
     console.error("Error assigning lead:", error);
@@ -254,6 +264,8 @@ export const deleteLead = async (leadId: string) => {
     if (!deletedLead) {
       throw new Error("Lead not found");
     }
+
+    revalidatePath("/leads");
 
     return { message: "Lead deleted successfully" };
   } catch (error) {

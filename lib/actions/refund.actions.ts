@@ -4,12 +4,16 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Refund from "../database/models/refund.model";
 import { RefundParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE REFUND
 export const createRefund = async (params: RefundParams) => {
   try {
     await connectToDatabase();
     const newRefund = await Refund.create(params);
+
+    revalidatePath("/quotations/refund");
+
     return JSON.parse(JSON.stringify(newRefund));
   } catch (error) {
     handleError(error);
@@ -63,6 +67,8 @@ export const updateRefund = async (
       throw new Error("Refund not found");
     }
 
+    revalidatePath("/quotations/refund");
+
     return JSON.parse(JSON.stringify(updatedRefund));
   } catch (error) {
     handleError(error);
@@ -79,6 +85,8 @@ export const deleteRefund = async (refundId: string) => {
     if (!deletedRefund) {
       throw new Error("Refund not found");
     }
+
+    revalidatePath("/quotations/refund");
 
     return { message: "Refund deleted successfully" };
   } catch (error) {

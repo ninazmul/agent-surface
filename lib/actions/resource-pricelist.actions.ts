@@ -4,6 +4,7 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import { ResourcePriceListParams } from "@/types";
 import ResourcePriceList from "../database/models/resource-pricelist.model";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE RESOURCE PRICE LIST
 export const createResourcePriceList = async (params: ResourcePriceListParams) => {
@@ -11,6 +12,8 @@ export const createResourcePriceList = async (params: ResourcePriceListParams) =
     await connectToDatabase();
 
     const newResourcePriceList = await ResourcePriceList.create(params);
+
+    revalidatePath("/resources/pricelist");
 
     return JSON.parse(JSON.stringify(newResourcePriceList));
   } catch (error) {
@@ -86,6 +89,8 @@ export const updateResourcePriceList = async (
       throw new Error("ResourcePriceList not found");
     }
 
+    revalidatePath("/resources/pricelist");
+
     return JSON.parse(JSON.stringify(updatedResourcePriceList));
   } catch (error) {
     handleError(error);
@@ -104,6 +109,8 @@ export const deleteResourcePriceList = async (resourcePriceListId: string) => {
     if (!deletedResourcePriceList) {
       throw new Error("ResourcePriceList not found");
     }
+
+    revalidatePath("/resources/pricelist");
 
     return { message: "ResourcePriceList deleted successfully" };
   } catch (error) {

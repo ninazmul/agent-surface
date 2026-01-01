@@ -4,6 +4,7 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Profile from "../database/models/profile.model";
 import { ProfileParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE PROFILE
 export const createProfile = async (params: ProfileParams) => {
@@ -11,6 +12,8 @@ export const createProfile = async (params: ProfileParams) => {
     await connectToDatabase();
 
     const newProfile = await Profile.create(params);
+
+    revalidatePath("/profile");
 
     return JSON.parse(JSON.stringify(newProfile));
   } catch (error) {
@@ -124,6 +127,8 @@ export const updateProfile = async (
       throw new Error("Profile not found");
     }
 
+    revalidatePath("/profile");
+
     return JSON.parse(JSON.stringify(updatedProfile));
   } catch (error) {
     handleError(error);
@@ -142,6 +147,8 @@ export const deleteProfile = async (profileId: string) => {
     if (!deletedProfile) {
       throw new Error("Profile not found");
     }
+
+    revalidatePath("/profile");
 
     return { message: "Profile deleted successfully" };
   } catch (error) {

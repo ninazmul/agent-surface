@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { connectToDatabase } from "../database";
 import {
   CampaignField,
@@ -87,6 +88,8 @@ export async function createCampaignForm({
 
     await session.commitTransaction();
     session.endSession();
+
+    revalidatePath("/leads/campaigns");
 
     return {
       success: true,
@@ -205,6 +208,8 @@ export async function deleteCampaignFormById(formId: string) {
 
     await session.commitTransaction();
     session.endSession();
+
+    revalidatePath("/leads/campaigns");
 
     return { success: true };
   } catch (err) {

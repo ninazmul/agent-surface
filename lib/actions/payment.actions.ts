@@ -4,12 +4,15 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Payment from "../database/models/payment.model";
 import { PaymentParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE PAYMENT
 export const createPayment = async (params: PaymentParams) => {
   try {
     await connectToDatabase();
     const newPayment = await Payment.create(params);
+
+    revalidatePath("/finance/payment");
     return JSON.parse(JSON.stringify(newPayment));
   } catch (error) {
     handleError(error);
@@ -80,6 +83,8 @@ export const updatePayment = async (
       throw new Error("Payment not found");
     }
 
+    revalidatePath("/finance/payment");
+
     return JSON.parse(JSON.stringify(updatedPayment));
   } catch (error) {
     handleError(error);
@@ -96,6 +101,8 @@ export const deletePayment = async (paymentId: string) => {
     if (!deletedPayment) {
       throw new Error("Payment not found");
     }
+
+    revalidatePath("/finance/payment");
 
     return { message: "Payment deleted successfully" };
   } catch (error) {

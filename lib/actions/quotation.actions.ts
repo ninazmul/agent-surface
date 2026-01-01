@@ -5,6 +5,7 @@ import { connectToDatabase } from "../database";
 import Quotation from "../database/models/quotation.model";
 import { QuotationParams } from "@/types";
 import { getNextQuotationSerial } from "../getNextSerial";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE QUOTATION
 export const createQuotation = async (params: QuotationParams) => {
@@ -24,6 +25,8 @@ export const createQuotation = async (params: QuotationParams) => {
       ...params,
       quotationNumber,
     });
+
+    revalidatePath("/quotations");
 
     return JSON.parse(JSON.stringify(newQuotation));
   } catch (error) {
@@ -118,6 +121,8 @@ export const updateQuotation = async (
       throw new Error("Quotation not found");
     }
 
+    revalidatePath("/quotations");
+
     return JSON.parse(JSON.stringify(updatedQuotation));
   } catch (error) {
     handleError(error);
@@ -134,6 +139,8 @@ export const deleteQuotation = async (quotationId: string) => {
     if (!deletedQuotation) {
       throw new Error("Quotation not found");
     }
+
+    revalidatePath("/quotations");
 
     return { message: "Quotation deleted successfully" };
   } catch (error) {

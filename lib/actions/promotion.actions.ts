@@ -4,6 +4,7 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Promotion from "../database/models/promotion.model";
 import { PromotionParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE PROMOTION
 export const createPromotion = async (params: PromotionParams) => {
@@ -11,6 +12,8 @@ export const createPromotion = async (params: PromotionParams) => {
     await connectToDatabase();
 
     const newPromotion = await Promotion.create(params);
+
+    revalidatePath("/promotions");
 
     return JSON.parse(JSON.stringify(newPromotion));
   } catch (error) {
@@ -86,6 +89,8 @@ export const updatePromotion = async (
       throw new Error("Promotion not found");
     }
 
+    revalidatePath("/promotions");
+
     return JSON.parse(JSON.stringify(updatedPromotion));
   } catch (error) {
     handleError(error);
@@ -104,6 +109,8 @@ export const deletePromotion = async (promotionId: string) => {
     if (!deletedPromotion) {
       throw new Error("Promotion not found");
     }
+
+    revalidatePath("/promotions");
 
     return { message: "Promotion deleted successfully" };
   } catch (error) {

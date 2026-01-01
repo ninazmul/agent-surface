@@ -4,6 +4,7 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import StudentResource from "../database/models/student-resource.model";
 import { StudentResourceParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE StudentRESOURCE
 export const createStudentResource = async (params: StudentResourceParams) => {
@@ -11,6 +12,8 @@ export const createStudentResource = async (params: StudentResourceParams) => {
     await connectToDatabase();
 
     const newStudentResource = await StudentResource.create(params);
+
+    revalidatePath("/resources/student");
 
     return JSON.parse(JSON.stringify(newStudentResource));
   } catch (error) {
@@ -89,6 +92,8 @@ export const updateStudentResource = async (
       throw new Error("StudentResource not found");
     }
 
+    revalidatePath("/resources/student");
+
     return JSON.parse(JSON.stringify(updatedStudentResource));
   } catch (error) {
     handleError(error);
@@ -108,6 +113,8 @@ export const deleteStudentResource = async (StudentResourceId: string) => {
       throw new Error("StudentResource not found");
     }
 
+    revalidatePath("/resources/student");
+    
     return { message: "StudentResource deleted successfully" };
   } catch (error) {
     handleError(error);

@@ -4,12 +4,14 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Course from "../database/models/course.model";
 import { CourseParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE COURSE
 export const createCourse = async (params: CourseParams) => {
   try {
     await connectToDatabase();
     const newCourse = await Course.create(params);
+    revalidatePath("/courses");
     return JSON.parse(JSON.stringify(newCourse));
   } catch (error) {
     handleError(error);
@@ -60,6 +62,8 @@ export const updateCourse = async (
       throw new Error("Course not found");
     }
 
+    revalidatePath("/courses");
+
     return JSON.parse(JSON.stringify(updatedCourse));
   } catch (error) {
     handleError(error);
@@ -76,6 +80,8 @@ export const deleteCourse = async (courseId: string) => {
     if (!deletedCourse) {
       throw new Error("Course not found");
     }
+
+    revalidatePath("/courses");
 
     return { message: "Course deleted successfully" };
   } catch (error) {

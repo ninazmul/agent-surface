@@ -4,6 +4,7 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Download from "../database/models/download.model";
 import { DownloadParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE DOWNLOAD
 export const createDownload = async (params: DownloadParams) => {
@@ -11,6 +12,8 @@ export const createDownload = async (params: DownloadParams) => {
     await connectToDatabase();
 
     const newDownload = await Download.create(params);
+
+    revalidatePath("/downloads");
 
     return JSON.parse(JSON.stringify(newDownload));
   } catch (error) {
@@ -86,6 +89,8 @@ export const updateDownload = async (
       throw new Error("Download not found");
     }
 
+    revalidatePath("/downloads");
+
     return JSON.parse(JSON.stringify(updatedDownload));
   } catch (error) {
     handleError(error);
@@ -104,6 +109,8 @@ export const deleteDownload = async (downloadId: string) => {
     if (!deletedDownload) {
       throw new Error("Download not found");
     }
+
+    revalidatePath("/downloads");
 
     return { message: "Download deleted successfully" };
   } catch (error) {

@@ -4,6 +4,7 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Resource from "../database/models/resource.model";
 import { ResourceParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE RESOURCE
 export const createResource = async (params: ResourceParams) => {
@@ -11,6 +12,8 @@ export const createResource = async (params: ResourceParams) => {
     await connectToDatabase();
 
     const newResource = await Resource.create(params);
+
+    revalidatePath("/resources");
 
     return JSON.parse(JSON.stringify(newResource));
   } catch (error) {
@@ -86,6 +89,8 @@ export const updateResource = async (
       throw new Error("Resource not found");
     }
 
+    revalidatePath("/resources");
+
     return JSON.parse(JSON.stringify(updatedResource));
   } catch (error) {
     handleError(error);
@@ -104,6 +109,8 @@ export const deleteResource = async (resourceId: string) => {
     if (!deletedResource) {
       throw new Error("Resource not found");
     }
+
+    revalidatePath("/resources");
 
     return { message: "Resource deleted successfully" };
   } catch (error) {

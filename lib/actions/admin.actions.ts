@@ -4,12 +4,14 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Admin from "../database/models/admin.model";
 import { AdminParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE ADMIN
 export const createAdmin = async (params: AdminParams) => {
   try {
     await connectToDatabase();
     const newAdmin = await Admin.create(params);
+    revalidatePath("/admins");
     return JSON.parse(JSON.stringify(newAdmin));
   } catch (error) {
     handleError(error);
@@ -81,6 +83,8 @@ export const updateAdmin = async (
       throw new Error("Admin not found");
     }
 
+    revalidatePath("/admins");
+
     return JSON.parse(JSON.stringify(updatedAdmin));
   } catch (error) {
     handleError(error);
@@ -97,6 +101,8 @@ export const deleteAdmin = async (adminId: string) => {
     if (!deletedAdmin) {
       throw new Error("Admin not found");
     }
+
+    revalidatePath("/admins");
 
     return { message: "Admin deleted successfully" };
   } catch (error) {
@@ -127,7 +133,9 @@ export async function isAdmin(email: string): Promise<boolean> {
 }
 
 // ====== GET ADMIN ROLE PERMISSIONS BY EMAIL
-export const getAdminRolePermissionsByEmail = async (email: string): Promise<string[]> => {
+export const getAdminRolePermissionsByEmail = async (
+  email: string
+): Promise<string[]> => {
   try {
     await connectToDatabase();
     const admin = await Admin.findOne({ email });
@@ -146,7 +154,9 @@ export const getAdminRolePermissionsByEmail = async (email: string): Promise<str
 };
 
 // ====== GET ADMIN COUNTRIES BY EMAIL
-export const getAdminCountriesByEmail = async (email: string): Promise<string[]> => {
+export const getAdminCountriesByEmail = async (
+  email: string
+): Promise<string[]> => {
   try {
     await connectToDatabase();
     const admin = await Admin.findOne({ email });
@@ -163,4 +173,3 @@ export const getAdminCountriesByEmail = async (email: string): Promise<string[]>
     return [];
   }
 };
-

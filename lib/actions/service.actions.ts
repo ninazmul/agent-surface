@@ -4,12 +4,16 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Service from "../database/models/service.model";
 import { ServicesParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE SERVICE CALENDAR
 export const createService = async (params: ServicesParams) => {
   try {
     await connectToDatabase();
     const newService = await Service.create(params);
+
+    revalidatePath("/services");
+
     return JSON.parse(JSON.stringify(newService));
   } catch (error) {
     handleError(error);
@@ -80,6 +84,8 @@ export const updateService = async (
       throw new Error("Service not found");
     }
 
+    revalidatePath("/services");
+
     return JSON.parse(JSON.stringify(updatedService));
   } catch (error) {
     handleError(error);
@@ -97,6 +103,8 @@ export const deleteService = async (serviceId: string) => {
       throw new Error("Service not found");
     }
 
+    revalidatePath("/services");
+    
     return { message: "Service deleted successfully" };
   } catch (error) {
     handleError(error);

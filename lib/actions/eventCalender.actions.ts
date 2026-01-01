@@ -4,12 +4,15 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import EventCalendar from "../database/models/eventCalender.model";
 import { EventCalenderParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE EVENT CALENDAR
 export const createEventCalendar = async (params: EventCalenderParams) => {
   try {
     await connectToDatabase();
     const newEvent = await EventCalendar.create(params);
+
+    revalidatePath("/events");
     return JSON.parse(JSON.stringify(newEvent));
   } catch (error) {
     handleError(error);
@@ -63,6 +66,8 @@ export const updateEventCalendar = async (
       throw new Error("EventCalendar not found");
     }
 
+    revalidatePath("/events");
+
     return JSON.parse(JSON.stringify(updatedEvent));
   } catch (error) {
     handleError(error);
@@ -79,6 +84,8 @@ export const deleteEventCalendar = async (eventId: string) => {
     if (!deletedEvent) {
       throw new Error("EventCalendar not found");
     }
+
+    revalidatePath("/events");
 
     return { message: "EventCalendar deleted successfully" };
   } catch (error) {

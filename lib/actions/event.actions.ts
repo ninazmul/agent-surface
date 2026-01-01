@@ -4,12 +4,16 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import Event from "../database/models/event.model";
 import { EventParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE EVENT
 export const createEvent = async (params: EventParams) => {
   try {
     await connectToDatabase();
     const newEvent = await Event.create(params);
+
+    revalidatePath("/events/event");
+
     return JSON.parse(JSON.stringify(newEvent));
   } catch (error) {
     handleError(error);
@@ -63,6 +67,8 @@ export const updateEvent = async (
       throw new Error("Event not found");
     }
 
+    revalidatePath("/events/event");
+
     return JSON.parse(JSON.stringify(updatedEvent));
   } catch (error) {
     handleError(error);
@@ -79,6 +85,8 @@ export const deleteEvent = async (eventId: string) => {
     if (!deletedEvent) {
       throw new Error("Event not found");
     }
+
+    revalidatePath("/events/event");
 
     return { message: "Event deleted successfully" };
   } catch (error) {

@@ -4,6 +4,7 @@ import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
 import MarketingResource from "../database/models/marketing-resource.model";
 import { MarketingResourceParams } from "@/types";
+import { revalidatePath } from "next/cache";
 
 // ====== CREATE MARKETING RESOURCE
 export const createMarketingResource = async (params: MarketingResourceParams) => {
@@ -11,6 +12,8 @@ export const createMarketingResource = async (params: MarketingResourceParams) =
     await connectToDatabase();
 
     const newMarketingResource = await MarketingResource.create(params);
+
+    revalidatePath("/resources/marketing");
 
     return JSON.parse(JSON.stringify(newMarketingResource));
   } catch (error) {
@@ -71,6 +74,8 @@ export const updateMarketingResource = async (
       throw new Error("MarketingResource not found");
     }
 
+    revalidatePath("/resources/marketing");
+
     return JSON.parse(JSON.stringify(updatedMarketingResource));
   } catch (error) {
     handleError(error);
@@ -90,6 +95,8 @@ export const deleteMarketingResource = async (
     if (!deletedMarketingResource) {
       throw new Error("MarketingResource not found");
     }
+
+    revalidatePath("/resources/marketing");
 
     return { message: "MarketingResource deleted successfully" };
   } catch (error) {
