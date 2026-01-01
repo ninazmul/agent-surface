@@ -60,11 +60,6 @@ const TranscriptForm = ({ type, lead, leadId }: TranscriptFormProps) => {
   // ✅ Fixed onSubmit
   async function onSubmit(values: z.infer<typeof transcriptFormSchema>) {
     try {
-      const navigate = () => {
-        router.replace("/finance");
-        router.refresh();
-      };
-
       if (type === "Update" && leadId) {
         const updatedLead = await updateLead(leadId, {
           transcript: values.transcript || [],
@@ -85,7 +80,8 @@ const TranscriptForm = ({ type, lead, leadId }: TranscriptFormProps) => {
           });
           form.reset({ transcript: values.transcript || [] });
           toast.success("Lead updated successfully!");
-          navigate();
+          router.push("/finance");
+          window.location.reload();
         }
       }
     } catch (error) {

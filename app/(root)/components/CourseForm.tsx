@@ -100,27 +100,15 @@ const CourseForm = ({ type, Course, CourseId }: CourseFormProps) => {
         if (created) {
           form.reset();
           toast.success("Course added successfully!");
-          const navigate = () => {
-            router.replace("/courses");
-            router.refresh();
-          };
-
-          if (created) {
-            navigate();
-          }
+          router.push("/courses");
+          window.location.reload();
         }
       } else if (type === "Update" && CourseId) {
         const updated = await updateCourse(CourseId, values);
         if (updated) {
           toast.success("Course updated successfully!");
-          const navigate = () => {
-            router.replace("/courses");
-            router.refresh();
-          };
-
-          if (updated) {
-            navigate();
-          }
+          router.push("/courses");
+          window.location.reload();
         }
       }
     } catch (error) {

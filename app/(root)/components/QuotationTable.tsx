@@ -197,7 +197,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
     try {
       const res = await deleteLead(id);
       if (res) toast.success("Lead deleted successfully.");
-      router.refresh();
+      window.location.reload();
     } catch {
       toast.error("Failed to delete lead.");
     } finally {
@@ -440,7 +440,9 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                           <PopoverTrigger asChild>
                             <Button
                               variant="outline"
-                              size="sm" className="w-48 justify-center px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600">
+                              size="sm"
+                              className="w-48 justify-center px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
+                            >
                               Documents <ChevronDown className="ml-1 w-4 h-4" />
                             </Button>
                           </PopoverTrigger>

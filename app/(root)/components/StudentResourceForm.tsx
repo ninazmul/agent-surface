@@ -20,7 +20,10 @@ import { IResource } from "@/lib/database/models/resource.model";
 import { resourceDefaultValues } from "@/constants";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { createStudentResource, updateStudentResource } from "@/lib/actions/student-resource.actions";
+import {
+  createStudentResource,
+  updateStudentResource,
+} from "@/lib/actions/student-resource.actions";
 
 export const studentStudentResourceFormSchema = z
   .object({
@@ -40,7 +43,11 @@ type StudentResourceFormProps = {
   resourceId?: string;
 };
 
-const StudentResourceForm = ({ type, resource, resourceId }: StudentResourceFormProps) => {
+const StudentResourceForm = ({
+  type,
+  resource,
+  resourceId,
+}: StudentResourceFormProps) => {
   const [link, setLink] = useState<File[]>([]);
   const router = useRouter();
 
@@ -59,7 +66,9 @@ const StudentResourceForm = ({ type, resource, resourceId }: StudentResourceForm
     defaultValues: initialValues,
   });
 
-  async function onSubmit(values: z.infer<typeof studentStudentResourceFormSchema>) {
+  async function onSubmit(
+    values: z.infer<typeof studentStudentResourceFormSchema>
+  ) {
     let uploadedLinkUrl = values.link;
     const finalCategory = values.customCategory || values.category;
 
@@ -86,28 +95,19 @@ const StudentResourceForm = ({ type, resource, resourceId }: StudentResourceForm
         if (newResource) {
           form.reset();
           toast.success("Resource upload successfully!");
-          const navigate = () => {
-            router.replace("/resources/student");
-            router.refresh();
-          };
-
-          if (newResource) {
-            navigate();
-          }
+          router.push("/resources/student");
+          window.location.reload();
         }
       } else if (type === "Update" && resourceId) {
-        const updatedResource = await updateStudentResource(resourceId, resourceData);
+        const updatedResource = await updateStudentResource(
+          resourceId,
+          resourceData
+        );
         if (updatedResource) {
           form.reset();
           toast.success("Resource updated Successfully!");
-          const navigate = () => {
-            router.replace("/resources/student");
-            router.refresh();
-          };
-
-          if (updatedResource) {
-            navigate();
-          }
+          router.push("/resources/student");
+          window.location.reload();
         }
       }
     } catch (error) {

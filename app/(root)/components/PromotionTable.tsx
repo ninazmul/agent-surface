@@ -74,7 +74,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
       const res = await deletePromotion(id);
       if (res) {
         toast.success("Promotion deleted");
-        router.refresh();
+        window.location.reload();
       }
     } catch {
       toast.error("Failed to delete");
@@ -352,7 +352,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                                 !promotion.isPaused ? "paused" : "activated"
                               }`
                             );
-                            router.refresh();
+                            window.location.reload();
                           } catch {
                             toast.error("Failed to update status");
                           }

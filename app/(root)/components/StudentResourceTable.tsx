@@ -76,7 +76,7 @@ const StudentResourceTable = ({
       if (response) {
         toast.success("Resource deleted successfully");
       }
-      router.refresh();
+      window.location.reload();
     } catch (error) {
       toast.error("Failed to delete resource");
       console.error("Error deleting resource:", error);

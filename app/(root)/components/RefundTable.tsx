@@ -98,7 +98,7 @@ const RefundTable = ({
     try {
       const res = await deleteRefund(id);
       if (res) toast.success("Refund deleted successfully.");
-      router.refresh();
+      window.location.reload();
     } catch {
       toast.error("Failed to delete refund.");
     } finally {
@@ -116,7 +116,7 @@ const RefundTable = ({
       });
       if (response) {
         toast.success(`Progress upauthord to ${newProgress}`);
-        router.refresh();
+        window.location.reload();
       }
     } catch (error) {
       toast.error("Failed to upauthor progress");

@@ -98,14 +98,8 @@ const ResourcePriceListForm = ({
         if (newResource) {
           form.reset();
           toast.success("Resource upload successfully!");
-          const navigate = () => {
-            router.replace("/resources/pricelist");
-            router.refresh();
-          };
-
-          if (newResource) {
-            navigate();
-          }
+          router.push("/resources/pricelist");
+          window.location.reload();
         }
       } else if (type === "Update" && resourceId) {
         const updatedResource = await updateResourcePriceList(
@@ -115,14 +109,8 @@ const ResourcePriceListForm = ({
         if (updatedResource) {
           form.reset();
           toast.success("Resource updated Successfully!");
-          const navigate = () => {
-            router.replace("/resources/pricelist");
-            router.refresh();
-          };
-
-          if (updatedResource) {
-            navigate();
-          }
+          router.push("/resources/pricelist");
+          window.location.reload();
         }
       }
     } catch (error) {

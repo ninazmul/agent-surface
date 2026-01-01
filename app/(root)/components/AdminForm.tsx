@@ -95,27 +95,15 @@ const AdminForm = ({ type, Admin, AdminId }: AdminFormProps) => {
         if (created) {
           form.reset();
           toast.success("Admin created Successfully!");
-          const navigate = () => {
-            router.replace("/admins");
-            router.refresh();
-          };
-
-          if (created) {
-            navigate();
-          }
+          router.push("/admins");
+          window.location.reload();
         }
       } else if (type === "Update" && AdminId) {
         const updated = await updateAdmin(AdminId, adminData);
         if (updated) {
           toast.success("Admin's profile updated Successfully!");
-          const navigate = () => {
-            router.replace("/admins");
-            router.refresh();
-          };
-
-          if (updated) {
-            navigate();
-          }
+          router.push("/admins");
+          window.location.reload();
         }
       }
     } catch (error) {

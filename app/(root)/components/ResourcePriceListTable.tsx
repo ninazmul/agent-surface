@@ -81,7 +81,7 @@ const ResourcePriceListCards = ({
     try {
       await deleteStudentResource(id);
       toast.success("Resource deleted successfully");
-      router.refresh();
+      window.location.reload();
     } catch (err) {
       console.error(err);
       toast.error("Failed to delete resource");

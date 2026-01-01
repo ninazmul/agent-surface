@@ -97,14 +97,8 @@ const DownloadForm = ({
           });
           form.reset();
           toast.success("Docs uploaded successfully!");
-          const navigate = () => {
-            router.replace("/downloads");
-            router.refresh();
-          };
-
-          if (newDownload) {
-            navigate();
-          }
+          router.push("/downloads");
+          window.location.reload();
         }
       } else if (type === "Update" && downloadId) {
         const updatedDownload = await updateDownload(downloadId, {
@@ -120,14 +114,8 @@ const DownloadForm = ({
           });
           form.reset();
           toast.success("Docs updated successfully!");
-          const navigate = () => {
-            router.replace("/downloads");
-            router.refresh();
-          };
-
-          if (updatedDownload) {
-            navigate();
-          }
+          router.push("/downloads");
+          window.location.reload();
         }
       }
     } catch (error) {

@@ -286,14 +286,8 @@ const LeadForm = ({
           });
 
           toast.success("Lead created successfully!");
-          const navigate = () => {
-            router.replace("/leads");
-            router.refresh();
-          };
-
-          if (created) {
-            navigate();
-          }
+          router.push("/leads");
+          window.location.reload();
         }
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
@@ -328,14 +322,8 @@ const LeadForm = ({
             status: "updated",
           });
           toast.success("Lead updated successfully!");
-          const navigate = () => {
-            router.replace("/leads");
-            router.refresh();
-          };
-
-          if (updated) {
-            navigate();
-          }
+          router.push("/leads");
+          window.location.reload();
         }
       }
     } catch (error) {

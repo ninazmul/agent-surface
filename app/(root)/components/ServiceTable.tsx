@@ -67,7 +67,7 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
       const response = await deleteService(serviceId);
       if (response) {
         toast.success("Service deleted successfully");
-        router.refresh();
+        window.location.reload();
       }
     } catch (error) {
       toast.error("Failed to delete service");

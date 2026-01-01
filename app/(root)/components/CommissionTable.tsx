@@ -669,7 +669,7 @@ const CommissionTable = ({
                                     status: newStatus,
                                   });
 
-                                  router.refresh(); // still keep this to sync with DB
+                                  window.location.reload(); // still keep this to sync with DB
                                 } catch (err) {
                                   console.error(err);
                                   toast.error(

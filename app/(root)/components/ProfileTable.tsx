@@ -96,7 +96,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
       const response = await deleteProfile(profileId);
       if (response) {
         toast.success("Profile deleted successfully");
-        router.refresh();
+        window.location.reload();
       }
     } catch (error) {
       toast.error("Failed to delete profile");
@@ -114,7 +114,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
       try {
         await updateProfile(profileId, { salesTarget: value });
         toast.success(`Sales Target updated to €${value}`);
-        router.refresh();
+        window.location.reload();
       } catch {
         toast.error("Failed to update Sales Target");
       }
@@ -132,7 +132,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
       });
       if (response) {
         toast.success(`Status updated to ${newStatus}`);
-        router.refresh();
+        window.location.reload();
 
         if (newStatus === "Approved") {
           await fetch("/api/send-email", {

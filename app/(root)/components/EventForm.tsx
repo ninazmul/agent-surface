@@ -59,27 +59,15 @@ const EventForm = ({ type, Event, EventId, email }: EventFormProps) => {
         if (created) {
           form.reset();
           toast.success("Event created Successfully!");
-          const navigate = () => {
-            router.replace("/events");
-            router.refresh();
-          };
-
-          if (created) {
-            navigate();
-          }
+          router.push("/events");
+          window.location.reload();
         }
       } else if (type === "Update" && EventId) {
         const updated = await updateEvent(EventId, eventData);
         if (updated) {
           toast.success("Event updated Successfully!");
-          const navigate = () => {
-            router.replace("/events");
-            router.refresh();
-          };
-
-          if (updated) {
-            navigate();
-          }
+          router.push("/events");
+          window.location.reload();
         }
       }
     } catch (error) {

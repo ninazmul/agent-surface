@@ -81,14 +81,8 @@ const PaymentForm = ({
           });
           form.reset();
           toast.success("Payment request created successfully!");
-          const navigate = () => {
-            router.replace("/finance");
-            router.refresh();
-          };
-
-          if (created) {
-            navigate();
-          }
+          router.push("/finance");
+          window.location.reload();
         }
       } else if (type === "Update" && PaymentId) {
         const updated = await updatePayment(PaymentId, {
@@ -103,14 +97,8 @@ const PaymentForm = ({
             route: `/finance`,
           });
           toast.success("Payment request updated successfully!");
-          const navigate = () => {
-            router.replace("/finance");
-            router.refresh();
-          };
-
-          if (updated) {
-            navigate();
-          }
+          router.push("/finance");
+          window.location.reload();
         }
       }
     } catch (error) {

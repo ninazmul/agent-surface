@@ -118,19 +118,16 @@ const MarketingResourceForm = ({ type, resource, resourceId }: Props) => {
     };
 
     try {
-      const navigate = () => {
-        router.replace("/events");
-        router.refresh();
-      };
-
       if (type === "Create") {
         await createMarketingResource(payload);
         toast.success("Resource created successfully!");
-        navigate();
+        router.push("/events");
+        window.location.reload();
       } else if (resourceId) {
         await updateMarketingResource(resourceId, payload);
         toast.success("Resource updated successfully!");
-        navigate();
+        router.push("/events");
+        window.location.reload();
       }
     } catch {
       toast.error("Operation failed");

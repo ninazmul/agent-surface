@@ -70,7 +70,7 @@ const AdminTable = ({
       if (response) {
         toast.success("Admin deleted successfully");
       }
-      router.refresh();
+      window.location.reload();
     } catch (error) {
       toast.error("Failed to delete admin");
       console.error(error);

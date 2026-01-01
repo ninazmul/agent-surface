@@ -72,7 +72,7 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
       if (response) {
         toast.success("Event deleted successfully");
       }
-      router.refresh();
+      window.location.reload();
     } catch (error) {
       toast.error("Failed to delete event");
       console.error(error);

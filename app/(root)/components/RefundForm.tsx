@@ -76,14 +76,8 @@ const RefundForm = ({ type, Refund, RefundId, leads }: RefundFormProps) => {
           });
           form.reset();
           toast.success("Refund request created successfully!");
-          const navigate = () => {
-            router.replace("/applications/refund");
-            router.refresh();
-          };
-
-          if (created) {
-            navigate();
-          }
+          router.push("/applications/refund");
+          window.location.reload();
         }
       } else if (type === "Update" && RefundId) {
         const updated = await updateRefund(RefundId, refundData);
@@ -95,14 +89,8 @@ const RefundForm = ({ type, Refund, RefundId, leads }: RefundFormProps) => {
             route: `/applications`,
           });
           toast.success("Refund request updated successfully!");
-          const navigate = () => {
-            router.replace("/applications/refund");
-            router.refresh();
-          };
-
-          if (updated) {
-            navigate();
-          }
+          router.push("/applications/refund");
+          window.location.reload();
         }
       }
     } catch (error) {

@@ -275,14 +275,8 @@ const PromotionLeadForm = ({
             route: `/leads`,
           });
           toast.success(`Leads created for ${values.name}`);
-          const navigate = () => {
-            router.replace("/promotions");
-            router.refresh();
-          };
-
-          if (created) {
-            navigate();
-          }
+          router.push("/promotions");
+          window.location.reload();
         }
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
@@ -311,14 +305,8 @@ const PromotionLeadForm = ({
             route: `/leads`,
           });
           toast.success("Lead updated successfully!");
-          const navigate = () => {
-            router.replace("/promotions");
-            router.refresh();
-          };
-
-          if (updated) {
-            navigate();
-          }
+          router.push("/promotions");
+          window.location.reload();
         }
       }
     } catch (error) {

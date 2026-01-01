@@ -157,7 +157,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
     try {
       const res = await deleteLead(id);
       if (res) toast.success("Lead deleted successfully.");
-      router.refresh();
+      window.location.reload();
     } catch {
       toast.error("Failed to delete lead.");
     } finally {

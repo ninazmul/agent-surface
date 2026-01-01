@@ -73,27 +73,15 @@ const ServiceForm = ({ type, Service, ServiceId }: ServiceFormProps) => {
         if (created) {
           form.reset();
           toast.success("Service added successfully!");
-          const navigate = () => {
-            router.replace("/services");
-            router.refresh();
-          };
-
-          if (created) {
-            navigate();
-          }
+          router.push("/services");
+          window.location.reload();
         }
       } else if (type === "Update" && ServiceId) {
         const updated = await updateService(ServiceId, payload);
         if (updated) {
           toast.success("Service updated successfully!");
-          const navigate = () => {
-            router.replace("/services");
-            router.refresh();
-          };
-
-          if (updated) {
-            navigate();
-          }
+          router.push("/services");
+          window.location.reload();
         }
       }
     } catch (error) {

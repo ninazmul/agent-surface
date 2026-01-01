@@ -126,7 +126,7 @@ const Dashboard = () => {
 
       // Redirect student
       if (safeProfile?.role === "Student") {
-        router.replace("/profile");
+        router.push("/profile");
         return;
       }
 
@@ -211,7 +211,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (searchParams.get("reload")) {
       setDashboardData(null);
-      router.replace("/");
+      router.push("/");
       loadDashboardData();
     }
   }, [searchParams, router, setDashboardData, loadDashboardData]);
