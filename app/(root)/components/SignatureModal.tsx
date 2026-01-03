@@ -59,7 +59,7 @@ export function SignatureModal({
 
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={onClose}>
-            Cancel/Close
+            Close
           </Button>
         </div>
       </div>

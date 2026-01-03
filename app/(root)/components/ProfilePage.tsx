@@ -109,19 +109,30 @@ export default function ProfilePage({
                 </div>
 
                 {/* Action */}
+                {/* Action */}
                 <div className="mt-4">
-                  {!myProfile?.signatureDocument ? (
+                  {myProfile?.signatureDocument ? (
+                    <div className="space-y-2">
+                      <div className="text-sm text-green-700 bg-green-50 border border-green-200 px-4 py-3 rounded-md">
+                        Thank you for submitting your signature. Your profile is
+                        still under review.
+                      </div>
+                      {/* Display signature image */}
+                      <div className="mt-2">
+                        <Image
+                          src={myProfile.signatureDocument}
+                          alt="Submitted Signature"
+                          className="border rounded-md w-64 h-auto"
+                        />
+                      </div>
+                    </div>
+                  ) : (
                     <Button
                       onClick={() => setOpenSignatureModal(true)}
                       className="bg-primary text-white"
                     >
                       Sign Agreement
                     </Button>
-                  ) : (
-                    <div className="text-sm text-green-700 bg-green-50 border border-green-200 px-4 py-3 rounded-md">
-                      Thank you for submitting your signature. Your profile is
-                      still under review.
-                    </div>
                   )}
                 </div>
 
