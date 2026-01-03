@@ -103,16 +103,14 @@ export default function ProfilePage({
                   <div className="text-sm text-yellow-700 bg-yellow-50 dark:bg-yellow-900 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700 px-4 py-3 rounded-lg">
                     Your profile is currently under review. Please review the
                     agreement and submit your signature to proceed.
-                  </div>
-
-                  {/* View Agreement Button */}
-                  <div className="flex justify-center">
-                    <button
-                      onClick={() => setOpenAgreementModal(true)}
-                      className="px-6 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-100 text-gray-900 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-                    >
-                      View Agreement
-                    </button>
+                    <div className="flex justify-center mt-2">
+                      <button
+                        onClick={() => setOpenAgreementModal(true)}
+                        className="px-6 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-100 text-gray-900 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                      >
+                        View Agreement
+                      </button>
+                    </div>
                   </div>
 
                   {/* Signature Section */}

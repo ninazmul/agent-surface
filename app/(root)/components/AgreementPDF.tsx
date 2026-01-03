@@ -25,7 +25,7 @@ export default function AgreementModal({ open, onClose }: AgreementModalProps) {
         </Transition.Child>
 
         <div className="fixed inset-0 overflow-y-auto">
-          <div className="flex items-center justify-center min-h-full p-4 text-center">
+          <div className="flex items-center justify-center min-h-full md:p-4 text-center">
             <Transition.Child
               as={Fragment}
               enter="ease-out duration-300"
