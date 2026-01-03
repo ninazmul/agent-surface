@@ -12,8 +12,8 @@ import { useEffect, useState } from "react";
 import { getLeadByEmail } from "@/lib/actions/lead.actions";
 import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
-import AgreementPDF from "./AgreementPDF";
 import { SignatureModal } from "./SignatureModal";
+import AgreementModal from "./AgreementPDF";
 
 interface ProfilePageProps {
   adminStatus: boolean;
@@ -37,6 +37,7 @@ export default function ProfilePage({
   const { theme } = useTheme();
   const [myLead, setMyLead] = useState<ILead | null>(null);
   const [openSignatureModal, setOpenSignatureModal] = useState(false);
+  const [openAgreementModal, setOpenAgreementModal] = useState(false);
 
   // Fetch leads client-side
   useEffect(() => {
@@ -97,52 +98,62 @@ export default function ProfilePage({
 
             {myProfile?.status === "Pending" && (
               <>
-                {/* Pending Notice */}
-                <div className="mt-4 text-sm text-yellow-700 bg-yellow-50 border border-yellow-200 px-4 py-3 rounded-md">
-                  Your profile is currently under review. Please review the
-                  agreement and submit your signature to proceed.
-                </div>
+                <div className="mt-6 p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 space-y-6">
+                  {/* Pending Notice */}
+                  <div className="text-sm text-yellow-700 bg-yellow-50 dark:bg-yellow-900 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700 px-4 py-3 rounded-lg">
+                    Your profile is currently under review. Please review the
+                    agreement and submit your signature to proceed.
+                  </div>
 
-                {/* Agreement */}
-                <div className="mt-4">
-                  <AgreementPDF />
-                </div>
+                  {/* View Agreement Button */}
+                  <div className="flex justify-center">
+                    <button
+                      onClick={() => setOpenAgreementModal(true)}
+                      className="px-6 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-100 text-gray-900 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+                    >
+                      View Agreement
+                    </button>
+                  </div>
 
-                {/* Action */}
-                {/* Action */}
-                <div className="mt-4">
+                  {/* Signature Section */}
                   {myProfile?.signatureDocument ? (
-                    <div className="space-y-2">
-                      <div className="text-sm text-green-700 bg-green-50 border border-green-200 px-4 py-3 rounded-md">
+                    <div className="space-y-3">
+                      <div className="text-sm text-green-700 bg-green-50 dark:bg-green-900 dark:text-green-300 border border-green-200 dark:border-green-700 px-4 py-3 rounded-lg">
                         Thank you for submitting your signature. Your profile is
                         still under review.
                       </div>
-                      {/* Display signature image */}
-                      <div className="mt-2">
+
+                      <div className="mt-2 flex justify-center">
                         <Image
                           src={myProfile.signatureDocument}
                           alt="Submitted Signature"
-                          className="border rounded-md w-64 h-auto"
+                          className="border rounded-xl w-64 h-auto shadow-sm"
                         />
                       </div>
                     </div>
                   ) : (
-                    <Button
-                      onClick={() => setOpenSignatureModal(true)}
-                      className="bg-primary text-white"
-                    >
-                      Sign Agreement
-                    </Button>
+                    <div className="flex justify-center">
+                      <Button
+                        onClick={() => setOpenSignatureModal(true)}
+                        className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition"
+                      >
+                        Sign Agreement
+                      </Button>
+                    </div>
                   )}
-                </div>
 
-                {/* Signature Modal */}
-                <SignatureModal
-                  open={openSignatureModal}
-                  onClose={() => setOpenSignatureModal(false)}
-                  profileName={myProfile?.name}
-                  profileId={myProfile?._id.toString()}
-                />
+                  {/* Modals */}
+                  <AgreementModal
+                    open={openAgreementModal}
+                    onClose={() => setOpenAgreementModal(false)}
+                  />
+                  <SignatureModal
+                    open={openSignatureModal}
+                    onClose={() => setOpenSignatureModal(false)}
+                    profileName={myProfile?.name}
+                    profileId={myProfile?._id.toString()}
+                  />
+                </div>
               </>
             )}
 
