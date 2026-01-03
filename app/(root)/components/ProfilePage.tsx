@@ -130,6 +130,7 @@ export default function ProfilePage({
                   open={openSignatureModal}
                   onClose={() => setOpenSignatureModal(false)}
                   profileName={myProfile?.name}
+                  profileId={myProfile?._id.toString()}
                 />
               </>
             )}

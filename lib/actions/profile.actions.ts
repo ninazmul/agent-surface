@@ -225,3 +225,29 @@ export const addSubAgentByEmailToProfile = async (
     handleError(error);
   }
 };
+
+
+export const uploadSignatureDocument = async (
+  profileId: string,
+  signatureDocument: string
+) => {
+  try {
+    await connectToDatabase();
+
+    const profile = await Profile.findByIdAndUpdate(
+      profileId,
+      { signatureDocument },
+      { new: true, runValidators: true }
+    );
+
+    if (!profile) {
+      throw new Error("Profile not found");
+    }
+
+    revalidatePath("/profile");
+
+    return JSON.parse(JSON.stringify(profile));
+  } catch (error) {
+    handleError(error);
+  }
+};

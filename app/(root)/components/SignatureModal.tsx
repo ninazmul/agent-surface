@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { SignatureDocumentForm } from "./SignatureDocumentForm";
 
 export const AGREEMENT_LETTER = `
 DECLARATION & AGREEMENT
@@ -21,12 +22,14 @@ interface SignatureModalProps {
   open: boolean;
   onClose: () => void;
   profileName?: string;
+  profileId: string;
 }
 
 export function SignatureModal({
   open,
   onClose,
   profileName,
+  profileId,
 }: SignatureModalProps) {
   if (!open) return null;
 
@@ -52,7 +55,7 @@ export function SignatureModal({
         </div>
 
         {/* Signature form */}
-        {/* <SignatureForm /> */}
+        <SignatureDocumentForm profileId={profileId} />
 
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={onClose}>
