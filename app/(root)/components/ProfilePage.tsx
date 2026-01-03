@@ -97,62 +97,110 @@ export default function ProfilePage({
             {/* Profile Status or Update */}
 
             {myProfile?.status === "Pending" && (
-              <>
-                <div className="mt-6 p-6 rounded-2xl bg-white dark:bg-gray-800 shadow-lg border border-gray-200 dark:border-gray-700 space-y-6">
-                  {/* Pending Notice */}
-                  <div className="text-sm text-yellow-700 bg-yellow-50 dark:bg-yellow-900 dark:text-yellow-300 border border-yellow-200 dark:border-yellow-700 px-4 py-3 rounded-lg">
-                    Your profile is currently under review. Please review the
-                    agreement and submit your signature to proceed.
-                    <div className="flex justify-center mt-2">
-                      <button
-                        onClick={() => setOpenAgreementModal(true)}
-                        className="px-6 py-2 bg-gray-200 dark:bg-gray-700 dark:text-gray-100 text-gray-900 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition"
-                      >
-                        View Agreement
-                      </button>
+              <div className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+                {/* Header Section */}
+                <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4 dark:border-gray-800 dark:bg-gray-800/50">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Finalize Your Registration
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Complete the steps below to activate your account.
+                  </p>
+                </div>
+
+                <div className="p-6 space-y-8">
+                  {/* Step 1: Review Agreement */}
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 font-medium text-sm">
+                      1
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <h4 className="font-medium text-gray-900 dark:text-white">
+                            Review Legal Agreement
+                          </h4>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Please read the terms and conditions carefully.
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setOpenAgreementModal(true)}
+                          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-all"
+                        >
+                          View Document
+                        </button>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Signature Section */}
-                  {myProfile?.signatureDocument ? (
-                    <div className="space-y-3">
-                      <div className="text-sm text-green-700 bg-green-50 dark:bg-green-900 dark:text-green-300 border border-green-200 dark:border-green-700 px-4 py-3 rounded-lg">
-                        Thank you for submitting your signature. Your profile is
-                        still under review.
-                      </div>
-
-                      <div className="mt-2 flex justify-center">
-                        <Image
-                          src={myProfile.signatureDocument}
-                          alt="Submitted Signature"
-                          className="border rounded-xl w-64 h-auto shadow-sm"
-                        />
-                      </div>
+                  {/* Step 2: Signature */}
+                  <div className="flex items-start gap-4">
+                    <div
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-medium text-sm transition-colors ${
+                        myProfile?.signatureDocument
+                          ? "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                          : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                      }`}
+                    >
+                      {myProfile?.signatureDocument ? "✓" : "2"}
                     </div>
-                  ) : (
-                    <div className="flex justify-center">
-                      <Button
-                        onClick={() => setOpenSignatureModal(true)}
-                        className="bg-primary text-white px-6 py-2 rounded-lg hover:bg-primary/90 transition"
-                      >
-                        Sign Agreement
-                      </Button>
-                    </div>
-                  )}
 
-                  {/* Modals */}
-                  <AgreementModal
-                    open={openAgreementModal}
-                    onClose={() => setOpenAgreementModal(false)}
-                  />
-                  <SignatureModal
-                    open={openSignatureModal}
-                    onClose={() => setOpenSignatureModal(false)}
-                    profileName={myProfile?.name}
-                    profileId={myProfile?._id.toString()}
-                  />
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900 dark:text-white">
+                        Digital Signature
+                      </h4>
+
+                      {myProfile?.signatureDocument ? (
+                        <div className="mt-4 flex flex-col items-center sm:items-start gap-4">
+                          <div className="rounded-lg bg-green-50 px-4 py-2 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-300 border border-green-100 dark:border-green-800/30">
+                            Signature successfully captured and under review.
+                          </div>
+                          <div className="group relative rounded-xl border border-gray-200 bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-800">
+                            <Image
+                              src={myProfile.signatureDocument}
+                              alt="Submitted Signature"
+                              className="h-24 w-auto object-contain mix-blend-multiply dark:mix-blend-normal dark:invert-[0.05]"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-4">
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            You must provide a signature to proceed with the
+                            review.
+                          </p>
+                          <Button
+                            onClick={() => setOpenSignatureModal(true)}
+                            className="bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20 px-8 py-2.5 transition-all"
+                          >
+                            Sign Agreement
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </>
+
+                {/* Status Footer */}
+                <div className="bg-yellow-50/50 px-6 py-3 dark:bg-yellow-900/10 border-t border-yellow-100 dark:border-yellow-900/20 text-center">
+                  <span className="text-xs font-medium uppercase tracking-wider text-yellow-700 dark:text-yellow-500">
+                    Current Status: Profile Under Review
+                  </span>
+                </div>
+
+                {/* Modals */}
+                <AgreementModal
+                  open={openAgreementModal}
+                  onClose={() => setOpenAgreementModal(false)}
+                />
+                <SignatureModal
+                  open={openSignatureModal}
+                  onClose={() => setOpenSignatureModal(false)}
+                  profileName={myProfile?.name}
+                  profileId={myProfile?._id.toString()}
+                />
+              </div>
             )}
 
             {myProfile?.status === "Approved" && (
