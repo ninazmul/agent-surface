@@ -257,7 +257,7 @@ const HomeSidebar = ({
     <Sidebar className="font-[var(--font-space-grotesk)] bg-gray-100 dark:bg-gray-900 text-gray-700 dark:text-gray-200">
       <SidebarContent>
         <SidebarGroup className="flex items-center justify-center space-y-6">
-          <SidebarGroupLabel className="flex items-center justify-items-center">
+          <SidebarGroupLabel className="flex items-center justify-items-center relative w-3/4 h-32">
             <a href={role === "Student" ? "/profile" : "/"}>
               <Image
                 src={
@@ -265,8 +265,7 @@ const HomeSidebar = ({
                     ? "/assets/images/logo-white.png"
                     : "/assets/images/logo.png"
                 }
-                width={100}
-                height={100}
+                fill
                 alt="Logo"
                 className="w-full h-auto"
               />
