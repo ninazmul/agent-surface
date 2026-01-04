@@ -11,7 +11,14 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { SortAsc, SortDesc, ExternalLink, Copy, Trash2 } from "lucide-react";
+import {
+  SortAsc,
+  SortDesc,
+  ExternalLink,
+  Copy,
+  Trash2,
+  Share2,
+} from "lucide-react";
 import toast from "react-hot-toast";
 import {
   Dialog,
@@ -201,6 +208,25 @@ const CampaignFormsTable = ({
                       }}
                     >
                       <Copy className="w-4 h-4" />
+                    </Button>
+
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={async () => {
+                        const link = `${shareUrl}`;
+                        if (navigator.share) {
+                          await navigator.share({
+                            title: "Share Campaign Form",
+                            url: link,
+                          });
+                        } else {
+                          navigator.clipboard.writeText(link);
+                          toast.success("Link copied (Share unavailable)");
+                        }
+                      }}
+                    >
+                      <Share2 size={16} />
                     </Button>
 
                     {/* Delete */}
