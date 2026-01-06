@@ -832,7 +832,7 @@ const LeadTable = ({
                     </TableCell>
 
                     {/* Date */}
-                    <TableCell className="w-72 align-top">
+                    <TableCell className="w-60 align-top">
                       <div className="flex flex-col text-sm w-full">
                         <span>
                           <strong>Created:</strong>{" "}
