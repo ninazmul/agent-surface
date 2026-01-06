@@ -859,7 +859,7 @@ const LeadTable = ({
 
                     {/* Social icons */}
                     <TableCell className="w-max align-top">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-52">
                         <a
                           href={lead.social?.facebook}
                           target="_blank"
