@@ -494,7 +494,7 @@ const LeadTable = ({
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table className="table-fixed min-w-[1200px]">
+        <Table>
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white cursor-pointer">
@@ -548,7 +548,7 @@ const LeadTable = ({
                 {sortKey === "date" &&
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
-              <TableHead className="text-white cursor-pointer w-[120px]">
+              <TableHead className="text-white cursor-pointer">
                 Social Media
               </TableHead>
               <TableHead className="text-white cursor-pointer">
@@ -858,7 +858,7 @@ const LeadTable = ({
                     </TableCell>
 
                     {/* Social icons */}
-                    <TableCell className="w-[120px] text-center align-top">
+                    <TableCell className="w-max align-top">
                       <div className="flex items-center gap-2">
                         <a
                           href={lead.social?.facebook}
