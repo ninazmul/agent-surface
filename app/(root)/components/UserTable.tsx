@@ -129,7 +129,7 @@ const UserTable = ({ users }: { users: Array<IUser> }) => {
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table className="table-fixed min-w-[1400px]">
+        <Table className="table-fixed w-full">
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>

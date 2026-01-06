@@ -494,7 +494,7 @@ const LeadTable = ({
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table className="table-fixed min-w-[1400px]">
+        <Table className="table-fixed w-full">
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white cursor-pointer w-[40px]">
@@ -594,7 +594,7 @@ const LeadTable = ({
                         className="flex flex-col space-y-1"
                       >
                         <span className="font-semibold flex items-center gap-2">
-                          <span className="line-clamp-1 truncate truncate">
+                          <span className="line-clamp-1 truncate">
                             {lead.name}
                           </span>
                           {lead.status && (

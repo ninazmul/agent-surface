@@ -152,7 +152,7 @@ const PaymentTable = ({
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table className="table-fixed min-w-[1400px]">
+        <Table className="table-fixed w-full">
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white cursor-pointer">#</TableHead>
