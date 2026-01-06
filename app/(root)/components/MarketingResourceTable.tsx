@@ -118,7 +118,7 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
             <TableRow>
               <TableHead className="text-white cursor-pointer">#</TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("fileName")}
               >
                 File Name{" "}
@@ -126,7 +126,7 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("category")}
               >
                 Category{" "}
@@ -134,7 +134,7 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("price")}
               >
                 Price ({userCountry}){" "}

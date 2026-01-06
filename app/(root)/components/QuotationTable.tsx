@@ -260,7 +260,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
             <TableRow>
               <TableHead className="text-white cursor-pointer">#</TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
@@ -274,7 +274,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                 Course + Services Fees
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("quotationStatus")}
               >
                 Status{" "}
@@ -285,7 +285,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                 Documents
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}

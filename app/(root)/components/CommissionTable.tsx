@@ -295,7 +295,7 @@ const CommissionTable = ({
               </TableHead>
               <TableHead className="text-white cursor-pointer">#</TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
@@ -310,7 +310,7 @@ const CommissionTable = ({
               </TableHead>
               <TableHead className="text-white cursor-pointer">Fees</TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("paymentStatus")}
               >
                 Status{" "}
@@ -318,7 +318,7 @@ const CommissionTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}

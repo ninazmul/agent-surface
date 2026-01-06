@@ -204,7 +204,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
             <TableRow>
               <TableHead className="text-white cursor-pointer">#</TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
@@ -218,7 +218,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                 Course + Service Fees
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}

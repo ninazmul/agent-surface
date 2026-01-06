@@ -131,7 +131,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
               <TableHead className="text-white cursor-pointer">#</TableHead>
               <TableHead className="text-white cursor-pointer">Photo</TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("title")}
               >
                 Title{" "}

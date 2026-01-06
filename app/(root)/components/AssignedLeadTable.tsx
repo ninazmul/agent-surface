@@ -433,7 +433,7 @@ const AssignedLeadTable = ({
                 />
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
@@ -447,7 +447,7 @@ const AssignedLeadTable = ({
                 Course & Services
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("progress")}
               >
                 Progress{" "}
@@ -455,7 +455,7 @@ const AssignedLeadTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("status")}
               >
                 Status{" "}
@@ -463,7 +463,7 @@ const AssignedLeadTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-[40px]"
+                className="text-white cursor-pointer w-full"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}
