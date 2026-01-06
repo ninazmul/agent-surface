@@ -497,7 +497,7 @@ const LeadTable = ({
         <Table>
           <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead className="text-white cursor-pointer w-full">
+              <TableHead className="text-white cursor-pointer w-max">
                 <input
                   type="checkbox"
                   checked={selectedLeads.length === paginatedLeads.length}
@@ -511,7 +511,7 @@ const LeadTable = ({
                 />
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-full"
+                className="text-white cursor-pointer w-max"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
@@ -525,7 +525,7 @@ const LeadTable = ({
                 Course & Services
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-full"
+                className="text-white cursor-pointer w-max"
                 onClick={() => handleSort("progress")}
               >
                 Progress{" "}
@@ -533,7 +533,7 @@ const LeadTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-full"
+                className="text-white cursor-pointer w-max"
                 onClick={() => handleSort("status")}
               >
                 Status{" "}
@@ -541,7 +541,7 @@ const LeadTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer w-full"
+                className="text-white cursor-pointer w-max"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}
