@@ -832,8 +832,8 @@ const LeadTable = ({
                     </TableCell>
 
                     {/* Date */}
-                    <TableCell className="w-60 align-top">
-                      <div className="flex flex-col text-sm w-full">
+                    <TableCell className="w-max align-top">
+                      <div className="flex flex-col text-sm">
                         <span>
                           <strong>Created:</strong>{" "}
                           {lead.createdAt
