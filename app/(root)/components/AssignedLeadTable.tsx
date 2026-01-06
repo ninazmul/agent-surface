@@ -783,7 +783,7 @@ const AssignedLeadTable = ({
 
                     {/* Date */}
                     <TableCell className="w-max align-top">
-                      <div className="flex flex-col text-sm">
+                      <div className="flex flex-col text-sm w-32">
                         <span>
                           <strong>Created:</strong>{" "}
                           {lead.createdAt
@@ -809,7 +809,7 @@ const AssignedLeadTable = ({
 
                     {/* Social icons */}
                     <TableCell className="w-max align-top">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2 w-28">
                         <a
                           href={lead.social?.facebook}
                           target="_blank"
