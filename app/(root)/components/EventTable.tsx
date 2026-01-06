@@ -166,7 +166,7 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
                 <TableCell>{event.title}</TableCell>
-                <TableCell className="">{event.description}</TableCell>
+                <TableCell className="w-max ">{event.description}</TableCell>
                 <TableCell>
                   {new Date(event.date).toLocaleString("en-GB", {
                     day: "2-digit",
@@ -177,7 +177,7 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
                     hour12: true,
                   })}
                 </TableCell>
-                <TableCell className="flex items-center space-x-2">
+                <TableCell className="w-max flex items-center space-x-2">
                   <Sheet>
                     <SheetTrigger>
                       <Button variant="ghost" size="icon">

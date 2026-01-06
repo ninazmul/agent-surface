@@ -167,11 +167,11 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                 key={promotion._id.toString()}
                 className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
               >
-                <TableCell className="align-top">
+                <TableCell className="w-max align-top">
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
                 {/* Photo */}
-                <TableCell className="align-top">
+                <TableCell className="w-max align-top">
                   {promotion.photo ? (
                     <Image
                       src={promotion.photo}
@@ -184,20 +184,22 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                     "-"
                   )}
                 </TableCell>
-                <TableCell className="align-top">{promotion.title}</TableCell>
-                <TableCell className="max-w-40 truncate align-top">
+                <TableCell className="w-max align-top">
+                  {promotion.title}
+                </TableCell>
+                <TableCell className="w-max max-w-40 truncate align-top">
                   {promotion.description}
                 </TableCell>
-                <TableCell className="max-w-40 truncate align-top">
+                <TableCell className="w-max max-w-40 truncate align-top">
                   {promotion.criteria}
                 </TableCell>
-                <TableCell className="align-top">
+                <TableCell className="w-max align-top">
                   {formatDateTime(promotion.startDate).dateOnly} <br />
                   {formatDateTime(promotion.endDate).dateOnly}
                 </TableCell>
 
                 {/* Courses & Services */}
-                <TableCell className="align-top">
+                <TableCell className="w-max align-top">
                   {promotion.course?.length || promotion.services?.length ? (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -246,7 +248,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                 </TableCell>
 
                 {/* Countries */}
-                <TableCell className="align-top">
+                <TableCell className="w-max align-top">
                   {promotion.countries?.length ? (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -277,7 +279,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                 </TableCell>
 
                 {/* Agencies */}
-                <TableCell className="align-top">
+                <TableCell className="w-max align-top">
                   {promotion.agencies?.length ? (
                     <Popover>
                       <PopoverTrigger asChild>
@@ -307,10 +309,12 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                   )}
                 </TableCell>
 
-                <TableCell className="align-top">{promotion.sku}</TableCell>
+                <TableCell className="w-max align-top">
+                  {promotion.sku}
+                </TableCell>
 
                 {/* Actions */}
-                <TableCell className="relative text-right align-top">
+                <TableCell className="w-max relative text-right align-top">
                   <Popover>
                     <PopoverTrigger asChild>
                       <Button

@@ -319,12 +319,12 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                     key={lead._id.toString()}
                     className={`hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0`}
                   >
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       {(currentPage - 1) * itemsPerPage + idx + 1}
                     </TableCell>
 
                     {/* Name & Email */}
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       <a
                         href={`/leads/${
                           (lead.email && leadIds[lead.email]) || ""
@@ -355,7 +355,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                     </TableCell>
 
                     {/* Course & Services */}
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       {lead.course ? (
                         <Popover>
                           <PopoverTrigger asChild>
@@ -411,7 +411,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                       )}
                     </TableCell>
 
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       <div className="text-sm space-y-1">
                         <div className="text-gray-500 dark:text-gray-300">
                           €{courseAmount} + €{servicesTotal}
@@ -424,7 +424,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                     </TableCell>
 
                     {/* QuotationStatus */}
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       {lead.quotationStatus ? (
                         <span className="px-4 py-2 text-xs font-medium rounded-full bg-green-100 text-green-700 border">
                           Accepted
@@ -436,7 +436,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                       )}
                     </TableCell>
 
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       {lead.quotationStatus ? (
                         <Popover>
                           <PopoverTrigger asChild>
@@ -501,7 +501,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                     </TableCell>
 
                     {/* Date */}
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       <div className="flex flex-col text-sm">
                         <span>
                           <strong>Created:</strong>{" "}
@@ -535,7 +535,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                     </TableCell>
 
                     {/* Actions */}
-                    <TableCell className="relative text-right align-top">
+                    <TableCell className="w-max relative text-right align-top">
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button

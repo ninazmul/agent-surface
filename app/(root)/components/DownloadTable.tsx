@@ -214,13 +214,13 @@ const DownloadTable = ({
                     {download.author}
                   </a>
                 </TableCell>
-                <TableCell className="w-52">
+                <TableCell className="w-max w-52">
                   <span className="block w-full px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border">
                     {formatDateTime(download.date).dateOnly}
                   </span>
                 </TableCell>
 
-                <TableCell className="w-52">
+                <TableCell className="w-max w-52">
                   {download.documents?.length > 0 ? (
                     <select
                       onChange={(e) => {
@@ -244,7 +244,7 @@ const DownloadTable = ({
                 </TableCell>
 
                 {isAdmin && (
-                  <TableCell className="flex items-center space-x-2">
+                  <TableCell className="w-max flex items-center space-x-2">
                     <a href={`/downloads/${download._id.toString()}/update`}>
                       <Button variant="ghost" size="icon">
                         <Pencil className="w-4 h-4 text-black" />

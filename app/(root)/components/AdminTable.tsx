@@ -202,7 +202,7 @@ const AdminTable = ({
                     </PopoverContent>
                   </Popover>
                 </TableCell>
-                <TableCell className="flex items-center space-x-2">
+                <TableCell className="w-max flex items-center space-x-2">
                   {isRestricted ? (
                     <span className="text-muted-foreground italic text-xs">
                       Restricted

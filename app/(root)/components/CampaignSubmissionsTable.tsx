@@ -139,7 +139,7 @@ export default function CampaignSubmissionsTable({
 
                 <TableCell>{idx + 1}</TableCell>
 
-                <TableCell className="font-medium">
+                <TableCell className="w-max font-medium">
                   {pickField(sub.answers, ["name"])}
                 </TableCell>
 
@@ -151,7 +151,7 @@ export default function CampaignSubmissionsTable({
                   {new Date(sub.submittedAt).toLocaleDateString()}
                 </TableCell>
 
-                <TableCell className="text-right">
+                <TableCell className="w-max text-right">
                   <span
                     className="px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
                     onClick={() => setActiveSubmission(sub)}

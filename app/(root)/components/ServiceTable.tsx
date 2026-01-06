@@ -160,7 +160,7 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
-                <TableCell className="line-clamp-1 truncate">
+                <TableCell className="w-max line-clamp-1 truncate">
                   {service.title}
                 </TableCell>
                 <TableCell>
@@ -186,7 +186,7 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
                     : "N/A"}
                 </TableCell>
                 <TableCell>{`€${service.amount}` || "N/A"}</TableCell>
-                <TableCell className="flex items-center space-x-2">
+                <TableCell className="w-max flex items-center space-x-2">
                   <a href={`/services/${service._id.toString()}/update`}>
                     <Button variant="ghost" size="icon">
                       <Pencil className="w-4 h-4 text-black" />

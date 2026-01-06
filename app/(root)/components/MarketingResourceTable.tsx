@@ -192,7 +192,7 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
                     </a>
                   </TableCell>
                   {isAdmin && (
-                    <TableCell className="flex items-center space-x-2">
+                    <TableCell className="w-max flex items-center space-x-2">
                       <a href={`/resources/${resource._id.toString()}/update`}>
                         <Button variant="ghost" size="icon">
                           <Pencil className="w-4 h-4 text-black" />

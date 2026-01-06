@@ -225,7 +225,7 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
                   {new Date(course.createdAt).toLocaleDateString()}
                 </TableCell>
 
-                <TableCell className="space-x-2">
+                <TableCell className="w-max space-x-2">
                   {/* Edit */}
                   <a href={`/courses/${course._id.toString()}/update`}>
                     <Button variant="ghost" size="icon">

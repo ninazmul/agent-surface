@@ -208,7 +208,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
                       }}
                       className="hover:bg-purple-500 hover:text-white rounded-2xl border-none flex items-center justify-between cursor-pointer"
                     >
-                      <TableCell className="flex items-center space-x-2">
+                      <TableCell className="w-max flex items-center space-x-2">
                         <Image
                           src={
                             agencyProfiles[thread.userEmail]?.logo ||

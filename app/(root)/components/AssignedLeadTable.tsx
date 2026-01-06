@@ -490,7 +490,7 @@ const AssignedLeadTable = ({
                         : ""
                     }`}
                   >
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       <input
                         type="checkbox"
                         checked={selectedLeads.includes(lead._id.toString())}
@@ -509,7 +509,7 @@ const AssignedLeadTable = ({
                       />
                     </TableCell>
                     {/* Name & Email */}
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       <a
                         href={`/leads/${lead._id.toString()}`}
                         className="flex flex-col space-y-1"
@@ -593,7 +593,7 @@ const AssignedLeadTable = ({
                       </a>
                     </TableCell>
 
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       <div className="flex flex-col space-y-1">
                         <span className="font-semibold">
                           {profiles[lead.author] ? (
@@ -667,7 +667,7 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     {/* Course & Services */}
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       {lead.course ? (
                         <Popover>
                           <PopoverTrigger asChild>
@@ -724,7 +724,7 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     {/* Progress */}
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       <select
                         value={lead.progress}
                         onChange={(e) =>
@@ -753,7 +753,7 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     {/* Status */}
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       <select
                         value={lead.status}
                         onChange={(e) =>
@@ -782,7 +782,7 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     {/* Date */}
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       <div className="flex flex-col text-sm">
                         <span>
                           <strong>Created:</strong>{" "}
@@ -808,7 +808,7 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     {/* Social icons */}
-                    <TableCell className="align-top">
+                    <TableCell className="w-max align-top">
                       <div className="flex items-center gap-2">
                         <a
                           href={lead.social?.facebook}
@@ -862,7 +862,7 @@ const AssignedLeadTable = ({
                     </TableCell>
 
                     {/* Actions */}
-                    <TableCell className="relative text-right align-top">
+                    <TableCell className="w-max relative text-right align-top">
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button

@@ -178,7 +178,7 @@ const StudentResourceTable = ({
                     {resource.fileName}
                   </a>
                 </TableCell>
-                <TableCell className="line-clamp-1 truncate w-40 md:w-auto">
+                <TableCell className="w-max line-clamp-1 truncate w-40 md:w-auto">
                   {resource.category}
                 </TableCell>
                 <TableCell>
@@ -191,7 +191,7 @@ const StudentResourceTable = ({
 
                 {isAdmin && (
                   <>
-                    <TableCell className="flex items-center space-x-2">
+                    <TableCell className="w-max flex items-center space-x-2">
                       <a href={`/resources/${resource._id.toString()}/update`}>
                         <Button variant="ghost" size="icon">
                           <Pencil className="w-4 h-4 text-black" />

@@ -341,7 +341,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                   </div>
                 </TableCell>
 
-                <TableCell className="flex items-center space-x-2">
+                <TableCell className="w-max flex items-center space-x-2">
                   <a href={`/profile/${profile._id.toString()}/update`}>
                     <Button variant="ghost" size="icon">
                       <Pencil className="w-4 h-4 text-black" />
