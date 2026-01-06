@@ -106,7 +106,7 @@ export default function CampaignSubmissionsTable({
       )}
 
       <div className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800">
-        <Table className="table-fixed">
+        <Table>
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="w-10">

@@ -199,7 +199,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table className="table-fixed">
+        <Table>
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white cursor-pointer">#</TableHead>
