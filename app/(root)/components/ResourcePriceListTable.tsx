@@ -156,7 +156,7 @@ const ResourcePriceListCards = ({
             className="cursor-pointer rounded-2xl border bg-white dark:bg-gray-800 p-5 space-y-3 hover:shadow-lg transition"
           >
             <div>
-              <h3 className="font-semibold line-clamp-1">
+              <h3 className="font-semibold line-clamp-1 truncate">
                 {resource.fileName}
               </h3>
               <p className="text-sm text-muted-foreground">

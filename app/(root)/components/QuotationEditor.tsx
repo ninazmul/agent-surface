@@ -294,7 +294,7 @@ export default function QuotationEditor({
                   ? new Date(course.startDate).toLocaleDateString()
                   : "-"}
               </p>
-              <p className="text-sm text-gray-500 dark:text-gray-300 line-clamp-1 max-w-64">
+              <p className="text-sm text-gray-500 dark:text-gray-300 line-clamp-1 truncate max-w-64">
                 Campus:{" "}
                 {course.campus
                   ? `${course.campus.name} (${course.campus.shift})`

@@ -253,7 +253,7 @@ const CommissionTable = ({
       />
 
       <div
-        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -277,7 +277,7 @@ const CommissionTable = ({
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table>
+        <Table className="table-fixed min-w-[1400px]">
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white cursor-pointer">
@@ -295,7 +295,7 @@ const CommissionTable = ({
               </TableHead>
               <TableHead className="text-white cursor-pointer">#</TableHead>
               <TableHead
-                className="text-white cursor-pointer"
+                className="text-white cursor-pointer w-[40px]"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
@@ -310,7 +310,7 @@ const CommissionTable = ({
               </TableHead>
               <TableHead className="text-white cursor-pointer">Fees</TableHead>
               <TableHead
-                className="text-white cursor-pointer"
+                className="text-white cursor-pointer w-[40px]"
                 onClick={() => handleSort("paymentStatus")}
               >
                 Status{" "}
@@ -318,7 +318,7 @@ const CommissionTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer"
+                className="text-white cursor-pointer w-[40px]"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}
@@ -381,7 +381,9 @@ const CommissionTable = ({
                     <TableCell className="align-top">
                       <a className="flex flex-col">
                         <span className="font-semibold flex items-center gap-2">
-                          <span className="line-clamp-1">{lead.name}</span>
+                          <span className="line-clamp-1 truncate">
+                            {lead.name}
+                          </span>
                           {lead.isAdditional ? (
                             <span className="px-2 py-0.5 text-xs rounded-full bg-yellow-100 text-yellow-600 border border-yellow-300">
                               Additional
@@ -669,7 +671,7 @@ const CommissionTable = ({
                                     status: newStatus,
                                   });
 
-                                  router.refresh() // still keep this to sync with DB
+                                  router.refresh(); // still keep this to sync with DB
                                 } catch (err) {
                                   console.error(err);
                                   toast.error(

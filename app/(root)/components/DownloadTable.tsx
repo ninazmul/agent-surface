@@ -111,7 +111,7 @@ const DownloadTable = ({
         className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
       <div
-        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -136,7 +136,7 @@ const DownloadTable = ({
         }}
       >
         {" "}
-        <Table>
+        <Table className="table-fixed min-w-[1400px]">
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white cursor-pointer">#</TableHead>
@@ -191,7 +191,7 @@ const DownloadTable = ({
                 <TableCell>
                   <a
                     href={`/applications/${download._id.toString()}`}
-                    className="line-clamp-1 w-40 md:w-auto hover:underline"
+                    className="line-clamp-1 truncate w-40 md:w-auto hover:underline"
                   >
                     {download.name}
                   </a>
@@ -268,7 +268,7 @@ const DownloadTable = ({
       </div>
 
       <div className="flex justify-between items-center mt-4 w-full">
-        <span className="text-sm text-muted-foreground line-clamp-1">
+        <span className="text-sm text-muted-foreground line-clamp-1 truncate">
           Showing{" "}
           {Math.min(itemsPerPage * currentPage, filteredDownloads.length)} of{" "}
           {filteredDownloads.length} downloads

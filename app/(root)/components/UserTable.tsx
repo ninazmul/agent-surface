@@ -129,7 +129,7 @@ const UserTable = ({ users }: { users: Array<IUser> }) => {
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table>
+        <Table className="table-fixed min-w-[1400px]">
           <TableHeader>
             <TableRow>
               <TableHead>#</TableHead>
@@ -205,7 +205,7 @@ const UserTable = ({ users }: { users: Array<IUser> }) => {
         </Table>
       </div>
       <div className="flex justify-between items-center mt-4 w-full">
-        <span className="text-sm text-muted-foreground line-clamp-1">
+        <span className="text-sm text-muted-foreground line-clamp-1 truncate">
           Showing {Math.min(itemsPerPage * currentPage, filteredUsers.length)}{" "}
           of {filteredUsers.length} users
         </span>

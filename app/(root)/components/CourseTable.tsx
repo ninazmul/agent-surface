@@ -99,7 +99,7 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
       />
 
       <div
-        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -123,7 +123,7 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table>
+        <Table className="table-fixed min-w-[1400px]">
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white cursor-pointer">#</TableHead>

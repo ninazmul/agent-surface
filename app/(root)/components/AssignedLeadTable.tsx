@@ -392,7 +392,7 @@ const AssignedLeadTable = ({
       </div>
 
       <div
-        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -416,7 +416,7 @@ const AssignedLeadTable = ({
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table>
+        <Table className="table-fixed min-w-[1400px]">
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white cursor-pointer">
@@ -433,7 +433,7 @@ const AssignedLeadTable = ({
                 />
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer"
+                className="text-white cursor-pointer w-[40px]"
                 onClick={() => handleSort("name")}
               >
                 Name & Email{" "}
@@ -447,7 +447,7 @@ const AssignedLeadTable = ({
                 Course & Services
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer"
+                className="text-white cursor-pointer w-[40px]"
                 onClick={() => handleSort("progress")}
               >
                 Progress{" "}
@@ -455,7 +455,7 @@ const AssignedLeadTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer"
+                className="text-white cursor-pointer w-[40px]"
                 onClick={() => handleSort("status")}
               >
                 Status{" "}
@@ -463,7 +463,7 @@ const AssignedLeadTable = ({
                   (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
               </TableHead>
               <TableHead
-                className="text-white cursor-pointer"
+                className="text-white cursor-pointer w-[40px]"
                 onClick={() => handleSort("date")}
               >
                 Date{" "}
@@ -515,7 +515,9 @@ const AssignedLeadTable = ({
                         className="flex flex-col space-y-1"
                       >
                         <span className="font-semibold flex items-center gap-2">
-                          <span className="line-clamp-1">{lead.name}</span>
+                          <span className="line-clamp-1 truncate">
+                            {lead.name}
+                          </span>
                           {lead.status && (
                             <span
                               className={`

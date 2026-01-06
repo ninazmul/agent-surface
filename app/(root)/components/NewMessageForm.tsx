@@ -32,7 +32,7 @@ const NewMessageForm = ({
             ) : (
               <div className="w-10 h-10 bg-gray-300 dark:bg-gray-600 rounded-full" />
             )}
-            <div className="font-bold text-sm line-clamp-1">
+            <div className="font-bold text-sm line-clamp-1 truncate">
               {user.name || user.email}
             </div>
           </div>

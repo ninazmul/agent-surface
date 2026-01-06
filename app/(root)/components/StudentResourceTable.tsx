@@ -103,7 +103,7 @@ const StudentResourceTable = ({
         className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
       <div
-        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -127,7 +127,7 @@ const StudentResourceTable = ({
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table>
+        <Table className="table-fixed min-w-[1400px]">
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white cursor-pointer">#</TableHead>
@@ -173,12 +173,12 @@ const StudentResourceTable = ({
                 <TableCell>
                   <a
                     href={`/applications/${resource._id.toString()}`}
-                    className="line-clamp-1 w-40 md:w-auto hover:underline"
+                    className="line-clamp-1 truncate w-40 md:w-auto hover:underline"
                   >
                     {resource.fileName}
                   </a>
                 </TableCell>
-                <TableCell className="line-clamp-1 w-40 md:w-auto">
+                <TableCell className="line-clamp-1 truncate w-40 md:w-auto">
                   {resource.category}
                 </TableCell>
                 <TableCell>
@@ -216,7 +216,7 @@ const StudentResourceTable = ({
       </div>
 
       <div className="flex justify-between items-center mt-4 w-full">
-        <span className="text-sm text-muted-foreground line-clamp-1">
+        <span className="text-sm text-muted-foreground line-clamp-1 truncate">
           Showing{" "}
           {Math.min(itemsPerPage * currentPage, filteredResources.length)} of{" "}
           {filteredResources.length} resources

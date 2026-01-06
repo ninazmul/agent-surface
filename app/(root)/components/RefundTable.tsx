@@ -134,7 +134,7 @@ const RefundTable = ({
       />
 
       <div className="overflow-auto rounded-2xl bg-green-50 dark:bg-gray-900">
-        <Table>
+        <Table className="table-fixed min-w-[1400px]">
           <TableHeader>
             <TableRow>
               <TableHead className="whitespace-nowrap">#</TableHead>

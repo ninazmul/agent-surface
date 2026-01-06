@@ -95,7 +95,7 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
         className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
       />
       <div
-        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800 scrollbar-hide"
+        className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800"
         style={{ cursor: "grab" }}
         onMouseDown={(e) => {
           const el = e.currentTarget;
@@ -119,7 +119,7 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table>
+        <Table className="table-fixed min-w-[1400px]">
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white cursor-pointer">#</TableHead>
@@ -160,7 +160,9 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
                 <TableCell>
                   {(currentPage - 1) * itemsPerPage + index + 1}
                 </TableCell>
-                <TableCell className="line-clamp-1">{service.title}</TableCell>
+                <TableCell className="line-clamp-1 truncate">
+                  {service.title}
+                </TableCell>
                 <TableCell>
                   <Popover>
                     <PopoverTrigger asChild>
