@@ -115,7 +115,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
           Leads Progress
         </h2>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <select
             className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
             onChange={(e) => setFilter(e.target.value)}
