@@ -224,10 +224,11 @@ const Dashboard = () => {
   return (
     <div className="p-4 mb-10">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:h-[450px]">
-        {myProfile && myProfile.role !== "Student" && (
+        {(!myProfile || myProfile.role !== "Student") && (
           <SalesDashboard leads={leads} />
         )}
-        {myProfile && myProfile.role !== "Student" && (
+
+        {(!myProfile || myProfile.role !== "Student") && (
           <CountrySalesTargets
             adminStatus={adminStatus}
             profiles={profiles}
