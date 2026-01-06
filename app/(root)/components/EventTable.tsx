@@ -172,9 +172,6 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
                     day: "2-digit",
                     month: "2-digit",
                     year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                    hour12: true,
                   })}
                 </TableCell>
                 <TableCell className="w-max flex items-center space-x-2">

@@ -25,7 +25,7 @@ import {
 const CourseTable = ({ courses }: { courses: ICourse[] }) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [sortKey, setSortKey] = useState<"name" | "createdAt" | null>(null);
+  const [sortKey, setSortKey] = useState<"name" | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
@@ -44,9 +44,6 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
         if (sortKey === "name") {
           valA = a.name.toLowerCase();
           valB = b.name.toLowerCase();
-        } else if (sortKey === "createdAt") {
-          valA = new Date(a.createdAt).getTime();
-          valB = new Date(b.createdAt).getTime();
         }
 
         return sortOrder === "asc"
@@ -80,7 +77,7 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
     }
   };
 
-  const handleSort = (key: "name" | "createdAt") => {
+  const handleSort = (key: "name") => {
     if (sortKey === key) {
       setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
     } else {
@@ -154,16 +151,6 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
                 Campuses
               </TableHead>
               <TableHead className="text-white cursor-pointer">
-                <div
-                  onClick={() => handleSort("createdAt")}
-                  className="flex items-center gap-2 cursor-pointer select-none"
-                >
-                  Created At
-                  {sortKey === "createdAt" &&
-                    (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
-                </div>
-              </TableHead>
-              <TableHead className="text-white cursor-pointer">
                 Actions
               </TableHead>
             </TableRow>
@@ -219,10 +206,6 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
                       </div>
                     </PopoverContent>
                   </Popover>
-                </TableCell>
-
-                <TableCell>
-                  {new Date(course.createdAt).toLocaleDateString()}
                 </TableCell>
 
                 <TableCell className="w-max space-x-2">

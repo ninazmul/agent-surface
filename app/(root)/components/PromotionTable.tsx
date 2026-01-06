@@ -194,8 +194,10 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                   {promotion.criteria}
                 </TableCell>
                 <TableCell className="w-max align-top">
-                  {formatDateTime(promotion.startDate).dateOnly} <br />
-                  {formatDateTime(promotion.endDate).dateOnly}
+                  <div className="flex flex-col text-sm w-40">
+                    {formatDateTime(promotion.startDate).dateOnly} <br />
+                    {formatDateTime(promotion.endDate).dateOnly}
+                  </div>
                 </TableCell>
 
                 {/* Courses & Services */}

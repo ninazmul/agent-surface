@@ -353,7 +353,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
 
                     {/* Date */}
                     <TableCell className="w-max align-top">
-                      <div className="flex flex-col text-sm">
+                      <div className="flex flex-col text-sm w-40">
                         <span>
                           <strong>Created:</strong>{" "}
                           {lead.createdAt
@@ -361,10 +361,6 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                                 day: "2-digit",
                                 month: "2-digit",
                                 year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                second: "2-digit",
-                                hour12: false,
                               })
                             : "N/A"}
                         </span>
@@ -374,11 +370,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             ? new Date(lead.updatedAt).toLocaleString("en-GB", {
                                 day: "2-digit",
                                 month: "2-digit",
-                                year: "numeric",
-                                hour: "2-digit",
-                                minute: "2-digit",
-                                second: "2-digit",
-                                hour12: false,
+                                year: "numeric", 
                               })
                             : "N/A"}
                         </span>
