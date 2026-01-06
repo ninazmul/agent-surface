@@ -123,7 +123,7 @@ const EventTable = ({ events }: { events: Array<IEvent> }) => {
           window.addEventListener("mouseup", onMouseUp);
         }}
       >
-        <Table className="table-fixed w-full">
+        <Table>
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white cursor-pointer">#</TableHead>

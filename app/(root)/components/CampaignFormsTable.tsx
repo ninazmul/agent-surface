@@ -136,7 +136,7 @@ const CampaignFormsTable = ({
         className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800"
         style={{ cursor: "grab" }}
       >
-        <Table className="table-fixed w-full">
+        <Table>
           <TableHeader className="bg-gray-900">
             <TableRow>
               <TableHead className="text-white">#</TableHead>

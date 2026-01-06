@@ -189,7 +189,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-2xl"
           />
-          <Table className="table-fixed w-full">
+          <Table>
             <TableBody>
               {threads
                 .filter((t) =>
