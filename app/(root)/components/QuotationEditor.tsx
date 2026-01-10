@@ -24,17 +24,20 @@ interface IService {
 export default function QuotationEditor({
   data,
   isAdmin,
+  agency,
   allCourse,
   allServices,
   isQuotationAccepted,
 }: {
   data: ILead | IQuotation;
   isAdmin: boolean;
+  agency?: string;
   allCourse: ICourse[];
   allServices: IServices[];
   isQuotationAccepted: boolean;
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const canEdit = isAdmin || (Boolean(agency) && !isQuotationAccepted);
 
   // Courses & Services states
   const expandCourses = (course: ICourse): SelectedCourse[] => {
@@ -97,14 +100,19 @@ export default function QuotationEditor({
     }))
   );
 
-  const [discount, setDiscount] = useState<number>(Number(data.discount) || 0);
+  const [discount, setDiscount] = useState<string>(
+    data.discount ? data.discount.toString() : ""
+  );
+
   const [loading, setLoading] = useState(false);
+
+  const discountNumber = Number(discount) || 0;
 
   const subTotal =
     selectedCourses.reduce((sum, c) => sum + Number(c.courseFee || 0), 0) +
     selectedServices.reduce((sum, s) => sum + s.amount, 0);
 
-  const grandTotal = subTotal - discount;
+  const grandTotal = subTotal - discountNumber;
 
   const courseKey = (course: SelectedCourse) =>
     `${course.name}-${course.campus?.name}-${course.campus?.shift}`;
@@ -189,7 +197,7 @@ export default function QuotationEditor({
         <h2 className="text-xl font-semibold text-primary-800">
           Services & Fees
         </h2>
-        {(isAdmin || !isQuotationAccepted) && (
+        {canEdit && (
           <>
             {isEditing ? (
               <div className="flex gap-2">
@@ -381,11 +389,13 @@ export default function QuotationEditor({
           <Input
             type="number"
             value={discount}
-            onChange={(e) => setDiscount(Number(e.target.value))}
+            onChange={(e) => setDiscount(e.target.value)}
+            placeholder="0"
+            min={0}
             className="w-28"
           />
         ) : (
-          <p>- €{discount.toFixed(2)}</p>
+          <p>- €{discount}</p>
         )}
       </div>
 

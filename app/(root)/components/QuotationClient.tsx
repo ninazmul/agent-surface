@@ -203,6 +203,7 @@ export default function QuotationClient({
             <QuotationEditor
               data={data}
               isAdmin={hasAccess}
+              agency={agency?.email || ""}
               allCourse={course}
               allServices={services}
               isQuotationAccepted={quotationAccepted}
