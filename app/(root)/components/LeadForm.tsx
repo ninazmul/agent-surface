@@ -292,18 +292,27 @@ const LeadForm = ({
         const updated = await updateLead(LeadId, {
           ...values,
           passport: {
-            ...values.passport,
+            ...(values.passport || {}),
             file: uploadedPassport || values?.passport?.file,
           },
           arrival: {
-            ...values.arrival,
+            ...(values.arrival || {}),
             file: uploadedArrival || values?.arrival?.file,
           },
-          course: values.course || [],
-          services: values.services?.map((s) => ({
-            ...s,
-            _id: new Types.ObjectId(s._id),
-          })),
+          course:
+            values.course?.map((c) => ({
+              ...c,
+              startDate: c.startDate ? new Date(c.startDate) : undefined,
+              endDate: c.endDate ? new Date(c.endDate) : undefined,
+              campus: c.campus || { name: "", shift: "" },
+            })) || [],
+          services:
+            values.services?.map((s) => ({
+              ...s,
+              _id:
+                typeof s._id === "string" ? new Types.ObjectId(s._id) : s._id,
+            })) || [],
+          date: values.date ? new Date(values.date) : new Date(),
           others: values.others || [],
         });
         if (updated) {
