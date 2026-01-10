@@ -225,7 +225,7 @@ const LeadForm = ({
         (Lead?.progress as "Open" | "Contacted" | "Converted" | "Closed") ||
         "Open",
       status:
-        (Lead?.progress as "Perception" | "Cold" | "Warm" | "Hot") ||
+        (Lead?.status as "Perception" | "Cold" | "Warm" | "Hot") ||
         "Perception",
       date: Lead?.date ? new Date(Lead.date) : new Date(),
       isPinned: Lead?.isPinned || false,
