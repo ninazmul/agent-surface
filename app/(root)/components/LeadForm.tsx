@@ -103,7 +103,7 @@ const LeadFormSchema = z.object({
   progress: z.enum(["Open", "Contacted", "Converted", "Closed"]),
   status: z.enum(["Perception", "Cold", "Warm", "Hot"]),
   date: z.date(),
-  author: z.string(),
+  author: z.string().optional(),
   isPinned: z.boolean().optional(),
   others: z
     .array(
@@ -250,10 +250,21 @@ const LeadForm = ({
     const uploadedPassport = await safeUpload(passportFile);
     const uploadedArrival = await safeUpload(arrivalFile);
 
+    const resolveAuthor = () => {
+      // Update: preserve unless explicitly changed by admin
+      if (type === "Update") {
+        if (isAdmin && values.author) return values.author;
+        return Lead?.author; // 🔒 preserve existing
+      }
+    };
+
+    const finalAuthor = resolveAuthor();
+
     try {
       if (type === "Create") {
         const created = await createLead({
           ...values,
+          author: values.author || email,
           passport: {
             ...values.passport,
             file: uploadedPassport || values?.passport?.file,
@@ -273,7 +284,7 @@ const LeadForm = ({
         if (created) {
           await createNotification({
             title: `New lead created for ${values.name}`,
-            agency: values.author,
+            agency: values.author || email,
             country: values.home.country,
             route: `/leads`,
           });
@@ -291,6 +302,7 @@ const LeadForm = ({
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
           ...values,
+          author: finalAuthor || Lead?.author || email,
           passport: {
             ...(values.passport || {}),
             file: uploadedPassport || values?.passport?.file,
@@ -318,7 +330,7 @@ const LeadForm = ({
         if (updated) {
           await createNotification({
             title: `${values.name}'s lead updated!`,
-            agency: values.author,
+            agency: finalAuthor || Lead?.author || email,
             country: values.home.country,
             route: `/leads`,
           });
