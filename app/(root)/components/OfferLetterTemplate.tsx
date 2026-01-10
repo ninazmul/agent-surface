@@ -45,6 +45,7 @@ export default function OfferLetterTemplate({
             width={150}
             height={80}
             className="object-contain dark:hidden"
+            unoptimized
           />
           <Image
             src="/assets/images/logo-white.png"
@@ -52,6 +53,7 @@ export default function OfferLetterTemplate({
             width={150}
             height={80}
             className="object-contain hidden dark:block"
+            unoptimized
           />
         </div>
 

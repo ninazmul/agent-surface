@@ -60,7 +60,6 @@ const OfferLetter = async ({ params }: PageProps) => {
           width={120}
           height={120}
           className="object-contain dark:hidden"
-          unoptimized
         />
         <Image
           src="/assets/images/logo-white.png"
@@ -68,7 +67,6 @@ const OfferLetter = async ({ params }: PageProps) => {
           width={120}
           height={120}
           className="object-contain hidden dark:block"
-          unoptimized
         />
         <div className="text-right text-xs text-gray-600 dark:text-gray-300 space-y-0.5">
           <p>33 Gardiner Place, Dublin 1 • Ireland +353 1 878 8616</p>
