@@ -24,20 +24,25 @@ interface IService {
 export default function QuotationEditor({
   data,
   isAdmin,
-  agency,
   allCourse,
   allServices,
   isQuotationAccepted,
+  userEmail,
 }: {
   data: ILead | IQuotation;
   isAdmin: boolean;
-  agency?: string;
   allCourse: ICourse[];
   allServices: IServices[];
   isQuotationAccepted: boolean;
+  userEmail?: string;
 }) {
   const [isEditing, setIsEditing] = useState(false);
-  const canEdit = isAdmin || (Boolean(agency) && !isQuotationAccepted);
+  const canEdit =
+    isAdmin ||
+    (userEmail &&
+      data.author &&
+      userEmail === data.author &&
+      !isQuotationAccepted);
 
   // Courses & Services states
   const expandCourses = (course: ICourse): SelectedCourse[] => {

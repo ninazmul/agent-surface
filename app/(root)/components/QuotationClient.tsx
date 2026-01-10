@@ -16,6 +16,8 @@ import { IServices } from "@/lib/database/models/service.model";
 import { ICourse } from "@/lib/database/models/course.model";
 import QuotationVoidStatusUpdater from "./QuotationVoidStatusUpdater";
 import { IQuotation } from "@/lib/database/models/quotation.model";
+import { useUser } from "@clerk/nextjs";
+import { getUserByClerkId, getUserEmailById } from "@/lib/actions";
 
 const steps = [
   { id: 1, label: "Validate your Quote" },
@@ -41,6 +43,25 @@ export default function QuotationClient({
   hasAccess: boolean;
 }) {
   const data = lead || quotation;
+  const [userEmail, setUserEmail] = useState<string>("");
+  const { user } = useUser();
+  const userId = user?.id || "";
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        if (!userId) return;
+
+        const userID = await getUserByClerkId(userId);
+        const email = await getUserEmailById(userID);
+
+        setUserEmail(email);
+      } catch (err) {
+        console.error("User not found error:", err);
+      }
+    };
+
+    fetchData();
+  }, [userId]);
 
   const [accepted, setAccepted] = useState(false);
   const [language, setLanguage] = useState("en");
@@ -203,10 +224,10 @@ export default function QuotationClient({
             <QuotationEditor
               data={data}
               isAdmin={hasAccess}
-              agency={agency?.email || ""}
               allCourse={course}
               allServices={services}
               isQuotationAccepted={quotationAccepted}
+              userEmail={userEmail}
             />{" "}
             {/* Agency + Payment */}{" "}
             {agency ? (
