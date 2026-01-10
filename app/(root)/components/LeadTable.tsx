@@ -431,7 +431,7 @@ const LeadTable = ({
           placeholder="Search leads..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
+          className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl outline-none"
         />
 
         {/* Filters Container */}
