@@ -9,6 +9,7 @@ import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import { getLeadById } from "@/lib/actions/lead.actions";
 import LeadForm from "@/app/(root)/components/LeadForm";
+import { getAllServices } from "@/lib/actions/service.actions";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -23,6 +24,7 @@ const UpdatePage = async ({ params }: PageProps) => {
   if (!lead) redirect("/applications");
 
   const courses = await getAllCourses();
+  const services = await getAllServices();
 
   const adminStatus = await isAdmin(email);
 
@@ -38,13 +40,14 @@ const UpdatePage = async ({ params }: PageProps) => {
     <div className="max-w-5xl mx-auto px-4 py-8">
       <h2 className="text-3xl font-bold mb-6">Update lead</h2>
       <LeadForm
-        type="Update"
+        email={email}
         Lead={lead}
         LeadId={id}
-        email={email}
-        courses={courses}
         agency={agency}
+        courses={courses}
+        services={services}
         isAdmin={adminStatus}
+        type="Update"
       />
     </div>
   );
