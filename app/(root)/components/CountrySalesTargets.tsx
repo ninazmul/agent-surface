@@ -179,7 +179,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   // UI (UNCHANGED)
   return (
     <section>
-      <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+      <div className="space-y-4 mb-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Sales Target by Country
         </h2>

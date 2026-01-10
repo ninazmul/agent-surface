@@ -183,7 +183,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   return (
     <div className="">
       {/* Header & Filters */}
-      <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+      <div className="space-y-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Sales & Performance Analytics
         </h1>
