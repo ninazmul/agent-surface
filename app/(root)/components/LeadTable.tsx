@@ -425,13 +425,13 @@ const LeadTable = ({
   return (
     <div className="space-y-6">
       {/* --- Filters --- */}
-      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-start sm:items-center">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-start sm:items-center p-1">
         {/* Search */}
         <Input
           placeholder="Search leads..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl outline-none"
+          className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
         />
 
         {/* Filters Container */}
