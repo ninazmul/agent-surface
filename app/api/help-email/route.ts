@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
     await transporter.sendMail({
       from: `"${body.agentName}" <${process.env.EMAIL_USER}>`,
-      to: "nazmulsaw@gmail.com",
+      to: "abpartnerportal@gmail.com",
       subject: `Help Request from Agent: ${body.agentName}`,
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111; padding: 20px; background: #fff;">
