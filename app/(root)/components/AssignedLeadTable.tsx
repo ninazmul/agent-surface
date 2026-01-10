@@ -347,7 +347,7 @@ const AssignedLeadTable = ({
   return (
     <div className="space-y-6">
       {/* --- Filters --- */}
-      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-start sm:items-center">
+      <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-start sm:items-center p-1">
         {/* Search */}
         <Input
           placeholder="Search leads..."
