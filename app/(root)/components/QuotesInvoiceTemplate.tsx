@@ -65,7 +65,8 @@ export default function QuotesInvoiceTemplate({
             alt="Agent Surface Logo"
             width={150}
             height={80}
-            className="object-contain dark:hidden"
+            className="h-20 w-auto object-contain"
+            unoptimized
           />
           <Image
             src="/assets/images/logo-white.png"
@@ -73,6 +74,7 @@ export default function QuotesInvoiceTemplate({
             width={150}
             height={80}
             className="object-contain hidden dark:block"
+            unoptimized
           />
         </div>
 
