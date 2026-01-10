@@ -486,7 +486,7 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="text-gray-400 dark:text-gray-300 cursor-not-allowed justify-start"
+                                className="w-full justify-start px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600"
                               >
                                 <Ban className="w-4 h-4 mr-1" />
                                 Unavailable
