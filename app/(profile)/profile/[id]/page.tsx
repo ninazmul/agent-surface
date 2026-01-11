@@ -4,6 +4,7 @@ import Image from "next/image";
 import { FileText } from "lucide-react";
 import { getLeadsByAgency } from "@/lib/actions/lead.actions";
 import SalesTargetProgress from "@/app/(root)/components/SalesTargetProgress";
+import Agreement from "@/components/shared/Agreement";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -141,17 +142,7 @@ const ProfileDetails = async ({ params }: PageProps) => {
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Agreement Document */}
-              {profile?.agreementDocument && (
-                <a
-                  href={profile.agreementDocument}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white dark:bg-gray-800 border hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-medium"
-                >
-                  📄 View Signed Agreement
-                </a>
-              )}
+              <Agreement />
 
               {/* Signature Preview */}
               {profile?.signatureDocument && (
