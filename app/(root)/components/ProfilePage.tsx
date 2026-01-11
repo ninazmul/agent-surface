@@ -362,6 +362,47 @@ export default function ProfilePage({
                     </div>
                   </div>
 
+                  {/* Legal Documents (View Only) */}
+                  {(myProfile?.agreementDocument ||
+                    myProfile?.signatureDocument) && (
+                    <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                      <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-4">
+                        Legal Documents
+                      </h3>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {/* Agreement Document */}
+                        {myProfile?.agreementDocument && (
+                          <a
+                            href={myProfile.agreementDocument}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white dark:bg-gray-800 border hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-medium"
+                          >
+                            📄 View Signed Agreement
+                          </a>
+                        )}
+
+                        {/* Signature Preview */}
+                        {myProfile?.signatureDocument && (
+                          <div className="flex flex-col items-center justify-center gap-2 rounded-xl bg-white dark:bg-gray-800 border p-3">
+                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                              Digital Signature
+                            </p>
+                            <Image
+                              src={myProfile.signatureDocument}
+                              alt="Approved Signature"
+                              className="h-24 w-auto object-contain mix-blend-multiply dark:mix-blend-normal dark:invert-[0.05]"
+                            />
+                            <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                              ✔ Verified & Approved
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
                   {/* Documents */}
                   {(myProfile?.licenseDocument ||
                     myProfile?.agreementDocument) && (
