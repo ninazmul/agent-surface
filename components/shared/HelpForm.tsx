@@ -13,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { HelpCircle } from "lucide-react";
+import { MessageCircle } from "lucide-react";
 import toast from "react-hot-toast";
 
 export default function HelpModal() {
@@ -60,7 +60,7 @@ export default function HelpModal() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button className="fixed bottom-6 right-6 z-50 bg-black text-white hover:bg-white hover:text-black border border-black dark:bg-white dark:text-black dark:hover:bg-black dark:hover:text-white rounded-full w-12 h-12 shadow-lg flex items-center justify-center">
-          <HelpCircle className="w-10 h-10" />
+          <MessageCircle className="w-10 h-10" />
         </Button>
       </DialogTrigger>
 
