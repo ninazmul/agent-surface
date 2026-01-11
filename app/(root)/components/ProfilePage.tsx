@@ -372,16 +372,12 @@ export default function ProfilePage({
 
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         {/* Agreement Document */}
-                        {myProfile?.agreementDocument && (
-                          <a
-                            href={myProfile.agreementDocument}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white dark:bg-gray-800 border hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-medium"
-                          >
-                            📄 View Signed Agreement
-                          </a>
-                        )}
+                        <button
+                          onClick={() => setOpenAgreementModal(true)}
+                          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-all"
+                        >
+                          View Document
+                        </button>
 
                         {/* Signature Preview */}
                         {myProfile?.signatureDocument && (
