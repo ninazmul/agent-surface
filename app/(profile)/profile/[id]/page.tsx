@@ -21,12 +21,11 @@ const ProfileDetails = async ({ params }: PageProps) => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 my-10 bg-white dark:bg-gray-900 rounded-xl shadow-lg">
-      {/* Agency Details */}
+      {/* Agency Identity */}
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-4 border-b pb-2">
           Agency Details
         </h2>
-
         <div className="flex items-center gap-4 mb-6">
           <div className="w-16 h-16 border rounded overflow-hidden shadow">
             <Image
@@ -37,13 +36,12 @@ const ProfileDetails = async ({ params }: PageProps) => {
               className="object-cover w-full h-full"
             />
           </div>
-
           <div>
             <div className="flex items-center gap-2 mb-1">
               <p className="text-lg font-semibold">{profile.name}</p>
-              <span className="text-green-600 bg-green-50 text-sm font-semibold rounded-full px-3 py-1">
+              <p className="text-green-600 bg-green-50 text-sm font-semibold rounded-full text-center w-max px-3 py-1">
                 {profile.role}
-              </span>
+              </p>
             </div>
             <p className="text-gray-500 dark:text-gray-300 text-sm">
               {profile.email}
@@ -56,7 +54,7 @@ const ProfileDetails = async ({ params }: PageProps) => {
             { label: "Phone Number", value: profile.number },
             { label: "Country", value: profile.country },
             { label: "Location", value: profile.location },
-            { label: "Status", value: profile.status },
+            { label: "Status", value: profile.status, className: "capitalize" },
             {
               label: "Submitted At",
               value: `${formatDateTime(profile.createdAt).dateOnly} - ${
@@ -68,7 +66,11 @@ const ProfileDetails = async ({ params }: PageProps) => {
               <label className="block text-gray-600 dark:text-gray-200 font-medium mb-1">
                 {item.label}
               </label>
-              <p className="border rounded px-3 py-2 bg-gray-50 dark:bg-gray-800 capitalize">
+              <p
+                className={`border rounded px-3 py-2 bg-gray-50 dark:bg-gray-800 ${
+                  item.className || ""
+                }`}
+              >
                 {item.value}
               </p>
             </div>
@@ -76,12 +78,11 @@ const ProfileDetails = async ({ params }: PageProps) => {
         </div>
       </section>
 
-      {/* Banking Details */}
+      {/* Banking Information */}
       <section className="mb-10">
         <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-4 border-b pb-2">
           Banking Details
         </h2>
-
         <div className="grid md:grid-cols-2 gap-6 text-sm">
           {[
             { label: "Bank Name", value: profile.bankName },
@@ -107,7 +108,6 @@ const ProfileDetails = async ({ params }: PageProps) => {
         <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-4 border-b pb-2">
           Uploaded Documents
         </h2>
-
         <div className="grid md:grid-cols-2 gap-6 text-sm">
           {[
             { label: "License Document", url: profile.licenseDocument },
@@ -117,57 +117,77 @@ const ProfileDetails = async ({ params }: PageProps) => {
               <label className="block text-gray-600 dark:text-gray-200 font-medium mb-1">
                 {doc.label}
               </label>
-
               {doc.url ? (
                 <a
                   href={doc.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2 border rounded text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-gray-800 transition"
+                  className="flex items-center gap-2 px-4 py-2 border rounded text-blue-600 dark:text-blue-400 hover:bg-blue-50 transition"
                 >
                   <FileText className="w-4 h-4" />
                   View Document
                 </a>
               ) : (
-                <p className="text-gray-500 dark:text-gray-400">Not Uploaded</p>
+                <p className="text-gray-500 dark:text-gray-300">Not Uploaded</p>
               )}
             </div>
           ))}
-
-          {/* Digital Signature – View Only */}
-          {profile.signatureDocument && (
-            <div>
-              <label className="block text-gray-600 dark:text-gray-200 font-medium mb-2">
-                Digital Signature
-              </label>
-
-              <div className="flex flex-col items-center gap-2 p-4 border rounded bg-gray-50 dark:bg-gray-800">
-                <Image
-                  src={profile.signatureDocument}
-                  alt="Approved Signature"
-                  width={220}
-                  height={100}
-                  className="object-contain mix-blend-multiply dark:mix-blend-normal dark:invert-[0.05]"
-                />
-                <span className="text-xs font-medium text-green-600 dark:text-green-400">
-                  ✔ Approved & Verified
-                </span>
-              </div>
-            </div>
-          )}
         </div>
+        {/* Digital Signature (View Only) */}
+        {profile.signatureDocument && (
+          <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+            <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-4">
+              Legal Documents
+            </h3>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {/* Agreement Document */}
+              {profile?.agreementDocument && (
+                <a
+                  href={profile.agreementDocument}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-white dark:bg-gray-800 border hover:bg-gray-200 dark:hover:bg-gray-600 transition text-sm font-medium"
+                >
+                  📄 View Signed Agreement
+                </a>
+              )}
+
+              {/* Signature Preview */}
+              {profile?.signatureDocument && (
+                <div className="flex flex-col items-center justify-center gap-2 rounded-xl bg-white dark:bg-gray-800 border p-3">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    Digital Signature
+                  </p>
+                  <Image
+                    src={profile.signatureDocument}
+                    alt="Approved Signature"
+                    className="h-24 w-auto object-contain mix-blend-multiply dark:mix-blend-normal dark:invert-[0.05]"
+                  />
+                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+                    ✔ Verified & Approved
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </section>
 
-      {/* Agent Relationships */}
+      {/* Agent Relationship */}
       {profile.role === "Sub Agent" && profile.countryAgent && (
         <section className="mb-10">
           <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-4 border-b pb-2">
             Assigned Country Agent
           </h2>
-
-          <p className="border rounded px-3 py-2 bg-gray-50 dark:bg-gray-800 text-sm">
-            {profile.countryAgent}
-          </p>
+          <div className="text-sm">
+            <label className="block text-gray-600 dark:text-gray-200 font-medium mb-1">
+              Country Agent Email
+            </label>
+            <p className="border rounded px-3 py-2 bg-gray-50 dark:bg-gray-800">
+              {profile.countryAgent}
+            </p>
+          </div>
         </section>
       )}
 
@@ -178,16 +198,16 @@ const ProfileDetails = async ({ params }: PageProps) => {
             <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-4 border-b pb-2">
               Sub Agents
             </h2>
-
             <ul className="list-disc list-inside text-sm space-y-1 bg-gray-50 dark:bg-gray-800 rounded p-4 border">
               {profile.subAgents.map((email: string, idx: number) => (
-                <li key={idx}>{email}</li>
+                <li key={idx} className="text-gray-700 dark:text-gray-100">
+                  {email}
+                </li>
               ))}
             </ul>
           </section>
         )}
 
-      {/* Sales Target */}
       <SalesTargetProgress profile={profile} leads={leads} />
     </div>
   );
