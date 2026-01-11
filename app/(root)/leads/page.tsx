@@ -68,7 +68,7 @@ const Page = async () => {
     <>
       <section className="p-4">
         {/* Header + Actions */}
-        <div className="px-2 sm:px-4 flex flex-col md:flex-row items-center justify-between gap-3">
+        <div className="px-2 sm:px-4 flex flex-col lg:flex-row items-center justify-between gap-3">
           {/* Title */}
           <h3 className="h3-bold text-center sm:text-left">All Leads</h3>
 
@@ -88,7 +88,7 @@ const Page = async () => {
                 size="sm"
                 className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
               >
-                <Plus size={16} /> Add Lead
+                <Plus size={16} /> Add <span className="hidden md:block">Lead</span>
               </Button>
             </a>
 
