@@ -30,7 +30,7 @@ export default function LeadImport() {
       const data: { success: boolean; count?: number; error?: string } = await res.json();
 
       if (data.success) {
-        setStatus(`✅ Imported ${data.count || 0} leads successfully`);
+        setStatus(`✅ Imported leads successfully`);
       } else {
         setStatus(`❌ Failed: ${data.error || "Unknown error"}`);
       }
