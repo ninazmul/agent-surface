@@ -27,7 +27,6 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   const parseNumber = (value: string | number | undefined) =>
     parseFloat((value || 0).toString().replace(/,/g, "").trim()) || 0;
 
-  // SAFETY CLEANUP: remove invalid leads
   const safeLeads = useMemo(() => {
     return (leads || [])
       .filter((l) => l && typeof l === "object")
@@ -35,7 +34,6 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
       .filter((l) => l.home && l.home.country);
   }, [leads]);
 
-  // DATE FILTERING
   const filterByDateRange = useCallback(
     (data: ILead[]) => {
       return data.filter((lead) => {
@@ -66,10 +64,8 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     [filter, startDate, endDate]
   );
 
-  // FILTERED LEADS
   const filteredLeads = useMemo(() => {
     const accepted = safeLeads.filter((l) => l.paymentStatus === "Accepted");
-
     const dateFiltered = adminStatus ? filterByDateRange(accepted) : accepted;
 
     return dateFiltered.filter((l) => {
@@ -78,13 +74,10 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
 
       const countryMatch =
         selectedCountry === "All" ? true : country === selectedCountry;
-
       const agencyMatch =
         selectedAgency === "All" ? true : l.author === selectedAgency;
 
-      return adminStatus
-        ? countryMatch && agencyMatch
-        : country === myProfile?.country;
+      return adminStatus ? countryMatch && agencyMatch : true;
     });
   }, [
     safeLeads,
@@ -92,23 +85,18 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     filterByDateRange,
     selectedCountry,
     selectedAgency,
-    myProfile?.country,
   ]);
 
-  // TARGET PER COUNTRY
   const salesTargetByCountry = useMemo(() => {
-    const relevant = adminStatus ? profiles : myProfile ? [myProfile] : [];
-
-    return relevant.reduce<Record<string, number>>((acc, p) => {
+    return profiles.reduce<Record<string, number>>((acc, p) => {
       if (p.country) {
         const key = p.country.trim();
         acc[key] = (acc[key] || 0) + parseNumber(p.salesTarget);
       }
       return acc;
     }, {});
-  }, [profiles, adminStatus, myProfile]);
+  }, [profiles]);
 
-  // SALES PER COUNTRY
   const salesByCountry = useMemo(() => {
     return filteredLeads.reduce<Record<string, number>>((acc, lead) => {
       if (!lead.home.country) return acc;
@@ -128,26 +116,29 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     }, {});
   }, [filteredLeads]);
 
-  // SORTED ENTRIES (IMPORTANT FIX)
   const sortedEntries = useMemo(() => {
-    const raw = adminStatus
-      ? Object.entries(salesTargetByCountry)
-      : myProfile
-      ? [[myProfile.country, salesTargetByCountry[myProfile.country] || 0]]
-      : [];
+    const raw = Object.entries(salesTargetByCountry);
 
     const computed = raw.map(([country, target]) => {
       const t = parseNumber(target);
       const s = salesByCountry[country] || 0;
       const progress = t > 0 ? (s / t) * 100 : 0;
-
       return { country, target: t, sales: s, progress };
     });
 
-    return computed.sort((a, b) => b.progress - a.progress);
-  }, [adminStatus, myProfile, salesTargetByCountry, salesByCountry]);
+    // Move non-admin's country to top
+    if (!adminStatus && myProfile?.country) {
+      const myCountry = myProfile.country.trim();
+      const myIndex = computed.findIndex((e) => e.country === myCountry);
+      if (myIndex > -1) {
+        const [myEntry] = computed.splice(myIndex, 1);
+        computed.unshift(myEntry);
+      }
+    }
 
-  // OPTIONS LIST
+    return computed.sort((a, b) => b.progress - a.progress);
+  }, [salesTargetByCountry, salesByCountry, adminStatus, myProfile]);
+
   const countriesList = useMemo(
     () =>
       Array.from(
@@ -176,7 +167,6 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
     setSelectedAgency("All");
   };
 
-  // UI (UNCHANGED)
   return (
     <section>
       <div className="space-y-4 mb-6">
@@ -252,13 +242,24 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
         )}
       </div>
 
-      {/* SCROLL AREA */}
       <div className="relative bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 overflow-hidden divide-y divide-gray-100 dark:divide-gray-700 h-[445px] overflow-y-auto scroll-smooth">
         {sortedEntries.map(({ country, target, sales, progress }) => {
+          const isMyCountry =
+            !adminStatus && myProfile?.country?.trim() === country;
+
           return (
-            <div key={country} className="py-4">
+            <div
+              key={country}
+              className={`py-4 ${
+                isMyCountry ? "bg-yellow-100 dark:bg-yellow-800 rounded-xl px-2" : ""
+              }`}
+            >
               <div className="flex justify-between items-center mb-1">
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span
+                  className={`font-semibold ${
+                    isMyCountry ? "text-yellow-800 dark:text-yellow-200" : "text-gray-900 dark:text-gray-100"
+                  }`}
+                >
                   {country}
                 </span>
 
