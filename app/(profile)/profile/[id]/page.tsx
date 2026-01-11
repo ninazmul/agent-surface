@@ -4,7 +4,7 @@ import Image from "next/image";
 import { FileText } from "lucide-react";
 import { getLeadsByAgency } from "@/lib/actions/lead.actions";
 import SalesTargetProgress from "@/app/(root)/components/SalesTargetProgress";
-import Agreement from "@/components/shared/Agreement";
+import ViewContactAgreement from "@/components/shared/ViewContactAgreement";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -134,33 +134,30 @@ const ProfileDetails = async ({ params }: PageProps) => {
             </div>
           ))}
         </div>
-        {/* Digital Signature (View Only) */}
-        {profile.signatureDocument && (
-          <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
-            <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-4">
-              Legal Documents
-            </h3>
+      </section>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <Agreement />
+      {/* Contact agreement */}
+      <section className="mb-10">
+        <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-4 border-b pb-2">
+          Contact Agreement
+        </h2>
 
-              {/* Signature Preview */}
-              {profile?.signatureDocument && (
-                <div className="flex flex-col items-center justify-center gap-2 rounded-xl bg-white dark:bg-gray-800 border p-3">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Digital Signature
-                  </p>
-                  <Image
-                    src={profile.signatureDocument}
-                    alt="Approved Signature"
-                    className="h-24 w-auto object-contain mix-blend-multiply dark:mix-blend-normal dark:invert-[0.05]"
-                  />
-                  <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                    ✔ Verified & Approved
-                  </span>
-                </div>
-              )}
-            </div>
+        <ViewContactAgreement />
+
+        {/* Signature Preview */}
+        {profile?.signatureDocument && (
+          <div className="flex flex-col items-center justify-center gap-2 rounded-xl bg-white dark:bg-gray-800 border p-3">
+            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Digital Signature
+            </p>
+            <Image
+              src={profile.signatureDocument}
+              alt="Approved Signature"
+              className="h-24 w-auto object-contain mix-blend-multiply dark:mix-blend-normal dark:invert-[0.05]"
+            />
+            <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+              ✔ Verified & Approved
+            </span>
           </div>
         )}
       </section>
