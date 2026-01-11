@@ -197,36 +197,36 @@ export default function QuotationEditor({
   };
 
   return (
-    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-500 rounded-xl p-4 shadow-sm space-y-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-xl font-semibold text-primary-800">
+    <div className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-600 rounded-xl p-4 sm:p-6 shadow-sm space-y-6">
+      {/* ================= HEADER ================= */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <h2 className="text-lg sm:text-xl font-semibold text-primary-800">
           Services & Fees
         </h2>
+
         {canEdit && (
-          <>
+          <div className="flex gap-2 self-start sm:self-auto">
             {isEditing ? (
-              <div className="flex gap-2">
+              <>
                 <Button
-                  variant="outline"
                   size="sm"
+                  variant="outline"
                   onClick={() => setIsEditing(false)}
                   disabled={loading}
                 >
                   Cancel
                 </Button>
                 <Button
-                  onClick={handleSave}
-                  variant="outline"
                   size="sm"
-                  className="bg-blue-500 hover:bg-blue-600 text-white"
+                  onClick={handleSave}
                   disabled={loading}
+                  className="bg-blue-500 hover:bg-blue-600 text-white"
                 >
                   {loading ? "Saving..." : "Save"}
                 </Button>
-              </div>
+              </>
             ) : (
               <Button
-                variant="outline"
                 size="sm"
                 onClick={() => setIsEditing(true)}
                 className="bg-blue-500 hover:bg-blue-600 text-white"
@@ -234,13 +234,13 @@ export default function QuotationEditor({
                 Edit
               </Button>
             )}
-          </>
+          </div>
         )}
       </div>
 
-      {/* Course Selection */}
+      {/* ================= COURSES ================= */}
       {isEditing ? (
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="flex flex-col sm:flex-row gap-4 sm:overflow-x-auto pb-2">
           {expandedCourses.map((course) => {
             const isSelected = selectedCourses.some(
               (c) =>
@@ -248,42 +248,36 @@ export default function QuotationEditor({
                 c.campus?.name === course.campus?.name &&
                 c.campus?.shift === course.campus?.shift
             );
+
             return (
               <div
                 key={courseKey(course)}
-                className={`flex-shrink-0 rounded-xl border p-4 shadow-md
-        bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700
-        w-[280px] md:w-[300px] transition-all duration-200
-        ${isSelected ? "border-blue-600 dark:border-blue-500 scale-105" : ""}`}
+                className={`rounded-xl border p-4 shadow-md
+                bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700
+                w-full sm:w-[280px] md:w-[300px]
+                transition-all
+                ${isSelected ? "border-blue-600 scale-[1.02]" : ""}`}
               >
-                <h4 className="font-semibold mb-1">{course.name}</h4>
+                <h4 className="font-semibold">{course.name}</h4>
                 <p className="text-sm text-gray-600">
-                  Type: {course.courseType}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Duration: {course.courseDuration}
-                </p>
-                <p className="text-sm text-gray-600">
-                  Start:{" "}
-                  {course.startDate
-                    ? new Date(course.startDate).toLocaleDateString()
-                    : "-"}
+                  {course.courseType} • {course.courseDuration}
                 </p>
                 <p className="text-sm text-gray-600">
                   Campus: {course.campus?.name} ({course.campus?.shift})
                 </p>
-                <p className="text-sm text-gray-600 mb-2">
+                <p className="text-sm text-gray-600 mb-3">
                   Fee: €{course.courseFee}
                 </p>
+
                 <button
                   type="button"
                   onClick={() => toggleCourse(course)}
                   className={`w-full py-2 rounded-md font-medium text-sm
-          ${
-            isSelected
-              ? "bg-blue-600 text-white"
-              : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300"
-          }`}
+                  ${
+                    isSelected
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300"
+                  }`}
                 >
                   {isSelected ? "Selected ✅" : "Select Course"}
                 </button>
@@ -292,71 +286,63 @@ export default function QuotationEditor({
           })}
         </div>
       ) : (
-        selectedCourses.map((course) => (
-          <div
-            key={courseKey(course)}
-            className="flex justify-between border-b border-gray-200 dark:border-gray-500 pb-2"
-          >
-            <div>
-              <p className="font-medium">{course.name}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-300">
-                {course.courseType} • {course.courseDuration}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-300">
-                {course.startDate
-                  ? new Date(course.startDate).toLocaleDateString()
-                  : "-"}
-              </p>
-              <p className="text-sm text-gray-500 dark:text-gray-300 line-clamp-1 truncate max-w-64">
-                Campus:{" "}
-                {course.campus
-                  ? `${course.campus.name} (${course.campus.shift})`
-                  : "-"}
+        <div className="space-y-3">
+          {selectedCourses.map((course) => (
+            <div
+              key={courseKey(course)}
+              className="flex flex-col sm:flex-row sm:justify-between gap-1 border-b pb-2"
+            >
+              <div>
+                <p className="font-medium">{course.name}</p>
+                <p className="text-sm text-gray-500">
+                  {course.courseType} • {course.courseDuration}
+                </p>
+                <p className="text-sm text-gray-500">
+                  {course.campus?.name} ({course.campus?.shift})
+                </p>
+              </div>
+              <p className="font-medium">
+                €{Number(course.courseFee).toFixed(2)}
               </p>
             </div>
-            <p>€{Number(course.courseFee).toFixed(2)}</p>
-          </div>
-        ))
+          ))}
+        </div>
       )}
 
-      {/* Services Selection */}
+      {/* ================= SERVICES ================= */}
       {isEditing ? (
-        <div className="flex gap-4 overflow-x-auto pb-2">
+        <div className="flex flex-col sm:flex-row gap-4 sm:overflow-x-auto pb-2">
           {allServices.map((service, idx) => {
             const isSelected = selectedServices.some(
               (s) => s._id === service._id
             );
+
             return (
               <div
                 key={idx}
-                className={`flex-shrink-0 rounded-xl border p-4 shadow-md
-                  bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700
-                  w-[260px] md:w-[300px] transition-all duration-200
-                  ${
-                    isSelected
-                      ? "border-blue-600 dark:border-blue-500 scale-105"
-                      : ""
-                  }`}
+                className={`rounded-xl border p-4 shadow-md
+                bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700
+                w-full sm:w-[260px] md:w-[300px]
+                transition-all
+                ${isSelected ? "border-blue-600 scale-[1.02]" : ""}`}
               >
-                <h4 className="font-semibold mb-1">{service.title}</h4>
+                <h4 className="font-semibold">{service.title}</h4>
                 <p className="text-sm text-gray-600">
                   Type: {service.serviceType}
                 </p>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-600 mb-3">
                   Amount: €{service.amount}
                 </p>
-                <p className="text-sm text-gray-600 mb-2">
-                  {service.description}
-                </p>
+
                 <button
                   type="button"
                   onClick={() => toggleService(service)}
                   className={`w-full py-2 rounded-md font-medium text-sm
-                    ${
-                      isSelected
-                        ? "bg-blue-600 text-white"
-                        : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300"
-                    }`}
+                  ${
+                    isSelected
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-200 dark:bg-gray-700 hover:bg-gray-300"
+                  }`}
                 >
                   {isSelected ? "Selected ✅" : "Select Service"}
                 </button>
@@ -365,49 +351,47 @@ export default function QuotationEditor({
           })}
         </div>
       ) : (
-        selectedServices.map((service, idx) => (
-          <div
-            key={idx}
-            className="flex justify-between border-b border-gray-200 dark:border-gray-500 pb-2"
-          >
-            <div>
-              <p className="font-medium">{service.title}</p>
-              <p className="text-sm text-gray-500 dark:text-gray-300">
-                {service.serviceType || "Additional service"}
-              </p>
+        <div className="space-y-3">
+          {selectedServices.map((service, idx) => (
+            <div key={idx} className="flex justify-between border-b pb-2">
+              <div>
+                <p className="font-medium">{service.title}</p>
+                <p className="text-sm text-gray-500">
+                  {service.serviceType || "Additional service"}
+                </p>
+              </div>
+              <p className="font-medium">€{service.amount.toFixed(2)}</p>
             </div>
-            <p>€{service.amount.toFixed(2)}</p>
-          </div>
-        ))
+          ))}
+        </div>
       )}
 
-      {/* Subtotal */}
-      <div className="flex justify-between font-semibold text-gray-800 dark:text-gray-100 pt-2">
-        <p>Subtotal</p>
-        <p>€{subTotal.toFixed(2)}</p>
-      </div>
+      {/* ================= TOTALS ================= */}
+      <div className="space-y-2 pt-4 border-t">
+        <div className="flex justify-between text-sm sm:text-base font-semibold">
+          <p>Subtotal</p>
+          <p>€{subTotal.toFixed(2)}</p>
+        </div>
 
-      {/* Discount */}
-      <div className="flex justify-between font-semibold text-gray-800 dark:text-gray-100 pt-2">
-        <p>Discount</p>
-        {isEditing ? (
-          <Input
-            type="number"
-            value={discount}
-            onChange={(e) => setDiscount(e.target.value)}
-            placeholder="0"
-            min={0}
-            className="w-28"
-          />
-        ) : (
-          <p>- €{discount}</p>
-        )}
-      </div>
+        <div className="flex justify-between text-sm sm:text-base font-semibold">
+          <p>Discount</p>
+          {isEditing ? (
+            <Input
+              type="number"
+              value={discount}
+              onChange={(e) => setDiscount(e.target.value)}
+              min={0}
+              className="w-24 sm:w-28 text-right"
+            />
+          ) : (
+            <p>- €{discount}</p>
+          )}
+        </div>
 
-      {/* Grand Total */}
-      <div className="flex justify-between font-bold text-primary-800 pt-2">
-        <p>Total</p>
-        <p>€{grandTotal.toFixed(2)}</p>
+        <div className="flex justify-between text-lg sm:text-xl font-bold text-primary-800 pt-2">
+          <p>Total</p>
+          <p>€{grandTotal.toFixed(2)}</p>
+        </div>
       </div>
     </div>
   );
