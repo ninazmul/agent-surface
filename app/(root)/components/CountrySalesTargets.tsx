@@ -9,6 +9,7 @@ interface CountrySalesTargetsProps {
   adminStatus: boolean;
   profiles: IProfile[];
   leads: ILead[];
+  allLeads?: ILead[];
   myProfile?: IProfile | null;
 }
 
@@ -16,6 +17,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   adminStatus,
   profiles,
   leads,
+  allLeads,
   myProfile,
 }) => {
   const [filter, setFilter] = useState("month");
@@ -27,12 +29,14 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   const parseNumber = (value: string | number | undefined) =>
     parseFloat((value || 0).toString().replace(/,/g, "").trim()) || 0;
 
-  const safeLeads = useMemo(() => {
-    return (leads || [])
+  const effectiveLeads = useMemo(() => {
+    const source = adminStatus ? leads : allLeads || leads;
+
+    return (source || [])
       .filter((l) => l && typeof l === "object")
       .filter((l) => l.createdAt || l.updatedAt)
       .filter((l) => l.home && l.home.country);
-  }, [leads]);
+  }, [adminStatus, leads, allLeads]);
 
   const filterByDateRange = useCallback(
     (data: ILead[]) => {
@@ -65,7 +69,10 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
   );
 
   const filteredLeads = useMemo(() => {
-    const accepted = safeLeads.filter((l) => l.paymentStatus === "Accepted");
+    const accepted = effectiveLeads.filter(
+      (l) => l.paymentStatus === "Accepted"
+    );
+
     const dateFiltered = adminStatus ? filterByDateRange(accepted) : accepted;
 
     return dateFiltered.filter((l) => {
@@ -80,7 +87,7 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
       return adminStatus ? countryMatch && agencyMatch : true;
     });
   }, [
-    safeLeads,
+    effectiveLeads,
     adminStatus,
     filterByDateRange,
     selectedCountry,
@@ -251,13 +258,17 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
             <div
               key={country}
               className={`py-4 ${
-                isMyCountry ? "bg-yellow-100 dark:bg-yellow-800 rounded-xl px-2" : ""
+                isMyCountry
+                  ? "bg-yellow-100 dark:bg-yellow-800 rounded-xl px-2"
+                  : ""
               }`}
             >
               <div className="flex justify-between items-center mb-1">
                 <span
                   className={`font-semibold ${
-                    isMyCountry ? "text-yellow-800 dark:text-yellow-200" : "text-gray-900 dark:text-gray-100"
+                    isMyCountry
+                      ? "text-yellow-800 dark:text-yellow-200"
+                      : "text-gray-900 dark:text-gray-100"
                   }`}
                 >
                   {country}

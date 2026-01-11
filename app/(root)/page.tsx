@@ -233,6 +233,7 @@ const Dashboard = () => {
             adminStatus={adminStatus}
             profiles={profiles}
             leads={leads}
+            allLeads={dashboardData?.leads || []}
             myProfile={myProfile}
           />
         )}
