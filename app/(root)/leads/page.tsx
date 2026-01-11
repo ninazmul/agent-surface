@@ -14,6 +14,7 @@ import { redirect } from "next/navigation";
 import { ILead } from "@/lib/database/models/lead.model";
 import { Download, Plus } from "lucide-react";
 import SendRemindersButton from "@/components/shared/SendRemindersButton";
+import ExportLeadsExcelClient from "@/components/shared/ExportToExcelClient";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -29,7 +30,7 @@ const Page = async () => {
     if (!rolePermissions.includes("leads")) {
       redirect("/");
     }
-  } 
+  }
   // ====== NON-ADMIN PATH (profile required)
   else {
     // Profile must be Approved
@@ -90,6 +91,15 @@ const Page = async () => {
                 <Plus size={16} /> Add Lead
               </Button>
             </a>
+
+            {adminStatus && (
+              <div>
+                <ExportLeadsExcelClient
+                  data={leads}
+                  fileName="all_leads.xlsx"
+                />
+              </div>
+            )}
 
             {adminStatus && (
               <div>
