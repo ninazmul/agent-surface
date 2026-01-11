@@ -8,9 +8,22 @@ const BulkImportLeadsPage = () => {
           📥 Bulk Lead Import
         </h1>
         <p className="text-gray-600 dark:text-gray-100 mb-6 text-center">
-          Upload an Excel file (<code>.xlsx</code> or <code>.xls</code>) with your leads. 
-          Make sure it follows the required template.
+          Upload an Excel file (<code>.xlsx</code> or <code>.xls</code>) with
+          your leads. Make sure it follows the required template.
         </p>
+
+        {/* Download Template */}
+        <div className="text-center mb-6">
+          <a
+            href="/leads.xlsx"
+            download
+            className="inline-block px-6 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition"
+          >
+            📄 Download Template
+          </a>
+        </div>
+
+        {/* Lead Import Component */}
         <LeadImport />
       </div>
     </div>
