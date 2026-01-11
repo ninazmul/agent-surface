@@ -152,7 +152,7 @@ const ProfileDetails = async ({ params }: PageProps) => {
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Digital Signature
             </p>
-            <div className="h-24 w-48 flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-md overflow-hidden">
+            <div className="h-24 w-48 flex items-center justify-center bg-gray-50 rounded-md overflow-hidden">
               <Image
                 src={profile.signatureDocument}
                 alt="Approved Signature"

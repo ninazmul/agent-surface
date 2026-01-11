@@ -10,10 +10,7 @@ function ViewContactAgreement() {
     <div className="flex-1">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h4 className="font-medium text-gray-900 dark:text-white">
-            User Agreement
-          </h4>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
+          <p className="text-green-600 dark:text-green-400">
             This is the agreement you have accepted. Please review the terms carefully.
           </p>
         </div>
