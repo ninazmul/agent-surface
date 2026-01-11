@@ -188,12 +188,6 @@ export default function ProfilePage({
                     Current Status: Profile Under Review
                   </span>
                 </div>
-
-                {/* Modals */}
-                <AgreementModal
-                  open={openAgreementModal}
-                  onClose={() => setOpenAgreementModal(false)}
-                />
                 <SignatureModal
                   open={openSignatureModal}
                   onClose={() => setOpenSignatureModal(false)}
@@ -638,6 +632,12 @@ export default function ProfilePage({
           </div>
         </section>
       )}
+
+      {/* Modals */}
+      <AgreementModal
+        open={openAgreementModal}
+        onClose={() => setOpenAgreementModal(false)}
+      />
     </div>
   );
 }
