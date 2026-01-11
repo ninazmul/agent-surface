@@ -251,7 +251,7 @@ export default function ProfilePage({
                         >
                           <Button
                             variant="outline"
-                            className="flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-black text-white dark:bg-gray-600 dark:text-gray-100 hover:bg-gray-800 rounded-md w-max"
+                            className="flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-black text-white dark:bg-gray-600 dark:text-gray-100 hover:bg-gray-800 hover:text-white rounded-md w-max"
                           >
                             <span className="text-xs sm:text-sm md:text-base">
                               Edit Profile
@@ -271,11 +271,15 @@ export default function ProfilePage({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
                       <div>
                         <p className="text-lg text-gray-700">Name:</p>
-                        <p>{myProfile?.name}</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.name}
+                        </p>
                       </div>
                       <div>
                         <p className="text-lg text-gray-700">Location:</p>
-                        <p>{myProfile?.location}</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.location}
+                        </p>
                       </div>
                       <div>
                         <p className="text-lg text-gray-700">Email:</p>
@@ -285,7 +289,9 @@ export default function ProfilePage({
                       </div>
                       <div>
                         <p className="text-lg text-gray-700">Phone:</p>
-                        <p>{myProfile?.number}</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.number}
+                        </p>
                       </div>
                       <div>
                         <p className="text-lg text-gray-700">Created At:</p>
@@ -297,7 +303,9 @@ export default function ProfilePage({
                       </div>
                       <div>
                         <p className="text-lg text-gray-700">Country:</p>
-                        <p>{myProfile?.country}</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.country}
+                        </p>
                       </div>
                       <div>
                         <p className="text-lg text-gray-700">Country Agent:</p>
@@ -323,23 +331,33 @@ export default function ProfilePage({
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
                       <div>
                         <p className="text-lg text-gray-700">Bank Name:</p>
-                        <p>{myProfile?.bankName}</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.bankName}
+                        </p>
                       </div>
                       <div>
                         <p className="text-lg text-gray-700">SWIFT Code:</p>
-                        <p>{myProfile?.swiftCode}</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.swiftCode}
+                        </p>
                       </div>
                       <div>
                         <p className="text-lg text-gray-700">Branch Address:</p>
-                        <p>{myProfile?.branchAddress}</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.branchAddress}
+                        </p>
                       </div>
                       <div>
                         <p className="text-lg text-gray-700">Account Number:</p>
-                        <p>{myProfile?.accountNumber}</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.accountNumber}
+                        </p>
                       </div>
                       <div>
                         <p className="text-lg text-gray-700">Routing Number:</p>
-                        <p>{myProfile?.routingNumber}</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.routingNumber}
+                        </p>
                       </div>
                     </div>
                   </div>
