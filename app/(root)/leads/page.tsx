@@ -88,7 +88,8 @@ const Page = async () => {
                 size="sm"
                 className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
               >
-                <Plus size={16} /> Add <span className="hidden md:block">Lead</span>
+                <Plus size={16} /> Add{" "}
+                <span className="hidden md:block">Lead</span>
               </Button>
             </a>
 

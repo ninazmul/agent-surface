@@ -11,7 +11,10 @@ interface ExportLeadsExcelProps {
   fileName?: string;
 }
 
-export default function ExportLeadsExcelClient({ data, fileName = "leads.xlsx" }: ExportLeadsExcelProps) {
+export default function ExportLeadsExcelClient({
+  data,
+  fileName = "leads.xlsx",
+}: ExportLeadsExcelProps) {
   const handleExport = () => {
     if (!data || data.length === 0) return;
 
@@ -21,7 +24,9 @@ export default function ExportLeadsExcelClient({ data, fileName = "leads.xlsx" }
       phone: lead.number,
       gender: lead.gender,
       marital_status: lead.maritalStatus,
-      date_of_birth: lead.dateOfBirth ? new Date(lead.dateOfBirth).toLocaleDateString() : "",
+      date_of_birth: lead.dateOfBirth
+        ? new Date(lead.dateOfBirth).toLocaleDateString()
+        : "",
       home_address: lead.home?.address || "",
       home_city: lead.home?.city || "",
       home_state: lead.home?.state || "",
@@ -35,8 +40,12 @@ export default function ExportLeadsExcelClient({ data, fileName = "leads.xlsx" }
         : "",
       progress: lead.progress,
       status: lead.status || "",
-      created_at: lead.createdAt ? new Date(lead.createdAt).toLocaleString() : "",
-      updated_at: lead.updatedAt ? new Date(lead.updatedAt).toLocaleString() : "",
+      created_at: lead.createdAt
+        ? new Date(lead.createdAt).toLocaleString()
+        : "",
+      updated_at: lead.updatedAt
+        ? new Date(lead.updatedAt).toLocaleString()
+        : "",
       assigned_to: lead.assignedTo?.join(", ") || "",
       payment_status: lead.paymentStatus || "",
       payment_method: lead.paymentMethod || "",
@@ -45,14 +54,18 @@ export default function ExportLeadsExcelClient({ data, fileName = "leads.xlsx" }
       source: lead.source || "",
       courses: lead.course?.map((c) => c.name).join(", ") || "",
       services: lead.services?.map((s) => s.title).join(", ") || "",
-      transcript_amounts: lead.transcript?.map((t) => t.amount).join(", ") || "",
+      transcript_amounts:
+        lead.transcript?.map((t) => t.amount).join(", ") || "",
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(formattedData);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "leads");
 
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
     const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
     saveAs(blob, fileName);
   };
