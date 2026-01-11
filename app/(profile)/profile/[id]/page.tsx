@@ -138,24 +138,28 @@ const ProfileDetails = async ({ params }: PageProps) => {
 
       {/* Contact agreement */}
       <section className="mb-10">
-        <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-4 border-b pb-2">
+        <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-6 border-b pb-2">
           Contact Agreement
         </h2>
 
-        <ViewContactAgreement />
+        <div className="mb-6">
+          <ViewContactAgreement />
+        </div>
 
         {/* Signature Preview */}
         {profile?.signatureDocument && (
-          <div className="flex flex-col items-center justify-center gap-2 rounded-xl bg-white dark:bg-gray-800 border p-3">
+          <div className="flex flex-col items-center gap-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
             <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
               Digital Signature
             </p>
-            <Image
-              src={profile.signatureDocument}
-              alt="Approved Signature"
-              className="h-24 w-auto object-contain mix-blend-multiply dark:mix-blend-normal dark:invert-[0.05]"
-            />
-            <span className="text-xs text-green-600 dark:text-green-400 font-medium">
+            <div className="h-24 w-48 flex items-center justify-center bg-gray-50 dark:bg-gray-900 rounded-md overflow-hidden">
+              <Image
+                src={profile.signatureDocument}
+                alt="Approved Signature"
+                className="h-full w-auto object-contain mix-blend-multiply dark:mix-blend-normal dark:invert-[0.05]"
+              />
+            </div>
+            <span className="text-xs text-green-600 dark:text-green-400 font-semibold">
               ✔ Verified & Approved
             </span>
           </div>
