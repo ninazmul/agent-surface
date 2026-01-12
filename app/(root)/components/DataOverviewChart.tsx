@@ -28,6 +28,9 @@ import { IProfile } from "@/lib/database/models/profile.model";
 import { IDownload } from "@/lib/database/models/download.model";
 import { ILead } from "@/lib/database/models/lead.model";
 
+/* -------------------------------------------------------
+   PROPS
+------------------------------------------------------- */
 interface DataOverviewChartProps {
   adminStatus: boolean;
   admins: IAdmin[];
@@ -42,17 +45,12 @@ interface DataOverviewChartProps {
 }
 
 /* -------------------------------------------------------
-   STRICTLY TYPED CUSTOM SHAPE
+   CUSTOM BAR (NaN-SAFE)
 ------------------------------------------------------- */
-type RechartsBarShapeProps = RectangleProps & {
-  value?: number;
-  fill?: string;
-};
-
 interface CombinedBarProps extends RectangleProps {
-  value: number;
+  value?: number;
   maxValue: number;
-  fill: string;
+  fill?: string;
 }
 
 const CombinedBar: React.FC<CombinedBarProps> = ({
@@ -60,22 +58,29 @@ const CombinedBar: React.FC<CombinedBarProps> = ({
   y = 0,
   width = 0,
   height = 0,
-  fill,
   value,
   maxValue,
+  fill = "#000",
 }) => {
-  const fullHeight = Math.max(height, 0);
-  const filledHeight = (value / maxValue) * fullHeight;
-  const filledY = y + (fullHeight - filledHeight);
+  // HARD CLAMPS — SVG MUST NEVER SEE NaN
+  const safeHeight = Number.isFinite(height) && height > 0 ? height : 0;
+
+  const safeValue =
+    value !== undefined && Number.isFinite(value) && value > 0 ? value : 0;
+
+  const safeMax = Number.isFinite(maxValue) && maxValue > 0 ? maxValue : 1;
+
+  const filledHeight = (safeValue / safeMax) * safeHeight;
+  const filledY = y + (safeHeight - filledHeight);
 
   return (
     <g>
-      {/* empty background track */}
+      {/* background track */}
       <rect
         x={x}
         y={y}
         width={width}
-        height={fullHeight}
+        height={safeHeight}
         fill="#E5E7EB"
         rx={4}
         ry={4}
@@ -96,7 +101,7 @@ const CombinedBar: React.FC<CombinedBarProps> = ({
 };
 
 /* -------------------------------------------------------
-   MAIN CHART COMPONENT
+   MAIN COMPONENT
 ------------------------------------------------------- */
 export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
   adminStatus,
@@ -110,27 +115,25 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
   promotions,
   services,
 }) => {
-  // normalize all incoming lists to avoid null crashes
+  /* ---------------- SAFE NORMALIZATION ---------------- */
   const safeAdmins = Array.isArray(admins) ? admins : [];
   const safeLeads = Array.isArray(leads) ? leads : [];
   const safeResources = Array.isArray(resources) ? resources : [];
   const safeCourses = Array.isArray(courses) ? courses : [];
   const safeDownloads = Array.isArray(downloads) ? downloads : [];
-  const safeEventCalendars = Array.isArray(eventCalendars)
-    ? eventCalendars
-    : [];
+  const safeCalendars = Array.isArray(eventCalendars) ? eventCalendars : [];
   const safeProfiles = Array.isArray(profiles) ? profiles : [];
   const safePromotions = Array.isArray(promotions) ? promotions : [];
   const safeServices = Array.isArray(services) ? services : [];
 
-  // Filter labels based on adminStatus
+  /* ---------------- LABELS ---------------- */
   const labels = [
     { key: "Admins", value: safeAdmins.length },
     { key: "Leads", value: safeLeads.length },
     { key: "Resources", value: safeResources.length },
     { key: "Courses", value: safeCourses.length },
     { key: "Downloads", value: safeDownloads.length },
-    { key: "Calendars", value: safeEventCalendars.length },
+    { key: "Calendars", value: safeCalendars.length },
     { key: "Profiles", value: safeProfiles.length },
     { key: "Promotions", value: safePromotions.length },
     { key: "Services", value: safeServices.length },
@@ -138,15 +141,18 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
     (item) => adminStatus || !["Admins", "Profiles", "Users"].includes(item.key)
   );
 
-  // Chart data
+  /* ---------------- CHART DATA ---------------- */
   const chartData = labels.map((item) => ({
     category: item.key,
-    count: item.value,
+    count: Number(item.value) || 0,
   }));
 
-  const validCounts = chartData.map((d) => Number(d.count) || 0);
-  const maxCount = validCounts.length ? Math.max(...validCounts) : 1;
+  const counts = chartData.map((d) => d.count);
 
+  const maxCount =
+    counts.length && Math.max(...counts) > 0 ? Math.max(...counts) : 1;
+
+  /* ---------------- COLORS ---------------- */
   const barColors = [
     "#1D1D1D",
     "#AE8BCA",
@@ -159,8 +165,9 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
     "#DD992B",
   ];
 
+  /* ---------------- RENDER ---------------- */
   return (
-    <Card className="h-auto bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
+    <Card className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Data Overview
@@ -168,29 +175,34 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
         <CardDescription>Total Entries by Category</CardDescription>
       </CardHeader>
 
-      <CardContent className="flex flex-col">
-        {/* Chart */}
+      <CardContent>
+        {/* CHART */}
         <div className="w-full h-[400px] lg:h-[500px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
               data={chartData}
-              margin={{ top: 20, right: 20, left: 0, bottom: 20 }}
+              margin={{ top: 20, right: 20, bottom: 20 }}
             >
               <XAxis
                 dataKey="category"
                 tick={{ fontSize: 14, fill: "#6B7280" }}
               />
               <Tooltip />
+
               <Bar
                 dataKey="count"
                 isAnimationActive={false}
                 shape={(props: unknown) => {
-                  const p = props as RechartsBarShapeProps;
+                  const p = props as RectangleProps & {
+                    value?: number;
+                    fill?: string;
+                  };
+
                   return (
                     <CombinedBar
                       {...p}
-                      value={p.value ?? 0}
-                      fill={p.fill ?? "#000"}
+                      value={p.value}
+                      fill={p.fill}
                       maxValue={maxCount}
                     />
                   );
@@ -208,13 +220,15 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
           </ResponsiveContainer>
         </div>
 
-        {/* Legend */}
+        {/* LEGEND */}
         <div className="mt-6 flex flex-wrap gap-4">
           {labels.map((item, index) => (
-            <div key={index} className="flex items-center gap-2">
+            <div key={item.key} className="flex items-center gap-2">
               <div
                 className="w-4 h-4 rounded-sm"
-                style={{ backgroundColor: barColors[index % barColors.length] }}
+                style={{
+                  backgroundColor: barColors[index % barColors.length],
+                }}
               />
               <span className="text-sm font-medium text-gray-700 dark:text-gray-100">
                 {item.key}
