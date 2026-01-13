@@ -187,11 +187,13 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">
           Sales & Performance Analytics
         </h1>
-        <div className="flex items-center gap-2">
+
+        {/* Filters */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2 gap-3 w-full">
           {/* Filter */}
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <select
-              className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              className="w-full px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
               onChange={(e) => setFilter(e.target.value)}
               value={filter}
             >
@@ -203,10 +205,11 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
               <option value="custom">Custom Range</option>
             </select>
           </div>
+
           {/* Country */}
-          <div className="relative">
+          <div className="relative w-full sm:w-auto">
             <select
-              className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              className="w-full px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
               onChange={(e) => setCountry(e.target.value)}
               value={country}
             >
@@ -221,27 +224,33 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
 
       {/* Custom Range Inputs */}
       {filter === "custom" && (
-        <div className="flex gap-4 mb-6 items-center p-4 rounded-xl shadow bg-gray-50 dark:bg-gray-900">
-          <label>From:</label>
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="border px-4 py-2 rounded-2xl dark:bg-gray-700"
-          />
-          <label>To:</label>
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="border px-4 py-2 rounded-2xl dark:bg-gray-700"
-          />
-          <button
-            onClick={handleResetFilters}
-            className="bg-black dark:bg-gray-700 text-white px-4 py-2 rounded-2xl"
-          >
-            Reset
-          </button>
+        <div className="flex flex-col sm:flex-row flex-wrap gap-3 mb-6 p-4 rounded-xl shadow bg-gray-50 dark:bg-gray-900">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+            <label>From:</label>
+            <input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="border px-4 py-2 rounded-2xl dark:bg-gray-700 w-full sm:w-auto"
+            />
+          </div>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+            <label>To:</label>
+            <input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="border px-4 py-2 rounded-2xl dark:bg-gray-700 w-full sm:w-auto"
+            />
+          </div>
+          <div className="w-full sm:w-auto">
+            <button
+              onClick={handleResetFilters}
+              className="bg-black dark:bg-gray-700 text-white px-4 py-2 rounded-2xl w-full sm:w-auto"
+            >
+              Reset
+            </button>
+          </div>
         </div>
       )}
 

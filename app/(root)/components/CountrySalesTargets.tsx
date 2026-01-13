@@ -182,69 +182,84 @@ const CountrySalesTargets: React.FC<CountrySalesTargetsProps> = ({
         </h2>
 
         {adminStatus && (
-          <div className="flex flex-wrap gap-2 items-center">
-            <select
-              className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
-              onChange={(e) => setFilter(e.target.value)}
-              value={filter}
-            >
-              <option value="week">This Week</option>
-              <option value="month">This Month</option>
-              <option value="quarter">This Quarter</option>
-              <option value="year">This Year</option>
-              <option value="all">All Time</option>
-              <option value="custom">Custom Range</option>
-            </select>
+          <div className="flex flex-col sm:flex-row sm:flex-wrap gap-2 items-start w-full">
+            {/* Filter */}
+            <div className="w-full sm:w-auto">
+              <select
+                className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+                onChange={(e) => setFilter(e.target.value)}
+                value={filter}
+              >
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="quarter">This Quarter</option>
+                <option value="year">This Year</option>
+                <option value="all">All Time</option>
+                <option value="custom">Custom Range</option>
+              </select>
+            </div>
 
+            {/* Custom Dates */}
             {filter === "custom" && (
               <>
-                <input
-                  type="date"
-                  className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                />
-                <input
-                  type="date"
-                  className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
-                  value={endDate}
-                  onChange={(e) => setEndDate(e.target.value)}
-                />
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <input
+                    type="date"
+                    className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                  />
+                  <input
+                    type="date"
+                    className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+                    value={endDate}
+                    onChange={(e) => setEndDate(e.target.value)}
+                  />
+                </div>
               </>
             )}
 
-            <select
-              className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
-              onChange={(e) => setSelectedCountry(e.target.value)}
-              value={selectedCountry}
-            >
-              <option value="All">All Countries</option>
-              {countriesList.map((c) => (
-                <option key={c} value={c}>
-                  {c}
-                </option>
-              ))}
-            </select>
+            {/* Country */}
+            <div className="w-full sm:w-auto">
+              <select
+                className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+                onChange={(e) => setSelectedCountry(e.target.value)}
+                value={selectedCountry}
+              >
+                <option value="All">All Countries</option>
+                {countriesList.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <select
-              className="px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
-              onChange={(e) => setSelectedAgency(e.target.value)}
-              value={selectedAgency}
-            >
-              <option value="All">All Agencies</option>
-              {agenciesList.map((a) => (
-                <option key={a.email} value={a.email}>
-                  {a.name}
-                </option>
-              ))}
-            </select>
+            {/* Agency */}
+            <div className="w-full sm:w-auto">
+              <select
+                className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+                onChange={(e) => setSelectedAgency(e.target.value)}
+                value={selectedAgency}
+              >
+                <option value="All">All Agencies</option>
+                {agenciesList.map((a) => (
+                  <option key={a.email} value={a.email}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            <button
-              className="bg-black dark:bg-gray-700 text-white px-4 py-2 rounded-2xl transition"
-              onClick={handleResetFilters}
-            >
-              Reset Filters
-            </button>
+            {/* Reset Button */}
+            <div className="w-full sm:w-auto">
+              <button
+                className="w-full sm:w-auto bg-black dark:bg-gray-700 text-white px-4 py-2 rounded-2xl transition"
+                onClick={handleResetFilters}
+              >
+                Reset Filters
+              </button>
+            </div>
           </div>
         )}
       </div>
