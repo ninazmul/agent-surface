@@ -26,13 +26,15 @@ const signatureSchema = z.object({
 
 type SignatureFormProps = {
   profileId: string;
+  onClose?: () => void;
 };
 
-export function SignatureDocumentForm({ profileId }: SignatureFormProps) {
+export function SignatureDocumentForm({
+  profileId,
+  onClose,
+}: SignatureFormProps & { onClose?: () => void }) {
   const router = useRouter();
-
   const [signatureDocument, setSignatureDocument] = useState<File[]>([]);
-
   const { startUpload } = useUploadThing("mediaUploader");
 
   const form = useForm<z.infer<typeof signatureSchema>>({
@@ -48,18 +50,20 @@ export function SignatureDocumentForm({ profileId }: SignatureFormProps) {
 
       if (signatureDocument.length > 0) {
         const uploaded = await startUpload(signatureDocument);
-
-        if (!uploaded || uploaded.length === 0) {
+        if (!uploaded || uploaded.length === 0)
           throw new Error("Upload failed");
-        }
-
         uploadedSignatureDocumentUrl = uploaded[0].url;
       }
 
       await uploadSignatureDocument(profileId, uploadedSignatureDocumentUrl);
 
       toast.success("Signature submitted successfully");
+
+      // Refresh data
       router.refresh();
+
+      // Close modal if onClose is provided
+      if (onClose) onClose();
     } catch (error) {
       console.error(error);
       toast.error("Failed to submit signature");
@@ -87,7 +91,6 @@ export function SignatureDocumentForm({ profileId }: SignatureFormProps) {
             </FormItem>
           )}
         />
-
         <Button
           type="submit"
           className="w-full rounded-xl"

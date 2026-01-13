@@ -55,7 +55,7 @@ export function SignatureModal({
         </div>
 
         {/* Signature form */}
-        <SignatureDocumentForm profileId={profileId} />
+        <SignatureDocumentForm profileId={profileId} onClose={onClose} />
 
         <div className="flex justify-end gap-2 mt-4">
           <Button variant="outline" onClick={onClose}>
