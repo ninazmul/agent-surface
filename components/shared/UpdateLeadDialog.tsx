@@ -62,7 +62,7 @@ const UpdateLeadDialog = ({
         "
       >
         <DialogHeader>
-          <DialogTitle>Create Lead</DialogTitle>
+          <DialogTitle>Update Lead</DialogTitle>
         </DialogHeader>
 
         <LeadForm
