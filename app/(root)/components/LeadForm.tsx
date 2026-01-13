@@ -13,7 +13,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { createLead, updateLead } from "@/lib/actions/lead.actions";
 import { ILead } from "@/lib/database/models/lead.model";
 import { IProfile } from "@/lib/database/models/profile.model";
@@ -132,6 +132,7 @@ type LeadFormProps = {
   services?: IServices[];
   isAdmin?: boolean;
   email: string;
+  onSuccess?: () => void;
 };
 
 const LeadForm = ({
@@ -143,8 +144,9 @@ const LeadForm = ({
   email,
   courses,
   services,
+  onSuccess,
 }: LeadFormProps) => {
-  const router = useRouter();
+  // const router = useRouter();
   const { startUpload } = useUploadThing("mediaUploader");
 
   const [passportFile, setPassportFile] = useState<File[]>([]);
@@ -297,7 +299,8 @@ const LeadForm = ({
           });
 
           toast.success("Lead created successfully!");
-          router.push("/leads");
+          // router.push("/leads");
+          onSuccess?.();
         }
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
@@ -342,7 +345,8 @@ const LeadForm = ({
             status: "updated",
           });
           toast.success("Lead updated successfully!");
-          router.push("/leads");
+          // router.push("/leads");
+          onSuccess?.();
         }
       }
     } catch (error) {

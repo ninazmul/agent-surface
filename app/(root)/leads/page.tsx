@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
+import { getAllProfiles, getProfileByEmail } from "@/lib/actions/profile.actions";
 import LeadTable from "../components/LeadTable";
 import {
   getAdminCountriesByEmail,
@@ -12,9 +12,12 @@ import {
 } from "@/lib/actions/admin.actions";
 import { redirect } from "next/navigation";
 import { ILead } from "@/lib/database/models/lead.model";
-import { Download, Plus } from "lucide-react";
+import { Download } from "lucide-react";
 import SendRemindersButton from "@/components/shared/SendRemindersButton";
 import ExportLeadsExcelClient from "@/components/shared/ExportToExcelClient";
+import AddLeadDialog from "@/components/shared/AddLeadDialog";
+import { getAllCourses } from "@/lib/actions/course.actions";
+import { getAllServices } from "@/lib/actions/service.actions";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -64,6 +67,17 @@ const Page = async () => {
     leads = allLeads.flat().filter(Boolean);
   }
 
+  let agency = [];
+  if (adminStatus) {
+    agency = await getAllProfiles();
+  } else {
+    const myAgency = await getProfileByEmail(email);
+    if (myAgency) agency = [myAgency];
+  }
+
+  const courses = await getAllCourses();
+  const services = await getAllServices();
+
   return (
     <>
       <section className="p-4">
@@ -83,7 +97,7 @@ const Page = async () => {
               </Button>
             </a>
 
-            <a href={"/leads/create"}>
+            {/* <a href={"/leads/create"}>
               <Button
                 size="sm"
                 className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
@@ -91,7 +105,15 @@ const Page = async () => {
                 <Plus size={16} /> Add{" "}
                 <span className="hidden md:block">Lead</span>
               </Button>
-            </a>
+            </a> */}
+
+            <AddLeadDialog
+              email={email}
+              agency={agency}
+              courses={courses}
+              services={services}
+              isAdmin={adminStatus}
+            />
 
             {adminStatus && (
               <div>
