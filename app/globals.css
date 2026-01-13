@@ -447,6 +447,7 @@ body {
   background-color: #fff;
   color: #111827; /* gray-900 */
   border-color: #d1d5db; /* gray-300 */
+  max-width: 100%;
 }
 
 .react-select__menu {

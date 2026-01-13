@@ -44,7 +44,17 @@ const AddLeadDialog = ({
         </Button>
       </DialogTrigger>
 
-      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto bg-white dark:bg-gray-800">
+      <DialogContent
+        className="
+        w-[95vw]
+        max-w-[95vw]
+        sm:max-w-3xl
+        max-h-[90vh]
+        overflow-y-auto
+        overflow-x-hidden
+        p-0
+        "
+      >
         <DialogHeader>
           <DialogTitle>Create Lead</DialogTitle>
         </DialogHeader>
