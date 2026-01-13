@@ -46,13 +46,14 @@ const AddLeadDialog = ({
 
       <DialogContent
         className="
-        w-[95vw]
+        w-full md:w-[95vw]
         max-w-[95vw]
         sm:max-w-3xl
         max-h-[90vh]
         overflow-y-auto
         overflow-x-hidden
-        p-0
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
         "
       >
         <DialogHeader>
