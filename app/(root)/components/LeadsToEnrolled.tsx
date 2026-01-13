@@ -108,7 +108,7 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
     if (agentsData.length <= 6) setShowMore(false);
   }, [agentsData]);
 
-  // Ensure at least 3 cards are rendered
+  // Always render at least 3 cards, fill with empty agent placeholders
   const cardsToShow = showMore
     ? agentsData
     : [...agentsData, ...Array(Math.max(3 - agentsData.length, 0)).fill(null)];
@@ -181,34 +181,22 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {cardsToShow.map((agent, index) => {
-          if (!agent) {
-            // Placeholder card for empty slots
-            return (
-              <Card
-                key={`empty-${index}`}
-                className="p-4 h-full bg-gray-100 dark:bg-gray-800 shadow-sm rounded-2xl border border-gray-100 flex items-center justify-center text-gray-400"
-              >
-                No Data
-              </Card>
-            );
-          }
-
           const maxCount = Math.max(
-            ...leadStages.map((stage) => agent[stage] || 0),
+            ...leadStages.map((stage) => agent?.[stage] || 0),
             1
           );
 
           return (
             <Card
-              key={agent.agentName}
+              key={agent?.agentName || `empty-${index}`}
               className="p-4 h-full bg-gray-100 dark:bg-gray-800 shadow-sm rounded-2xl border border-gray-100"
             >
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                {agent.agentName}
+                {agent?.agentName || "No Agent"}
               </h3>
 
               {leadStages.map((stage) => {
-                const count = agent[stage] || 0;
+                const count = agent?.[stage] || 0;
                 const progress = (count / maxCount) * 100;
 
                 const stageColor = {

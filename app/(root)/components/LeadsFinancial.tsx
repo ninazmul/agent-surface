@@ -226,40 +226,32 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
       {/* CARDS */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {cardsToShow.map((s, index) => {
-          if (!s) {
-            // Placeholder card
-            return (
-              <Card
-                key={`empty-${index}`}
-                className="p-4 h-full bg-gray-100 dark:bg-gray-800 shadow-sm rounded-2xl border border-gray-100 flex items-center justify-center text-gray-400"
-              >
-                No Data
-              </Card>
-            );
-          }
-
-          const percent = s.totalAmount
-            ? Math.round((s.paid / s.totalAmount) * 100)
+          const studentName = s?.studentName || "No Student";
+          const totalAmount = s?.totalAmount || 0;
+          const paid = s?.paid || 0;
+          const due = s?.due || 0;
+          const percent = totalAmount
+            ? Math.round((paid / totalAmount) * 100)
             : 0;
 
           return (
-            <Card key={s.studentName} className="p-2">
+            <Card key={index} className="p-2 h-full">
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 border-b border-gray-900 dark:border-gray-100 mb-4">
-                {s.studentName || "Unknown"}
+                {studentName}
               </h3>
 
               <div className="text-gray-700 dark:text-gray-300">
                 <p className="flex items-center justify-between">
                   <span className="font-medium">Total:</span> €
-                  {s.totalAmount?.toLocaleString() || 0}
+                  {totalAmount.toLocaleString()}
                 </p>
                 <p className="flex items-center justify-between">
                   <span className="font-medium">Paid:</span> €
-                  {s.paid?.toLocaleString() || 0}
+                  {paid.toLocaleString()}
                 </p>
                 <p className="flex items-center justify-between">
                   <span className="font-medium">Due:</span> €
-                  {s.due?.toLocaleString() || 0}
+                  {due.toLocaleString()}
                 </p>
               </div>
 
