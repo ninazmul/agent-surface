@@ -101,12 +101,17 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
           : null;
       })
       .filter((a): a is AgentProgress & { total: number } => a !== null)
-      .sort((a, b) => (b.total || 0) - (a.total || 0)); // Sort descending by total leads
+      .sort((a, b) => (b.total || 0) - (a.total || 0));
   }, [profiles, agentFilteredLeads]);
 
   useEffect(() => {
     if (agentsData.length <= 6) setShowMore(false);
   }, [agentsData]);
+
+  // Ensure at least 3 cards are rendered
+  const cardsToShow = showMore
+    ? agentsData
+    : [...agentsData, ...Array(Math.max(3 - agentsData.length, 0)).fill(null)];
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
@@ -175,7 +180,19 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-        {(showMore ? agentsData : agentsData.slice(0, 3)).map((agent) => {
+        {cardsToShow.map((agent, index) => {
+          if (!agent) {
+            // Placeholder card for empty slots
+            return (
+              <Card
+                key={`empty-${index}`}
+                className="p-4 h-full bg-gray-100 dark:bg-gray-800 shadow-sm rounded-2xl border border-gray-100 flex items-center justify-center text-gray-400"
+              >
+                No Data
+              </Card>
+            );
+          }
+
           const maxCount = Math.max(
             ...leadStages.map((stage) => agent[stage] || 0),
             1
