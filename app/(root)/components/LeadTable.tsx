@@ -21,7 +21,6 @@ import {
   Trash,
   SortAsc,
   SortDesc,
-  Pencil,
   PinOff,
   Pin,
   Mail,
@@ -62,6 +61,9 @@ import { createTrack, getTracksByStudent } from "@/lib/actions/track.actions";
 import { IStudentEvent, ITrack } from "@/lib/database/models/track.model";
 import { getAllAdmins } from "@/lib/actions/admin.actions";
 import Image from "next/image";
+import UpdateLeadDialog from "@/components/shared/UpdateLeadDialog";
+import { IServices } from "@/lib/database/models/service.model";
+import { ICourse } from "@/lib/database/models/course.model";
 
 type PinUnpinStatus = ILead & { isPinned: "pinned" | "unpinned" };
 
@@ -69,10 +71,16 @@ const LeadTable = ({
   leads,
   isAdmin,
   email,
+  agency,
+  services,
+  courses,
 }: {
   leads: ILead[];
-  isAdmin?: boolean;
+  isAdmin: boolean;
   email: string;
+  agency: IProfile[];
+  services: IServices[];
+  courses: ICourse[];
 }) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -1005,15 +1013,15 @@ const LeadTable = ({
                           </Popover>
 
                           {/* Edit */}
-                          <a href={`/leads/${lead._id.toString()}/update`}>
-                            <Button
-                              variant="ghost"
-                              className="w-full justify-start text-purple-500 gap-2"
-                            >
-                              <Pencil className="w-4 h-4" />
-                              Edit Lead
-                            </Button>
-                          </a>
+                          <UpdateLeadDialog
+                            email={email}
+                            lead={lead}
+                            leadId={lead._id.toString()}
+                            agency={agency}
+                            courses={courses}
+                            services={services}
+                            isAdmin={isAdmin}
+                          />
 
                           <Button
                             onClick={() => {

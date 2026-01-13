@@ -9,37 +9,43 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import { Pencil } from "lucide-react";
 import LeadForm from "@/app/(root)/components/LeadForm";
 import { ICourse } from "@/lib/database/models/course.model";
 import { IServices } from "@/lib/database/models/service.model";
 import { IProfile } from "@/lib/database/models/profile.model";
+import { ILead } from "@/lib/database/models/lead.model";
 
-interface AddLeadDialogProps {
+interface UpdateLeadDialogProps {
   email: string;
   agency: IProfile[];
   courses: ICourse[];
   services: IServices[];
   isAdmin: boolean;
+  lead: ILead;
+  leadId: string;
 }
 
-const AddLeadDialog = ({
+const UpdateLeadDialog = ({
   email,
   agency,
   courses,
   services,
   isAdmin,
-}: AddLeadDialogProps) => {
+  lead,
+  leadId,
+}: UpdateLeadDialogProps) => {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button
-          size="sm"
-          className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+          variant="ghost"
+          className="w-full justify-start text-purple-500 gap-2"
         >
-          <Plus size={16} /> Add <span className="hidden md:block">Lead</span>
+          <Pencil className="w-4 h-4" />
+          Edit Lead
         </Button>
       </DialogTrigger>
 
@@ -61,11 +67,13 @@ const AddLeadDialog = ({
 
         <LeadForm
           email={email}
+          Lead={lead}
+          LeadId={leadId}
           agency={agency}
           courses={courses}
           services={services}
           isAdmin={isAdmin}
-          type="Create"
+          type="Update"
           onSuccess={() => setOpen(false)} // optional but recommended
         />
       </DialogContent>
@@ -73,4 +81,4 @@ const AddLeadDialog = ({
   );
 };
 
-export default AddLeadDialog;
+export default UpdateLeadDialog;

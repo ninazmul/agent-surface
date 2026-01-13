@@ -3,7 +3,10 @@ import { Button } from "@/components/ui/button";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
-import { getAllProfiles, getProfileByEmail } from "@/lib/actions/profile.actions";
+import {
+  getAllProfiles,
+  getProfileByEmail,
+} from "@/lib/actions/profile.actions";
 import LeadTable from "../components/LeadTable";
 import {
   getAdminCountriesByEmail,
@@ -134,7 +137,14 @@ const Page = async () => {
 
         {/* Table */}
         <div className="overflow-x-auto my-8">
-          <LeadTable leads={leads} isAdmin={adminStatus} email={email} />
+          <LeadTable
+            leads={leads}
+            isAdmin={adminStatus}
+            email={email}
+            agency={agency}
+            courses={courses}
+            services={services}
+          />
         </div>
       </section>
     </>
