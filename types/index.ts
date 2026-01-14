@@ -370,6 +370,8 @@ export type PromotionParams = {
     description?: string;
   }[];
   discount?: string;
+  commissionPercent?: string;
+  commissionAmount?: string;
   isPaused?: boolean;
   sku: string;
   createdAt: Date;

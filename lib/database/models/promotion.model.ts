@@ -30,6 +30,8 @@ export interface IPromotion extends Document {
     description?: string;
   }[];
   discount?: string;
+  commissionPercent?: string;
+  commissionAmount?: string;
   isPaused?: boolean;
   sku: string;
   createdAt: Date;
@@ -74,6 +76,8 @@ const PromotionSchema = new Schema<IPromotion>({
     default: [],
   },
   discount: { type: String },
+  commissionPercent: { type: String, required: false },
+  commissionAmount: { type: String, required: false },
   isPaused: { type: Boolean, default: false },
   sku: { type: String, required: true, unique: true },
   createdAt: { type: Date, default: Date.now },

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import * as z from "zod";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useUploadThing } from "@/lib/uploadthing";
 import { FileUploader } from "@/components/shared/FileUploader";
 import {
@@ -72,6 +72,8 @@ export const promotionFormSchema = z.object({
     )
     .optional(),
   discount: z.string().optional(),
+  commissionPercent: z.string().optional(),
+  commissionAmount: z.string().optional(),
   sku: z.string(),
 });
 
@@ -137,6 +139,8 @@ const PromotionForm = ({
             })) || [],
           startDate: new Date(promotion.startDate),
           endDate: new Date(promotion.endDate),
+          commissionPercent: promotion?.commissionPercent,
+          commissionAmount: promotion?.commissionAmount,
           sku: promotion.sku || "",
           countries: promotion.countries || [],
           agencies: promotion.agencies || [],
@@ -149,6 +153,18 @@ const PromotionForm = ({
     resolver: zodResolver(promotionFormSchema),
     defaultValues: initialValues,
   });
+
+  const commissionPercent = form.watch("commissionPercent");
+  const commissionAmount = form.watch("commissionAmount");
+
+  useEffect(() => {
+    if (commissionPercent) {
+      form.setValue("commissionAmount", "");
+    }
+    if (commissionAmount) {
+      form.setValue("commissionPercent", "");
+    }
+  }, [commissionPercent, commissionAmount, form]);
 
   async function onSubmit(values: z.infer<typeof promotionFormSchema>) {
     let uploadedPhotoUrl = values.photo;
@@ -662,6 +678,48 @@ const PromotionForm = ({
             </FormItem>
           )}
         />
+
+        <div className="grid grid-cols-1 md:grid-cols-2">
+          {/* CommissionPercent */}
+          <FormField
+            control={form.control}
+            name="commissionPercent"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Commission Percent</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter commission percent"
+                    {...field}
+                    disabled={!!commissionAmount}
+                    className="w-full rounded-md border px-3 py-2 text-sm"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* CommissionAmount */}
+          <FormField
+            control={form.control}
+            name="commissionAmount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Commission Amount</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter commission amount"
+                    {...field}
+                    disabled={!!commissionPercent}
+                    className="w-full rounded-md border px-3 py-2 text-sm"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         {/* Submit Button */}
         <div className="pt-4">
