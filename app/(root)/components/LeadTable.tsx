@@ -1209,86 +1209,96 @@ const LeadTable = ({
 
       {/* Track Modal */}
       <Dialog open={isTrackModalOpen} onOpenChange={setIsTrackModalOpen}>
-        <DialogContent className="max-w-lg bg-white">
-          <DialogHeader>
+        <DialogContent className="max-w-lg bg-white max-h-[80vh] flex flex-col">
+          {/* Header stays fixed */}
+          <DialogHeader className="shrink-0">
             <DialogTitle>Student Track</DialogTitle>
           </DialogHeader>
 
-          {trackData ? (
-            <div className="space-y-4">
-              <p className="text-sm text-gray-500">
-                <strong>Email:</strong> {trackData.student}
-              </p>
+          {/* Scrollable body */}
+          <div className="flex-1 overflow-y-auto pr-2">
+            {trackData ? (
+              <div className="space-y-4">
+                <p className="text-sm text-gray-500">
+                  <strong>Email:</strong> {trackData.student}
+                </p>
 
-              {/* Timeline */}
-              <div className="relative border-l border-gray-300 pl-6 space-y-6">
-                {trackData.events.map((event: IStudentEvent, index: number) => {
-                  const status = event.status || "Unknown";
-                  // Simple hash → pick one of Tailwind’s soft colors
-                  const colors = [
-                    "bg-blue-100 text-blue-700",
-                    "bg-green-100 text-green-700",
-                    "bg-purple-100 text-purple-700",
-                    "bg-yellow-100 text-yellow-700",
-                    "bg-pink-100 text-pink-700",
-                    "bg-orange-100 text-orange-700",
-                    "bg-gray-100 text-gray-700",
-                    "bg-red-100 text-red-700",
-                  ];
-                  const hash = status
-                    .split("")
-                    .reduce((acc, char) => acc + char.charCodeAt(0), 0);
-                  const colorClass = colors[hash % colors.length];
+                {/* Timeline */}
+                <div className="relative border-l border-gray-300 pl-6 space-y-6">
+                  {trackData.events.map(
+                    (event: IStudentEvent, index: number) => {
+                      const status = event.status || "Unknown";
 
-                  return (
-                    <div key={index} className="relative">
-                      {/* Dot */}
-                      <span className="absolute -left-[9px] top-2 w-3 h-3 rounded-full bg-purple-500 border-2 border-white shadow" />
+                      const colors = [
+                        "bg-blue-100 text-blue-700",
+                        "bg-green-100 text-green-700",
+                        "bg-purple-100 text-purple-700",
+                        "bg-yellow-100 text-yellow-700",
+                        "bg-pink-100 text-pink-700",
+                        "bg-orange-100 text-orange-700",
+                        "bg-gray-100 text-gray-700",
+                        "bg-red-100 text-red-700",
+                      ];
 
-                      <div className="bg-gray-50 rounded-xl p-4 shadow-sm border">
-                        <p className="font-medium text-gray-800">
-                          {event.event}
-                        </p>
+                      const hash = status
+                        .split("")
+                        .reduce((acc, char) => acc + char.charCodeAt(0), 0);
 
-                        {/* Status Badge */}
-                        <div className="flex items-center gap-2 mt-1">
-                          <span
-                            className={`px-2 py-0.5 rounded-full text-xs font-medium ${colorClass}`}
-                          >
-                            {event.status}
-                          </span>
-                          <span className="text-xs text-gray-500">
-                            {new Date(event.createdAt).toLocaleString("en-US", {
-                              hour: "numeric",
-                              minute: "numeric",
-                              hour12: true,
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })}
-                          </span>
+                      const colorClass = colors[hash % colors.length];
+
+                      return (
+                        <div key={index} className="relative">
+                          {/* Dot */}
+                          <span className="absolute -left-[9px] top-2 w-3 h-3 rounded-full bg-purple-500 border-2 border-white shadow" />
+
+                          <div className="bg-gray-50 rounded-xl p-4 shadow-sm border">
+                            <p className="font-medium text-gray-800">
+                              {event.event}
+                            </p>
+
+                            <div className="flex items-center gap-2 mt-1">
+                              <span
+                                className={`px-2 py-0.5 rounded-full text-xs font-medium ${colorClass}`}
+                              >
+                                {event.status}
+                              </span>
+
+                              <span className="text-xs text-gray-500">
+                                {new Date(event.createdAt).toLocaleString(
+                                  "en-US",
+                                  {
+                                    hour: "numeric",
+                                    minute: "numeric",
+                                    hour12: true,
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  }
+                                )}
+                              </span>
+                            </div>
+
+                            {event.route && (
+                              <Button
+                                variant="link"
+                                size="sm"
+                                asChild
+                                className="mt-2 p-0"
+                              >
+                                <a href={event.route}>Go to Route →</a>
+                              </Button>
+                            )}
+                          </div>
                         </div>
-
-                        {/* Route link */}
-                        {event.route && (
-                          <Button
-                            variant="link"
-                            size="sm"
-                            asChild
-                            className="mt-2 p-0"
-                          >
-                            <a href={event.route}>Go to Route →</a>
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
+                      );
+                    }
+                  )}
+                </div>
               </div>
-            </div>
-          ) : (
-            <p className="text-sm text-gray-400">No tracking data found.</p>
-          )}
+            ) : (
+              <p className="text-sm text-gray-400">No tracking data found.</p>
+            )}
+          </div>
         </DialogContent>
       </Dialog>
 
