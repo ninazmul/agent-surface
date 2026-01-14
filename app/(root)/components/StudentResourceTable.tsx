@@ -178,7 +178,7 @@ const StudentResourceTable = ({
                     {resource.fileName}
                   </a>
                 </TableCell>
-                <TableCell className="w-max line-clamp-1 truncate w-40 md:w-auto">
+                <TableCell className="line-clamp-1 truncate w-40 md:w-auto">
                   {resource.category}
                 </TableCell>
                 <TableCell>

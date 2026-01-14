@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   assignLeadToUser,
   deleteLead,
+  unassignLeadFromUser,
   updateLead,
 } from "@/lib/actions/lead.actions";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -379,38 +380,59 @@ const LeadTable = ({
     }
   };
 
+  const openAssignModal = () => {
+    if (selectedLeads.length === 0) {
+      setSelectedLeads(paginatedLeads.map((l) => l._id.toString()));
+    }
+
+    // Get assigned users common to all selected leads
+    const selectedLeadObjects = localLeads.filter((l) =>
+      selectedLeads.includes(l._id.toString())
+    );
+
+    const commonAssignedUsers = selectedLeadObjects.length
+      ? selectedLeadObjects
+          .map((l) => l.assignedTo || [])
+          .reduce((a, b) => a.filter((u) => b.includes(u)))
+      : [];
+
+    setAssignedUsers(commonAssignedUsers);
+    setAssignModalOpen(true);
+  };
+
   const handleBulkAssign = async () => {
-    if (assignedUsers.length === 0 || selectedLeads.length === 0) return;
+    if (selectedLeads.length === 0) return;
 
     try {
       await Promise.all(
-        selectedLeads.map((leadId) =>
-          Promise.all(
-            assignedUsers.map(
-              (user) => assignLeadToUser(leadId, user) // your API call
-            )
-          )
-        )
-      );
-
-      toast.success("Leads assigned successfully!");
-
-      await Promise.all(
         selectedLeads.map(async (leadId) => {
           const lead = localLeads.find((l) => l._id.toString() === leadId);
-          return createTrack({
+          const currentAssigned = lead?.assignedTo || [];
+
+          const toAdd = assignedUsers.filter(
+            (u) => !currentAssigned.includes(u)
+          );
+          const toRemove = currentAssigned.filter(
+            (u) => !assignedUsers.includes(u)
+          );
+
+          await Promise.all([
+            ...toAdd.map((u) => assignLeadToUser(leadId, u)),
+            ...toRemove.map((u) => unassignLeadFromUser(leadId, u)),
+          ]);
+
+          await createTrack({
             student: lead?.email || "",
-            event: `Lead assigned to ${assignedUsers.join(", ")}`,
+            event: "Lead assignment updated",
             route: `/leads/${leadId}`,
-            status: `Assigned to ${assignedUsers.join(", ")}`,
+            status: `Assigned: ${assignedUsers.join(", ")}`,
           });
         })
       );
 
-      setSelectedLeads([]);
-      setAssignedUsers([]);
-      setAssignModalOpen(false);
+      toast.success("Lead assignments updated");
 
+      // Update UI
       setLocalLeads((prev) =>
         prev.map((lead) => {
           if (selectedLeads.includes(lead._id.toString())) {
@@ -424,9 +446,13 @@ const LeadTable = ({
           return lead;
         })
       );
+
+      setSelectedLeads([]);
+      setAssignedUsers([]);
+      setAssignModalOpen(false);
     } catch (error) {
       console.error(error);
-      toast.error("Failed to assign leads.");
+      toast.error("Failed to update assignments");
     }
   };
 
@@ -1024,16 +1050,7 @@ const LeadTable = ({
                           />
 
                           <Button
-                            onClick={() => {
-                              if (selectedLeads.length === 0) {
-                                setSelectedLeads(
-                                  paginatedLeads.map((lead) =>
-                                    lead._id.toString()
-                                  )
-                                );
-                              }
-                              setAssignModalOpen(true);
-                            }}
+                            onClick={openAssignModal}
                             variant="ghost"
                             className="w-full justify-start text-blue-500 gap-2"
                           >
@@ -1315,8 +1332,6 @@ const LeadTable = ({
 
             <div className="max-h-64 overflow-y-auto border rounded-md p-2">
               {allProfiles.map((user) => {
-                const checked = assignedUsers.includes(user.email);
-
                 return (
                   <label
                     key={user._id.toString()}
@@ -1324,7 +1339,7 @@ const LeadTable = ({
                   >
                     <input
                       type="checkbox"
-                      checked={checked}
+                      checked={assignedUsers.includes(user.email)}
                       onChange={(e) => {
                         if (e.target.checked) {
                           setAssignedUsers((prev) => [...prev, user.email]);
@@ -1335,6 +1350,7 @@ const LeadTable = ({
                         }
                       }}
                     />
+
                     <div className="flex flex-col">
                       <span className="font-medium">{user.name}</span>
                       <span className="text-xs text-gray-500">

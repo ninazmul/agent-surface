@@ -254,6 +254,35 @@ export const assignLeadToUser = async (leadId: string, email: string) => {
   }
 };
 
+// ====== UNASSIGN LEAD FROM USER
+export const unassignLeadFromUser = async (
+  leadId: string,
+  email: string
+) => {
+  try {
+    await connectToDatabase();
+
+    const updatedLead = await Lead.findByIdAndUpdate(
+      leadId,
+      {
+        $pull: { assignedTo: email }, // removes email if exists
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedLead) {
+      throw new Error("Lead not found");
+    }
+
+    revalidatePath("/leads/assigned");
+
+    return JSON.parse(JSON.stringify(updatedLead));
+  } catch (error) {
+    console.error("Error unassigning lead:", error);
+    handleError(error);
+  }
+};
+
 // ====== DELETE LEAD
 export const deleteLead = async (leadId: string) => {
   try {
