@@ -118,6 +118,7 @@ const LeadTable = ({
 
   const [assignModalOpen, setAssignModalOpen] = useState(false);
   const [assignedUsers, setAssignedUsers] = useState<string[]>([]);
+  const [assignLoading, setAssignLoading] = useState(false);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -403,6 +404,8 @@ const LeadTable = ({
   const handleBulkAssign = async () => {
     if (selectedLeads.length === 0) return;
 
+    setAssignLoading(true); // start loading
+
     try {
       await Promise.all(
         selectedLeads.map(async (leadId) => {
@@ -447,12 +450,15 @@ const LeadTable = ({
         })
       );
 
+      // Clear state & close modal
       setSelectedLeads([]);
       setAssignedUsers([]);
       setAssignModalOpen(false);
     } catch (error) {
       console.error(error);
       toast.error("Failed to update assignments");
+    } finally {
+      setAssignLoading(false); // stop loading
     }
   };
 
@@ -1374,9 +1380,9 @@ const LeadTable = ({
             </Button>
             <Button
               onClick={handleBulkAssign}
-              disabled={!assignedUsers || selectedLeads.length === 0}
+              disabled={assignLoading || selectedLeads.length === 0}
             >
-              Assign
+              {assignLoading ? "Assigning..." : "Assign"}
             </Button>
           </DialogFooter>
         </DialogContent>
