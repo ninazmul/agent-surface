@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 import { ILead } from "@/lib/database/models/lead.model";
 import { IQuotation } from "@/lib/database/models/quotation.model";
 import { createTrack } from "@/lib/actions/track.actions";
+import { useRouter } from "next/navigation";
 
 interface QuotationStatusUpdaterProps {
   data: ILead | IQuotation;
@@ -20,6 +21,7 @@ const QuotationStatusUpdater = ({
   isVoid,
   onAccepted,
 }: QuotationStatusUpdaterProps) => {
+  const router = useRouter();
   const initialStatus =
     "quotationStatus" in data ? data.quotationStatus : false;
   const [status, setStatus] = useState(initialStatus);
@@ -71,6 +73,7 @@ const QuotationStatusUpdater = ({
         route: `/quotation/${data._id.toString()}`,
         status: "Accepted",
       });
+      router.push("/leads");
     } catch (err) {
       console.error("Failed to update quotationStatus or send email", err);
       toast.error("Error while processing quotation acceptance.");

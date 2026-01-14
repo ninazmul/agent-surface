@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2, Circle, Share2 } from "lucide-react";
 import QuotationEditor from "@/app/(root)/components/QuotationEditor";
 import QuotationStatusUpdater from "@/app/(root)/components/QuotationStatusUpdater";
 import QuotationDownloader from "@/app/(root)/components/QuotationDownloader";
@@ -18,6 +18,7 @@ import QuotationVoidStatusUpdater from "./QuotationVoidStatusUpdater";
 import { IQuotation } from "@/lib/database/models/quotation.model";
 import { useUser } from "@clerk/nextjs";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions";
+import toast from "react-hot-toast";
 
 const steps = [
   { id: 1, label: "Validate your Quote" },
@@ -448,9 +449,30 @@ export default function QuotationClient({
               >
                 ← Previous
               </Button>
-              <div className="flex gap-2">
+              <div className="flex flex-wrap gap-2">
                 <QuotationDownloader data={data} agency={agency} />
                 <CopyQuotationButton quotationId={data._id.toString()} />
+                {/* Share Link */}
+                <Button
+                  size={"sm"}
+                  variant={"outline"}
+                  className="flex items-center gap-2 transition-all"
+                  onClick={async () => {
+                    const link = `${window.location.origin}/quotation/${data._id}/invoice`;
+                    if (navigator.share) {
+                      await navigator.share({
+                        title: "Create Profile",
+                        url: link,
+                      });
+                    } else {
+                      navigator.clipboard.writeText(link);
+                      toast.success("Link copied (Share unavailable)");
+                    }
+                  }}
+                >
+                  <Share2 size={16} />
+                  Share Invoice
+                </Button>
               </div>
             </div>
           </div>
