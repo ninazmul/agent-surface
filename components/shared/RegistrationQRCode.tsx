@@ -11,33 +11,40 @@ const LeadQRCode = ({ url }: { url: string }) => {
     const canvas = qrRef.current;
     if (!canvas) return;
 
-    // Convert canvas to blob
-    canvas.toBlob(async (blob) => {
+    try {
+      // Convert canvas to blob
+      const blob = await new Promise<Blob | null>((resolve) =>
+        canvas.toBlob((b) => resolve(b), "image/png")
+      );
       if (!blob) return;
 
-      // Check if navigator can share files
+      // Mobile: use Web Share API if supported
       if (navigator.canShare && navigator.canShare({ files: [new File([blob], "lead-qr.png", { type: "image/png" })] })) {
-        try {
-          await navigator.share({
-            files: [new File([blob], "lead-qr.png", { type: "image/png" })],
-            title: "Lead QR Code",
-            text: "Scan this QR code to access the lead form",
-          });
-        } catch (err) {
-          console.error("Error sharing QR code:", err);
-        }
-      } else {
-        alert("Sharing is not supported on this device.");
+        await navigator.share({
+          files: [new File([blob], "lead-qr.png", { type: "image/png" })],
+          title: "Lead QR Code",
+          text: "Scan this QR code to access the lead form",
+        });
+        return;
       }
-    }, "image/png");
+
+      // Desktop: copy image to clipboard
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          "image/png": blob,
+        }),
+      ]);
+
+      alert("QR code copied to clipboard! You can now paste it anywhere.");
+    } catch (err) {
+      console.error("Failed to share QR code:", err);
+      alert("Sharing not supported on this device.");
+    }
   };
 
   return (
     <div className="flex flex-col items-center gap-4 max-w-48">
-      {/* QR Code */}
       <QRCodeCanvas value={url} size={200} ref={qrRef} />
-
-      {/* Share Button */}
       <Button onClick={shareQRCode}>Share QR Code</Button>
     </div>
   );
