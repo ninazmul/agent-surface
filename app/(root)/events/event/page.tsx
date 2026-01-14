@@ -57,7 +57,7 @@ const Page = async () => {
     <>
       <section className="p-4">
         <Sheet>
-          <div className="wrapper flex flex-wrap justify-between items-center gap-4 mx-auto">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
             <h3 className="h3-bold text-center sm:text-left">Our Events</h3>
             <SheetTrigger className="w-full md:w-max">
               <Button
@@ -85,7 +85,7 @@ const Page = async () => {
           </SheetContent>
         </Sheet>
 
-        <div className="wrapper my-8">
+        <div className="overflow-x-auto my-8">
           <EventTable events={events} />
         </div>
       </section>

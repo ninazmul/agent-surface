@@ -226,12 +226,14 @@ const NotificationTable = ({
   return (
     <div className="space-y-4">
       {/* Search */}
-      <Input
-        placeholder="Search notifications..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
-      />
+      <div className="p-1">
+        <Input
+          placeholder="Search notifications..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="mb-4 w-full md:w-1/2 lg:w-1/3 rounded-2xl"
+        />
+      </div>
 
       {/* Sort & Actions */}
       <div className="flex flex-wrap items-center justify-between gap-4">

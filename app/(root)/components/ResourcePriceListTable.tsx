@@ -116,7 +116,7 @@ const ResourcePriceListCards = ({
   return (
     <div className="space-y-6">
       {/* Search & Sort */}
-      <div className="flex flex-wrap gap-3 items-center">
+      <div className="flex flex-wrap gap-3 items-center p-1">
         <Input
           placeholder="Search by file name or country"
           value={searchQuery}
