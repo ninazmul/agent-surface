@@ -126,12 +126,14 @@ const RefundTable = ({
 
   return (
     <div className="space-y-6">
-      <Input
-        placeholder="Search by any field"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full max-w-md rounded-2xl"
-      />
+      <div className="p-1">
+        <Input
+          placeholder="Search by any field"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full max-w-md rounded-2xl"
+        />
+      </div>
 
       <div className="overflow-auto rounded-2xl bg-green-50 dark:bg-gray-900">
         <Table>

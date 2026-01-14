@@ -167,12 +167,14 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
 
   return (
     <div className="space-y-6">
-      <Input
-        placeholder="Search leads..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
-      />
+      <div className="p-1">
+        <Input
+          placeholder="Search leads..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
+        />
+      </div>
 
       <div
         className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800"
@@ -370,7 +372,7 @@ const InvoiceTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             ? new Date(lead.updatedAt).toLocaleString("en-GB", {
                                 day: "2-digit",
                                 month: "2-digit",
-                                year: "numeric", 
+                                year: "numeric",
                               })
                             : "N/A"}
                         </span>

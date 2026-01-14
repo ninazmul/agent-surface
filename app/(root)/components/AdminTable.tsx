@@ -90,12 +90,14 @@ const AdminTable = ({
 
   return (
     <div className="space-y-6">
-      <Input
-        placeholder="Search by name, or email"
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
-      />
+      <div className="p-1">
+        <Input
+          placeholder="Search by name, or email"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
+        />
+      </div>
       <div
         className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800"
         style={{ cursor: "grab" }}
