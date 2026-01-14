@@ -462,6 +462,7 @@ export type ProfileParams = {
   subAgents?: string[];
   status: string;
   salesTarget?: string;
+  commission?: string;
   signatureDocument?: string;
   createdAt: Date;
 };

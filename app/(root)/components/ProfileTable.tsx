@@ -30,6 +30,9 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
   const [editedData, setEditedData] = useState<
     Record<string, { salesTarget: string }>
   >({});
+  const [editedCommissionData, setEditedCommissionData] = useState<
+    Record<string, { commission: string }>
+  >({});
 
   const filteredProfiles = useMemo(() => {
     const filtered = profiles.filter((profile) => {
@@ -117,6 +120,21 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
         router.refresh();
       } catch {
         toast.error("Failed to update Sales Target");
+      }
+    }
+  };
+
+  const handleCommission = async (profileId: string) => {
+    const value = editedCommissionData[profileId]?.commission ?? "";
+    const original =
+      profiles.find((r) => r._id.toString() === profileId)?.commission ?? "";
+    if (value && value !== original) {
+      try {
+        await updateProfile(profileId, { commission: value });
+        toast.success(`Commission updated to %${value}`);
+        router.refresh();
+      } catch {
+        toast.error("Failed to update Commission");
       }
     }
   };
@@ -263,6 +281,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                 </div>
               </TableHead>
               <TableHead className="text-white cursor-pointer">S/T</TableHead>
+              <TableHead className="text-white cursor-pointer">%</TableHead>
               <TableHead className="text-white cursor-pointer">
                 Actions
               </TableHead>
@@ -340,7 +359,33 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                     />
                   </div>
                 </TableCell>
-
+                <TableCell>
+                  <div className="relative w-24">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
+                      %
+                    </span>
+                    <Input
+                      type="number"
+                      className="w-full pl-6 rounded-full text-center"
+                      value={
+                        editedCommissionData[profile._id.toString()]
+                          ?.commission ??
+                        profile.commission ??
+                        ""
+                      }
+                      onChange={(e) =>
+                        setEditedCommissionData((prev) => ({
+                          ...prev,
+                          [profile._id.toString()]: {
+                            commission: e.target.value,
+                          },
+                        }))
+                      }
+                      onBlur={() => handleCommission(profile._id.toString())}
+                      placeholder="100"
+                    />
+                  </div>
+                </TableCell>
                 <TableCell className="w-max flex items-center space-x-2">
                   <a href={`/profile/${profile._id.toString()}/update`}>
                     <Button variant="ghost" size="icon">

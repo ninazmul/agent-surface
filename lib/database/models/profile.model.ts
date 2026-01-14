@@ -20,6 +20,7 @@ export interface IProfile extends Document {
   subAgents?: string[];
   status: string;
   salesTarget?: string;
+  commission?: string;
   signatureDocument?: string;
   createdAt: Date;
 }
@@ -43,6 +44,7 @@ const ProfileSchema = new Schema<IProfile>({
   subAgents: { type: [String], default: undefined },
   status: { type: String, required: true },
   salesTarget: { type: String, required: false },
+  commission: { type: String, required: false },
   signatureDocument: { type: String, required: false },
   createdAt: { type: Date, default: Date.now },
 });
