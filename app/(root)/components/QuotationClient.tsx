@@ -449,7 +449,7 @@ export default function QuotationClient({
               >
                 ← Previous
               </Button>
-              <div className="flex flex-wrap items-center justify-around gap-2">
+              <div className="flex flex-wrap items-center md:items-start justify-around gap-2">
                 <QuotationDownloader data={data} agency={agency} />
                 <CopyQuotationButton quotationId={data._id.toString()} />
                 {/* Share Link */}
