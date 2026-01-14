@@ -21,7 +21,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ILead } from "@/lib/database/models/lead.model";
 import PromotionLeadsStats from "./PromotionLeadsStats";
 import { Pencil } from "lucide-react";
@@ -36,6 +36,33 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
 
   const [leads, setLeads] = useState<ILead[]>([]);
   const [loading, setLoading] = useState(false);
+
+  const calculateTimeLeft = (endDate: Date) => {
+    const diff = endDate.getTime() - Date.now();
+    if (diff <= 0) return null;
+
+    return {
+      days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+      hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+      minutes: Math.floor((diff / (1000 * 60)) % 60),
+      seconds: Math.floor((diff / 1000) % 60),
+    };
+  };
+
+  const [timeLeft, setTimeLeft] = useState<{
+    days: number;
+    hours: number;
+    minutes: number;
+    seconds: number;
+  } | null>(() => calculateTimeLeft(new Date(promotion.endDate)));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTimeLeft(calculateTimeLeft(new Date(promotion.endDate)));
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [promotion.endDate]);
 
   const COLORS = ["#8b5cf6", "#ec4899", "#10b981"];
 
@@ -94,11 +121,34 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
                 See Details
               </button>
             </DialogTrigger>
-            {promotion.discount && (
-              <span className="absolute top-3 left-3 px-3 py-1 text-xs font-semibold rounded-full bg-white text-black shadow">
-                €{promotion.discount} OFF
-              </span>
+            {timeLeft && (
+              <div className="absolute top-0 left-0 z-10 bg-white rounded-xl px-4 py-3 shadow-lg flex items-center gap-3">
+                {[
+                  { label: "Days", value: timeLeft.days },
+                  { label: "Hour", value: timeLeft.hours },
+                  { label: "Minutes", value: timeLeft.minutes },
+                  { label: "Seconds", value: timeLeft.seconds },
+                ].map((item, index) => (
+                  <div key={item.label} className="flex items-center gap-3">
+                    <div className="text-center">
+                      <p className="text-xs text-gray-500 font-medium">
+                        {item.label}
+                      </p>
+                      <p className="text-2xl font-bold text-gray-900 leading-none">
+                        {String(item.value).padStart(2, "0")}
+                      </p>
+                    </div>
+
+                    {index < 3 && (
+                      <span className="text-2xl font-bold text-gray-400 pb-1">
+                        :
+                      </span>
+                    )}
+                  </div>
+                ))}
+              </div>
             )}
+
             {isAdmin && (
               <a
                 href={`/promotions/${promotion._id.toString()}/update`}
