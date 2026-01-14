@@ -122,7 +122,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
               </button>
             </DialogTrigger>
             {timeLeft && (
-              <div className="absolute top-0 left-0 z-10 bg-white rounded-xl px-4 py-3 shadow-lg flex items-center gap-3">
+              <div className="absolute top-0 left-0 z-10 bg-white rounded-xl rounded-tr-none rounded-bl-none px-4 py-3 shadow-lg flex items-center gap-3">
                 {[
                   { label: "Days", value: timeLeft.days },
                   { label: "Hour", value: timeLeft.hours },
