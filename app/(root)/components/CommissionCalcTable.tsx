@@ -208,7 +208,7 @@ const CommissionCalcTable = ({
                         {lead.email}
                       </span>
 
-                      <span className="flex items-center justify-around gap-2">
+                      <span className="flex items-center justify-around gap-2 w-max">
                         <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold border">
                           {lead.home.country}
                         </span>
