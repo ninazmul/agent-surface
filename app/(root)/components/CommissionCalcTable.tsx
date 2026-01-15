@@ -140,13 +140,14 @@ const CommissionCalcTable = ({
 
   return (
     <div className="space-y-6">
-      {/* Search only */}
-      <Input
-        placeholder="Search finance..."
-        value={searchQuery}
-        onChange={(e) => setSearchQuery(e.target.value)}
-        className="rounded-2xl max-w-sm"
-      />
+      <div className="p-1">
+        <Input
+          placeholder="Search finance..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="rounded-2xl max-w-sm"
+        />
+      </div>
 
       <div className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800">
         <Table>
