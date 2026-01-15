@@ -112,12 +112,12 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
               <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                 {promotion.title}
               </h3>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-1 w-3/5">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-1 w-4/5">
                 {promotion.description}
               </p>
             </div>
             <DialogTrigger asChild>
-              <button className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-500 text-white shadow">
+              <button className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-500 text-white shadow w-14">
                 See Details
               </button>
             </DialogTrigger>
