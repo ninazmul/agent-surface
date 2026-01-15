@@ -239,7 +239,35 @@ const CommissionCalcTable = ({
                     <div className="text-sm">{profile?.email}</div>
                   </TableCell>
 
-                  <TableCell className="font-semibold">€{grandTotal}</TableCell>
+                  <TableCell className="w-max font-semibold align-top">
+                    <div className="text-sm space-y-1">
+                      {/* Paid & Due calculation */}
+                      {(() => {
+                        const paidAmount = Array.isArray(lead.transcript)
+                          ? lead.transcript.reduce(
+                              (sum, t) => sum + Number(t.amount || 0),
+                              0
+                            )
+                          : 0;
+
+                        const dueAmount = grandTotal - paidAmount;
+
+                        return (
+                          <>
+                            <div>Total €{grandTotal}</div>
+                            {paidAmount > 0 && (
+                              <div className="text-green-600 dark:text-green-400">
+                                Paid: €{paidAmount}
+                              </div>
+                            )}
+                            <div className="text-red-600 dark:text-red-400">
+                              Due: €{dueAmount}
+                            </div>
+                          </>
+                        );
+                      })()}
+                    </div>
+                  </TableCell>
 
                   <TableCell>
                     <div className="font-semibold">
