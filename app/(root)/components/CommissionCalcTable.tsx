@@ -252,7 +252,7 @@ const CommissionCalcTable = ({
                   </TableCell>
 
                   <TableCell>
-                    <div className="font-semibold">
+                    <div className="font-semibold align-top">
                       {profile?.name ?? "N/A"}
                     </div>
                     <div className="text-sm">{profile?.email}</div>
@@ -289,7 +289,7 @@ const CommissionCalcTable = ({
                   </TableCell>
 
                   <TableCell>
-                    <div className="font-semibold">
+                    <div className="font-semibold align-top">
                       €{commissionAmount.toFixed(2)}
                     </div>
 
