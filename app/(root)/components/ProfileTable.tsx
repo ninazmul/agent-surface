@@ -284,7 +284,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                 </div>
               </TableHead>
               <TableHead className="text-white cursor-pointer">S/T</TableHead>
-              <TableHead className="text-white cursor-pointer">%</TableHead>
+              <TableHead className="text-white cursor-pointer">commn.</TableHead>
               <TableHead className="text-white cursor-pointer">
                 Actions
               </TableHead>
