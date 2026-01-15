@@ -4,8 +4,6 @@ import type { Metadata } from "next";
 import { Space_Grotesk } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "next-themes";
-import { Analytics } from "@vercel/analytics/next";
-import { SpeedInsights } from "@vercel/speed-insights/next";
 
 import "./globals.css";
 
@@ -74,8 +72,6 @@ export default function RootLayout({
         <ClerkProvider>
           <ThemeProvider attribute="class" defaultTheme="system">
             {children}
-            <Analytics />
-            <SpeedInsights />
           </ThemeProvider>
         </ClerkProvider>
       </body>
