@@ -162,6 +162,8 @@ export type LeadParams = {
   isVoid?: boolean;
   isPromotion?: boolean;
   promotionSku?: string;
+  commissionPercent?: string;
+  commissionAmount?: string;
   transcript?: {
     amount: string;
     method: string;

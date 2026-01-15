@@ -107,6 +107,8 @@ const PromotionLeadFormSchema = z.object({
   isPinned: z.boolean().optional(),
   isPromotion: z.boolean().optional(),
   promotionSku: z.string(),
+  commissionPercent: z.string().optional(),
+  commissionAmount: z.string().optional(),
   others: z
     .array(
       z.object({
@@ -225,6 +227,9 @@ const PromotionLeadForm = ({
       isPinned: Lead?.isPinned || false,
       isPromotion: Lead?.isPromotion || true,
       promotionSku: Lead?.promotionSku || promotion?.sku,
+      commissionAmount: Lead?.commissionAmount || promotion?.commissionAmount,
+      commissionPercent:
+        Lead?.commissionPercent || promotion?.commissionPercent,
       others: Lead?.others || [],
       social: Lead?.social || undefined,
     },
@@ -265,6 +270,10 @@ const PromotionLeadForm = ({
           })),
           others: values.others || [],
           promotionSku: promotion?.sku || values.promotionSku,
+          commissionAmount:
+            promotion?.commissionAmount || values.commissionAmount,
+          commissionPercent:
+            promotion?.commissionPercent || values.commissionPercent,
         });
 
         if (created) {
@@ -295,6 +304,10 @@ const PromotionLeadForm = ({
           })),
           others: values.others || [],
           promotionSku: values.promotionSku || promotion?.sku,
+          commissionAmount:
+            values.commissionAmount || promotion?.commissionAmount,
+          commissionPercent:
+            values.commissionPercent || promotion?.commissionPercent,
         });
         if (updated) {
           await createNotification({

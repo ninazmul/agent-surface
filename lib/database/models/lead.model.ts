@@ -79,6 +79,8 @@ export interface ILead extends Document {
   isVoid?: boolean;
   isPromotion?: boolean;
   promotionSku?: string;
+  commissionPercent?: string;
+  commissionAmount?: string;
   transcript?: {
     amount: string;
     method: string;
@@ -194,6 +196,8 @@ const LeadSchema = new Schema<ILead>(
     isVoid: { type: Boolean, default: false },
     isPromotion: { type: Boolean, default: false },
     promotionSku: { type: String },
+    commissionPercent: { type: String, required: false },
+    commissionAmount: { type: String, required: false },
     transcript: {
       type: [
         {
