@@ -95,9 +95,15 @@ const sidebarItems = [
         url: "/finance/received",
         icon: Euro,
       },
+       {
+        key: "commission",
+        title: "Commission",
+        url: "/finance/commission",
+        icon: Wallet,
+      },
       {
         key: "payment",
-        title: "Commission",
+        title: "Payment",
         url: "/finance/payment",
         icon: Wallet,
       },
