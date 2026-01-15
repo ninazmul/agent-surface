@@ -222,6 +222,52 @@ const CommissionReceivedTable = ({
     }
   };
 
+  const handlePaymentStatusChange = async (
+    item: ICombinedItem,
+    newStatus: "Pending" | "Accepted" | "Rejected"
+  ) => {
+    try {
+      const payload: {
+        paymentStatus: "Pending" | "Accepted" | "Rejected";
+        paymentAcceptedAt?: Date | null;
+      } = {
+        paymentStatus: newStatus,
+        paymentAcceptedAt: newStatus === "Accepted" ? new Date() : null,
+      };
+
+      // 🔁 Optimistic UI update
+      setLocalLeads((prev) =>
+        prev.map((l) =>
+          l._id.toString() === item._id.toString()
+            ? ({ ...l, ...payload } as ICombinedItem)
+            : l
+        )
+      );
+
+      // 🧠 Decide backend action
+      const updated =
+        item.type === "Quotation"
+          ? await updateQuotation(item._id.toString(), payload)
+          : await updateLead(item._id.toString(), payload);
+
+      toast.success(`Payment status set to ${newStatus}`);
+
+      if (updated?.email) {
+        await createTrack({
+          student: updated.email,
+          event: `${updated.name}'s payment status set to ${newStatus} by ${email}`,
+          route: `/finance/received`,
+          status: newStatus,
+        });
+      }
+
+      router.refresh();
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to update payment status.");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:flex-wrap gap-3 items-start sm:items-center p-1">
@@ -409,24 +455,49 @@ const CommissionReceivedTable = ({
 
                     {/* PaymentStatus */}
                     <TableCell className="w-max align-top">
-                      {(() => {
-                        const statusStyles: Record<string, string> = {
-                          Accepted: "bg-green-100 text-green-600",
-                          Pending: "bg-yellow-100 text-yellow-600",
-                          Rejected: "bg-red-100 text-red-600",
-                          NA: "bg-gray-100 text-gray-600",
-                        };
-
-                        const status = lead.paymentStatus || "NA";
-
-                        return (
-                          <p
-                            className={`px-4 py-2 text-xs font-medium rounded-full border text-center ${statusStyles[status]}`}
+                      {isAdmin ? (
+                        <>
+                          <select
+                            value={lead.paymentStatus}
+                            onChange={(e) =>
+                              handlePaymentStatusChange(
+                                lead,
+                                e.target.value as
+                                  | "Pending"
+                                  | "Accepted"
+                                  | "Rejected"
+                              )
+                            }
+                            className={`px-4 py-2 text-xs font-medium rounded-full border text-center ${
+                              lead.paymentStatus === "Pending"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : lead.paymentStatus === "Accepted"
+                                ? "bg-green-100 text-green-700"
+                                : "bg-red-100 text-red-700"
+                            }`}
                           >
-                            {status === "NA" ? "N/A" : status}
-                          </p>
-                        );
-                      })()}
+                            <option value="Pending">Pending</option>
+                            <option value="Accepted">Accepted</option>
+                            <option value="Rejected">Rejected</option>
+                          </select>
+                        </>
+                      ) : (
+                        <>
+                          <span
+                            className={`px-4 py-2 text-xs font-medium rounded-full border text-center ${
+                              lead.paymentStatus === "Pending"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : lead.paymentStatus === "Accepted"
+                                ? "bg-green-100 text-green-700"
+                                : lead.paymentStatus === "Rejected"
+                                ? "bg-red-100 text-red-700"
+                                : ""
+                            }`}
+                          >
+                            {lead.paymentStatus}
+                          </span>
+                        </>
+                      )}
                     </TableCell>
 
                     {/* Date */}
@@ -560,12 +631,14 @@ const CommissionReceivedTable = ({
                                     `Payment status set to ${newStatus}`
                                   );
 
-                                  await createTrack({
-                                    student: updated.email,
-                                    event: `${updated.name}'s payment status set to ${newStatus} by ${email}`,
-                                    route: `/finance/received`,
-                                    status: newStatus,
-                                  });
+                                  if (updated.email) {
+                                    await createTrack({
+                                      student: updated.email,
+                                      event: `${updated.name}'s payment status set to ${newStatus} by ${email}`,
+                                      route: `/finance/received`,
+                                      status: newStatus,
+                                    });
+                                  }
 
                                   router.refresh(); // still keep this to sync with DB
                                 } catch (err) {
