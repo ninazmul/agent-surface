@@ -117,7 +117,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
               </p>
             </div>
             <DialogTrigger asChild>
-              <button className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-500 text-white shadow w-14">
+              <button className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-500 text-white shadow w-24">
                 See Details
               </button>
             </DialogTrigger>
