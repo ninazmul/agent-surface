@@ -112,7 +112,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
               <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
                 {promotion.title}
               </h3>
-              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-1 w-4/5">
+              <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-1 w-3/5">
                 {promotion.description}
               </p>
             </div>
@@ -279,10 +279,26 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
               )}
 
             {promotion.discount && (
-              <div className="mt-4">
+              <div className="mt-4 flex flex-wrap items-center gap-4">
                 <span className="inline-block px-3 py-1 text-sm font-semibold rounded-lg bg-gradient-to-r from-green-400 via-emerald-500 to-teal-500 text-white shadow">
                   🎉 Special Discount: €{promotion.discount}
                 </span>
+                <div>
+                  {promotion?.commissionAmount && (
+                    <>
+                      <span className="inline-block px-3 py-1 text-sm font-semibold rounded-lg text-black border shadow">
+                        Your Commission: €{promotion.commissionAmount}
+                      </span>
+                    </>
+                  )}
+                  {promotion?.commissionPercent && (
+                    <>
+                      <span className="inline-block px-3 py-1 text-sm font-semibold rounded-lg text-black border shadow">
+                        Your Commission: %{promotion.commissionPercent}
+                      </span>
+                    </>
+                  )}
+                </div>
               </div>
             )}
           </div>
