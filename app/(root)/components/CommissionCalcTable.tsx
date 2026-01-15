@@ -59,6 +59,9 @@ interface ICombinedItem {
   updatedAt?: Date | string;
   author?: string;
   isAdditional?: boolean;
+  isPromotion?: boolean;
+  promotionSku?: string;
+  source?: string;
   type: "Lead" | "Quotation";
 }
 
@@ -163,19 +166,19 @@ const CommissionCalcTable = ({
 
           <TableBody>
             {paginatedLeads.map((lead, idx) => {
-              const profile = lead.author
-                ? profiles[lead.author]
-                : undefined;
+              const profile = lead.author ? profiles[lead.author] : undefined;
 
-              const courseAmount = lead.course?.reduce(
-                (sum, c) => sum + Number(c.courseFee || 0),
-                0
-              ) || 0;
+              const courseAmount =
+                lead.course?.reduce(
+                  (sum, c) => sum + Number(c.courseFee || 0),
+                  0
+                ) || 0;
 
-              const servicesTotal = lead.services?.reduce(
-                (sum, s) => sum + Number(s.amount || 0),
-                0
-              ) || 0;
+              const servicesTotal =
+                lead.services?.reduce(
+                  (sum, s) => sum + Number(s.amount || 0),
+                  0
+                ) || 0;
 
               const discount = Number(lead.discount) || 0;
               const grandTotal = courseAmount + servicesTotal - discount;
@@ -192,7 +195,42 @@ const CommissionCalcTable = ({
                     {(currentPage - 1) * itemsPerPage + idx + 1}
                   </TableCell>
 
-                  <TableCell>{lead.name}</TableCell>
+                  <TableCell className="w-max align-top">
+                    <a
+                      href={`/leads/${lead._id.toString()}`}
+                      className="flex flex-col space-y-1"
+                    >
+                      <span className="font-semibold flex items-center gap-2 line-clamp-1">
+                        {lead.name}
+                      </span>
+
+                      <span className="text-sm text-gray-500 dark:text-gray-300 flex items-center gap-1">
+                        {lead.email}
+                      </span>
+
+                      <span className="flex items-center justify-around gap-2">
+                        <span className="px-3 py-1 w-full rounded-full text-center text-xs font-semibold border">
+                          {lead.home.country}
+                        </span>
+                        <span
+                          className={`px-3 py-1 w-full rounded-full text-center text-xs font-semibold border ${
+                            lead.isPromotion
+                              ? "bg-purple-100 text-purple-700 border-purple-300"
+                              : lead.source
+                              ? "bg-blue-100 text-blue-700 border-blue-300"
+                              : "bg-gray-100 text-gray-700 border-gray-300"
+                          }`}
+                        >
+                          {lead.isPromotion
+                            ? "Promotion"
+                            : lead.source
+                            ? lead.source.charAt(0).toUpperCase() +
+                              lead.source.slice(1)
+                            : "General"}
+                        </span>
+                      </span>
+                    </a>
+                  </TableCell>
 
                   <TableCell>
                     <div className="font-semibold">
@@ -201,9 +239,7 @@ const CommissionCalcTable = ({
                     <div className="text-sm">{profile?.email}</div>
                   </TableCell>
 
-                  <TableCell className="font-semibold">
-                    €{grandTotal}
-                  </TableCell>
+                  <TableCell className="font-semibold">€{grandTotal}</TableCell>
 
                   <TableCell>
                     <div className="font-semibold">
@@ -252,9 +288,8 @@ const CommissionCalcTable = ({
       {/* Pagination unchanged */}
       <div className="flex justify-between items-center">
         <span className="text-sm">
-          Showing{" "}
-          {Math.min(itemsPerPage * currentPage, filteredLeads.length)} of{" "}
-          {filteredLeads.length}
+          Showing {Math.min(itemsPerPage * currentPage, filteredLeads.length)}{" "}
+          of {filteredLeads.length}
         </span>
         <div className="flex gap-2">
           <Button
