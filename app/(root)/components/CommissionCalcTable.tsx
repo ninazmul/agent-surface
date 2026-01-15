@@ -210,7 +210,7 @@ const CommissionCalcTable = ({
 
               return (
                 <TableRow key={lead._id.toString()}>
-                  <TableCell>
+                  <TableCell className="align-top">
                     {(currentPage - 1) * itemsPerPage + idx + 1}
                   </TableCell>
 
@@ -251,44 +251,41 @@ const CommissionCalcTable = ({
                     </a>
                   </TableCell>
 
-                  <TableCell>
+                  <TableCell className="align-top">
                     <div className="font-semibold align-top">
                       {profile?.name ?? "N/A"}
                     </div>
                     <div className="text-sm">{profile?.email}</div>
                   </TableCell>
 
-                  <TableCell className="w-max font-semibold align-top">
-                    <div className="text-sm space-y-1">
-                      {/* Paid & Due calculation */}
-                      {(() => {
-                        const paidAmount = Array.isArray(lead.transcript)
-                          ? lead.transcript.reduce(
-                              (sum, t) => sum + Number(t.amount || 0),
-                              0
-                            )
-                          : 0;
+                  <TableCell className="w-max text-sm font-semibold align-top space-y-1">
+                    {(() => {
+                      const paidAmount = Array.isArray(lead.transcript)
+                        ? lead.transcript.reduce(
+                            (sum, t) => sum + Number(t.amount || 0),
+                            0
+                          )
+                        : 0;
 
-                        const dueAmount = grandTotal - paidAmount;
+                      const dueAmount = grandTotal - paidAmount;
 
-                        return (
-                          <>
-                            <div>Total €{grandTotal}</div>
-                            {paidAmount > 0 && (
-                              <div className="text-green-600 dark:text-green-400">
-                                Paid: €{paidAmount}
-                              </div>
-                            )}
-                            <div className="text-red-600 dark:text-red-400">
-                              Due: €{dueAmount}
+                      return (
+                        <>
+                          <div>Total €{grandTotal}</div>
+                          {paidAmount > 0 && (
+                            <div className="text-green-600 dark:text-green-400">
+                              Paid: €{paidAmount}
                             </div>
-                          </>
-                        );
-                      })()}
-                    </div>
+                          )}
+                          <div className="text-red-600 dark:text-red-400">
+                            Due: €{dueAmount}
+                          </div>
+                        </>
+                      );
+                    })()}
                   </TableCell>
 
-                  <TableCell>
+                  <TableCell className="align-top">
                     <div className="font-semibold align-top">
                       €{commissionAmount.toFixed(2)}
                     </div>
@@ -306,7 +303,7 @@ const CommissionCalcTable = ({
                     )}
                   </TableCell>
 
-                  <TableCell>
+                  <TableCell className="align-top">
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button size="icon" variant="outline">
