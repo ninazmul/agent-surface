@@ -61,6 +61,8 @@ interface ICombinedItem {
   isAdditional?: boolean;
   isPromotion?: boolean;
   promotionSku?: string;
+  commissionAmount?: string;
+  commissionPercent?: string;
   source?: string;
   type: "Lead" | "Quotation";
 }
@@ -183,11 +185,28 @@ const CommissionCalcTable = ({
               const discount = Number(lead.discount) || 0;
               const grandTotal = courseAmount + servicesTotal - discount;
 
-              const commissionPercent = Number(profile?.commission || 0);
-              const commissionAmount =
-                commissionPercent > 0
-                  ? (grandTotal * commissionPercent) / 100
-                  : 0;
+              let commissionAmount = 0;
+              let commissionPercent = 0;
+
+              // Promotion logic overrides profile
+              if (lead.isPromotion) {
+                if (lead.commissionAmount) {
+                  // Fixed commission
+                  commissionAmount = Number(lead.commissionAmount);
+                } else if (lead.commissionPercent) {
+                  // Percentage commission
+                  commissionPercent = Number(lead.commissionPercent);
+                  commissionAmount = (grandTotal * commissionPercent) / 100;
+                } else {
+                  // Fallback to profile commission
+                  commissionPercent = Number(profile?.commission || 0);
+                  commissionAmount = (grandTotal * commissionPercent) / 100;
+                }
+              } else {
+                // Normal lead → profile commission
+                commissionPercent = Number(profile?.commission || 0);
+                commissionAmount = (grandTotal * commissionPercent) / 100;
+              }
 
               return (
                 <TableRow key={lead._id.toString()}>
@@ -273,9 +292,13 @@ const CommissionCalcTable = ({
                     <div className="font-semibold">
                       €{commissionAmount.toFixed(2)}
                     </div>
+
                     <div className="text-xs text-muted-foreground">
-                      {commissionPercent}%
+                      {commissionPercent > 0
+                        ? `${commissionPercent}%`
+                        : "Fixed"}
                     </div>
+
                     {commissionPercent === 0 && (
                       <div className="text-xs text-red-500">
                         No commission set
