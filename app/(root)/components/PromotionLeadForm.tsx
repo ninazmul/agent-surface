@@ -269,6 +269,7 @@ const PromotionLeadForm = ({
             _id: new Types.ObjectId(s._id),
           })),
           others: values.others || [],
+          author: values.author || email,
           promotionSku: promotion?.sku || values.promotionSku,
           commissionAmount:
             promotion?.commissionAmount || values.commissionAmount,
@@ -303,6 +304,7 @@ const PromotionLeadForm = ({
             _id: new Types.ObjectId(s._id),
           })),
           others: values.others || [],
+          author: values.author || email,
           promotionSku: values.promotionSku || promotion?.sku,
           commissionAmount:
             values.commissionAmount || promotion?.commissionAmount,
