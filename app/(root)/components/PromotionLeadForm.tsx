@@ -144,6 +144,7 @@ const PromotionLeadForm = ({
   type,
   Lead,
   LeadId,
+  agency,
   isAdmin,
   email,
   promotion,
@@ -154,6 +155,27 @@ const PromotionLeadForm = ({
 
   const [passportFile, setPassportFile] = useState<File[]>([]);
   const [arrivalFile, setArrivalFile] = useState<File[]>([]);
+
+  const resolveCommission = () => {
+    if (promotion?.commissionPercent) {
+      return {
+        commissionPercent: promotion.commissionPercent,
+        commissionAmount: undefined,
+      };
+    }
+
+    if (promotion?.commissionAmount) {
+      return {
+        commissionPercent: undefined,
+        commissionAmount: promotion.commissionAmount,
+      };
+    }
+
+    return {
+      commissionPercent: undefined,
+      commissionAmount: undefined,
+    };
+  };
 
   const countryOptions = countries.map((country) => ({
     label: `${country.flag} ${country.name.common}`,
@@ -252,9 +274,20 @@ const PromotionLeadForm = ({
     const uploadedArrival = await safeUpload(arrivalFile);
 
     try {
+      const commission = resolveCommission();
+      const resolveAuthor = () => {
+        // Update: preserve unless explicitly changed by admin
+        if (type === "Update") {
+          if (isAdmin && values.author) return values.author;
+          return Lead?.author; // 🔒 preserve existing
+        }
+      };
+      const finalAuthor = resolveAuthor();
+
       if (type === "Create") {
         const created = await createLead({
           ...values,
+          ...commission,
           passport: {
             ...values.passport,
             file: uploadedPassport || values?.passport?.file,
@@ -271,16 +304,12 @@ const PromotionLeadForm = ({
           others: values.others || [],
           author: values.author || email,
           promotionSku: promotion?.sku || values.promotionSku,
-          commissionAmount:
-            promotion?.commissionAmount || values.commissionAmount,
-          commissionPercent:
-            promotion?.commissionPercent || values.commissionPercent,
         });
 
         if (created) {
           await createNotification({
             title: `New lead created for ${values.name}`,
-            agency: values.author,
+            agency: values.author || email,
             country: values.home.country,
             route: `/leads`,
           });
@@ -290,6 +319,7 @@ const PromotionLeadForm = ({
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
           ...values,
+          ...commission,
           passport: {
             ...values.passport,
             file: uploadedPassport || values?.passport?.file,
@@ -304,17 +334,13 @@ const PromotionLeadForm = ({
             _id: new Types.ObjectId(s._id),
           })),
           others: values.others || [],
-          author: values.author || email,
+          author: finalAuthor || Lead?.author || email,
           promotionSku: values.promotionSku || promotion?.sku,
-          commissionAmount:
-            values.commissionAmount || promotion?.commissionAmount,
-          commissionPercent:
-            values.commissionPercent || promotion?.commissionPercent,
         });
         if (updated) {
           await createNotification({
             title: `${values.name}'s lead updated!`,
-            agency: values.author,
+            agency: finalAuthor || Lead?.author || email,
             country: values.home.country,
             route: `/leads`,
           });
@@ -463,6 +489,39 @@ const PromotionLeadForm = ({
               </FormItem>
             )}
           />
+
+          {/* Agency (Admin only) */}
+          {isAdmin && (
+            <FormField
+              name="author"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem className="min-w-0">
+                  <FormLabel>Agency</FormLabel>
+                  <FormControl>
+                    <Select
+                      options={agency?.map((a) => ({
+                        value: a.email,
+                        label: a.name || a.email,
+                      }))}
+                      value={
+                        agency
+                          ?.map((a) => ({
+                            value: a.email,
+                            label: a.name || a.email,
+                          }))
+                          .find((option) => option.value === field.value) ||
+                        null
+                      }
+                      onChange={(val) => field.onChange(val?.value)}
+                      placeholder="Select agency"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          )}
         </div>
 
         {/* ===== Home Address ===== */}
