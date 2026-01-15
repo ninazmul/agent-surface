@@ -109,7 +109,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
 
           <div className="p-5 flex justify-between items-center gap-4">
             <div>
-              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors">
+              <h3 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors line-clamp-1 w-4/5">
                 {promotion.title}
               </h3>
               <p className="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-1 w-4/5">
@@ -117,7 +117,7 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
               </p>
             </div>
             <DialogTrigger asChild>
-              <button className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-500 text-white shadow w-24">
+              <button className="px-3 py-1 text-xs font-semibold rounded-full bg-purple-500 text-white shadow w-28">
                 See Details
               </button>
             </DialogTrigger>
