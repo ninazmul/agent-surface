@@ -12,15 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  SortAsc,
-  SortDesc,
-  MoreVertical,
-  FileText,
-  CheckCircle,
-  XCircle,
-  Clock,
-} from "lucide-react";
+import { SortAsc, SortDesc, MoreVertical, FileText } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { IProfile } from "@/lib/database/models/profile.model";
@@ -562,119 +554,6 @@ const CommissionReceivedTable = ({
                             <p className="text-gray-500 dark:text-gray-300 italic">
                               No payment receipt available yet.
                             </p>
-                          )}
-
-                          {/* Admin-only: Update Status */}
-                          {isAdmin && (
-                            <Button
-                              variant="ghost"
-                              className="w-full justify-start gap-2"
-                              onClick={async () => {
-                                try {
-                                  let updated;
-
-                                  // cycle through statuses
-                                  const nextStatus:
-                                    | "Pending"
-                                    | "Accepted"
-                                    | "Rejected" =
-                                    lead.paymentStatus === "Pending"
-                                      ? "Accepted"
-                                      : lead.paymentStatus === "Accepted"
-                                      ? "Rejected"
-                                      : "Pending";
-
-                                  const updatePayload: {
-                                    paymentStatus:
-                                      | "Pending"
-                                      | "Accepted"
-                                      | "Rejected";
-                                    paymentAcceptedAt?: Date | null;
-                                  } = { paymentStatus: nextStatus };
-
-                                  if (nextStatus === "Accepted") {
-                                    updatePayload.paymentAcceptedAt =
-                                      new Date();
-                                  } else {
-                                    updatePayload.paymentAcceptedAt = null;
-                                  }
-
-                                  // ✅ Optimistic update
-                                  setLocalLeads((prev) =>
-                                    prev.map((l) =>
-                                      l._id.toString() === lead._id.toString()
-                                        ? ({
-                                            ...l,
-                                            ...updatePayload,
-                                          } as ICombinedItem)
-                                        : l
-                                    )
-                                  );
-
-                                  // Update backend
-                                  if ("quotationNumber" in lead) {
-                                    updated = await updateQuotation(
-                                      lead._id.toString(),
-                                      updatePayload
-                                    );
-                                  } else {
-                                    updated = await updateLead(
-                                      lead._id.toString(),
-                                      updatePayload
-                                    );
-                                  }
-
-                                  const newStatus =
-                                    updated?.paymentStatus ?? nextStatus;
-
-                                  toast.success(
-                                    `Payment status set to ${newStatus}`
-                                  );
-
-                                  if (updated.email) {
-                                    await createTrack({
-                                      student: updated.email,
-                                      event: `${updated.name}'s payment status set to ${newStatus} by ${email}`,
-                                      route: `/finance/received`,
-                                      status: newStatus,
-                                    });
-                                  }
-
-                                  router.refresh(); // still keep this to sync with DB
-                                } catch (err) {
-                                  console.error(err);
-                                  toast.error(
-                                    "Failed to update payment status."
-                                  );
-                                }
-                              }}
-                            >
-                              {lead.paymentStatus === "Accepted" ? (
-                                <>
-                                  <CheckCircle className="w-4 h-4 text-green-600" />{" "}
-                                  Payment Accepted
-                                  {lead.paymentAcceptedAt && (
-                                    <span className="ml-2 text-xs text-gray-500">
-                                      (
-                                      {new Date(
-                                        lead.paymentAcceptedAt
-                                      ).toLocaleString()}
-                                      )
-                                    </span>
-                                  )}
-                                </>
-                              ) : lead.paymentStatus === "Rejected" ? (
-                                <>
-                                  <XCircle className="w-4 h-4 text-red-600" />{" "}
-                                  Payment Rejected
-                                </>
-                              ) : (
-                                <>
-                                  <Clock className="w-4 h-4 text-yellow-600" />{" "}
-                                  Pending
-                                </>
-                              )}
-                            </Button>
                           )}
                         </PopoverContent>
                       </Popover>
