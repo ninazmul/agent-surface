@@ -38,7 +38,7 @@ export async function POST() {
       if (!lead.author) continue;
 
       await transporter.sendMail({
-        from: `"Agent Surface" <${process.env.EMAIL_USER}>`,
+        from: `"AB Partner Portal" <${process.env.EMAIL_USER}>`,
         to: lead.author,
         subject: `⚠ Reminder: Lead "${lead.name}" is still open`,
         html: `

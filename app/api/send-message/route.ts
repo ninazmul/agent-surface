@@ -25,14 +25,14 @@ export const POST = async (req: NextRequest) => {
     });
 
     await transporter.sendMail({
-      from: `"Agent Surface" <${process.env.EMAIL_USER}>`,
+      from: `"AB Partner Portal" <${process.env.EMAIL_USER}>`,
       to: email,
-      subject: subject || "Message from Agent Surface",
+      subject: subject || "Message from AB Partner Portal",
       html:
         html ||
         `<p>Hi ${
           name || "there"
-        },</p><p>This is a message from Agent Surface.</p>`,
+        },</p><p>This is a message from AB Partner Portal.</p>`,
     });
 
     return new Response("Email sent successfully!", { status: 200 });

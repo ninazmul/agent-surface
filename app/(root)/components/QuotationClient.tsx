@@ -89,7 +89,7 @@ export default function QuotationClient({
       <div className="flex items-center justify-center h-24 md:h-32 max-w-md mx-auto">
         <Image
           src="/assets/images/logo.png"
-          alt="Agent Surface Logo"
+          alt="AB Partner Portal Logo"
           width={500}
           height={300}
           className="w-full h-full object-contain dark:hidden"
@@ -97,7 +97,7 @@ export default function QuotationClient({
         />
         <Image
           src="/assets/images/logo-white.png"
-          alt="Agent Surface Logo"
+          alt="AB Partner Portal Logo"
           width={500}
           height={300}
           className="w-full h-full object-contain hidden dark:block"
@@ -159,14 +159,14 @@ export default function QuotationClient({
               {" "}
               <Image
                 src="/assets/images/logo.png"
-                alt="Agent Surface Logo"
+                alt="AB Partner Portal Logo"
                 width={120}
                 height={120}
                 className="object-contain dark:hidden"
               />
               <Image
                 src="/assets/images/logo-white.png"
-                alt="Agent Surface Logo"
+                alt="AB Partner Portal Logo"
                 width={120}
                 height={120}
                 className="object-contain hidden dark:block"

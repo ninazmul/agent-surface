@@ -41,7 +41,7 @@ export default function OfferLetterTemplate({
         <div className="h-20 w-auto relative">
           <Image
             src="/assets/images/logo.png"
-            alt="Agent Surface Logo"
+            alt="AB Partner Portal Logo"
             width={150}
             height={80}
             className="object-contain dark:hidden"
@@ -49,7 +49,7 @@ export default function OfferLetterTemplate({
           />
           <Image
             src="/assets/images/logo-white.png"
-            alt="Agent Surface Logo"
+            alt="AB Partner Portal Logo"
             width={150}
             height={80}
             className="object-contain hidden dark:block"
@@ -177,7 +177,7 @@ export default function OfferLetterTemplate({
           <strong>Bank:</strong> AIB (Allied Irish Banks)
         </p>
         <p>
-          <strong>Account Name:</strong> Agent Surface LIMITED
+          <strong>Account Name:</strong> AB Partner Portal LIMITED
         </p>
         <p>
           <strong>Account No.:</strong> 50998180

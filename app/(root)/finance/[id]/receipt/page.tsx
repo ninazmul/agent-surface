@@ -91,14 +91,14 @@ const Receipt = async ({ params }: PageProps) => {
       <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-6">
         <Image
           src="/assets/images/logo.png"
-          alt="Agent Surface Logo"
+          alt="AB Partner Portal Logo"
           width={150}
           height={80}
           className="object-contain dark:hidden"
         />
         <Image
           src="/assets/images/logo-white.png"
-          alt="Agent Surface Logo"
+          alt="AB Partner Portal Logo"
           width={150}
           height={80}
           className="object-contain hidden dark:block"
@@ -136,7 +136,7 @@ const Receipt = async ({ params }: PageProps) => {
       <p className="text-sm leading-relaxed text-gray-700 dark:text-gray-300 mb-6">
         This is to confirm that the student named below has paid for a place on
         an English Language course (subject to standard terms and conditions) at
-        Agent Surface. The particulars for this admission are as below.
+        AB Partner Portal. The particulars for this admission are as below.
       </p>
 
       {/* Student Details */}

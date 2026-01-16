@@ -80,14 +80,14 @@ const leadDetails = async ({ params }: PageProps) => {
         <div className="flex items-center gap-4">
           <Image
             src="/assets/images/logo.png"
-            alt="Agent Surface Logo"
+            alt="AB Partner Portal Logo"
             width={500}
             height={500}
             className="h-28 w-auto dark:hidden"
           />
           <Image
             src="/assets/images/logo-white.png"
-            alt="Agent Surface Logo"
+            alt="AB Partner Portal Logo"
             width={500}
             height={500}
             className="h-28 w-auto hidden dark:block"
@@ -95,7 +95,7 @@ const leadDetails = async ({ params }: PageProps) => {
 
           <div>
             <h1 className="text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">
-              Agent Surface
+              AB Partner Portal
             </h1>
             <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base mt-1">
               Lead Application Form

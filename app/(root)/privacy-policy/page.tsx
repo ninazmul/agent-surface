@@ -22,9 +22,9 @@ const PrivacyPolicy = () => {
 
       <h2 className="text-xl font-semibold mt-4 mb-2">1. Introduction</h2>
       <p className="mb-2">
-        Agent Surface (“we,” “our,” or “us”) operates a platform that connects
-        colleges, universities, agents, and students. This Privacy Policy
-        explains:
+        AB Partner Portal (“we,” “our,” or “us”) operates a platform that
+        connects colleges, universities, agents, and students. This Privacy
+        Policy explains:
       </p>
       <ul className="list-disc list-inside mb-2">
         <li>What personal data we collect</li>
@@ -178,10 +178,10 @@ const PrivacyPolicy = () => {
       <p className="mb-2">
         Requests should be sent to:{" "}
         <a
-          href="mailto:agentsurface@gmail.com"
+          href="mailto:abpartnerportal@gmail.com"
           className="text-blue-600 underline"
         >
-          agentsurface@gmail.com
+          abpartnerportal@gmail.com
         </a>
         .
       </p>
@@ -235,14 +235,14 @@ const PrivacyPolicy = () => {
       <p className="mb-2">
         For privacy-related concerns, contact us at:
         <br />
-        <strong>Agent Surface</strong>
+        <strong>AB Partner Portal</strong>
         <br />
         Email:{" "}
         <a
-          href="mailto:agentsurface@gmail.com"
+          href="mailto:abpartnerportal@gmail.com"
           className="text-blue-600 underline"
         >
-          agentsurface@gmail.com
+          abpartnerportal@gmail.com
         </a>
         <br />
         {/* Phone: +353 83 033 5708 */}

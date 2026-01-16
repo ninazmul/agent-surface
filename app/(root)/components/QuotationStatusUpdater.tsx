@@ -40,8 +40,8 @@ const QuotationStatusUpdater = ({
       }
 
       // generate links
-      const quotationLink = `https://agentsurface.com/quotation/${data._id.toString()}`;
-      const invoiceLink = `https://agentsurface.com/quotation/${data._id.toString()}/invoice`;
+      const quotationLink = `https://abpartnerportal.com/quotation/${data._id.toString()}`;
+      const invoiceLink = `https://abpartnerportal.com/quotation/${data._id.toString()}/invoice`;
 
       // send email via new API route
       await fetch("/api/send-message", {
@@ -59,7 +59,7 @@ const QuotationStatusUpdater = ({
               <li><a href="${quotationLink}">View Quotation</a></li>
               <li><a href="${invoiceLink}">View Invoice</a></li>
             </ul>
-            <p>Thank you for choosing Agent Surface!</p>
+            <p>Thank you for choosing AB Partner Portal!</p>
           `,
         }),
       });

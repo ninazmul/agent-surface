@@ -14,11 +14,11 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata: Metadata = {
-  title: "Agent Surface – University, Agent & Student CRM Dashboard",
+  title: "AB Partner Portal – University, Agent & Student CRM Dashboard",
   description:
-    "Agent Surface is a powerful CRM dashboard designed for universities, agents, and students to streamline applications, communication, and management in one platform.",
+    "AB Partner Portal is a powerful CRM dashboard designed for universities, agents, and students to streamline applications, communication, and management in one platform.",
   keywords: [
-    "Agent Surface",
+    "AB Partner Portal",
     "University CRM",
     "Education Agents",
     "Student Management",
@@ -32,30 +32,30 @@ export const metadata: Metadata = {
     apple: "/assets/images/logo.png",
   },
   alternates: {
-    canonical: "https://agentsurface.com/",
+    canonical: "https://abpartnerportal.com/",
   },
   openGraph: {
-    title: "Agent Surface – University, Agent & Student CRM Dashboard",
+    title: "AB Partner Portal – University, Agent & Student CRM Dashboard",
     description:
-      "Manage student recruitment, agent partnerships, and university admissions in one seamless CRM dashboard with Agent Surface.",
-    url: "https://agentsurface.com/",
-    siteName: "Agent Surface",
+      "Manage student recruitment, agent partnerships, and university admissions in one seamless CRM dashboard with AB Partner Portal.",
+    url: "https://abpartnerportal.com/",
+    siteName: "AB Partner Portal",
     images: [
       {
-        url: "https://agentsurface.com/assets/images/dashboard-preview.png",
+        url: "https://abpartnerportal.com/assets/images/dashboard-preview.png",
         width: 1200,
         height: 630,
-        alt: "Agent Surface CRM Dashboard",
+        alt: "AB Partner Portal CRM Dashboard",
       },
     ],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Agent Surface – University, Agent & Student CRM Dashboard",
+    title: "AB Partner Portal – University, Agent & Student CRM Dashboard",
     description:
       "A modern CRM platform for universities, agents, and students to simplify applications, recruitment, and collaboration.",
-    images: ["https://agentsurface.com/assets/images/dashboard-preview.png"],
+    images: ["https://abpartnerportal.com/assets/images/dashboard-preview.png"],
   },
 };
 

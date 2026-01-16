@@ -56,14 +56,14 @@ const OfferLetter = async ({ params }: PageProps) => {
       <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-6">
         <Image
           src="/assets/images/logo.png"
-          alt="Agent Surface Logo"
+          alt="AB Partner Portal Logo"
           width={120}
           height={120}
           className="object-contain dark:hidden"
         />
         <Image
           src="/assets/images/logo-white.png"
-          alt="Agent Surface Logo"
+          alt="AB Partner Portal Logo"
           width={120}
           height={120}
           className="object-contain hidden dark:block"
@@ -189,7 +189,7 @@ const OfferLetter = async ({ params }: PageProps) => {
           <strong>Bank:</strong> AIB (Allied Irish Banks)
         </p>
         <p>
-          <strong>Account Name:</strong> Agent Surface LIMITED
+          <strong>Account Name:</strong> AB Partner Portal LIMITED
         </p>
         <p>
           <strong>Account No.:</strong> 50998180

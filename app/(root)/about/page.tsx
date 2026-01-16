@@ -3,12 +3,12 @@
 const AboutUs = () => {
   return (
     <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
-      <h1 className="text-2xl font-bold mb-4">About Agent Surface</h1>
+      <h1 className="text-2xl font-bold mb-4">About AB Partner Portal</h1>
 
       <p className="mb-4">
-        <strong>Agent Surface</strong> is a digital platform designed to connect
-        students, education agents, and colleges/universities through a secure,
-        transparent, and efficient workflow. Our goal is to simplify the
+        <strong>AB Partner Portal</strong> is a digital platform designed to
+        connect students, education agents, and colleges/universities through a
+        secure, transparent, and efficient workflow. Our goal is to simplify the
         international education process by bringing all stakeholders into one
         centralized system.
       </p>
@@ -17,13 +17,15 @@ const AboutUs = () => {
       <p className="mb-4">
         We are a technology-driven platform focused on improving how student
         applications are managed, tracked, and processed. By combining smart
-        systems with structured workflows, Agent Surface helps reduce delays,
-        miscommunication, and manual errors in the admission journey.
+        systems with structured workflows, AB Partner Portal helps reduce
+        delays, miscommunication, and manual errors in the admission journey.
       </p>
 
       <h2 className="text-xl font-semibold mt-4 mb-2">What We Do</h2>
       <ul className="list-disc list-inside mb-4">
-        <li>Connect students with verified education agents and institutions</li>
+        <li>
+          Connect students with verified education agents and institutions
+        </li>
         <li>Provide a centralized dashboard for application tracking</li>
         <li>Enable secure document and data management</li>
         <li>Support transparent communication between all parties</li>
@@ -79,17 +81,17 @@ const AboutUs = () => {
 
       <h2 className="text-xl font-semibold mt-4 mb-2">Contact Us</h2>
       <p className="mb-2">
-        If you’d like to learn more about Agent Surface or collaborate with us,
-        feel free to reach out:
+        If you’d like to learn more about AB Partner Portal or collaborate with
+        us, feel free to reach out:
         <br />
-        <strong>Agent Surface</strong>
+        <strong>AB Partner Portal</strong>
         <br />
         Email:{" "}
         <a
-          href="mailto:agentsurface@gmail.com"
+          href="mailto:abpartnerportal@gmail.com"
           className="text-blue-600 underline"
         >
-          agentsurface@gmail.com
+          abpartnerportal@gmail.com
         </a>
       </p>
     </section>
