@@ -11,19 +11,26 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, SortAsc, SortDesc, Pencil } from "lucide-react";
+import { Trash, SortAsc, SortDesc } from "lucide-react";
 import { deleteDownload } from "@/lib/actions/download.actions";
 import { formatDateTime } from "@/lib/utils";
 import { IDownload } from "@/lib/database/models/download.model";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import UpdateDocDialog from "@/components/shared/UpdateDocDialog";
+import { ILead } from "@/lib/database/models/lead.model";
+import { IProfile } from "@/lib/database/models/profile.model";
 
 const DownloadTable = ({
   downloads,
   isAdmin,
+  leads,
+  agency,
 }: {
   downloads: Array<IDownload>;
   isAdmin: boolean;
+  leads: ILead[];
+  agency: IProfile[];
 }) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -247,11 +254,12 @@ const DownloadTable = ({
 
                 {isAdmin && (
                   <TableCell className="w-max flex items-center space-x-2">
-                    <a href={`/downloads/${download._id.toString()}/update`}>
-                      <Button variant="ghost" size="icon">
-                        <Pencil className="w-4 h-4 text-black" />
-                      </Button>
-                    </a>
+                    <UpdateDocDialog
+                      download={download}
+                      downloadId={download._id.toString()}
+                      leads={leads}
+                      agency={agency}
+                    />
                     <Button
                       onClick={() =>
                         setConfirmDeleteId(download._id.toString())

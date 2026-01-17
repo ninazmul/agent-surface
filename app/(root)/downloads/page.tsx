@@ -82,7 +82,7 @@ const Page = async () => {
         </div>
 
         <div className="overflow-x-auto">
-          <DownloadTable downloads={downloads} isAdmin={adminStatus} />
+          <DownloadTable downloads={downloads} isAdmin={adminStatus} leads={leads} agency={agency} />
         </div>
       </section>
     </>
