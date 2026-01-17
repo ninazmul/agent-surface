@@ -19,7 +19,6 @@ import { FileUploader } from "@/components/shared/FileUploader";
 import { createDownload, updateDownload } from "@/lib/actions/download.actions";
 import { IDownload } from "@/lib/database/models/download.model";
 import { downloadDefaultValues } from "@/constants";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -48,6 +47,7 @@ type DownloadFormProps = {
   downloadId?: string;
   agency?: IProfile[];
   leads?: ILead[];
+  onSuccess?: () => void;
 };
 
 const DownloadForm = ({
@@ -56,9 +56,8 @@ const DownloadForm = ({
   downloadId,
   agency,
   leads,
+  onSuccess,
 }: DownloadFormProps) => {
-  const router = useRouter();
-
   const initialValues =
     download && type === "Update"
       ? {
@@ -97,7 +96,7 @@ const DownloadForm = ({
           });
           form.reset();
           toast.success("Docs uploaded successfully!");
-          router.push("/downloads");
+          onSuccess?.();
         }
       } else if (type === "Update" && downloadId) {
         const updatedDownload = await updateDownload(downloadId, {
@@ -113,7 +112,7 @@ const DownloadForm = ({
           });
           form.reset();
           toast.success("Docs updated successfully!");
-          router.push("/downloads");
+          onSuccess?.();
         }
       }
     } catch (error) {
@@ -137,232 +136,246 @@ const DownloadForm = ({
   }, [form, leads]);
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm space-y-4"
-      >
-        <h2 className="text-xl font-semibold">Document Information</h2>
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+        space-y-4
+      "
+        >
+          <h2 className="text-xl font-semibold">Document Information</h2>
 
-        {/* Student Name (react-select) */}
-        <FormItem>
-          <FormLabel>Student</FormLabel>
-          <FormControl>
-            <Controller
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <Select
-                  options={leads?.map((r) => ({
-                    label: `${r.name} (${r.email})`,
-                    value: r.name,
-                  }))}
-                  isSearchable
-                  value={leads
-                    ?.map((r) => ({
+          {/* Student Name (react-select) */}
+          <FormItem>
+            <FormLabel>Student</FormLabel>
+            <FormControl>
+              <Controller
+                control={form.control}
+                name="name"
+                render={({ field }) => (
+                  <Select
+                    options={leads?.map((r) => ({
                       label: `${r.name} (${r.email})`,
                       value: r.name,
-                    }))
-                    .find((opt) => opt.value === field.value)}
-                  onChange={(selected) => field.onChange(selected?.value || "")}
-                  placeholder="Select a student"
-                  classNamePrefix="react-select"
-                />
-              )}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+                    }))}
+                    isSearchable
+                    value={leads
+                      ?.map((r) => ({
+                        label: `${r.name} (${r.email})`,
+                        value: r.name,
+                      }))
+                      .find((opt) => opt.value === field.value)}
+                    onChange={(selected) =>
+                      field.onChange(selected?.value || "")
+                    }
+                    placeholder="Select a student"
+                    classNamePrefix="react-select"
+                  />
+                )}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
 
-        {/* Email */}
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <FormControl>
-                <Input disabled {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          {/* Email */}
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input disabled {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Country */}
-        <FormField
-          control={form.control}
-          name="country"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Country</FormLabel>
-              <FormControl>
-                <Input disabled {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+          {/* Country */}
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Country</FormLabel>
+                <FormControl>
+                  <Input disabled {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* Agency (react-select) */}
-        <FormItem>
-          <FormLabel>Agency</FormLabel>
-          <FormControl>
-            <Controller
-              control={form.control}
-              name="author"
-              render={({ field }) => (
-                <Select
-                  options={agency?.map((a) => ({
-                    label: `${a.name} (${a.email})`,
-                    value: a.email,
-                  }))}
-                  isSearchable
-                  isDisabled
-                  value={agency
-                    ?.map((a) => ({
-                      label: `${a.name}`,
+          {/* Agency (react-select) */}
+          <FormItem>
+            <FormLabel>Agency</FormLabel>
+            <FormControl>
+              <Controller
+                control={form.control}
+                name="author"
+                render={({ field }) => (
+                  <Select
+                    options={agency?.map((a) => ({
+                      label: `${a.name} (${a.email})`,
                       value: a.email,
-                    }))
-                    .find((opt) => opt.value === field.value)}
-                  onChange={(selected) => field.onChange(selected?.value || "")}
-                  placeholder="Agency auto-filled"
-                  classNamePrefix="react-select"
-                />
-              )}
-            />
-          </FormControl>
-          <FormMessage />
-        </FormItem>
+                    }))}
+                    isSearchable
+                    isDisabled
+                    value={agency
+                      ?.map((a) => ({
+                        label: `${a.name}`,
+                        value: a.email,
+                      }))
+                      .find((opt) => opt.value === field.value)}
+                    onChange={(selected) =>
+                      field.onChange(selected?.value || "")
+                    }
+                    placeholder="Agency auto-filled"
+                    classNamePrefix="react-select"
+                  />
+                )}
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
 
-        {/* Date */}
-        <FormField
-          control={form.control}
-          name="date"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Date</FormLabel>
-              <FormControl>
-                <Input
-                  type="date"
-                  value={
-                    field.value
-                      ? typeof field.value === "string"
-                        ? field.value
-                        : field.value instanceof Date
-                        ? field.value.toISOString().slice(0, 10)
+          {/* Date */}
+          <FormField
+            control={form.control}
+            name="date"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Date</FormLabel>
+                <FormControl>
+                  <Input
+                    type="date"
+                    value={
+                      field.value
+                        ? typeof field.value === "string"
+                          ? field.value
+                          : field.value instanceof Date
+                          ? field.value.toISOString().slice(0, 10)
+                          : ""
                         : ""
-                      : ""
-                  }
-                  onChange={(e) => field.onChange(new Date(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+                    }
+                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        {/* ✅ SECTION 6: Documents (Documents) */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Documents</h3>
-          {form.watch("documents")?.map((item, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-1 gap-4 items-center border p-4 rounded-md bg-muted/40"
-            >
-              {/* File Name */}
-              <FormField
-                control={form.control}
-                name={`documents.${index}.fileName`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>File Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter file name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* File Uploader */}
-              <FormField
-                control={form.control}
-                name={`documents.${index}.fileUrl`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Upload File</FormLabel>
-                    <FormControl>
-                      <FileUploader
-                        onFieldChange={async (
-                          fileUrl: string,
-                          files?: File[]
-                        ) => {
-                          // If a file is selected, upload it and set the URL
-                          if (files && files.length > 0) {
-                            const uploaded = await startUpload(files);
-                            if (uploaded && uploaded[0]) {
-                              field.onChange(uploaded[0].url);
-                            }
-                          } else {
-                            // If just a URL is provided, set it directly
-                            field.onChange(fileUrl);
-                          }
-                        }}
-                        fileUrl={field.value || ""}
-                        setFiles={() => {}} // No-op to satisfy the prop type
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Remove Button */}
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={() => {
-                  const current = form.getValues("documents") || [];
-                  const updated = [
-                    ...current.slice(0, index),
-                    ...current.slice(index + 1),
-                  ];
-                  form.setValue("documents", updated);
-                }}
+          {/* ✅ SECTION 6: Documents (Documents) */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Documents</h3>
+            {form.watch("documents")?.map((item, index) => (
+              <div
+                key={index}
+                className="grid grid-cols-1 gap-4 items-center border p-4 rounded-md bg-muted/40"
               >
-                Remove
-              </Button>
-            </div>
-          ))}
+                {/* File Name */}
+                <FormField
+                  control={form.control}
+                  name={`documents.${index}.fileName`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>File Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter file name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-          {/* Add New Document Button */}
+                {/* File Uploader */}
+                <FormField
+                  control={form.control}
+                  name={`documents.${index}.fileUrl`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Upload File</FormLabel>
+                      <FormControl>
+                        <FileUploader
+                          onFieldChange={async (
+                            fileUrl: string,
+                            files?: File[]
+                          ) => {
+                            // If a file is selected, upload it and set the URL
+                            if (files && files.length > 0) {
+                              const uploaded = await startUpload(files);
+                              if (uploaded && uploaded[0]) {
+                                field.onChange(uploaded[0].url);
+                              }
+                            } else {
+                              // If just a URL is provided, set it directly
+                              field.onChange(fileUrl);
+                            }
+                          }}
+                          fileUrl={field.value || ""}
+                          setFiles={() => {}} // No-op to satisfy the prop type
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Remove Button */}
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => {
+                    const current = form.getValues("documents") || [];
+                    const updated = [
+                      ...current.slice(0, index),
+                      ...current.slice(index + 1),
+                    ];
+                    form.setValue("documents", updated);
+                  }}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+
+            {/* Add New Document Button */}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                const current = form.getValues("documents") || [];
+                form.setValue("documents", [
+                  ...current,
+                  { fileName: "", fileUrl: "" },
+                ]);
+              }}
+            >
+              Add Document
+            </Button>
+          </div>
+
+          {/* Submit Button */}
           <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              const current = form.getValues("documents") || [];
-              form.setValue("documents", [
-                ...current,
-                { fileName: "", fileUrl: "" },
-              ]);
-            }}
+            type="submit"
+            size="lg"
+            disabled={form.formState.isSubmitting}
+            className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
           >
-            Add Document
+            {form.formState.isSubmitting ? "Uploading..." : "Submit Form"}
           </Button>
-        </div>
-
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          size="lg"
-          disabled={form.formState.isSubmitting}
-          className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-        >
-          {form.formState.isSubmitting ? "Uploading..." : "Submit Form"}
-        </Button>
-      </form>
-    </Form>
+        </form>
+      </Form>
+    </div>
   );
 };
 

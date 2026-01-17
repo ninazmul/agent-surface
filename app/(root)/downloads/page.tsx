@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
   getAllDownloads,
   getDownloadsByAgency,
@@ -11,10 +10,11 @@ import {
   getAdminRolePermissionsByEmail,
   isAdmin,
 } from "@/lib/actions/admin.actions";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
+import { getAllProfiles, getProfileByEmail } from "@/lib/actions/profile.actions";
 import { redirect } from "next/navigation";
 import { IDownload } from "@/lib/database/models/download.model";
-import { Plus } from "lucide-react";
+import AddDocDialog from "@/components/shared/AddDocDialog";
+import { getAllLeads } from "@/lib/actions";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -30,7 +30,7 @@ const Page = async () => {
     if (!rolePermissions.includes("downloads")) {
       redirect("/");
     }
-  } 
+  }
   // ====== NON-ADMIN PATH (profile required)
   else {
     // Profile must be Approved
@@ -67,6 +67,9 @@ const Page = async () => {
     downloads = [...myDownloads, ...subAgentDownloads];
   }
 
+  const leads = await getAllLeads();
+  const agency = await getAllProfiles();
+
   return (
     <>
       <section className="p-4">
@@ -74,16 +77,7 @@ const Page = async () => {
           <h3 className="h3-bold text-center sm:text-left">All Docs</h3>
 
           <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
-            {adminStatus && (
-              <a href={`/downloads/create`} className="w-full sm:w-auto">
-                <Button
-                  size="sm"
-                  className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-                >
-                  <Plus size={16} /> Add Docs
-                </Button>
-              </a>
-            )}
+            {adminStatus && <AddDocDialog agency={agency} leads={leads} />}
           </div>
         </div>
 
