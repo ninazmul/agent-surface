@@ -38,7 +38,7 @@ const UpdatePromotionDialog = ({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        {type === "Action" && (
+        {type === "Action" ? (
           <Button
             variant="ghost"
             className="w-full justify-start text-purple-500 gap-2"
@@ -46,8 +46,11 @@ const UpdatePromotionDialog = ({
             <Pencil className="w-4 h-4" />
             Edit Promotion
           </Button>
+        ) : (
+          <Button variant="ghost" size="icon">
+            <Pencil className="w-3 h-3" />
+          </Button>
         )}
-        {type === "Card" && <Pencil className="w-3 h-3" />}
       </DialogTrigger>
 
       <DialogContent
