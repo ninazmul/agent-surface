@@ -4,7 +4,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
 import * as z from "zod";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import Select from "react-select";
 import countries from "world-countries";
@@ -56,6 +55,7 @@ type Props = {
   type: "Create" | "Update";
   resource?: IMarketingResource;
   resourceId?: string;
+  onSuccess?: () => void;
 };
 
 /* =======================
@@ -69,8 +69,7 @@ const countryOptions = countries.map((country) => ({
 /* =======================
    COMPONENT
 ======================= */
-const MarketingResourceForm = ({ type, resource, resourceId }: Props) => {
-  const router = useRouter();
+const MarketingResourceForm = ({ type, resource, resourceId, onSuccess }: Props) => {
   const [files, setFiles] = useState<File[]>([]);
   const { startUpload } = useUploadThing("mediaUploader");
 
@@ -121,11 +120,11 @@ const MarketingResourceForm = ({ type, resource, resourceId }: Props) => {
       if (type === "Create") {
         await createMarketingResource(payload);
         toast.success("Resource created successfully!");
-        router.push("/events");
+        onSuccess?.();
       } else if (resourceId) {
         await updateMarketingResource(resourceId, payload);
         toast.success("Resource updated successfully!");
-        router.push("/events");
+        onSuccess?.();
       }
     } catch {
       toast.error("Operation failed");

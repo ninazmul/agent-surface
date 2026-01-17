@@ -11,11 +11,12 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, SortAsc, SortDesc, Pencil } from "lucide-react";
+import { Trash, SortAsc, SortDesc } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { IMarketingResource } from "@/lib/database/models/marketing-resource.model";
 import { deleteMarketingResource } from "@/lib/actions/marketing-resource.actions";
+import UpdateMarketingResourceDialog from "@/components/shared/UpdateMarketingResourceDialog";
 
 interface Props {
   resources: IMarketingResource[];
@@ -196,11 +197,10 @@ const MarketingResourceTable = ({ resources, isAdmin, userCountry }: Props) => {
                   </TableCell>
                   {isAdmin && (
                     <TableCell className="w-max flex items-center space-x-2">
-                      <a href={`/resources/${resource._id.toString()}/update`}>
-                        <Button variant="ghost" size="icon">
-                          <Pencil className="w-4 h-4 text-black" />
-                        </Button>
-                      </a>
+                      <UpdateMarketingResourceDialog
+                        resource={resource}
+                        resourceId={resource._id.toString()}
+                      />
                       <Button
                         onClick={() =>
                           setConfirmDeleteId(resource._id.toString())

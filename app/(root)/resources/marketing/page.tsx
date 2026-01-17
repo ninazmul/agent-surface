@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import {
@@ -8,10 +7,10 @@ import {
 } from "@/lib/actions/admin.actions";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { redirect } from "next/navigation";
-import { Plus } from "lucide-react";
 import MarketingResourceTable from "../../components/MarketingResourceTable";
 import { IMarketingResource } from "@/lib/database/models/marketing-resource.model";
 import { getAllMarketingResources } from "@/lib/actions/marketing-resource.actions";
+import AddMarketingResourceDialog from "@/components/shared/AddMarketingResourceDialog";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -62,16 +61,7 @@ const Page = async () => {
           Marketing Resources
         </h3>
 
-        {adminStatus && (
-          <a href="/resources/marketing/create" className="w-full sm:w-auto">
-            <Button
-              size="sm"
-              className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-            >
-              <Plus size={16} /> Add Resource
-            </Button>
-          </a>
-        )}
+        {adminStatus && <AddMarketingResourceDialog />}
       </div>
 
       <div className="overflow-x-auto my-8">
