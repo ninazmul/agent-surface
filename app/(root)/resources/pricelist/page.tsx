@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import {
@@ -8,10 +7,10 @@ import {
 } from "@/lib/actions/admin.actions";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { redirect } from "next/navigation";
-import { Plus } from "lucide-react";
 import { getAllResourcePriceLists } from "@/lib/actions/resource-pricelist.actions";
 import { IResourcePriceList } from "@/lib/database/models/resource-pricelist.model";
 import ResourcePriceListCards from "../../components/ResourcePriceListTable";
+import AddResourcePricelistDialog from "@/components/shared/AddResourcePricelistDialog";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -62,16 +61,7 @@ const Page = async () => {
           <h3 className="h3-bold text-center sm:text-left">All Price List</h3>
 
           {/* Action Button */}
-          {adminStatus && (
-            <a href="/resources/pricelist/create" className="w-full sm:w-auto">
-              <Button
-                size="sm"
-                className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-              >
-                <Plus size={16} /> Add Price List
-              </Button>
-            </a>
-          )}
+          {adminStatus && <AddResourcePricelistDialog />}
         </div>
 
         <div className="overflow-x-auto my-8">

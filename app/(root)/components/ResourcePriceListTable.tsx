@@ -3,12 +3,13 @@
 import { useState, useMemo, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, SortAsc, SortDesc, Pencil, X } from "lucide-react";
+import { Trash, SortAsc, SortDesc, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { deleteStudentResource } from "@/lib/actions/student-resource.actions";
 import { IResourcePriceList } from "@/lib/database/models/resource-pricelist.model";
 import Image from "next/image";
+import UpdateResourcePricelistDialog from "@/components/shared/UpdateResourcePricelistDialog";
 
 const ResourcePriceListCards = ({
   resources,
@@ -180,12 +181,10 @@ const ResourcePriceListCards = ({
                   className="flex items-center gap-2"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <a
-                    href={`/resources/${resource._id.toString()}/update`}
-                    className="text-gray-700 dark:text-gray-200"
-                  >
-                    <Pencil className="w-4 h-4" />
-                  </a>
+                  <UpdateResourcePricelistDialog
+                    resource={resource}
+                    resourceId={resource._id.toString()}
+                  />
                   <Trash
                     className="w-4 h-4 text-red-600 cursor-pointer"
                     onClick={() => setConfirmDeleteId(resource._id.toString())}

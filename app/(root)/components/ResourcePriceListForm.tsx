@@ -16,9 +16,7 @@ import * as z from "zod";
 import { useState } from "react";
 import { useUploadThing } from "@/lib/uploadthing";
 import { FileUploader } from "@/components/shared/FileUploader";
-import { IResource } from "@/lib/database/models/resource.model";
 import { resourceDefaultValues } from "@/constants";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import {
   createResourcePriceList,
@@ -26,6 +24,7 @@ import {
 } from "@/lib/actions/resource-pricelist.actions";
 import Select from "react-select";
 import countries from "world-countries";
+import { IResourcePriceList } from "@/lib/database/models/resource-pricelist.model";
 
 export const studentResourcePriceListFormSchema = z
   .object({
@@ -40,8 +39,9 @@ export const studentResourcePriceListFormSchema = z
 
 type ResourcePriceListFormProps = {
   type: "Create" | "Update";
-  resource?: IResource;
+  resource?: IResourcePriceList;
   resourceId?: string;
+  onSuccess?: () => void;
 };
 
 const countryOptions = countries.map((country) => ({
@@ -53,9 +53,9 @@ const ResourcePriceListForm = ({
   type,
   resource,
   resourceId,
+  onSuccess,
 }: ResourcePriceListFormProps) => {
   const [link, setLink] = useState<File[]>([]);
-  const router = useRouter();
 
   const initialValues =
     resource && type === "Update"
@@ -98,7 +98,7 @@ const ResourcePriceListForm = ({
         if (newResource) {
           form.reset();
           toast.success("Resource upload successfully!");
-          router.push("/resources/pricelist");
+          onSuccess?.();
         }
       } else if (type === "Update" && resourceId) {
         const updatedResource = await updateResourcePriceList(
@@ -108,7 +108,7 @@ const ResourcePriceListForm = ({
         if (updatedResource) {
           form.reset();
           toast.success("Resource updated Successfully!");
-          router.push("/resources/pricelist");
+          onSuccess?.();
         }
       }
     } catch (error) {
@@ -117,31 +117,82 @@ const ResourcePriceListForm = ({
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-6 rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm"
-      >
-        {/* Section: Resource Info */}
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 text-center">
-            Add New Resource
-          </h2>
-        </div>
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+        space-y-4
+      "
+        >
+          {/* Section: Resource Info */}
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 text-center">
+              Add New Resource
+            </h2>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* File Name */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* File Name */}
+            <FormField
+              control={form.control}
+              name="fileName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>File Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter file name"
+                      {...field}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <FormControl>
+                    <Select
+                      options={countryOptions}
+                      isSearchable
+                      value={countryOptions.find(
+                        (opt) => opt.value === field.value
+                      )}
+                      onChange={(selected) => field.onChange(selected?.value)}
+                      placeholder="Select country"
+                      classNamePrefix="react-select"
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* File Upload */}
           <FormField
             control={form.control}
-            name="fileName"
+            name="link"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>File Name</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter file name"
-                    {...field}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                <FormLabel>Upload Resource File</FormLabel>
+                <FormControl className="h-72">
+                  <FileUploader
+                    onFieldChange={field.onChange}
+                    fileUrl={field.value || ""}
+                    setFiles={setLink}
                   />
                 </FormControl>
                 <FormMessage />
@@ -149,65 +200,24 @@ const ResourcePriceListForm = ({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="country"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Country</FormLabel>
-                <FormControl>
-                  <Select
-                    options={countryOptions}
-                    isSearchable
-                    value={countryOptions.find(
-                      (opt) => opt.value === field.value
-                    )}
-                    onChange={(selected) => field.onChange(selected?.value)}
-                    placeholder="Select country"
-                    classNamePrefix="react-select"
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* File Upload */}
-        <FormField
-          control={form.control}
-          name="link"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Upload Resource File</FormLabel>
-              <FormControl className="h-72">
-                <FileUploader
-                  onFieldChange={field.onChange}
-                  fileUrl={field.value || ""}
-                  setFiles={setLink}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Submit Button */}
-        <div className="pt-4">
-          <Button
-            type="submit"
-            size="lg"
-            disabled={form.formState.isSubmitting}
-            className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-          >
-            {form.formState.isSubmitting
-              ? "Uploading..."
-              : type === "Create"
-              ? "Upload Resource"
-              : "Update Resource"}
-          </Button>
-        </div>
-      </form>
-    </Form>
+          {/* Submit Button */}
+          <div className="pt-4">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={form.formState.isSubmitting}
+              className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+            >
+              {form.formState.isSubmitting
+                ? "Uploading..."
+                : type === "Create"
+                  ? "Upload Resource"
+                  : "Update Resource"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 };
 
