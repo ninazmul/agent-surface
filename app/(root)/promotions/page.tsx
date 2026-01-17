@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { getAllPromotions } from "@/lib/actions/promotion.actions";
 import PromotionTable from "../components/PromotionTable";
 import { auth } from "@clerk/nextjs/server";
@@ -16,7 +15,9 @@ import {
 } from "@/lib/actions/profile.actions";
 import { redirect } from "next/navigation";
 import { IPromotion } from "@/lib/database/models/promotion.model";
-import { Plus } from "lucide-react";
+import AddPromotionDialog from "@/components/shared/AddPromotionDialog";
+import { getAllCourses } from "@/lib/actions/course.actions";
+import { getAllServices } from "@/lib/actions/service.actions";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -33,7 +34,7 @@ const Page = async () => {
     if (!rolePermissions.includes("promotions")) {
       redirect("/");
     }
-  } 
+  }
   // ====== NON-ADMIN PATH (profile required)
   else {
     // Profile must be Approved
@@ -99,8 +100,11 @@ const Page = async () => {
       const start = new Date(promo.startDate).getTime();
       const end = new Date(promo.endDate).getTime();
       return start <= now && end >= now;
-    }
+    },
   );
+
+  const courses = await getAllCourses();
+  const services = await getAllServices();
 
   return (
     <>
@@ -109,6 +113,9 @@ const Page = async () => {
         <PromotionListClient
           promotions={dateFilteredPromotions}
           agency={agency}
+          courses={courses}
+          services={services}
+          agencies={agency}
           isAdmin={adminStatus}
         />
       </section>
@@ -118,18 +125,20 @@ const Page = async () => {
         <section className="p-4">
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
             <h3 className="h3-bold text-center sm:text-left">All Promotions</h3>
-            <a href="/promotions/create" className="w-full sm:w-auto">
-              <Button
-                size="sm"
-                className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-              >
-                <Plus size={16} /> Add Promotion
-              </Button>
-            </a>
+            <AddPromotionDialog
+              agency={agency}
+              courses={courses}
+              services={services}
+            />
           </div>
 
           <div className="overflow-x-auto">
-            <PromotionTable promotions={filteredPromotions} />
+            <PromotionTable
+              promotions={filteredPromotions}
+              agency={agency}
+              courses={courses}
+              services={services}
+            />
           </div>
         </section>
       )}

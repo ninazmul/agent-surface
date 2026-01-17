@@ -24,14 +24,26 @@ import {
 import { useEffect, useState } from "react";
 import { ILead } from "@/lib/database/models/lead.model";
 import PromotionLeadsStats from "./PromotionLeadsStats";
-import { Pencil } from "lucide-react";
+import UpdatePromotionDialog from "@/components/shared/UpdatePromotionDialog";
+import { IProfile } from "@/lib/database/models/profile.model";
+import { ICourse } from "@/lib/database/models/course.model";
+import { IServices } from "@/lib/database/models/service.model";
 
 type Props = {
+  agency: IProfile[];
+  courses: ICourse[];
+  services: IServices[];
   promotion: IPromotion;
   isAdmin?: boolean;
 };
 
-const PromotionCard = ({ promotion, isAdmin }: Props) => {
+const PromotionCard = ({
+  agency,
+  courses,
+  services,
+  promotion,
+  isAdmin,
+}: Props) => {
   const isPaused = promotion.isPaused;
 
   const [leads, setLeads] = useState<ILead[]>([]);
@@ -150,12 +162,16 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
             )}
 
             {isAdmin && (
-              <a
-                href={`/promotions/${promotion._id.toString()}/update`}
-                className="absolute top-3 right-3 p-2 text-xs font-semibold rounded-full bg-white/50 text-black shadow"
-              >
-                <Pencil className="w-3 h-3" />
-              </a>
+              <span className="absolute top-3 right-3 p-2 text-xs font-semibold rounded-full bg-white/50 text-black shadow">
+                <UpdatePromotionDialog
+                  promotion={promotion}
+                  promotionId={promotion._id.toString()}
+                  agency={agency}
+                  courses={courses}
+                  services={services}
+                  type="Card"
+                />
+              </span>
             )}
           </div>
         </div>
@@ -239,11 +255,11 @@ const PromotionCard = ({ promotion, isAdmin }: Props) => {
                         </p>
                         <p className="text-xs text-gray-500 dark:text-gray-300 mt-1">
                           {new Date(
-                            c.startDate || new Date()
+                            c.startDate || new Date(),
                           ).toLocaleDateString()}{" "}
                           →{" "}
                           {new Date(
-                            c.endDate || new Date()
+                            c.endDate || new Date(),
                           ).toLocaleDateString()}
                         </p>
                       </div>

@@ -22,7 +22,6 @@ import {
 } from "@/lib/actions/promotion.actions";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { promotionDefaultValues } from "@/constants";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import countries from "world-countries";
 import Select from "react-select";
@@ -57,7 +56,7 @@ export const promotionFormSchema = z.object({
           shift: z.string(),
         }),
         courseFee: z.string().optional(),
-      })
+      }),
     )
     .optional(),
   services: z
@@ -68,7 +67,7 @@ export const promotionFormSchema = z.object({
         serviceType: z.string(),
         amount: z.string().optional(),
         description: z.string().optional(),
-      })
+      }),
     )
     .optional(),
   discount: z.string().optional(),
@@ -84,6 +83,7 @@ type PromotionFormProps = {
   courses?: ICourse[];
   services?: IServices[];
   agencies: IProfile[];
+  onSuccess?: () => void;
 };
 
 const PromotionForm = ({
@@ -93,9 +93,9 @@ const PromotionForm = ({
   courses,
   services,
   agencies,
+  onSuccess,
 }: PromotionFormProps) => {
   const [photo, setPhoto] = useState<File[]>([]);
-  const router = useRouter();
 
   const countryOptions = countries
     .map((country) => ({
@@ -111,7 +111,7 @@ const PromotionForm = ({
 
   const expandedCourses = useMemo(
     () => courses?.flatMap(expandCourses) || [],
-    [courses]
+    [courses],
   );
 
   const initialValues =
@@ -197,7 +197,7 @@ const PromotionForm = ({
 
     async function notifyAgenciesViaWhatsApp(
       emails: string[],
-      promotionTitle: string
+      promotionTitle: string,
     ) {
       if (!emails || emails.length === 0) return;
 
@@ -206,7 +206,7 @@ const PromotionForm = ({
           emails.map(async (email) => {
             const profile = await getProfileByEmail(email);
             return profile?.number;
-          })
+          }),
         );
 
         const validNumbers = numbers.filter(Boolean);
@@ -249,9 +249,9 @@ const PromotionForm = ({
           await notifyAgencies(values.agencies || [], newPromotion.title);
           await notifyAgenciesViaWhatsApp(
             values.agencies || [],
-            newPromotion.title
+            newPromotion.title,
           );
-          router.push("/promotions");
+          onSuccess?.();
         }
       } else if (type === "Update" && promotionId && promotion) {
         const updatedPromotion = await updatePromotion(promotionId, {
@@ -271,13 +271,13 @@ const PromotionForm = ({
           const previousAgencies = promotion.agencies || [];
           const updatedAgencies = values.agencies || [];
           const newAgencies = updatedAgencies.filter(
-            (email) => !previousAgencies.includes(email)
+            (email) => !previousAgencies.includes(email),
           );
 
           // Notify only newly added agencies
           await notifyAgencies(newAgencies, updatedPromotion.title);
           await notifyAgenciesViaWhatsApp(newAgencies, updatedPromotion.title);
-          router.push("/promotions");
+          onSuccess?.();
         }
       }
     } catch (error) {
@@ -287,455 +287,466 @@ const PromotionForm = ({
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm space-y-4"
-      >
-        <h2 className="text-xl font-semibold">Promotion Information</h2>
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+        space-y-4
+      "
+        >
+          <h2 className="text-xl font-semibold">Promotion Information</h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Title */}
-          <FormField
-            control={form.control}
-            name="title"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Title</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter promotion title"
-                    {...field}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Title */}
+            <FormField
+              control={form.control}
+              name="title"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Title</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter promotion title"
+                      {...field}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Description */}
-          <FormField
-            control={form.control}
-            name="description"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Description</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter description"
-                    {...field}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Description */}
+            <FormField
+              control={form.control}
+              name="description"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Description</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter description"
+                      {...field}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Criteria */}
-          <FormField
-            control={form.control}
-            name="criteria"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Criteria</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter eligibility criteria"
-                    {...field}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Criteria */}
+            <FormField
+              control={form.control}
+              name="criteria"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Criteria</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter eligibility criteria"
+                      {...field}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Start Date */}
-          <FormField
-            control={form.control}
-            name="startDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Start Date</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    value={
-                      field.value instanceof Date &&
-                      !isNaN(field.value.getTime())
-                        ? field.value.toISOString().split("T")[0]
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const dateValue = e.target.value
-                        ? new Date(e.target.value)
-                        : undefined;
-                      field.onChange(dateValue);
-                    }}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Start Date */}
+            <FormField
+              control={form.control}
+              name="startDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Start Date</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={
+                        field.value instanceof Date &&
+                        !isNaN(field.value.getTime())
+                          ? field.value.toISOString().split("T")[0]
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const dateValue = e.target.value
+                          ? new Date(e.target.value)
+                          : undefined;
+                        field.onChange(dateValue);
+                      }}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* End Date */}
-          <FormField
-            control={form.control}
-            name="endDate"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>End Date</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    value={
-                      field.value instanceof Date &&
-                      !isNaN(field.value.getTime())
-                        ? field.value.toISOString().split("T")[0]
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const dateValue = e.target.value
-                        ? new Date(e.target.value)
-                        : undefined;
-                      field.onChange(dateValue);
-                    }}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* End Date */}
+            <FormField
+              control={form.control}
+              name="endDate"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>End Date</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={
+                        field.value instanceof Date &&
+                        !isNaN(field.value.getTime())
+                          ? field.value.toISOString().split("T")[0]
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const dateValue = e.target.value
+                          ? new Date(e.target.value)
+                          : undefined;
+                        field.onChange(dateValue);
+                      }}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* SKU */}
-          <FormField
-            control={form.control}
-            name="sku"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>SKU</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter SKU"
-                    {...field}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* SKU */}
+            <FormField
+              control={form.control}
+              name="sku"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>SKU</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter SKU"
+                      {...field}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Countries */}
-          <FormField
-            control={form.control}
-            name="countries"
-            render={() => (
-              <FormItem>
-                <FormLabel>Allowed Countries</FormLabel>
-                <FormControl>
-                  <Controller
-                    control={form.control}
-                    name="countries"
-                    render={({ field }) => (
-                      <Select
-                        isMulti
-                        options={countryOptions}
-                        value={countryOptions.filter((opt) =>
-                          field.value?.includes(opt.value)
-                        )}
-                        onChange={(selected) =>
-                          field.onChange(selected.map((opt) => opt.value))
-                        }
-                        placeholder="Select countries..."
-                        className="react-select-container"
-                        classNamePrefix="react-select"
-                      />
-                    )}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Countries */}
+            <FormField
+              control={form.control}
+              name="countries"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Allowed Countries</FormLabel>
+                  <FormControl>
+                    <Controller
+                      control={form.control}
+                      name="countries"
+                      render={({ field }) => (
+                        <Select
+                          isMulti
+                          options={countryOptions}
+                          value={countryOptions.filter((opt) =>
+                            field.value?.includes(opt.value),
+                          )}
+                          onChange={(selected) =>
+                            field.onChange(selected.map((opt) => opt.value))
+                          }
+                          placeholder="Select countries..."
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                        />
+                      )}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Agencies */}
-          <FormField
-            control={form.control}
-            name="agencies"
-            render={() => (
-              <FormItem>
-                <FormLabel>Agencies</FormLabel>
-                <FormControl>
-                  <Controller
-                    control={form.control}
-                    name="agencies"
-                    render={({ field }) => (
-                      <Select
-                        isMulti
-                        options={agencyOptions}
-                        value={agencyOptions.filter((opt) =>
-                          field.value?.includes(opt.value)
-                        )}
-                        onChange={(selected) =>
-                          field.onChange(selected.map((opt) => opt.value))
-                        }
-                        placeholder="Select agencies..."
-                        className="react-select-container"
-                        classNamePrefix="react-select"
-                      />
-                    )}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Agencies */}
+            <FormField
+              control={form.control}
+              name="agencies"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Agencies</FormLabel>
+                  <FormControl>
+                    <Controller
+                      control={form.control}
+                      name="agencies"
+                      render={({ field }) => (
+                        <Select
+                          isMulti
+                          options={agencyOptions}
+                          value={agencyOptions.filter((opt) =>
+                            field.value?.includes(opt.value),
+                          )}
+                          onChange={(selected) =>
+                            field.onChange(selected.map((opt) => opt.value))
+                          }
+                          placeholder="Select agencies..."
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                        />
+                      )}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Photo */}
-          <FormField
-            control={form.control}
-            name="photo"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Upload Banner (Optional)</FormLabel>
-                <FormControl className="h-72">
-                  <FileUploader
-                    onFieldChange={field.onChange}
-                    fileUrl={field.value || ""}
-                    setFiles={setPhoto}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+            {/* Photo */}
+            <FormField
+              control={form.control}
+              name="photo"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Upload Banner (Optional)</FormLabel>
+                  <FormControl className="h-72">
+                    <FileUploader
+                      onFieldChange={field.onChange}
+                      fileUrl={field.value || ""}
+                      setFiles={setPhoto}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-        {/* ✅ Courses & Services */}
-        <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm space-y-6">
-          <h3 className="text-xl font-semibold">Courses & Services</h3>
+          {/* ✅ Courses & Services */}
+          <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm space-y-6">
+            <h3 className="text-xl font-semibold">Courses & Services</h3>
 
-          {/* Courses */}
-          <div>
-            <h4 className="font-semibold mb-2">Courses</h4>
-            <div className="flex gap-4 overflow-x-auto pb-2">
-              {expandedCourses.map((course) => {
-                const isSelected = form
-                  .watch("course")
-                  ?.some(
-                    (c) =>
-                      c.name === course.name &&
-                      c.campus?.name === course.campus.name &&
-                      c.campus?.shift === course.campus.shift
-                  );
+            {/* Courses */}
+            <div>
+              <h4 className="font-semibold mb-2">Courses</h4>
+              <div className="flex gap-4 overflow-x-auto pb-2">
+                {expandedCourses.map((course) => {
+                  const isSelected = form
+                    .watch("course")
+                    ?.some(
+                      (c) =>
+                        c.name === course.name &&
+                        c.campus?.name === course.campus.name &&
+                        c.campus?.shift === course.campus.shift,
+                    );
 
-                return (
-                  <div
-                    key={courseKey(course)} // ✅ use unique courseKey
-                    className={`flex-shrink-0 rounded-xl border p-4 shadow-md
+                  return (
+                    <div
+                      key={courseKey(course)} // ✅ use unique courseKey
+                      className={`flex-shrink-0 rounded-xl border p-4 shadow-md
                           w-[260px] transition-all duration-200
                           ${
                             isSelected
                               ? "border-blue-600 dark:border-blue-500 scale-105"
                               : "border-gray-200 dark:border-gray-500"
                           }`}
-                  >
-                    <h4 className="font-semibold mb-1">{course.name}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Type: {course.courseType}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Duration: {course.courseDuration}
-                    </p>
-                    <p>Campus: {course.campus.name}</p>
-                    <p>Shift: {course.campus.shift}</p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                      Fee: €{course.courseFee}
-                    </p>
-
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const current = form.getValues("course") || [];
-                        if (isSelected) {
-                          form.setValue(
-                            "course",
-                            current.filter(
-                              (c) =>
-                                !(
-                                  c.name === course.name &&
-                                  c.campus?.name === course.campus.name &&
-                                  c.campus?.shift === course.campus.shift
-                                )
-                            )
-                          );
-                        } else {
-                          form.setValue("course", [...current, course]);
-                        }
-                      }}
-                      className={`w-full mt-2  ${
-                        isSelected ? "bg-blue-600 text-white" : ""
-                      }`}
                     >
-                      {isSelected ? "Selected ✅" : "Select Course"}
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
+                      <h4 className="font-semibold mb-1">{course.name}</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        Type: {course.courseType}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        Duration: {course.courseDuration}
+                      </p>
+                      <p>Campus: {course.campus.name}</p>
+                      <p>Shift: {course.campus.shift}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                        Fee: €{course.courseFee}
+                      </p>
 
-          {/* Services */}
-          <div>
-            <h4 className="font-semibold mb-2">Services</h4>
-            <div className="flex gap-4 overflow-x-auto pb-2">
-              {services?.map((service) => {
-                const isSelected = form
-                  .watch("services")
-                  ?.some((s) => s._id.toString() === service._id.toString());
-                return (
-                  <div
-                    key={service._id.toString()}
-                    className={`flex-shrink-0 rounded-xl border p-4 shadow-md w-[260px]
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const current = form.getValues("course") || [];
+                          if (isSelected) {
+                            form.setValue(
+                              "course",
+                              current.filter(
+                                (c) =>
+                                  !(
+                                    c.name === course.name &&
+                                    c.campus?.name === course.campus.name &&
+                                    c.campus?.shift === course.campus.shift
+                                  ),
+                              ),
+                            );
+                          } else {
+                            form.setValue("course", [...current, course]);
+                          }
+                        }}
+                        className={`w-full mt-2  ${
+                          isSelected ? "bg-blue-600 text-white" : ""
+                        }`}
+                      >
+                        {isSelected ? "Selected ✅" : "Select Course"}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Services */}
+            <div>
+              <h4 className="font-semibold mb-2">Services</h4>
+              <div className="flex gap-4 overflow-x-auto pb-2">
+                {services?.map((service) => {
+                  const isSelected = form
+                    .watch("services")
+                    ?.some((s) => s._id.toString() === service._id.toString());
+                  return (
+                    <div
+                      key={service._id.toString()}
+                      className={`flex-shrink-0 rounded-xl border p-4 shadow-md w-[260px]
                       ${
                         isSelected
                           ? "border-blue-600 dark:border-blue-500 scale-105"
                           : "border-gray-200 dark:border-gray-500"
                       }`}
-                  >
-                    <h4 className="font-semibold">{service.title}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Type: {service.serviceType}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      Amount: €{service.amount}
-                    </p>
-                    <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-                      {service.description}
-                    </p>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        const current = form.getValues("services") || [];
-                        if (isSelected) {
-                          form.setValue(
-                            "services",
-                            current.filter(
-                              (s) => s._id.toString() !== service._id.toString()
-                            )
-                          );
-                        } else {
-                          form.setValue("services", [
-                            ...current,
-                            {
-                              _id: service._id.toString(),
-                              title: service.title,
-                              serviceType: service.serviceType || "",
-                              amount: service.amount || "",
-                              description: service.description || "",
-                            },
-                          ]);
-                        }
-                      }}
-                      className={`w-full mt-2 ${
-                        isSelected ? "bg-blue-600 text-white" : ""
-                      }`}
                     >
-                      {isSelected ? "Selected ✅" : "Select Service"}
-                    </Button>
-                  </div>
-                );
-              })}
+                      <h4 className="font-semibold">{service.title}</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        Type: {service.serviceType}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300">
+                        Amount: €{service.amount}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-2">
+                        {service.description}
+                      </p>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => {
+                          const current = form.getValues("services") || [];
+                          if (isSelected) {
+                            form.setValue(
+                              "services",
+                              current.filter(
+                                (s) =>
+                                  s._id.toString() !== service._id.toString(),
+                              ),
+                            );
+                          } else {
+                            form.setValue("services", [
+                              ...current,
+                              {
+                                _id: service._id.toString(),
+                                title: service.title,
+                                serviceType: service.serviceType || "",
+                                amount: service.amount || "",
+                                description: service.description || "",
+                              },
+                            ]);
+                          }
+                        }}
+                        className={`w-full mt-2 ${
+                          isSelected ? "bg-blue-600 text-white" : ""
+                        }`}
+                      >
+                        {isSelected ? "Selected ✅" : "Select Service"}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
+          </section>
+
+          {/* Discount */}
+          <FormField
+            control={form.control}
+            name="discount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fixed Discount</FormLabel>
+                <FormControl>
+                  <Input
+                    placeholder="Enter fixed discount"
+                    {...field}
+                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* CommissionPercent */}
+            <FormField
+              control={form.control}
+              name="commissionPercent"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Commission Percent</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter commission percent"
+                      {...field}
+                      disabled={!!commissionAmount}
+                      className="w-full rounded-md border px-3 py-2 text-sm"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* CommissionAmount */}
+            <FormField
+              control={form.control}
+              name="commissionAmount"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Commission Amount</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter commission amount"
+                      {...field}
+                      disabled={!!commissionPercent}
+                      className="w-full rounded-md border px-3 py-2 text-sm"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
           </div>
-        </section>
 
-        {/* Discount */}
-        <FormField
-          control={form.control}
-          name="discount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Fixed Discount</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter fixed discount"
-                  {...field}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* CommissionPercent */}
-          <FormField
-            control={form.control}
-            name="commissionPercent"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Commission Percent</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter commission percent"
-                    {...field}
-                    disabled={!!commissionAmount}
-                    className="w-full rounded-md border px-3 py-2 text-sm"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* CommissionAmount */}
-          <FormField
-            control={form.control}
-            name="commissionAmount"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Commission Amount</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter commission amount"
-                    {...field}
-                    disabled={!!commissionPercent}
-                    className="w-full rounded-md border px-3 py-2 text-sm"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* Submit Button */}
-        <div className="pt-4">
-          <Button
-            type="submit"
-            size="lg"
-            disabled={form.formState.isSubmitting}
-            className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-          >
-            {form.formState.isSubmitting
-              ? "Submitting..."
-              : `${type} Promotion`}
-          </Button>
-        </div>
-      </form>
-    </Form>
+          {/* Submit Button */}
+          <div className="pt-4">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={form.formState.isSubmitting}
+              className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+            >
+              {form.formState.isSubmitting
+                ? "Submitting..."
+                : `${type} Promotion`}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 };
 

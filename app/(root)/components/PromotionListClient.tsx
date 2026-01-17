@@ -3,14 +3,25 @@
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import PromotionCard from "./PromotionCard";
 import { IProfile } from "@/lib/database/models/profile.model";
+import { ICourse } from "@/lib/database/models/course.model";
+import { IServices } from "@/lib/database/models/service.model";
 
 type Props = {
+  agencies: IProfile[];
+  courses: ICourse[];
+  services: IServices[];
   promotions: IPromotion[];
   agency: IProfile;
   isAdmin?: boolean;
 };
 
-const PromotionListClient = ({ promotions, isAdmin }: Props) => {
+const PromotionListClient = ({
+  promotions,
+  isAdmin,
+  agencies,
+  courses,
+  services,
+}: Props) => {
   return (
     <section className="">
       <h3 className="h3-bold text-center sm:text-left mb-6">
@@ -20,7 +31,14 @@ const PromotionListClient = ({ promotions, isAdmin }: Props) => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 rounded-2xl bg-white dark:bg-gray-800 p-4">
         {promotions.length > 0 ? (
           promotions.map((promotion, index) => (
-            <PromotionCard key={index} promotion={promotion} isAdmin={isAdmin} />
+            <PromotionCard
+              key={index}
+              promotion={promotion}
+              isAdmin={isAdmin}
+              agency={agencies}
+              courses={courses}
+              services={services}
+            />
           ))
         ) : (
           <p className="text-gray-500 text-center col-span-full">

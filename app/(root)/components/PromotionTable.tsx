@@ -15,7 +15,6 @@ import {
   Trash,
   SortAsc,
   SortDesc,
-  Pencil,
   MoreVertical,
   Play,
   Pause,
@@ -34,8 +33,22 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import UpdatePromotionDialog from "@/components/shared/UpdatePromotionDialog";
+import { IProfile } from "@/lib/database/models/profile.model";
+import { ICourse } from "@/lib/database/models/course.model";
+import { IServices } from "@/lib/database/models/service.model";
 
-const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
+const PromotionTable = ({
+  promotions,
+  agency,
+  courses,
+  services,
+}: {
+  promotions: IPromotion[];
+  agency: IProfile[];
+  courses: ICourse[];
+  services: IServices[];
+}) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState<keyof IPromotion | null>(null);
@@ -47,8 +60,8 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
   const filteredPromotions = useMemo(() => {
     const filtered = promotions.filter((promotion) =>
       [promotion.title, promotion.description, promotion.criteria].some(
-        (field) => field?.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+        (field) => field?.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
     );
 
     if (sortKey) {
@@ -102,7 +115,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
           className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
         />
       </div>
-      
+
       <div
         className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800"
         style={{ cursor: "grab" }}
@@ -335,17 +348,14 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                       className="w-56 p-2 space-y-1 rounded-xl shadow-lg"
                     >
                       {/* Edit */}
-                      <a
-                        href={`/promotions/${promotion._id.toString()}/update`}
-                      >
-                        <Button
-                          variant="ghost"
-                          className="w-full justify-start text-purple-500 gap-2"
-                        >
-                          <Pencil className="w-4 h-4" />
-                          Edit Promotion
-                        </Button>
-                      </a>
+                      <UpdatePromotionDialog
+                        promotion={promotion}
+                        promotionId={promotion._id.toString()}
+                        agency={agency}
+                        courses={courses}
+                        services={services}
+                        type="Action"
+                      />
 
                       {/* Pause / Activate */}
                       <Button
@@ -359,7 +369,7 @@ const PromotionTable = ({ promotions }: { promotions: IPromotion[] }) => {
                             toast.success(
                               `Promotion ${
                                 !promotion.isPaused ? "paused" : "activated"
-                              }`
+                              }`,
                             );
                             router.refresh();
                           } catch {
