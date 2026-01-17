@@ -19,7 +19,6 @@ import { FileUploader } from "@/components/shared/FileUploader";
 import { createResource, updateResource } from "@/lib/actions/resource.actions";
 import { IResource } from "@/lib/database/models/resource.model";
 import { resourceDefaultValues } from "@/constants";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 export const resourceFormSchema = z
@@ -38,11 +37,11 @@ type ResourceFormProps = {
   type: "Create" | "Update";
   resource?: IResource;
   resourceId?: string;
+  onSuccess?: () => void;
 };
 
-const ResourceForm = ({ type, resource, resourceId }: ResourceFormProps) => {
+const ResourceForm = ({ type, resource, resourceId, onSuccess }: ResourceFormProps) => {
   const [link, setLink] = useState<File[]>([]);
-  const router = useRouter();
 
   const initialValues =
     resource && type === "Update"
@@ -86,14 +85,14 @@ const ResourceForm = ({ type, resource, resourceId }: ResourceFormProps) => {
         if (newResource) {
           form.reset();
           toast.success("Docs upload successful!!");
-          router.push("/resources");
+          onSuccess?.();
         }
       } else if (type === "Update" && resourceId) {
         const updatedResource = await updateResource(resourceId, resourceData);
         if (updatedResource) {
           form.reset();
           toast.success("Updated Successfully!");
-          router.push("/resources");
+          onSuccess?.();
         }
       }
     } catch (error) {

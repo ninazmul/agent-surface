@@ -11,11 +11,12 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, SortAsc, SortDesc, Pencil } from "lucide-react";
+import { Trash, SortAsc, SortDesc } from "lucide-react";
 import { deleteResource } from "@/lib/actions/resource.actions";
 import { IResource } from "@/lib/database/models/resource.model";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import UpdateResourceDialog from "@/components/shared/UpdateResourceDialog";
 
 const ResourceTable = ({
   resources,
@@ -195,11 +196,10 @@ const ResourceTable = ({
                 {isAdmin && (
                   <>
                     <TableCell className="w-max flex items-center space-x-2">
-                      <a href={`/resources/${resource._id.toString()}/update`}>
-                        <Button variant="ghost" size="icon">
-                          <Pencil className="w-4 h-4 text-black" />
-                        </Button>
-                      </a>
+                      <UpdateResourceDialog
+                        resource={resource}
+                        resourceId={resource._id.toString()}
+                      />
                       <Button
                         onClick={() =>
                           setConfirmDeleteId(resource._id.toString())
