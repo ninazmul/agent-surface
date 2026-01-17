@@ -1,12 +1,11 @@
-import { Button } from "@/components/ui/button";
 import { getUserEmailById, isAdmin } from "@/lib/actions";
 import {
   getAllCampaignForms,
   getCampaignFormsByAuthor,
 } from "@/lib/actions/campaign.actions";
 import { auth } from "@clerk/nextjs/server";
-import { Plus } from "lucide-react";
 import CampaignFormsTable from "../../components/CampaignFormsTable";
+import CreateCampaignsDialog from "@/components/shared/CreateCampaignsDialog";
 
 export default async function CampaignDashboard() {
   const { sessionClaims } = await auth();
@@ -25,18 +24,7 @@ export default async function CampaignDashboard() {
         {/* Title */}
         <h3 className="h3-bold text-center sm:text-left">Campaign Forms</h3>
 
-        {/* Actions */}
-        <div className="flex flex-wrap gap-2">
-          {/* Create Form */}
-          <a href={"/leads/campaigns/create"}>
-            <Button
-              size="sm"
-              className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-            >
-              <Plus size={16} /> Create Form
-            </Button>
-          </a>
-        </div>
+        <CreateCampaignsDialog email={email} />
       </div>
 
       {/* Forms Table / List */}

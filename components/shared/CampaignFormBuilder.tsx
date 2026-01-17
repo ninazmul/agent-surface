@@ -3,7 +3,6 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { createCampaignForm } from "@/lib/actions/campaign.actions";
-import { useRouter } from "next/navigation";
 
 type FieldType = "text" | "email" | "number" | "textarea" | "select" | "date";
 
@@ -24,12 +23,13 @@ interface Field {
 
 interface CampaignFormBuilderProps {
   author: string;
+  onSuccess?: () => void;
 }
 
 export default function CampaignFormBuilder({
   author,
+  onSuccess,
 }: CampaignFormBuilderProps) {
-  const router = useRouter();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [slug, setSlug] = useState("");
@@ -265,7 +265,7 @@ export default function CampaignFormBuilder({
 
       await createCampaignForm(payload);
       toast.success("Form created successfully!");
-      router.push("/leads/campaigns");
+      onSuccess?.();
     } catch (err) {
       console.error(err);
       toast.error("Failed to create form");
@@ -275,162 +275,177 @@ export default function CampaignFormBuilder({
   };
 
   return (
-    <div className="space-y-6 max-w-4xl mx-auto p-4">
-      {/* Form Meta */}
-      <div className="space-y-3">
-        <input
-          className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
-          placeholder="Form title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <textarea
-          className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
-          placeholder="Description (optional)"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        />
-        <input
-          className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
-          placeholder="Slug (e.g. eid-offer-leads)"
-          value={slug}
-          onChange={(e) => setSlug(e.target.value)}
-        />
-      </div>
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <div
+        className="space-y-6 max-w-4xl mx-auto
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+      "
+      >
+        {/* Form Meta */}
+        <div className="space-y-3">
+          <input
+            className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
+            placeholder="Form title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+          <textarea
+            className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
+            placeholder="Description (optional)"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+          />
+          <input
+            className="w-full border p-2 rounded bg-white dark:bg-gray-900 dark:text-white border-gray-300 dark:border-gray-700"
+            placeholder="Slug (e.g. eid-offer-leads)"
+            value={slug}
+            onChange={(e) => setSlug(e.target.value)}
+          />
+        </div>
 
-      {/* Fields */}
-      <div className="space-y-4">
-        <h3 className="font-semibold text-black dark:text-white">Fields</h3>
-        {fields.map((field, index) => (
-          <div
-            key={index}
-            className="border rounded p-3 space-y-2 bg-gray-50 dark:bg-gray-800"
-          >
-            <div className="flex justify-between items-center">
-              <span className="font-medium text-sm text-gray-700 dark:text-gray-200">
-                {field.isDefault ? "Default Field" : "Custom Field"}
-              </span>
-              {!field.isDefault && (
-                <button
-                  onClick={() => removeField(index)}
-                  className="text-red-600 text-sm"
-                >
-                  Remove field
-                </button>
-              )}
-            </div>
-
-            <input
-              placeholder="Label"
-              className="w-full border p-2 rounded"
-              value={field.label}
-              onChange={(e) => updateField(index, "label", e.target.value)}
-            />
-            <input
-              placeholder="Name (key)"
-              className="w-full border p-2 rounded"
-              value={field.name}
-              onChange={(e) => updateField(index, "name", e.target.value)}
-            />
-            <select
-              className="w-full border p-2 rounded"
-              value={field.type}
-              onChange={(e) =>
-                updateFieldType(index, e.target.value as FieldType)
-              }
+        {/* Fields */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-black dark:text-white">Fields</h3>
+          {fields.map((field, index) => (
+            <div
+              key={index}
+              className="border rounded p-3 space-y-2 bg-gray-50 dark:bg-gray-800"
             >
-              <option value="text">Text</option>
-              <option value="email">Email</option>
-              <option value="number">Number</option>
-              <option value="textarea">Textarea</option>
-              <option value="select">Select</option>
-              <option value="date">Date</option>
-            </select>
-
-            {/* Options for select */}
-            {field.type === "select" && (
-              <div className="space-y-1">
-                {(field.options || []).map((opt, i) => (
-                  <div key={i} className="flex gap-2 items-center">
-                    <input
-                      placeholder="Label"
-                      className="border p-1 rounded flex-1"
-                      value={opt.label}
-                      onChange={(e) =>
-                        updateOption(index, i, "label", e.target.value)
-                      }
-                    />
-                    <input
-                      placeholder="Value"
-                      className="border p-1 rounded flex-1"
-                      value={opt.value}
-                      onChange={(e) =>
-                        updateOption(index, i, "value", e.target.value)
-                      }
-                    />
-                    <button
-                      onClick={() => removeOption(index, i)}
-                      className="text-red-600 text-sm"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))}
-                <button
-                  onClick={() => addOption(index)}
-                  className="px-2 py-1 border rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white text-sm"
-                >
-                  + Add Option
-                </button>
+              <div className="flex justify-between items-center">
+                <span className="font-medium text-sm text-gray-700 dark:text-gray-200">
+                  {field.isDefault ? "Default Field" : "Custom Field"}
+                </span>
+                {!field.isDefault && (
+                  <button
+                    onClick={() => removeField(index)}
+                    className="text-red-600 text-sm"
+                  >
+                    Remove field
+                  </button>
+                )}
               </div>
-            )}
 
-            {/* Value input for non-select */}
-            {field.type !== "select" &&
-              (field.type === "textarea" ? (
-                <textarea
-                  className="w-full border p-2 rounded"
-                  value={field.value || ""}
-                  onChange={(e) => updateField(index, "value", e.target.value)}
-                />
-              ) : (
-                <input
-                  type={field.type}
-                  className="w-full border p-2 rounded"
-                  value={field.value || ""}
-                  onChange={(e) => updateField(index, "value", e.target.value)}
-                />
-              ))}
-
-            <label className="flex items-center gap-2 text-sm">
               <input
-                type="checkbox"
-                checked={field.required}
-                onChange={(e) =>
-                  updateField(index, "required", e.target.checked)
-                }
+                placeholder="Label"
+                className="w-full border p-2 rounded"
+                value={field.label}
+                onChange={(e) => updateField(index, "label", e.target.value)}
               />
-              Required
-            </label>
-          </div>
-        ))}
+              <input
+                placeholder="Name (key)"
+                className="w-full border p-2 rounded"
+                value={field.name}
+                onChange={(e) => updateField(index, "name", e.target.value)}
+              />
+              <select
+                className="w-full border p-2 rounded"
+                value={field.type}
+                onChange={(e) =>
+                  updateFieldType(index, e.target.value as FieldType)
+                }
+              >
+                <option value="text">Text</option>
+                <option value="email">Email</option>
+                <option value="number">Number</option>
+                <option value="textarea">Textarea</option>
+                <option value="select">Select</option>
+                <option value="date">Date</option>
+              </select>
 
+              {/* Options for select */}
+              {field.type === "select" && (
+                <div className="space-y-1">
+                  {(field.options || []).map((opt, i) => (
+                    <div key={i} className="flex gap-2 items-center">
+                      <input
+                        placeholder="Label"
+                        className="border p-1 rounded flex-1"
+                        value={opt.label}
+                        onChange={(e) =>
+                          updateOption(index, i, "label", e.target.value)
+                        }
+                      />
+                      <input
+                        placeholder="Value"
+                        className="border p-1 rounded flex-1"
+                        value={opt.value}
+                        onChange={(e) =>
+                          updateOption(index, i, "value", e.target.value)
+                        }
+                      />
+                      <button
+                        onClick={() => removeOption(index, i)}
+                        className="text-red-600 text-sm"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => addOption(index)}
+                    className="px-2 py-1 border rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white text-sm"
+                  >
+                    + Add Option
+                  </button>
+                </div>
+              )}
+
+              {/* Value input for non-select */}
+              {field.type !== "select" &&
+                (field.type === "textarea" ? (
+                  <textarea
+                    className="w-full border p-2 rounded"
+                    value={field.value || ""}
+                    onChange={(e) =>
+                      updateField(index, "value", e.target.value)
+                    }
+                  />
+                ) : (
+                  <input
+                    type={field.type}
+                    className="w-full border p-2 rounded"
+                    value={field.value || ""}
+                    onChange={(e) =>
+                      updateField(index, "value", e.target.value)
+                    }
+                  />
+                ))}
+
+              <label className="flex items-center gap-2 text-sm">
+                <input
+                  type="checkbox"
+                  checked={field.required}
+                  onChange={(e) =>
+                    updateField(index, "required", e.target.checked)
+                  }
+                />
+                Required
+              </label>
+            </div>
+          ))}
+
+          <button
+            onClick={addField}
+            className="px-4 py-2 border rounded bg-black text-white dark:bg-white dark:text-black"
+          >
+            + Add Field
+          </button>
+        </div>
+
+        {/* Submit */}
         <button
-          onClick={addField}
-          className="px-4 py-2 border rounded bg-black text-white dark:bg-white dark:text-black"
+          onClick={handleCreate}
+          disabled={loading}
+          className="w-full py-2 mt-4 rounded bg-black text-white dark:bg-white dark:text-black disabled:bg-gray-400 disabled:cursor-not-allowed"
         >
-          + Add Field
+          {loading ? "Creating..." : "Create Form"}
         </button>
       </div>
-
-      {/* Submit */}
-      <button
-        onClick={handleCreate}
-        disabled={loading}
-        className="w-full py-2 mt-4 rounded bg-black text-white dark:bg-white dark:text-black disabled:bg-gray-400 disabled:cursor-not-allowed"
-      >
-        {loading ? "Creating..." : "Create Form"}
-      </button>
     </div>
   );
 }
