@@ -16,8 +16,7 @@ import {
 } from "date-fns";
 import { getAllEventCalendars } from "@/lib/actions/eventCalender.actions";
 import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
-import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
+import AddEventDialog from "@/components/shared/AddEventDialog";
 
 type CalendarEvent = {
   id: string;
@@ -65,7 +64,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
-    null
+    null,
   );
   const [activeTypeFilter, setActiveTypeFilter] = useState<string>("all");
   const [dateFilterType, setDateFilterType] = useState<DateFilterType>("month");
@@ -295,16 +294,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
         </div>
 
         <div className="w-full md:w-1/3">
-          {isAdmin && (
-            <a href={`/events/create`} className="w-full">
-              <Button
-                size="lg"
-                className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white text-lg flex items-center gap-1 w-full"
-              >
-                Create Event <Plus size={16} />
-              </Button>
-            </a>
-          )}
+          {isAdmin && <AddEventDialog />}
 
           <h3 className="text-xl font-semibold mb-2 text-cyan-700 dark:text-gray-100 mt-6">
             {selectedDate ? format(selectedDate, "PPP") : "Select a date"}
@@ -413,7 +403,7 @@ const EventCalendar = ({ isAdmin }: { isAdmin: boolean }) => {
               <p className="mb-2 text-yellow-700 font-semibold">
                 Offer Expires:{" "}
                 {new Date(
-                  selectedEvent.extendedProps.offerExpiryDate
+                  selectedEvent.extendedProps.offerExpiryDate,
                 ).toLocaleDateString()}
               </p>
             )}
