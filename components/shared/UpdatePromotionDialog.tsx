@@ -47,9 +47,7 @@ const UpdatePromotionDialog = ({
             Edit Promotion
           </Button>
         ) : (
-          <Button variant="ghost" size="icon">
-            <Pencil className="w-3 h-3" />
-          </Button>
+          <Pencil className="w-4 h-4" />
         )}
       </DialogTrigger>
 
