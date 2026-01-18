@@ -14,6 +14,7 @@ import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
 import { SignatureModal } from "./SignatureModal";
 import AgreementModal from "./AgreementPDF";
+import AddProfileDialog from "@/components/shared/AddProfileDialog";
 
 interface ProfilePageProps {
   adminStatus: boolean;
@@ -22,7 +23,9 @@ interface ProfilePageProps {
   countryAgent: IProfile | null;
   agent: IProfile[];
   subAgents: IProfile[];
+  isAgent?: boolean;
   myLeads?: ILead[];
+  email: string;
 }
 
 export default function ProfilePage({
@@ -32,7 +35,9 @@ export default function ProfilePage({
   countryAgent,
   agent,
   subAgents,
+  isAgent,
   myLeads,
+  email,
 }: ProfilePageProps) {
   const { theme } = useTheme();
   const [myLead, setMyLead] = useState<ILead | null>(null);
@@ -493,7 +498,7 @@ export default function ProfilePage({
                         className="rounded-xl flex items-center gap-1"
                         onClick={() => {
                           navigator.clipboard.writeText(
-                            `${window.location.origin}/profile/create`
+                            `${window.location.origin}/profile/create`,
                           );
                           toast.success("Link copied");
                         }}
@@ -576,15 +581,7 @@ export default function ProfilePage({
 
             <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
               {/* Add Profile */}
-              <a href={"/profile/create"}>
-                <Button
-                  size="sm"
-                  className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-                >
-                  <Plus size={16} />
-                  Add Profile
-                </Button>
-              </a>
+              <AddProfileDialog agent={agent} isAgent={isAgent} email={email} />
 
               {/* Copy Link */}
               <Button
@@ -593,7 +590,7 @@ export default function ProfilePage({
                 className="rounded-xl flex items-center gap-1"
                 onClick={() => {
                   navigator.clipboard.writeText(
-                    `${window.location.origin}/profile/create`
+                    `${window.location.origin}/profile/create`,
                   );
                   toast.success("Link copied");
                 }}
@@ -628,7 +625,7 @@ export default function ProfilePage({
 
           {/* Table */}
           <div className="overflow-x-auto my-8">
-            <ProfileTable profiles={profiles} />
+            <ProfileTable profiles={profiles} agent={agent} />
           </div>
         </section>
       )}

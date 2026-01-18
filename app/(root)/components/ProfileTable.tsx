@@ -11,13 +11,20 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, SortAsc, SortDesc, Clock, Check, Pencil } from "lucide-react";
+import { Trash, SortAsc, SortDesc, Clock, Check } from "lucide-react";
 import { deleteProfile, updateProfile } from "@/lib/actions/profile.actions";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import UpdateProfileDialog from "@/components/shared/UpdateProfileDialog";
 
-const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
+const ProfileTable = ({
+  profiles,
+  agent,
+}: {
+  profiles: Array<IProfile>;
+  agent?: IProfile[];
+}) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState<
@@ -141,7 +148,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
 
   const handleToggleStatus = async (
     profileId: string,
-    currentStatus: string
+    currentStatus: string,
   ) => {
     try {
       const newStatus = currentStatus === "Pending" ? "Approved" : "Pending";
@@ -173,7 +180,7 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
   };
 
   const handleSort = (
-    key: "name" | "email" | "number" | "country" | "role" | "status"
+    key: "name" | "email" | "number" | "country" | "role" | "status",
   ) => {
     if (sortKey === key) {
       setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -284,7 +291,9 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                 </div>
               </TableHead>
               <TableHead className="text-white cursor-pointer">S/T</TableHead>
-              <TableHead className="text-white cursor-pointer">commn.</TableHead>
+              <TableHead className="text-white cursor-pointer">
+                commn.
+              </TableHead>
               <TableHead className="text-white cursor-pointer">
                 Actions
               </TableHead>
@@ -390,11 +399,11 @@ const ProfileTable = ({ profiles }: { profiles: Array<IProfile> }) => {
                   </div>
                 </TableCell>
                 <TableCell className="w-max flex items-center space-x-2">
-                  <a href={`/profile/${profile._id.toString()}/update`}>
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="w-4 h-4 text-black" />
-                    </Button>
-                  </a>
+                  <UpdateProfileDialog
+                    profile={profile}
+                    profileId={profile._id.toString()}
+                    agent={agent}
+                  />
 
                   <Button
                     onClick={() => setConfirmDeleteId(profile._id.toString())}

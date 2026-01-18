@@ -23,7 +23,6 @@ import {
 } from "@/lib/actions/profile.actions";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { profileDefaultValues } from "@/constants";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { createNotification } from "@/lib/actions/notification.actions";
 import Select from "react-select";
@@ -61,7 +60,7 @@ export const profileFormSchema = z
     {
       message: "Country Agent must be selected for Sub Agents",
       path: ["countryAgent"],
-    }
+    },
   );
 
 type ProfileFormProps = {
@@ -71,6 +70,7 @@ type ProfileFormProps = {
   agent?: IProfile[];
   isAgent?: boolean;
   email?: string;
+  onSuccess?: () => void;
 };
 
 const ProfileForm = ({
@@ -80,13 +80,12 @@ const ProfileForm = ({
   agent,
   isAgent,
   email,
+  onSuccess,
 }: ProfileFormProps) => {
   const [logo, setLogo] = useState<File[]>([]);
   const [licenseDocument, setLicenseDocument] = useState<File[]>([]);
   const [agreementDocument, setAgreementDocument] = useState<File[]>([]);
   const [acceptedPrivacy, setAcceptedPrivacy] = useState(false);
-
-  const router = useRouter();
 
   const countryOptions = countries.map((country) => ({
     label: `${country.flag} ${country.name.common}`,
@@ -176,7 +175,7 @@ const ProfileForm = ({
           if (values.role === "Sub Agent" && values.countryAgent) {
             await addSubAgentByEmailToProfile(
               values.countryAgent,
-              values.email
+              values.email,
             );
           }
 
@@ -188,7 +187,7 @@ const ProfileForm = ({
           });
           form.reset();
           toast.success("Profile created! Your account is pending approval.");
-          router.push("/profile");
+          onSuccess?.();
         }
       } else if (type === "Update" && profileId) {
         const updatedProfile = await updateProfile(profileId, {
@@ -202,7 +201,7 @@ const ProfileForm = ({
           if (values.role === "Sub Agent" && values.countryAgent) {
             await addSubAgentByEmailToProfile(
               values.countryAgent,
-              values.email
+              values.email,
             );
           }
 
@@ -215,7 +214,7 @@ const ProfileForm = ({
 
           form.reset();
           toast.success("Profile updated successfully!");
-          router.push("/profile");
+          onSuccess?.();
         }
       }
     } catch (error) {
@@ -224,196 +223,99 @@ const ProfileForm = ({
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm space-y-4"
-      >
-        {/* ===== Basic Info ===== */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Basic Information</h2>
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+        space-y-4
+      "
+        >
+          {/* ===== Basic Info ===== */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Basic Information</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Full Name</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your full name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your email" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="number"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Phone Number</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your phone number" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <Select
-                      options={countryOptions}
-                      isSearchable
-                      value={countryOptions.find(
-                        (opt) => opt.value === field.value
-                      )}
-                      onChange={(selected) => field.onChange(selected?.value)}
-                      placeholder="Select a country"
-                      classNamePrefix="react-select"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="location"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Location</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter your city/location" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-
-        {/* ===== Role Selection ===== */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Agent Role</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {" "}
-            <FormField
-              control={form.control}
-              name="role"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Role</FormLabel>
-                  <FormControl>
-                    <select
-                      {...field}
-                      className="w-full p-2 border rounded dark:bg-gray-700"
-                    >
-                      <option value="">Select role</option>
-                      {!isAgent && <option value="Agent">Agent</option>}
-                      <option value="Sub Agent">Sub Agent</option>
-                      {!isAgent && <option value="Student">Student</option>}
-                    </select>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            {selectedRole === "Sub Agent" && (
-              <FormItem>
-                <FormLabel>Country Agent</FormLabel>
-                <FormControl>
-                  {isAgent ? (
-                    // Automatically set countryAgent to current user's email
-                    <input
-                      type="text"
-                      value={email || ""}
-                      readOnly
-                      className="w-full p-2 border rounded dark:bg-gray-200"
-                    />
-                  ) : (
-                    <Controller
-                      control={form.control}
-                      name="countryAgent"
-                      render={({ field }) => {
-                        const options = Array.isArray(agent)
-                          ? agent
-                              .filter((a) => a.country === selectedCountry)
-                              .map((a) => ({
-                                label: `${a.name} (${a.email})`,
-                                value: a.email,
-                              }))
-                          : [];
-
-                        return (
-                          <Select
-                            options={options}
-                            isSearchable
-                            value={
-                              options.find(
-                                (opt) => opt.value === field.value
-                              ) || null
-                            }
-                            onChange={(selected) =>
-                              field.onChange(selected?.value || "")
-                            }
-                            placeholder="Search and select agent"
-                            classNamePrefix="react-select"
-                          />
-                        );
-                      }}
-                    />
-                  )}
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          </div>
-        </div>
-
-        {/* ===== Bank Info ===== */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Bank Information</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {[
-              "bankName",
-              "accountNumber",
-              "swiftCode",
-              "routingNumber",
-              "branchAddress",
-            ].map((fieldName) => (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
-                key={fieldName}
                 control={form.control}
-                name={fieldName as keyof z.infer<typeof profileFormSchema>}
+                name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{formatLabel(fieldName)}</FormLabel>
+                    <FormLabel>Full Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your full name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your email" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="number"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Phone Number</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your phone number" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <FormControl>
+                      <Select
+                        options={countryOptions}
+                        isSearchable
+                        value={countryOptions.find(
+                          (opt) => opt.value === field.value,
+                        )}
+                        onChange={(selected) => field.onChange(selected?.value)}
+                        placeholder="Select a country"
+                        classNamePrefix="react-select"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="location"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Location</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder={`Enter ${formatLabel(fieldName)}`}
+                        placeholder="Enter your city/location"
                         {...field}
                       />
                     </FormControl>
@@ -421,99 +323,209 @@ const ProfileForm = ({
                   </FormItem>
                 )}
               />
-            ))}
+            </div>
           </div>
-        </div>
 
-        {/* ===== Documents ===== */}
-        <div className="space-y-4">
-          <h2 className="text-xl font-semibold">Upload Documents</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="logo"
-              render={({ field }) => (
+          {/* ===== Role Selection ===== */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Agent Role</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {" "}
+              <FormField
+                control={form.control}
+                name="role"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Role</FormLabel>
+                    <FormControl>
+                      <select
+                        {...field}
+                        className="w-full p-2 border rounded dark:bg-gray-700"
+                      >
+                        <option value="">Select role</option>
+                        {!isAgent && <option value="Agent">Agent</option>}
+                        <option value="Sub Agent">Sub Agent</option>
+                        {!isAgent && <option value="Student">Student</option>}
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              {selectedRole === "Sub Agent" && (
                 <FormItem>
-                  <FormLabel>Company Logo</FormLabel>
-                  <FormControl className="h-72">
-                    <FileUploader
-                      onFieldChange={field.onChange}
-                      fileUrl={field.value ?? ""}
-                      setFiles={setLogo}
-                    />
+                  <FormLabel>Country Agent</FormLabel>
+                  <FormControl>
+                    {isAgent ? (
+                      // Automatically set countryAgent to current user's email
+                      <input
+                        type="text"
+                        value={email || ""}
+                        readOnly
+                        className="w-full p-2 border rounded dark:bg-gray-200"
+                      />
+                    ) : (
+                      <Controller
+                        control={form.control}
+                        name="countryAgent"
+                        render={({ field }) => {
+                          const options = Array.isArray(agent)
+                            ? agent
+                                .filter((a) => a.country === selectedCountry)
+                                .map((a) => ({
+                                  label: `${a.name} (${a.email})`,
+                                  value: a.email,
+                                }))
+                            : [];
+
+                          return (
+                            <Select
+                              options={options}
+                              isSearchable
+                              value={
+                                options.find(
+                                  (opt) => opt.value === field.value,
+                                ) || null
+                              }
+                              onChange={(selected) =>
+                                field.onChange(selected?.value || "")
+                              }
+                              placeholder="Search and select agent"
+                              classNamePrefix="react-select"
+                            />
+                          );
+                        }}
+                      />
+                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
-            />
-
-            <FormField
-              control={form.control}
-              name="licenseDocument"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>License Document</FormLabel>
-                  <FormControl className="h-72">
-                    <FileUploader
-                      onFieldChange={field.onChange}
-                      fileUrl={field.value ?? ""}
-                      setFiles={setLicenseDocument}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="agreementDocument"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Agreement Document</FormLabel>
-                  <FormControl className="h-72">
-                    <FileUploader
-                      onFieldChange={field.onChange}
-                      fileUrl={field.value ?? ""}
-                      setFiles={setAgreementDocument}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            </div>
           </div>
-        </div>
 
-        <div className="flex items-center gap-2 mt-4">
-          <input
-            type="checkbox"
-            id="privacyPolicy"
-            checked={acceptedPrivacy}
-            onChange={(e) => setAcceptedPrivacy(e.target.checked)}
-            className="w-4 h-4"
-          />
-          <a href={"/privacy-policy"} className="text-sm cursor-pointer">
-            I have read and agree to the{" "}
-            <span className="text-blue-600 underline">Privacy Policy</span>
-          </a>
-        </div>
+          {/* ===== Bank Info ===== */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Bank Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                "bankName",
+                "accountNumber",
+                "swiftCode",
+                "routingNumber",
+                "branchAddress",
+              ].map((fieldName) => (
+                <FormField
+                  key={fieldName}
+                  control={form.control}
+                  name={fieldName as keyof z.infer<typeof profileFormSchema>}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>{formatLabel(fieldName)}</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder={`Enter ${formatLabel(fieldName)}`}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
+            </div>
+          </div>
 
-        {/* ===== Submit Button ===== */}
-        <Button
-          type="submit"
-          size="lg"
-          disabled={!acceptedPrivacy || form.formState.isSubmitting}
-          className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-        >
-          {form.formState.isSubmitting
-            ? "Submitting..."
-            : type === "Create"
-            ? "Create Profile"
-            : "Update Profile"}
-        </Button>
-      </form>
-    </Form>
+          {/* ===== Documents ===== */}
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold">Upload Documents</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="logo"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Company Logo</FormLabel>
+                    <FormControl className="h-72">
+                      <FileUploader
+                        onFieldChange={field.onChange}
+                        fileUrl={field.value ?? ""}
+                        setFiles={setLogo}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="licenseDocument"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>License Document</FormLabel>
+                    <FormControl className="h-72">
+                      <FileUploader
+                        onFieldChange={field.onChange}
+                        fileUrl={field.value ?? ""}
+                        setFiles={setLicenseDocument}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="agreementDocument"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Agreement Document</FormLabel>
+                    <FormControl className="h-72">
+                      <FileUploader
+                        onFieldChange={field.onChange}
+                        fileUrl={field.value ?? ""}
+                        setFiles={setAgreementDocument}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2 mt-4">
+            <input
+              type="checkbox"
+              id="privacyPolicy"
+              checked={acceptedPrivacy}
+              onChange={(e) => setAcceptedPrivacy(e.target.checked)}
+              className="w-4 h-4"
+            />
+            <a href={"/privacy-policy"} className="text-sm cursor-pointer">
+              I have read and agree to the{" "}
+              <span className="text-blue-600 underline">Privacy Policy</span>
+            </a>
+          </div>
+
+          {/* ===== Submit Button ===== */}
+          <Button
+            type="submit"
+            size="lg"
+            disabled={!acceptedPrivacy || form.formState.isSubmitting}
+            className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+          >
+            {form.formState.isSubmitting
+              ? "Submitting..."
+              : type === "Create"
+                ? "Create Profile"
+                : "Update Profile"}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 };
 

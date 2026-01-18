@@ -37,7 +37,7 @@ const Page = async () => {
       profiles = allProfiles;
     } else {
       profiles = allProfiles.filter((r: IProfile) =>
-        adminCountry.includes(r.country)
+        adminCountry.includes(r.country),
       );
     }
   } else {
@@ -49,8 +49,10 @@ const Page = async () => {
   const subAgents = await getSubAgentsByEmail(email);
   const countryAgent = await getProfileByEmail(myProfile?.countryAgent || "");
 
+  const isAgent = myProfile?.role === "Agent";
+
   const agent = (await getAllProfiles()).filter(
-    (p: IProfile) => p.role === "Agent" && p.status === "Approved"
+    (p: IProfile) => p.role === "Agent" && p.status === "Approved",
   );
 
   return (
@@ -61,7 +63,9 @@ const Page = async () => {
       countryAgent={countryAgent}
       agent={agent}
       subAgents={subAgents}
+      isAgent={isAgent}
       myLeads={myLeads}
+      email={email}
     />
   );
 };
