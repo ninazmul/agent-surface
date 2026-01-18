@@ -14,7 +14,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 import { createAdmin, updateAdmin } from "@/lib/actions/admin.actions";
 import { IAdmin } from "@/lib/database/models/admin.model";
 import countries from "world-countries";
@@ -66,11 +65,10 @@ type AdminFormProps = {
   type: "Create" | "Update";
   Admin?: IAdmin;
   AdminId?: string;
+  onSuccess?: () => void;
 };
 
-const AdminForm = ({ type, Admin, AdminId }: AdminFormProps) => {
-  const router = useRouter();
-
+const AdminForm = ({ type, Admin, AdminId, onSuccess }: AdminFormProps) => {
   const form = useForm<z.infer<typeof AdminFormSchema>>({
     resolver: zodResolver(AdminFormSchema),
     defaultValues: {
@@ -95,13 +93,13 @@ const AdminForm = ({ type, Admin, AdminId }: AdminFormProps) => {
         if (created) {
           form.reset();
           toast.success("Admin created Successfully!");
-          router.push("/admins");
+          onSuccess?.();
         }
       } else if (type === "Update" && AdminId) {
         const updated = await updateAdmin(AdminId, adminData);
         if (updated) {
           toast.success("Admin's profile updated Successfully!");
-          router.push("/admins");
+          onSuccess?.();
         }
       }
     } catch (error) {
@@ -110,170 +108,185 @@ const AdminForm = ({ type, Admin, AdminId }: AdminFormProps) => {
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm space-y-4"
-      >
-        {/* ===== Admin Info ===== */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Admin Information</h2>
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+        space-y-4
+      "
+        >
+          {/* ===== Admin Info ===== */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Admin Information</h2>
 
-          {/* Name */}
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Full Name</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter full name" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            {/* Name */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter full name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          {/* Email */}
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email Address</FormLabel>
-                <FormControl>
-                  <Input placeholder="Enter admin email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+            {/* Email */}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email Address</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter admin email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-        {/* ===== Access Control ===== */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-100">
-            Access Permissions
-          </h2>
+          {/* ===== Access Control ===== */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-100">
+              Access Permissions
+            </h2>
 
-          {/* Role Permissions */}
-          <FormField
-            control={form.control}
-            name="rolePermissions"
-            render={() => (
-              <FormItem>
-                <FormLabel>Role Permissions</FormLabel>
-                <FormControl>
-                  <Controller
-                    control={form.control}
-                    name="rolePermissions"
-                    render={({ field }) => {
-                      const selectAllOption: OptionType = {
-                        value: "*",
-                        label: "Select All",
-                      };
+            {/* Role Permissions */}
+            <FormField
+              control={form.control}
+              name="rolePermissions"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Role Permissions</FormLabel>
+                  <FormControl>
+                    <Controller
+                      control={form.control}
+                      name="rolePermissions"
+                      render={({ field }) => {
+                        const selectAllOption: OptionType = {
+                          value: "*",
+                          label: "Select All",
+                        };
 
-                      const handleChange = (
-                        selectedOptions: MultiValue<OptionType>
-                      ) => {
-                        if (!selectedOptions) return field.onChange([]);
+                        const handleChange = (
+                          selectedOptions: MultiValue<OptionType>,
+                        ) => {
+                          if (!selectedOptions) return field.onChange([]);
 
-                        const values = selectedOptions.map((opt) => opt.value);
-
-                        const allValues = rolePermissionOptions.map(
-                          (opt) => opt.value
-                        );
-
-                        if (values.includes("*")) {
-                          field.onChange(allValues);
-                        } else {
-                          field.onChange(values);
-                        }
-                      };
-
-                      const currentValues = field.value || [];
-                      const isAllSelected = rolePermissionOptions.every((opt) =>
-                        currentValues.includes(opt.value)
-                      );
-
-                      const value: OptionType[] = isAllSelected
-                        ? [selectAllOption, ...rolePermissionOptions].filter(
-                            (opt) => currentValues.includes(opt.value)
-                          )
-                        : rolePermissionOptions.filter((opt) =>
-                            currentValues.includes(opt.value)
+                          const values = selectedOptions.map(
+                            (opt) => opt.value,
                           );
 
-                      return (
+                          const allValues = rolePermissionOptions.map(
+                            (opt) => opt.value,
+                          );
+
+                          if (values.includes("*")) {
+                            field.onChange(allValues);
+                          } else {
+                            field.onChange(values);
+                          }
+                        };
+
+                        const currentValues = field.value || [];
+                        const isAllSelected = rolePermissionOptions.every(
+                          (opt) => currentValues.includes(opt.value),
+                        );
+
+                        const value: OptionType[] = isAllSelected
+                          ? [selectAllOption, ...rolePermissionOptions].filter(
+                              (opt) => currentValues.includes(opt.value),
+                            )
+                          : rolePermissionOptions.filter((opt) =>
+                              currentValues.includes(opt.value),
+                            );
+
+                        return (
+                          <Select
+                            isMulti
+                            options={[
+                              selectAllOption,
+                              ...rolePermissionOptions,
+                            ]}
+                            value={value}
+                            onChange={handleChange}
+                            placeholder="Select permissions..."
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                          />
+                        );
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Countries */}
+            <FormField
+              control={form.control}
+              name="countries"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Allowed Countries</FormLabel>
+                  <FormControl>
+                    <Controller
+                      control={form.control}
+                      name="countries"
+                      render={({ field }) => (
                         <Select
                           isMulti
-                          options={[selectAllOption, ...rolePermissionOptions]}
-                          value={value}
-                          onChange={handleChange}
-                          placeholder="Select permissions..."
+                          options={countryOptions}
+                          value={countryOptions.filter((opt) =>
+                            field.value?.includes(opt.value),
+                          )}
+                          onChange={(selected) =>
+                            field.onChange(selected.map((opt) => opt.value))
+                          }
+                          placeholder="Select countries..."
                           className="react-select-container"
                           classNamePrefix="react-select"
                         />
-                      );
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+                      )}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-          {/* Countries */}
-          <FormField
-            control={form.control}
-            name="countries"
-            render={() => (
-              <FormItem>
-                <FormLabel>Allowed Countries</FormLabel>
-                <FormControl>
-                  <Controller
-                    control={form.control}
-                    name="countries"
-                    render={({ field }) => (
-                      <Select
-                        isMulti
-                        options={countryOptions}
-                        value={countryOptions.filter((opt) =>
-                          field.value?.includes(opt.value)
-                        )}
-                        onChange={(selected) =>
-                          field.onChange(selected.map((opt) => opt.value))
-                        }
-                        placeholder="Select countries..."
-                        className="react-select-container"
-                        classNamePrefix="react-select"
-                      />
-                    )}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* ===== Submit Button ===== */}
-        <div className="pt-4">
-          <Button
-            type="submit"
-            size="lg"
-            disabled={form.formState.isSubmitting}
-            className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-          >
-            {form.formState.isSubmitting
-              ? "Submitting..."
-              : type === "Create"
-              ? "Create Admin"
-              : "Update Admin"}
-          </Button>
-        </div>
-      </form>
-    </Form>
+          {/* ===== Submit Button ===== */}
+          <div className="pt-4">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={form.formState.isSubmitting}
+              className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+            >
+              {form.formState.isSubmitting
+                ? "Submitting..."
+                : type === "Create"
+                  ? "Create Admin"
+                  : "Update Admin"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 };
 

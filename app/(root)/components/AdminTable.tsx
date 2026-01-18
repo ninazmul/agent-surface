@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, SortAsc, SortDesc, Pencil } from "lucide-react";
+import { Trash, SortAsc, SortDesc } from "lucide-react";
 import { IAdmin } from "@/lib/database/models/admin.model";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -21,6 +21,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import UpdateAdminDialog from "@/components/shared/UpdateAdminDialog";
 
 const AdminTable = ({
   admins,
@@ -42,8 +43,8 @@ const AdminTable = ({
   const filteredAdmins = useMemo(() => {
     const filtered = admins.filter((admin) =>
       [admin.name, admin.email || ""].some((value) =>
-        value.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+        value.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
     );
 
     if (sortKey) {
@@ -181,7 +182,7 @@ const AdminTable = ({
                         {admin.rolePermissions?.map(
                           (perm: string, i: number) => (
                             <li key={i}>{perm}</li>
-                          )
+                          ),
                         )}
                       </ul>
                     </PopoverContent>
@@ -211,11 +212,10 @@ const AdminTable = ({
                     </span>
                   ) : (
                     <>
-                      <a href={`/admins/${admin._id.toString()}/update`}>
-                        <Button variant="ghost" size="icon">
-                          <Pencil className="w-4 h-4 text-black" />
-                        </Button>
-                      </a>
+                      <UpdateAdminDialog
+                        admin={admin}
+                        adminId={admin._id.toString()}
+                      />
 
                       <Button
                         onClick={() => setConfirmDeleteId(admin._id.toString())}
