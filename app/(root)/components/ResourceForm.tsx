@@ -40,7 +40,12 @@ type ResourceFormProps = {
   onSuccess?: () => void;
 };
 
-const ResourceForm = ({ type, resource, resourceId, onSuccess }: ResourceFormProps) => {
+const ResourceForm = ({
+  type,
+  resource,
+  resourceId,
+  onSuccess,
+}: ResourceFormProps) => {
   const [link, setLink] = useState<File[]>([]);
 
   const initialValues =
@@ -101,30 +106,92 @@ const ResourceForm = ({ type, resource, resourceId, onSuccess }: ResourceFormPro
   }
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="flex flex-col gap-6 rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm"
-      >
-        {/* Section: Resource Info */}
-        <div className="space-y-2">
-          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 text-center">
-            Add New Resource
-          </h2>
-        </div>
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+        space-y-4
+      "
+        >
+          {/* Section: Resource Info */}
+          <div className="space-y-2">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100 text-center">
+              Add New Resource
+            </h2>
+          </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* File Name */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* File Name */}
+            <FormField
+              control={form.control}
+              name="fileName"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>File Name</FormLabel>
+                  <FormControl>
+                    <Input
+                      placeholder="Enter file name"
+                      {...field}
+                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="category"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Select Category</FormLabel>
+                  <FormControl>
+                    <select
+                      {...field}
+                      className="w-full rounded-md border border-input bg-background dark:bg-gray-700 px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      onChange={(e) => {
+                        const selected = e.target.value;
+                        field.onChange(selected);
+                        if (selected) form.setValue("customCategory", "");
+                      }}
+                    >
+                      <option value="">Select a category</option>
+                      <option value="Marketing Materials">
+                        Marketing Materials
+                      </option>
+                      <option value="Guidelines & Admission Requirements">
+                        Guidelines & Admission Requirements
+                      </option>
+                    </select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <FormField
             control={form.control}
-            name="fileName"
+            name="customCategory"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>File Name</FormLabel>
+                <FormLabel>Or Add New Category</FormLabel>
                 <FormControl>
                   <Input
-                    placeholder="Enter file name"
+                    placeholder="Enter custom category"
                     {...field}
+                    onChange={(e) => {
+                      field.onChange(e.target.value);
+                      if (e.target.value) form.setValue("category", "");
+                    }}
                     className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
                   />
                 </FormControl>
@@ -133,95 +200,43 @@ const ResourceForm = ({ type, resource, resourceId, onSuccess }: ResourceFormPro
             )}
           />
 
+          {/* File Upload */}
           <FormField
             control={form.control}
-            name="category"
+            name="link"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Select Category</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    className="w-full rounded-md border border-input bg-background dark:bg-gray-700 px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                    onChange={(e) => {
-                      const selected = e.target.value;
-                      field.onChange(selected);
-                      if (selected) form.setValue("customCategory", "");
-                    }}
-                  >
-                    <option value="">Select a category</option>
-                    <option value="Marketing Materials">
-                      Marketing Materials
-                    </option>
-                    <option value="Guidelines & Admission Requirements">
-                      Guidelines & Admission Requirements
-                    </option>
-                  </select>
+                <FormLabel>Upload Resource File</FormLabel>
+                <FormControl className="h-72">
+                  <FileUploader
+                    onFieldChange={field.onChange}
+                    fileUrl={field.value || ""}
+                    setFiles={setLink}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-        </div>
 
-        <FormField
-          control={form.control}
-          name="customCategory"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Or Add New Category</FormLabel>
-              <FormControl>
-                <Input
-                  placeholder="Enter custom category"
-                  {...field}
-                  onChange={(e) => {
-                    field.onChange(e.target.value);
-                    if (e.target.value) form.setValue("category", "");
-                  }}
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* File Upload */}
-        <FormField
-          control={form.control}
-          name="link"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Upload Resource File</FormLabel>
-              <FormControl className="h-72">
-                <FileUploader
-                  onFieldChange={field.onChange}
-                  fileUrl={field.value || ""}
-                  setFiles={setLink}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Submit Button */}
-        <div className="pt-4">
-          <Button
-            type="submit"
-            size="lg"
-            disabled={form.formState.isSubmitting}
-            className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-          >
-            {form.formState.isSubmitting
-              ? "Uploading..."
-              : type === "Create"
-              ? "Upload Resource"
-              : "Update Resource"}
-          </Button>
-        </div>
-      </form>
-    </Form>
+          {/* Submit Button */}
+          <div className="pt-4">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={form.formState.isSubmitting}
+              className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+            >
+              {form.formState.isSubmitting
+                ? "Uploading..."
+                : type === "Create"
+                  ? "Upload Resource"
+                  : "Update Resource"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
   );
 };
 

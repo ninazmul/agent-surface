@@ -113,219 +113,232 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm space-y-4"
-      >
-        <h2 className="text-xl font-semibold">Course Details</h2>
-
-        {/* Course Name */}
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Course Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter course name" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Campuses */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Campuses</h3>
-          {fields.map((field, index) => (
-            <div
-              key={field.id}
-              className="space-y-4 border p-4 rounded-md bg-orange-50 dark:bg-gray-800"
-            >
-              <FormField
-                control={form.control}
-                name={`campuses.${index}.campus`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Campus Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter campus name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name={`campuses.${index}.shifts.morning`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Morning Shift Seats</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Morning shift"
-                          value={field.value ?? ""}
-                          onChange={(e) =>
-                            field.onChange(parseInt(e.target.value || "0"))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name={`campuses.${index}.shifts.afternoon`}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Afternoon Shift Seats</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Afternoon shift"
-                          value={field.value ?? ""}
-                          onChange={(e) =>
-                            field.onChange(parseInt(e.target.value || "0"))
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              {fields.length > 1 && (
-                <Button
-                  type="button"
-                  variant="destructive"
-                  onClick={() => remove(index)}
-                >
-                  Remove Campus
-                </Button>
-              )}
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() =>
-              append({ campus: "", shifts: { morning: 1, afternoon: 1 } })
-            }
-          >
-            + Add Campus
-          </Button>
-        </div>
-
-        {/* Course Duration */}
-        <FormField
-          control={form.control}
-          name="courseDuration"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Course Duration</FormLabel>
-              <FormControl>
-                <Input placeholder="e.g., 6 weeks" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Course Type */}
-        <FormField
-          control={form.control}
-          name="courseType"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Course Type</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select course type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="Full Time">Full Time</SelectItem>
-                  <SelectItem value="Part Time">Part Time</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Course Fee */}
-        <FormField
-          control={form.control}
-          name="courseFee"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Course Fee</FormLabel>
-              <FormControl>
-                <Input placeholder="Enter course fee" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Start Date */}
-        <FormField
-          control={form.control}
-          name="startDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Start Date</FormLabel>
-              <FormControl>
-                <Input
-                  type="date"
-                  value={field.value?.toISOString().split("T")[0]}
-                  onChange={(e) => field.onChange(new Date(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* End Date */}
-        <FormField
-          control={form.control}
-          name="endDate"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>End Date</FormLabel>
-              <FormControl>
-                <Input
-                  type="date"
-                  value={field.value?.toISOString().split("T")[0]}
-                  onChange={(e) => field.onChange(new Date(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          size="lg"
-          disabled={form.formState.isSubmitting}
-          className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+        space-y-4
+      "
         >
-          {form.formState.isSubmitting
-            ? "Submitting..."
-            : type === "Create"
-              ? "Create Course"
-              : "Update Course"}
-        </Button>
-      </form>
-    </Form>
+          <h2 className="text-xl font-semibold">Course Details</h2>
+
+          {/* Course Name */}
+          <FormField
+            control={form.control}
+            name="name"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Course Name</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter course name" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Campuses */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Campuses</h3>
+            {fields.map((field, index) => (
+              <div
+                key={field.id}
+                className="space-y-4 border p-4 rounded-md bg-orange-50 dark:bg-gray-800"
+              >
+                <FormField
+                  control={form.control}
+                  name={`campuses.${index}.campus`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Campus Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter campus name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="grid grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name={`campuses.${index}.shifts.morning`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Morning Shift Seats</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Morning shift"
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value || "0"))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name={`campuses.${index}.shifts.afternoon`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Afternoon Shift Seats</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            placeholder="Afternoon shift"
+                            value={field.value ?? ""}
+                            onChange={(e) =>
+                              field.onChange(parseInt(e.target.value || "0"))
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                {fields.length > 1 && (
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    onClick={() => remove(index)}
+                  >
+                    Remove Campus
+                  </Button>
+                )}
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="secondary"
+              onClick={() =>
+                append({ campus: "", shifts: { morning: 1, afternoon: 1 } })
+              }
+            >
+              + Add Campus
+            </Button>
+          </div>
+
+          {/* Course Duration */}
+          <FormField
+            control={form.control}
+            name="courseDuration"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Course Duration</FormLabel>
+                <FormControl>
+                  <Input placeholder="e.g., 6 weeks" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Course Type */}
+          <FormField
+            control={form.control}
+            name="courseType"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Course Type</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select course type" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Full Time">Full Time</SelectItem>
+                    <SelectItem value="Part Time">Part Time</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Course Fee */}
+          <FormField
+            control={form.control}
+            name="courseFee"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Course Fee</FormLabel>
+                <FormControl>
+                  <Input placeholder="Enter course fee" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Start Date */}
+          <FormField
+            control={form.control}
+            name="startDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Start Date</FormLabel>
+                <FormControl>
+                  <Input
+                    type="date"
+                    value={field.value?.toISOString().split("T")[0]}
+                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* End Date */}
+          <FormField
+            control={form.control}
+            name="endDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>End Date</FormLabel>
+                <FormControl>
+                  <Input
+                    type="date"
+                    value={field.value?.toISOString().split("T")[0]}
+                    onChange={(e) => field.onChange(new Date(e.target.value))}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            size="lg"
+            disabled={form.formState.isSubmitting}
+            className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+          >
+            {form.formState.isSubmitting
+              ? "Submitting..."
+              : type === "Create"
+                ? "Create Course"
+                : "Update Course"}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 };
 
