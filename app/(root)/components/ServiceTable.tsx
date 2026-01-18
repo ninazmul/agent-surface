@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, SortAsc, SortDesc, StickyNote, Pencil } from "lucide-react";
+import { Trash, SortAsc, SortDesc, StickyNote } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { IServices } from "@/lib/database/models/service.model";
@@ -21,6 +21,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import UpdateServiceDialog from "@/components/shared/UpdateServiceDialog";
 
 const ServiceTable = ({ services }: { services: Array<IServices> }) => {
   const router = useRouter();
@@ -34,8 +35,8 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
   const filteredServices = useMemo(() => {
     const filtered = services.filter((service) =>
       [service.title, service.description].some((value) =>
-        value.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+        value.toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
     );
 
     if (sortKey) {
@@ -190,11 +191,10 @@ const ServiceTable = ({ services }: { services: Array<IServices> }) => {
                 </TableCell>
                 <TableCell>{`€${service.amount}` || "N/A"}</TableCell>
                 <TableCell className="w-max flex items-center space-x-2">
-                  <a href={`/services/${service._id.toString()}/update`}>
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="w-4 h-4 text-black" />
-                    </Button>
-                  </a>
+                  <UpdateServiceDialog
+                    service={service}
+                    serviceId={service._id.toString()}
+                  />
                   <Button
                     onClick={() => setConfirmDeleteId(service._id.toString())}
                     variant={"ghost"}

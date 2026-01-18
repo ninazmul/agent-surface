@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { getAllServices } from "@/lib/actions/service.actions";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
@@ -9,7 +8,7 @@ import {
 import { redirect } from "next/navigation";
 import ServiceTable from "../components/ServiceTable";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import { Plus } from "lucide-react";
+import AddServiceDialog from "@/components/shared/AddServiceDialog";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -24,7 +23,7 @@ const Page = async () => {
     if (!rolePermissions.includes("services")) {
       redirect("/");
     }
-  } 
+  }
   // ====== NON-ADMIN PATH (profile required)
   else {
     // Profile must be Approved
@@ -49,14 +48,7 @@ const Page = async () => {
 
           {adminStatus && (
             <div className="w-full sm:w-auto">
-              <a href="/services/create" className="w-full sm:w-auto">
-                <Button
-                  size="sm"
-                  className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-                >
-                  <Plus size={16} /> Add Service
-                </Button>
-              </a>
+              <AddServiceDialog />
             </div>
           )}
         </div>
