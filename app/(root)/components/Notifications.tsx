@@ -155,7 +155,7 @@ export default function NotificationsDropdown() {
     };
 
     fetchNotifications();
-    const interval = (fetchNotifications, 5000);
+    const interval = setInterval(fetchNotifications, 5000);
 
     return () => {
       mounted = false;
