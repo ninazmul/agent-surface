@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { getUnreadSummary } from "@/lib/actions/message.actions";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
 
-const POLL_INTERVAL = 5000; // 5s is a safer default
+const POLL_INTERVAL = 30000; // 30s for lower CPU usage
 
 export default function MessageCount() {
   const { user, isLoaded } = useUser();
@@ -16,31 +16,33 @@ export default function MessageCount() {
   const emailRef = useRef<string | null>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Resolve user email ONCE
+  // Resolve user email once
   const resolveUserEmail = useCallback(async () => {
     if (!user?.id || emailRef.current) return;
-
-    const userId = await getUserByClerkId(user.id);
-    const email = await getUserEmailById(userId);
-    emailRef.current = email;
+    try {
+      const userId = await getUserByClerkId(user.id);
+      const email = await getUserEmailById(userId);
+      emailRef.current = email;
+    } catch (err) {
+      console.error("Failed to resolve user email", err);
+    }
   }, [user?.id]);
 
-  // Fetch unread count ONLY
+  // Fetch unread count and only update if changed
   const fetchUnreadCount = useCallback(async () => {
     if (!emailRef.current) return;
-
     try {
       const data = await getUnreadSummary(emailRef.current);
-      setUnreadCount(data?.totalUnread ?? 0);
+      const totalUnread = data?.totalUnread ?? 0;
+      setUnreadCount((prev) => (prev !== totalUnread ? totalUnread : prev));
     } catch (err) {
       console.error("Unread count fetch failed", err);
     }
   }, []);
 
-  // Start polling with visibility awareness
+  // Start polling with tab visibility awareness
   useEffect(() => {
     if (!isLoaded || !user) return;
-
     let isActive = true;
 
     const startPolling = async () => {
@@ -58,9 +60,7 @@ export default function MessageCount() {
 
     return () => {
       isActive = false;
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+      if (intervalRef.current) clearInterval(intervalRef.current);
     };
   }, [isLoaded, user, resolveUserEmail, fetchUnreadCount]);
 
