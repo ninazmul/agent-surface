@@ -26,7 +26,7 @@ interface MessageTableProps {
   role: Role;
 }
 
-const POLL_INTERVAL = 5000; // milliseconds
+const POLL_INTERVAL = 5000;
 
 const MessageTable = ({ email, role }: MessageTableProps) => {
   const [threads, setThreads] = useState<IMessage[]>([]);
@@ -37,7 +37,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
   const [sending, setSending] = useState(false);
 
   const [allUsers, setAllUsers] = useState<{ email: string; name?: string }[]>(
-    []
+    [],
   );
   const [agencyProfiles, setAgencyProfiles] = useState<
     Record<string, { name?: string; logo?: string }>
@@ -47,23 +47,25 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
   >([]);
 
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const isAdminUser = role === "Admin";
 
-  // ====== FETCH USERS ======
+  // ====== FETCH ALL USERS ======
   const fetchAllUsers = useCallback(async () => {
     try {
       const profiles = await getAllProfiles();
       setAllUsers(profiles || []);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to fetch users:", err);
     }
   }, []);
 
   // ====== FETCH THREADS ======
   const fetchThreads = useCallback(async () => {
+    if (!email) return;
+
     try {
       const fetchedThreads = await getMessagesForUser(email, role);
-
       setThreads(fetchedThreads);
 
       // Preload profiles
@@ -71,10 +73,10 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
       await Promise.all(
         fetchedThreads.map(async (t) => {
           if (!map[t.userEmail]) {
-            const p = await getProfileByEmail(t.userEmail);
-            map[t.userEmail] = p || {};
+            const profile = await getProfileByEmail(t.userEmail);
+            map[t.userEmail] = profile || {};
           }
-        })
+        }),
       );
       setAgencyProfiles(map);
     } catch (err) {
@@ -95,7 +97,6 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
         senderRole: isAdminUser ? "Admin" : role,
         text: newMessageText,
       });
-
       setNewMessageText("");
       fetchThreads();
       toast.success("Message sent");
@@ -115,7 +116,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     fetchThreads,
   ]);
 
-  // ====== AVAILABLE USERS FOR NEW MESSAGE ======
+  // ====== AVAILABLE USERS ======
   const getAvailableUsers = useCallback(async () => {
     if (isAdminUser) return allUsers;
 
@@ -126,12 +127,13 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
       const subAgents = await getSubAgentsByEmail(email);
       const adminEmails = (
         await Promise.all(
-          allUsers.map(async (u) => ((await isAdmin(u.email)) ? u.email : null))
+          allUsers.map(async (u) =>
+            (await isAdmin(u.email)) ? u.email : null,
+          ),
         )
       ).filter(Boolean) as string[];
-
       return allUsers.filter(
-        (u) => subAgents.includes(u.email) || adminEmails.includes(u.email)
+        (u) => subAgents.includes(u.email) || adminEmails.includes(u.email),
       );
     }
 
@@ -143,7 +145,9 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     if (userRole === "Student") {
       const adminEmails = (
         await Promise.all(
-          allUsers.map(async (u) => ((await isAdmin(u.email)) ? u.email : null))
+          allUsers.map(async (u) =>
+            (await isAdmin(u.email)) ? u.email : null,
+          ),
         )
       ).filter(Boolean) as string[];
       return allUsers.filter((u) => adminEmails.includes(u.email));
@@ -152,6 +156,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     return [];
   }, [allUsers, email, isAdminUser]);
 
+  // ====== UPDATE AVAILABLE USERS WHEN ALL USERS CHANGE ======
   useEffect(() => {
     const fetchAvailable = async () => {
       const users = await getAvailableUsers();
@@ -172,8 +177,18 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     fetchAllUsers();
     fetchThreads();
 
-    const interval = setInterval(fetchThreads, POLL_INTERVAL);
-    return () => clearInterval(interval);
+    // Only poll when tab is visible
+    const poll = () => {
+      if (document.visibilityState === "visible") fetchThreads();
+    };
+
+    intervalRef.current = setInterval(poll, POLL_INTERVAL);
+    document.addEventListener("visibilitychange", poll);
+
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      document.removeEventListener("visibilitychange", poll);
+    };
   }, [fetchAllUsers, fetchThreads]);
 
   // ====== RENDER ======
@@ -193,7 +208,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
             <TableBody>
               {threads
                 .filter((t) =>
-                  t.userEmail.toLowerCase().includes(searchQuery.toLowerCase())
+                  t.userEmail.toLowerCase().includes(searchQuery.toLowerCase()),
                 )
                 .map((thread) => {
                   const lastMsg =
@@ -299,8 +314,8 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
                           isAdminMsg
                             ? "bg-purple-600 text-white rounded-br-none"
                             : isOwnMsg
-                            ? "bg-gray-600 text-white rounded-br-none"
-                            : "bg-gray-200 text-black rounded-bl-none"
+                              ? "bg-gray-600 text-white rounded-br-none"
+                              : "bg-gray-200 text-black rounded-bl-none"
                         }`}
                       >
                         {msg.text}

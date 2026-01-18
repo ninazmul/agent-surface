@@ -21,7 +21,7 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { ILead } from "@/lib/database/models/lead.model";
 import PromotionLeadsStats from "./PromotionLeadsStats";
 import UpdatePromotionDialog from "@/components/shared/UpdatePromotionDialog";
@@ -39,6 +39,8 @@ type Props = {
   isAdmin?: boolean;
 };
 
+const COLORS = ["#8b5cf6", "#ec4899", "#10b981"];
+
 const PromotionCard = ({
   email,
   agency,
@@ -48,21 +50,20 @@ const PromotionCard = ({
   isAdmin,
 }: Props) => {
   const isPaused = promotion.isPaused;
-
   const [leads, setLeads] = useState<ILead[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const calculateTimeLeft = (endDate: Date) => {
+  // Time left state
+  const calculateTimeLeft = useCallback((endDate: Date) => {
     const diff = endDate.getTime() - Date.now();
     if (diff <= 0) return null;
-
     return {
       days: Math.floor(diff / (1000 * 60 * 60 * 24)),
       hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
       minutes: Math.floor((diff / (1000 * 60)) % 60),
       seconds: Math.floor((diff / 1000) % 60),
     };
-  };
+  }, []);
 
   const [timeLeft, setTimeLeft] = useState<{
     days: number;
@@ -71,15 +72,46 @@ const PromotionCard = ({
     seconds: number;
   } | null>(() => calculateTimeLeft(new Date(promotion.endDate)));
 
+  // Interval ref for cleanup
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Countdown timer (visibility-aware)
   useEffect(() => {
-    const interval = setInterval(() => {
+    const updateTimer = () => {
       setTimeLeft(calculateTimeLeft(new Date(promotion.endDate)));
+    };
+
+    // Only update when tab is visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") updateTimer();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    updateTimer();
+
+    intervalRef.current = setInterval(() => {
+      if (document.visibilityState === "visible") updateTimer();
     }, 1000);
 
-    return () => clearInterval(interval);
-  }, [promotion.endDate]);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [promotion.endDate, calculateTimeLeft]);
 
-  const COLORS = ["#8b5cf6", "#ec4899", "#10b981"];
+  // Fetch leads (used when dialog opens)
+  const fetchLeads = useCallback(async () => {
+    if (!promotion.sku) return;
+    try {
+      setLoading(true);
+      const res = await getLeadsByPromotion(promotion.sku);
+      if (Array.isArray(res)) setLeads(res);
+    } catch (err) {
+      console.error("Failed to fetch leads:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [promotion.sku]);
 
   // Derived stats
   const stats = [
@@ -93,14 +125,6 @@ const PromotionCard = ({
       value: leads.filter((l) => l.status === "Pending").length,
     },
   ];
-
-  const fetchLeads = async () => {
-    if (!promotion.sku) return;
-    setLoading(true);
-    const res = await getLeadsByPromotion(promotion.sku);
-    setLeads(res);
-    setLoading(false);
-  };
 
   return (
     <div className="relative">

@@ -1,49 +1,82 @@
 "use client";
 
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useUser } from "@clerk/nextjs";
+import { MessageCircle } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { getUnreadSummary } from "@/lib/actions/message.actions";
 import { getUserByClerkId, getUserEmailById } from "@/lib/actions/user.actions";
-import { useUser } from "@clerk/nextjs";
-import { MessageCircle } from "lucide-react";
-import React, { useEffect, useState } from "react";
+
+const POLL_INTERVAL = 5000; // 5s is a safer default
 
 export default function MessageCount() {
-  const { user } = useUser();
-  const userId = user?.id || "";
+  const { user, isLoaded } = useUser();
   const [unreadCount, setUnreadCount] = useState(0);
+  const emailRef = useRef<string | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchUnreadCount = React.useCallback(async () => {
+  // Resolve user email ONCE
+  const resolveUserEmail = useCallback(async () => {
+    if (!user?.id || emailRef.current) return;
+
+    const userId = await getUserByClerkId(user.id);
+    const email = await getUserEmailById(userId);
+    emailRef.current = email;
+  }, [user?.id]);
+
+  // Fetch unread count ONLY
+  const fetchUnreadCount = useCallback(async () => {
+    if (!emailRef.current) return;
+
     try {
-      const userID = await getUserByClerkId(userId);
-      const email = await getUserEmailById(userID);
-      const data = await getUnreadSummary(email);
+      const data = await getUnreadSummary(emailRef.current);
       setUnreadCount(data?.totalUnread ?? 0);
-    } catch (error) {
-      console.error("Error fetching unreadCount", error);
+    } catch (err) {
+      console.error("Unread count fetch failed", err);
     }
-  }, [userId]);
+  }, []);
 
+  // Start polling with visibility awareness
   useEffect(() => {
-    fetchUnreadCount();
-    const interval = setInterval(fetchUnreadCount, 3000);
-    return () => clearInterval(interval);
-  }, [fetchUnreadCount]);
+    if (!isLoaded || !user) return;
+
+    let isActive = true;
+
+    const startPolling = async () => {
+      await resolveUserEmail();
+      await fetchUnreadCount();
+
+      intervalRef.current = setInterval(() => {
+        if (document.visibilityState === "visible" && isActive) {
+          fetchUnreadCount();
+        }
+      }, POLL_INTERVAL);
+    };
+
+    startPolling();
+
+    return () => {
+      isActive = false;
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [isLoaded, user, resolveUserEmail, fetchUnreadCount]);
 
   return (
-    <div>
-      <a href="/messages" className="relative inline-block">
-        <Button
-          size="icon"
-          variant="ghost"
-          className="w-9 h-9 text-gray-500 dark:text-gray-100 rounded-full"
-        >
-          <MessageCircle className="w-5 h-5 text-gray-500 dark:text-gray-100" />
-        </Button>
+    <a href="/messages" className="relative inline-block">
+      <Button
+        size="icon"
+        variant="ghost"
+        className="w-9 h-9 rounded-full text-gray-500 dark:text-gray-100"
+      >
+        <MessageCircle className="w-5 h-5" />
+      </Button>
 
-        {unreadCount > 0 && (
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-600 rounded-full border border-white"></span>
-        )}
-      </a>
-    </div>
+      {unreadCount > 0 && (
+        <span className="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-600 border border-white" />
+      )}
+    </a>
   );
 }

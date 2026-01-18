@@ -51,7 +51,7 @@ export default function NotificationsDropdown() {
   const dropdownRef = useRef<HTMLDivElement | null>(null);
   const previousUnreadCount = useRef<number>(0);
   const notificationSound = useRef<HTMLAudioElement>(
-    new Audio("/notification.mp3")
+    new Audio("/notification.mp3"),
   );
 
   /* ======================= EFFECTS ======================= */
@@ -109,7 +109,9 @@ export default function NotificationsDropdown() {
 
         const unread = data.filter(
           (n) =>
-            !n.readBy?.some((r) => r.email === userEmail && r.status === "read")
+            !n.readBy?.some(
+              (r) => r.email === userEmail && r.status === "read",
+            ),
         );
 
         if (!muted && unread.length > previousUnreadCount.current) {
@@ -142,7 +144,7 @@ export default function NotificationsDropdown() {
             {
               position: "top-right",
               duration: 3000,
-            }
+            },
           );
 
           setFirstLoad(false);
@@ -153,7 +155,7 @@ export default function NotificationsDropdown() {
     };
 
     fetchNotifications();
-    const interval = setInterval(fetchNotifications, 5000);
+    const interval = (fetchNotifications, 5000);
 
     return () => {
       mounted = false;
@@ -170,11 +172,11 @@ export default function NotificationsDropdown() {
 
     try {
       const unread = notifications.filter(
-        (n) => !n.readBy?.some((r) => r.email === email && r.status === "read")
+        (n) => !n.readBy?.some((r) => r.email === email && r.status === "read"),
       );
 
       await Promise.all(
-        unread.map((n) => toggleReadStatusForUser(n._id, email, "Unread"))
+        unread.map((n) => toggleReadStatusForUser(n._id, email, "Unread")),
       );
 
       toast.success("All notifications marked as read");
@@ -184,7 +186,7 @@ export default function NotificationsDropdown() {
         prev.map((n) => ({
           ...n,
           readBy: [...(n.readBy ?? []), { email, status: "read" }],
-        }))
+        })),
       );
 
       setUnreadCount(0);
