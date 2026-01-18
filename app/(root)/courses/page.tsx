@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { getAllCourses } from "@/lib/actions/course.actions";
 import CourseTable from "../components/CourseTable";
 import { auth } from "@clerk/nextjs/server";
@@ -9,7 +8,7 @@ import {
 } from "@/lib/actions/admin.actions";
 import { redirect } from "next/navigation";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import { Plus } from "lucide-react";
+import AddCourseDialog from "@/components/shared/AddCourseDialog";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -24,7 +23,7 @@ const Page = async () => {
     if (!rolePermissions.includes("courses")) {
       redirect("/");
     }
-  } 
+  }
   // ====== NON-ADMIN PATH (profile required)
   else {
     // Profile must be Approved
@@ -47,14 +46,7 @@ const Page = async () => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <h3 className="h3-bold text-center sm:text-left">All Courses</h3>
 
-          <a href={`/courses/create`} className="w-full sm:w-auto">
-            <Button
-              size="sm"
-              className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-            >
-              <Plus size={16} /> Add Course
-            </Button>
-          </a>
+          <AddCourseDialog />
         </div>
 
         {/* Table */}

@@ -3,7 +3,6 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray } from "react-hook-form";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -46,7 +45,7 @@ const CourseFormSchema = z.object({
             })
             .min(1, "At least 1 afternoon seat"),
         }),
-      })
+      }),
     )
     .min(1, "At least one campus is required"),
   courseDuration: z.string().min(1, "Course duration is required"),
@@ -63,12 +62,11 @@ type CourseFormProps = {
   type: "Create" | "Update";
   Course?: ICourse;
   CourseId?: string;
+  onSuccess?: () => void;
 };
 
 // ========= COMPONENT =========
-const CourseForm = ({ type, Course, CourseId }: CourseFormProps) => {
-  const router = useRouter();
-
+const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
   const form = useForm<z.infer<typeof CourseFormSchema>>({
     resolver: zodResolver(CourseFormSchema),
     defaultValues: {
@@ -100,13 +98,13 @@ const CourseForm = ({ type, Course, CourseId }: CourseFormProps) => {
         if (created) {
           form.reset();
           toast.success("Course added successfully!");
-          router.push("/courses");
+          onSuccess?.();
         }
       } else if (type === "Update" && CourseId) {
         const updated = await updateCourse(CourseId, values);
         if (updated) {
           toast.success("Course updated successfully!");
-          router.push("/courses");
+          onSuccess?.();
         }
       }
     } catch (error) {
@@ -323,8 +321,8 @@ const CourseForm = ({ type, Course, CourseId }: CourseFormProps) => {
           {form.formState.isSubmitting
             ? "Submitting..."
             : type === "Create"
-            ? "Create Course"
-            : "Update Course"}
+              ? "Create Course"
+              : "Update Course"}
         </Button>
       </form>
     </Form>

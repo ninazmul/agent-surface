@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, SortAsc, SortDesc, Pencil, Info } from "lucide-react";
+import { Trash, SortAsc, SortDesc, Info } from "lucide-react";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import {
@@ -21,6 +21,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import UpdateCourseDialog from "@/components/shared/UpdateCourseDialog";
 
 const CourseTable = ({ courses }: { courses: ICourse[] }) => {
   const router = useRouter();
@@ -33,7 +34,7 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
 
   const filteredCourses = useMemo(() => {
     const filtered = courses.filter((course) =>
-      course.name.toLowerCase().includes(searchQuery.toLowerCase())
+      course.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
     if (sortKey) {
@@ -51,8 +52,8 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
             ? -1
             : 1
           : valA > valB
-          ? -1
-          : 1;
+            ? -1
+            : 1;
       });
     }
 
@@ -172,8 +173,8 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
                   {course.courseType === "Full Time"
                     ? "Full Time"
                     : course.courseType === "Part Time"
-                    ? "Part Time"
-                    : "-"}
+                      ? "Part Time"
+                      : "-"}
                 </TableCell>
                 <TableCell>{course.courseDuration || "-"}</TableCell>
                 <TableCell>{course.courseFee || 0}</TableCell>
@@ -211,12 +212,10 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
                 </TableCell>
 
                 <TableCell className="w-max space-x-2">
-                  {/* Edit */}
-                  <a href={`/courses/${course._id.toString()}/update`}>
-                    <Button variant="ghost" size="icon">
-                      <Pencil className="w-4 h-4 text-black" />
-                    </Button>
-                  </a>
+                  <UpdateCourseDialog
+                    course={course}
+                    courseId={course._id.toString()}
+                  />
 
                   {/* Delete */}
                   <Button
