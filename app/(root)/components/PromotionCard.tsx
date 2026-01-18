@@ -327,30 +327,25 @@ const PromotionCard = ({
               Create Lead
             </h3>
 
-            <a
-              href={`/promotions/${promotion._id.toString()}/leads/create`}
-              className="w-full"
-            >
-              {isPaused ? (
-                <>
-                  <button
-                    disabled={isPaused}
-                    className="w-full px-5 py-2 rounded-lg font-medium shadow transition bg-gray-400 cursor-not-allowed text-gray-200"
-                  >
-                    Paused
-                  </button>
-                </>
-              ) : (
-                <>
-                  <AddPromotionLeadDialog
-                    email={email}
-                    agency={agency}
-                    promotion={promotion}
-                    isAdmin={isAdmin}
-                  />
-                </>
-              )}
-            </a>
+            {isPaused ? (
+              <>
+                <button
+                  disabled={isPaused}
+                  className="w-full px-5 py-2 rounded-lg font-medium shadow transition bg-gray-400 cursor-not-allowed text-gray-200"
+                >
+                  Paused
+                </button>
+              </>
+            ) : (
+              <>
+                <AddPromotionLeadDialog
+                  email={email}
+                  agency={agency}
+                  promotion={promotion}
+                  isAdmin={isAdmin}
+                />
+              </>
+            )}
           </div>
 
           {isAdmin && (
