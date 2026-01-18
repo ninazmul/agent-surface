@@ -317,7 +317,7 @@ const CommissionCalcTable = ({
                       </PopoverTrigger>
                       <PopoverContent align="end">
                         {lead.paymentStatus === "Accepted" ? (
-                          <Button asChild variant="ghost" className="w-full">
+                          <Button asChild variant="ghost" className="w-full justify-start">
                             <a href={`/finance/${lead._id}/receipt`}>
                               <FileText className="mr-2 h-4 w-4" />
                               Receipt
