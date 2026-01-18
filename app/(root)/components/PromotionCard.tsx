@@ -28,8 +28,10 @@ import UpdatePromotionDialog from "@/components/shared/UpdatePromotionDialog";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { ICourse } from "@/lib/database/models/course.model";
 import { IServices } from "@/lib/database/models/service.model";
+import AddPromotionLeadDialog from "@/components/shared/AddPromotionLeadDialog";
 
 type Props = {
+  email: string;
   agency: IProfile[];
   courses: ICourse[];
   services: IServices[];
@@ -38,6 +40,7 @@ type Props = {
 };
 
 const PromotionCard = ({
+  email,
   agency,
   courses,
   services,
@@ -328,16 +331,25 @@ const PromotionCard = ({
               href={`/promotions/${promotion._id.toString()}/leads/create`}
               className="w-full"
             >
-              <button
-                disabled={isPaused}
-                className={`w-full px-5 py-2 rounded-lg ${
-                  isPaused
-                    ? "bg-gray-400 cursor-not-allowed text-gray-200"
-                    : "bg-gradient-to-r from-fuchsia-600 via-pink-600 to-rose-600 hover:opacity-90 text-white"
-                } font-medium shadow transition`}
-              >
-                {isPaused ? "Paused" : "Get Started"}
-              </button>
+              {isPaused ? (
+                <>
+                  <button
+                    disabled={isPaused}
+                    className="w-full px-5 py-2 rounded-lg font-medium shadow transition bg-gray-400 cursor-not-allowed text-gray-200"
+                  >
+                    Paused
+                  </button>
+                </>
+              ) : (
+                <>
+                  <AddPromotionLeadDialog
+                    email={email}
+                    agency={agency}
+                    promotion={promotion}
+                    isAdmin={isAdmin}
+                  />
+                </>
+              )}
             </a>
           </div>
 

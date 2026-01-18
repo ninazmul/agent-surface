@@ -13,7 +13,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 import { createLead, updateLead } from "@/lib/actions/lead.actions";
 import { ILead } from "@/lib/database/models/lead.model";
 import { IProfile } from "@/lib/database/models/profile.model";
@@ -86,7 +85,7 @@ const PromotionLeadFormSchema = z.object({
           })
           .optional(),
         courseFee: z.string().optional(),
-      })
+      }),
     )
     .optional(),
   services: z
@@ -97,7 +96,7 @@ const PromotionLeadFormSchema = z.object({
         serviceType: z.string(),
         amount: z.string().optional(),
         description: z.string().optional(),
-      })
+      }),
     )
     .optional(),
   note: z.string().optional(),
@@ -114,7 +113,7 @@ const PromotionLeadFormSchema = z.object({
       z.object({
         fileName: z.string(),
         fileUrl: z.string(),
-      })
+      }),
     )
     .optional(),
   social: z
@@ -138,6 +137,7 @@ type PromotionLeadFormProps = {
   promotion?: IPromotion;
   isAdmin?: boolean;
   email: string;
+  onSuccess?: () => void;
 };
 
 const PromotionLeadForm = ({
@@ -148,8 +148,8 @@ const PromotionLeadForm = ({
   isAdmin,
   email,
   promotion,
+  onSuccess,
 }: PromotionLeadFormProps) => {
-  const router = useRouter();
 
   const { startUpload } = useUploadThing("mediaUploader");
 
@@ -220,7 +220,7 @@ const PromotionLeadForm = ({
         : undefined,
       course: Lead?.course?.length
         ? Lead.course
-        : promotion?.course?.map((c) => ({
+        : (promotion?.course?.map((c) => ({
             name: c.name,
             courseDuration: c.courseDuration,
             courseType: c.courseType,
@@ -228,17 +228,17 @@ const PromotionLeadForm = ({
             endDate: c.endDate ? new Date(c.endDate) : undefined,
             campus: c.campus ? { ...c.campus } : { name: "", shift: "" },
             courseFee: c.courseFee || "0",
-          })) ?? [],
+          })) ?? []),
 
       services: Lead?.services?.length
         ? Lead.services
-        : promotion?.services?.map((s) => ({
+        : (promotion?.services?.map((s) => ({
             _id: s._id.toString(),
             title: s.title,
             serviceType: s.serviceType,
             amount: s.amount || "0",
             description: s.description,
-          })) ?? [],
+          })) ?? []),
       discount: Lead?.discount || promotion?.discount || undefined,
       note: Lead?.note || "",
       author: isAdmin ? "" : email || "",
@@ -314,7 +314,7 @@ const PromotionLeadForm = ({
             route: `/leads`,
           });
           toast.success(`Leads created for ${values.name}`);
-          router.push("/promotions");
+          onSuccess?.();
         }
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
@@ -345,7 +345,7 @@ const PromotionLeadForm = ({
             route: `/leads`,
           });
           toast.success("Lead updated successfully!");
-          router.push("/promotions");
+          onSuccess?.();
         }
       }
     } catch (error) {
@@ -354,784 +354,794 @@ const PromotionLeadForm = ({
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          form.handleSubmit(onSubmit)(e);
-        }}
-        className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm space-y-4"
-      >
-        {/* ✅ Personal Information */}
-        <h3 className="text-xl font-semibold">Personal Information</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            name="name"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Name</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Your name" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="email"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Your email" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="number"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Number</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Your number" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="gender"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Gender</FormLabel>
-                <FormControl>
-                  <Select
-                    options={[
-                      { label: "Male", value: "Male" },
-                      { label: "Female", value: "Female" },
-                      { label: "Other", value: "Other" },
-                    ]}
-                    isSearchable={false}
-                    value={
-                      field.value
-                        ? { label: field.value, value: field.value }
-                        : null
-                    }
-                    onChange={(selected) => field.onChange(selected?.value)}
-                    placeholder="Select gender"
-                    classNamePrefix="react-select"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="maritalStatus"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Marital Status</FormLabel>
-                <FormControl>
-                  <Select
-                    options={[
-                      { label: "Single", value: "Single" },
-                      { label: "Married", value: "Married" },
-                      { label: "Divorced", value: "Divorced" },
-                      { label: "Widowed", value: "Widowed" },
-                    ]}
-                    isSearchable={false}
-                    value={
-                      field.value
-                        ? { label: field.value, value: field.value }
-                        : null
-                    }
-                    onChange={(selected) => field.onChange(selected?.value)}
-                    placeholder="Select status"
-                    classNamePrefix="react-select"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="dateOfBirth"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Date of Birth</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    value={
-                      field.value instanceof Date &&
-                      !isNaN(field.value.getTime())
-                        ? field.value.toISOString().slice(0, 10)
-                        : ""
-                    }
-                    placeholder="Date of Birth"
-                    onChange={(e) => {
-                      const dateValue = e.target.value
-                        ? new Date(e.target.value)
-                        : undefined;
-                      field.onChange(dateValue);
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          {/* Agency (Admin only) */}
-          {isAdmin && (
-            <FormField
-              name="author"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem className="min-w-0">
-                  <FormLabel>Agency</FormLabel>
-                  <FormControl>
-                    <Select
-                      options={agency?.map((a) => ({
-                        value: a.email,
-                        label: a.name || a.email,
-                      }))}
-                      value={
-                        agency
-                          ?.map((a) => ({
-                            value: a.email,
-                            label: a.name || a.email,
-                          }))
-                          .find((option) => option.value === field.value) ||
-                        null
-                      }
-                      onChange={(val) => field.onChange(val?.value)}
-                      placeholder="Select agency"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          )}
-        </div>
-
-        {/* ===== Home Address ===== */}
-        <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm">
-          <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
-            Home Address
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              name="home.address"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Your address" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="home.city"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Your city" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="home.state"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>State</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Your state" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="home.zip"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Zip</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Zip code" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="home.country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <Select
-                      options={countryOptions}
-                      isSearchable
-                      value={countryOptions.find(
-                        (opt) => opt.value === field.value
-                      )}
-                      onChange={(selected) => field.onChange(selected?.value)}
-                      placeholder="Select a country"
-                      classNamePrefix="react-select"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </section>
-
-        {/* ===== IRISH Address ===== */}
-        <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm">
-          <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
-            IRISH Address
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              name="irish.address"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Your address in Ireland" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="irish.city"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Your city in Ireland" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="irish.state"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>State</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Your state in Ireland" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="irish.zip"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Zip</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Zip code in Ireland" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="irish.country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <Select
-                      options={countryOptions}
-                      isSearchable
-                      value={countryOptions.find(
-                        (opt) => opt.value === field.value
-                      )}
-                      onChange={(selected) => field.onChange(selected?.value)}
-                      placeholder="Select a country"
-                      classNamePrefix="react-select"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </section>
-
-        {/* ✅ Courses & Services */}
-        <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm space-y-6">
-          <h3 className="text-xl font-semibold">Courses & Services</h3>
-
-          {/* Courses */}
-          <div>
-            <h4 className="font-semibold mb-2">Courses</h4>
-            <div className="flex gap-4 overflow-x-auto pb-2">
-              {form.watch("course")?.map((course, index) => (
-                <div
-                  key={`${course.name}-${index}`}
-                  className="flex-shrink-0 rounded-xl border p-4 shadow-md w-[260px]"
-                >
-                  <h4 className="font-semibold mb-1">{course.name}</h4>
-                  <p className="text-sm text-gray-600">
-                    Type: {course.courseType}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Duration: {course.courseDuration}
-                  </p>
-                  <p>Campus: {course.campus?.name}</p>
-                  <p>Shift: {course.campus?.shift}</p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    Fee: €{course.courseFee}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Services */}
-          <div>
-            <h4 className="font-semibold mb-2">Services</h4>
-            <div className="flex gap-4 overflow-x-auto pb-2">
-              {form.watch("services")?.map((service) => (
-                <div
-                  key={service._id.toString()}
-                  className="flex-shrink-0 rounded-xl border p-4 shadow-md w-[260px]"
-                >
-                  <h4 className="font-semibold">{service.title}</h4>
-                  <p className="text-sm text-gray-600">
-                    Type: {service.serviceType}
-                  </p>
-                  <p className="text-sm text-gray-600">
-                    Amount: €{service.amount}
-                  </p>
-                  <p className="text-sm text-gray-600 mb-2">
-                    {service.description}
-                  </p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ✅ Passport */}
-        <h3 className="text-xl font-semibold">Passport</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            name="passport.visa"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Visa Required</FormLabel>
-                <FormControl>
-                  <div className="flex gap-4 items-center">
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        value="true"
-                        checked={field.value === true}
-                        onChange={() => field.onChange(true)}
-                        className="w-4 h-4"
-                      />
-                      Yes
-                    </label>
-                    <label className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        value="false"
-                        checked={field.value === false}
-                        onChange={() => field.onChange(false)}
-                        className="w-4 h-4"
-                      />
-                      No
-                    </label>
-                  </div>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="passport.number"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Passport Number</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Your passport number" />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="passport.country"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Country</FormLabel>
-                <FormControl>
-                  <Select
-                    options={countryOptions}
-                    isSearchable
-                    value={countryOptions.find(
-                      (opt) => opt.value === field.value
-                    )}
-                    onChange={(selected) => field.onChange(selected?.value)}
-                    placeholder="Select a country"
-                    classNamePrefix="react-select"
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="passport.issueDate"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Issue Date</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    value={
-                      field.value instanceof Date &&
-                      !isNaN(field.value.getTime())
-                        ? field.value.toISOString().slice(0, 10)
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const dateValue = e.target.value
-                        ? new Date(e.target.value)
-                        : undefined;
-                      field.onChange(dateValue);
-                    }}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="passport.expirationDate"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Expiration Date</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    value={
-                      field.value instanceof Date &&
-                      !isNaN(field.value.getTime())
-                        ? field.value.toISOString().slice(0, 10)
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const dateValue = e.target.value
-                        ? new Date(e.target.value)
-                        : undefined;
-                      field.onChange(dateValue);
-                    }}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="passport.file"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Passport</FormLabel>
-                <FormControl>
-                  <FileUploader
-                    onFieldChange={field.onChange}
-                    fileUrl={field.value || ""}
-                    setFiles={setPassportFile}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* ✅ Arrival */}
-        <h3 className="text-xl font-semibold">Arrival</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {" "}
-          <FormField
-            name="arrival.flight"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Flight Number</FormLabel>
-                <FormControl>
-                  <Input {...field} placeholder="Your flight number" />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="arrival.date"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Date</FormLabel>
-                <FormControl>
-                  <Input
-                    type="date"
-                    value={
-                      field.value instanceof Date &&
-                      !isNaN(field.value.getTime())
-                        ? field.value.toISOString().slice(0, 10)
-                        : ""
-                    }
-                    onChange={(e) => {
-                      const dateValue = e.target.value
-                        ? new Date(e.target.value)
-                        : undefined;
-                      field.onChange(dateValue);
-                    }}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="arrival.time"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Time</FormLabel>
-                <FormControl>
-                  <Input
-                    type="time"
-                    value={new Date(field.value || new Date())
-                      .toISOString()
-                      .slice(11, 16)}
-                    onChange={(e) => {
-                      const d = new Date();
-                      const [h, m] = e.target.value.split(":");
-                      d.setHours(+h);
-                      d.setMinutes(+m);
-                      field.onChange(d);
-                    }}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="arrival.file"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Arrival File</FormLabel>
-                <FormControl>
-                  <FileUploader
-                    onFieldChange={field.onChange}
-                    fileUrl={field.value || ""}
-                    setFiles={setArrivalFile}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
-
-        {/* ✅ SECTION 6: Additional Documents (Others) */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Additional Documents</h3>
-          {form.watch("others")?.map((item, index) => (
-            <div
-              key={index}
-              className="grid grid-cols-1 gap-4 items-center border p-4 rounded-md bg-muted/40"
-            >
-              {/* File Name */}
-              <FormField
-                control={form.control}
-                name={`others.${index}.fileName`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>File Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter file name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* File Uploader */}
-              <FormField
-                control={form.control}
-                name={`others.${index}.fileUrl`}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Upload File</FormLabel>
-                    <FormControl>
-                      <FileUploader
-                        onFieldChange={async (
-                          fileUrl: string,
-                          files?: File[]
-                        ) => {
-                          // If a file is selected, upload it and set the URL
-                          if (files && files.length > 0) {
-                            const uploaded = await startUpload(files);
-                            if (uploaded && uploaded[0]) {
-                              field.onChange(uploaded[0].url);
-                            }
-                          } else {
-                            // If just a URL is provided, set it directly
-                            field.onChange(fileUrl);
-                          }
-                        }}
-                        fileUrl={field.value || ""}
-                        setFiles={() => {}} // No-op to satisfy the prop type
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Remove Button */}
-              <Button
-                type="button"
-                variant="destructive"
-                onClick={() => {
-                  const current = form.getValues("others") || [];
-                  const updated = [
-                    ...current.slice(0, index),
-                    ...current.slice(index + 1),
-                  ];
-                  form.setValue("others", updated);
-                }}
-              >
-                Remove
-              </Button>
-            </div>
-          ))}
-
-          {/* Add New Document Button */}
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              const current = form.getValues("others") || [];
-              form.setValue("others", [
-                ...current,
-                { fileName: "", fileUrl: "" },
-              ]);
-            }}
-          >
-            Add Document
-          </Button>
-        </div>
-
-        {/* ✅ Social Links */}
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold">Social Links</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              name="social.facebook"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Facebook</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Facebook profile link" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="social.instagram"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Instagram</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Instagram profile link" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="social.twitter"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Twitter</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Twitter profile link" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="social.skype"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Skype</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Skype username or link" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
-        </div>
-
-        {/* ✅ Submit */}
-        <Button
-          type="submit"
-          className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-          disabled={form.formState.isSubmitting}
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <Form {...form}>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit(onSubmit)(e);
+          }}
+          className="
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+        space-y-4
+      "
         >
-          {form.formState.isSubmitting ? "Submitting..." : "Submit"}
-        </Button>
-      </form>
-    </Form>
+          {/* ✅ Personal Information */}
+          <h3 className="text-xl font-semibold">Personal Information</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              name="name"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Your name" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="email"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Your email" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="number"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Your number" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="gender"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Gender</FormLabel>
+                  <FormControl>
+                    <Select
+                      options={[
+                        { label: "Male", value: "Male" },
+                        { label: "Female", value: "Female" },
+                        { label: "Other", value: "Other" },
+                      ]}
+                      isSearchable={false}
+                      value={
+                        field.value
+                          ? { label: field.value, value: field.value }
+                          : null
+                      }
+                      onChange={(selected) => field.onChange(selected?.value)}
+                      placeholder="Select gender"
+                      classNamePrefix="react-select"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="maritalStatus"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Marital Status</FormLabel>
+                  <FormControl>
+                    <Select
+                      options={[
+                        { label: "Single", value: "Single" },
+                        { label: "Married", value: "Married" },
+                        { label: "Divorced", value: "Divorced" },
+                        { label: "Widowed", value: "Widowed" },
+                      ]}
+                      isSearchable={false}
+                      value={
+                        field.value
+                          ? { label: field.value, value: field.value }
+                          : null
+                      }
+                      onChange={(selected) => field.onChange(selected?.value)}
+                      placeholder="Select status"
+                      classNamePrefix="react-select"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="dateOfBirth"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date of Birth</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={
+                        field.value instanceof Date &&
+                        !isNaN(field.value.getTime())
+                          ? field.value.toISOString().slice(0, 10)
+                          : ""
+                      }
+                      placeholder="Date of Birth"
+                      onChange={(e) => {
+                        const dateValue = e.target.value
+                          ? new Date(e.target.value)
+                          : undefined;
+                        field.onChange(dateValue);
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Agency (Admin only) */}
+            {isAdmin && (
+              <FormField
+                name="author"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="min-w-0">
+                    <FormLabel>Agency</FormLabel>
+                    <FormControl>
+                      <Select
+                        options={agency?.map((a) => ({
+                          value: a.email,
+                          label: a.name || a.email,
+                        }))}
+                        value={
+                          agency
+                            ?.map((a) => ({
+                              value: a.email,
+                              label: a.name || a.email,
+                            }))
+                            .find((option) => option.value === field.value) ||
+                          null
+                        }
+                        onChange={(val) => field.onChange(val?.value)}
+                        placeholder="Select agency"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            )}
+          </div>
+
+          {/* ===== Home Address ===== */}
+          <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+            <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
+              Home Address
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                name="home.address"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Your address" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="home.city"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Your city" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="home.state"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>State</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Your state" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="home.zip"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Zip</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Zip code" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="home.country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <FormControl>
+                      <Select
+                        options={countryOptions}
+                        isSearchable
+                        value={countryOptions.find(
+                          (opt) => opt.value === field.value,
+                        )}
+                        onChange={(selected) => field.onChange(selected?.value)}
+                        placeholder="Select a country"
+                        classNamePrefix="react-select"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </section>
+
+          {/* ===== IRISH Address ===== */}
+          <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm">
+            <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
+              IRISH Address
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                name="irish.address"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Address</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Your address in Ireland" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="irish.city"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>City</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Your city in Ireland" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="irish.state"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>State</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Your state in Ireland" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="irish.zip"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Zip</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Zip code in Ireland" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="irish.country"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Country</FormLabel>
+                    <FormControl>
+                      <Select
+                        options={countryOptions}
+                        isSearchable
+                        value={countryOptions.find(
+                          (opt) => opt.value === field.value,
+                        )}
+                        onChange={(selected) => field.onChange(selected?.value)}
+                        placeholder="Select a country"
+                        classNamePrefix="react-select"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </section>
+
+          {/* ✅ Courses & Services */}
+          <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm space-y-6">
+            <h3 className="text-xl font-semibold">Courses & Services</h3>
+
+            {/* Courses */}
+            <div>
+              <h4 className="font-semibold mb-2">Courses</h4>
+              <div className="flex gap-4 overflow-x-auto pb-2">
+                {form.watch("course")?.map((course, index) => (
+                  <div
+                    key={`${course.name}-${index}`}
+                    className="flex-shrink-0 rounded-xl border p-4 shadow-md w-[260px]"
+                  >
+                    <h4 className="font-semibold mb-1">{course.name}</h4>
+                    <p className="text-sm text-gray-600">
+                      Type: {course.courseType}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Duration: {course.courseDuration}
+                    </p>
+                    <p>Campus: {course.campus?.name}</p>
+                    <p>Shift: {course.campus?.shift}</p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      Fee: €{course.courseFee}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Services */}
+            <div>
+              <h4 className="font-semibold mb-2">Services</h4>
+              <div className="flex gap-4 overflow-x-auto pb-2">
+                {form.watch("services")?.map((service) => (
+                  <div
+                    key={service._id.toString()}
+                    className="flex-shrink-0 rounded-xl border p-4 shadow-md w-[260px]"
+                  >
+                    <h4 className="font-semibold">{service.title}</h4>
+                    <p className="text-sm text-gray-600">
+                      Type: {service.serviceType}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Amount: €{service.amount}
+                    </p>
+                    <p className="text-sm text-gray-600 mb-2">
+                      {service.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* ✅ Passport */}
+          <h3 className="text-xl font-semibold">Passport</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormField
+              name="passport.visa"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Visa Required</FormLabel>
+                  <FormControl>
+                    <div className="flex gap-4 items-center">
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          value="true"
+                          checked={field.value === true}
+                          onChange={() => field.onChange(true)}
+                          className="w-4 h-4"
+                        />
+                        Yes
+                      </label>
+                      <label className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          value="false"
+                          checked={field.value === false}
+                          onChange={() => field.onChange(false)}
+                          className="w-4 h-4"
+                        />
+                        No
+                      </label>
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="passport.number"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Passport Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Your passport number" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="passport.country"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Country</FormLabel>
+                  <FormControl>
+                    <Select
+                      options={countryOptions}
+                      isSearchable
+                      value={countryOptions.find(
+                        (opt) => opt.value === field.value,
+                      )}
+                      onChange={(selected) => field.onChange(selected?.value)}
+                      placeholder="Select a country"
+                      classNamePrefix="react-select"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="passport.issueDate"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Issue Date</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={
+                        field.value instanceof Date &&
+                        !isNaN(field.value.getTime())
+                          ? field.value.toISOString().slice(0, 10)
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const dateValue = e.target.value
+                          ? new Date(e.target.value)
+                          : undefined;
+                        field.onChange(dateValue);
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="passport.expirationDate"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Expiration Date</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={
+                        field.value instanceof Date &&
+                        !isNaN(field.value.getTime())
+                          ? field.value.toISOString().slice(0, 10)
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const dateValue = e.target.value
+                          ? new Date(e.target.value)
+                          : undefined;
+                        field.onChange(dateValue);
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="passport.file"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Passport</FormLabel>
+                  <FormControl>
+                    <FileUploader
+                      onFieldChange={field.onChange}
+                      fileUrl={field.value || ""}
+                      setFiles={setPassportFile}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* ✅ Arrival */}
+          <h3 className="text-xl font-semibold">Arrival</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {" "}
+            <FormField
+              name="arrival.flight"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Flight Number</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Your flight number" />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="arrival.date"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Date</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="date"
+                      value={
+                        field.value instanceof Date &&
+                        !isNaN(field.value.getTime())
+                          ? field.value.toISOString().slice(0, 10)
+                          : ""
+                      }
+                      onChange={(e) => {
+                        const dateValue = e.target.value
+                          ? new Date(e.target.value)
+                          : undefined;
+                        field.onChange(dateValue);
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="arrival.time"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Time</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="time"
+                      value={new Date(field.value || new Date())
+                        .toISOString()
+                        .slice(11, 16)}
+                      onChange={(e) => {
+                        const d = new Date();
+                        const [h, m] = e.target.value.split(":");
+                        d.setHours(+h);
+                        d.setMinutes(+m);
+                        field.onChange(d);
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="arrival.file"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Arrival File</FormLabel>
+                  <FormControl>
+                    <FileUploader
+                      onFieldChange={field.onChange}
+                      fileUrl={field.value || ""}
+                      setFiles={setArrivalFile}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* ✅ SECTION 6: Additional Documents (Others) */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Additional Documents</h3>
+            {form.watch("others")?.map((item, index) => (
+              <div
+                key={index}
+                className="grid grid-cols-1 gap-4 items-center border p-4 rounded-md bg-muted/40"
+              >
+                {/* File Name */}
+                <FormField
+                  control={form.control}
+                  name={`others.${index}.fileName`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>File Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter file name" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* File Uploader */}
+                <FormField
+                  control={form.control}
+                  name={`others.${index}.fileUrl`}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Upload File</FormLabel>
+                      <FormControl>
+                        <FileUploader
+                          onFieldChange={async (
+                            fileUrl: string,
+                            files?: File[],
+                          ) => {
+                            // If a file is selected, upload it and set the URL
+                            if (files && files.length > 0) {
+                              const uploaded = await startUpload(files);
+                              if (uploaded && uploaded[0]) {
+                                field.onChange(uploaded[0].url);
+                              }
+                            } else {
+                              // If just a URL is provided, set it directly
+                              field.onChange(fileUrl);
+                            }
+                          }}
+                          fileUrl={field.value || ""}
+                          setFiles={() => {}} // No-op to satisfy the prop type
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Remove Button */}
+                <Button
+                  type="button"
+                  variant="destructive"
+                  onClick={() => {
+                    const current = form.getValues("others") || [];
+                    const updated = [
+                      ...current.slice(0, index),
+                      ...current.slice(index + 1),
+                    ];
+                    form.setValue("others", updated);
+                  }}
+                >
+                  Remove
+                </Button>
+              </div>
+            ))}
+
+            {/* Add New Document Button */}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                const current = form.getValues("others") || [];
+                form.setValue("others", [
+                  ...current,
+                  { fileName: "", fileUrl: "" },
+                ]);
+              }}
+            >
+              Add Document
+            </Button>
+          </div>
+
+          {/* ✅ Social Links */}
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold">Social Links</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                name="social.facebook"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Facebook</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Facebook profile link" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="social.instagram"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Instagram</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Instagram profile link" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="social.twitter"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Twitter</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Twitter profile link" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                name="social.skype"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Skype</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Skype username or link" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          {/* ✅ Submit */}
+          <Button
+            type="submit"
+            className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+            disabled={form.formState.isSubmitting}
+          >
+            {form.formState.isSubmitting ? "Submitting..." : "Submit"}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 };
 

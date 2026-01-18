@@ -7,6 +7,7 @@ import { ICourse } from "@/lib/database/models/course.model";
 import { IServices } from "@/lib/database/models/service.model";
 
 type Props = {
+  email: string;
   agencies: IProfile[];
   courses: ICourse[];
   services: IServices[];
@@ -16,6 +17,7 @@ type Props = {
 };
 
 const PromotionListClient = ({
+  email,
   promotions,
   isAdmin,
   agencies,
@@ -33,6 +35,7 @@ const PromotionListClient = ({
           promotions.map((promotion, index) => (
             <PromotionCard
               key={index}
+              email={email}
               promotion={promotion}
               isAdmin={isAdmin}
               agency={agencies}

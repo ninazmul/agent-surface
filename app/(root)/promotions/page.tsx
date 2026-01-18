@@ -111,6 +111,7 @@ const Page = async () => {
       {/* Client Promotions */}
       <section className="p-4">
         <PromotionListClient
+          email={email}
           promotions={dateFilteredPromotions}
           agency={agency}
           courses={courses}
