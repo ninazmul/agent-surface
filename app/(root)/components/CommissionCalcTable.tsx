@@ -65,6 +65,7 @@ interface ICombinedItem {
   commissionAmount?: string;
   commissionPercent?: string;
   source?: string;
+  isPaid?: string;
   type: "Lead" | "Quotation";
 }
 
@@ -99,7 +100,7 @@ const CommissionCalcTable = ({
           if (!lead.author) return;
           const profile = await getProfileByEmail(lead.author);
           if (profile) map[lead.author] = profile;
-        })
+        }),
       );
       setProfiles(map);
     };
@@ -111,7 +112,7 @@ const CommissionCalcTable = ({
       return [lead.name, lead.email, lead.number, lead.home?.country]
         .filter(Boolean)
         .some((value) =>
-          value!.toLowerCase().includes(searchQuery.toLowerCase())
+          value!.toLowerCase().includes(searchQuery.toLowerCase()),
         );
     });
 
@@ -167,6 +168,7 @@ const CommissionCalcTable = ({
               <TableHead className="text-white">Agency</TableHead>
               <TableHead className="text-white">Fees</TableHead>
               <TableHead className="text-white">Commission</TableHead>
+              <TableHead className="text-white">Status</TableHead>
               <TableHead className="text-white">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -178,13 +180,13 @@ const CommissionCalcTable = ({
               const courseAmount =
                 lead.course?.reduce(
                   (sum, c) => sum + Number(c.courseFee || 0),
-                  0
+                  0,
                 ) || 0;
 
               const servicesTotal =
                 lead.services?.reduce(
                   (sum, s) => sum + Number(s.amount || 0),
-                  0
+                  0,
                 ) || 0;
 
               const discount = Number(lead.discount) || 0;
@@ -241,16 +243,16 @@ const CommissionCalcTable = ({
                             lead.isPromotion
                               ? "bg-purple-100 text-purple-700 border-purple-300"
                               : lead.source
-                              ? "bg-blue-100 text-blue-700 border-blue-300"
-                              : "bg-gray-100 text-gray-700 border-gray-300"
+                                ? "bg-blue-100 text-blue-700 border-blue-300"
+                                : "bg-gray-100 text-gray-700 border-gray-300"
                           }`}
                         >
                           {lead.isPromotion
                             ? "Promotion"
                             : lead.source
-                            ? lead.source.charAt(0).toUpperCase() +
-                              lead.source.slice(1)
-                            : "General"}
+                              ? lead.source.charAt(0).toUpperCase() +
+                                lead.source.slice(1)
+                              : "General"}
                         </span>
                       </span>
                     </a>
@@ -268,7 +270,7 @@ const CommissionCalcTable = ({
                       const paidAmount = Array.isArray(lead.transcript)
                         ? lead.transcript.reduce(
                             (sum, t) => sum + Number(t.amount || 0),
-                            0
+                            0,
                           )
                         : 0;
 
@@ -309,6 +311,18 @@ const CommissionCalcTable = ({
                   </TableCell>
 
                   <TableCell className="align-top">
+                    <span
+                      className={`px-4 py-2 text-xs font-medium rounded-full border text-center ${
+                        lead.isPaid
+                          ? "bg-green-100 text-green-700"
+                          : "bg-yellow-100 text-yellow-700"
+                      }`}
+                    >
+                      {lead.isPaid ? "Paid" : "Pending"}
+                    </span>
+                  </TableCell>
+
+                  <TableCell className="align-top">
                     <Popover>
                       <PopoverTrigger asChild>
                         <Button size="icon" variant="outline">
@@ -317,7 +331,11 @@ const CommissionCalcTable = ({
                       </PopoverTrigger>
                       <PopoverContent align="end">
                         {lead.paymentStatus === "Accepted" ? (
-                          <Button asChild variant="ghost" className="w-full justify-start">
+                          <Button
+                            asChild
+                            variant="ghost"
+                            className="w-full justify-start"
+                          >
                             <a href={`/finance/${lead._id}/receipt`}>
                               <FileText className="mr-2 h-4 w-4" />
                               Receipt
@@ -328,7 +346,12 @@ const CommissionCalcTable = ({
                             No receipt yet
                           </span>
                         )}
-                        <AddPaymentDialog type="Action" amount={commissionAmount.toString()} isAdmin={isAdmin} agency={agency}/>
+                        <AddPaymentDialog
+                          type="Action"
+                          amount={commissionAmount.toString()}
+                          isAdmin={isAdmin}
+                          agency={agency}
+                        />
                       </PopoverContent>
                     </Popover>
                   </TableCell>
