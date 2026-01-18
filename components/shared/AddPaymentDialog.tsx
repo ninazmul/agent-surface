@@ -9,27 +9,44 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus } from "lucide-react";
+import { Pencil, Plus } from "lucide-react";
 import { IProfile } from "@/lib/database/models/profile.model";
 import PaymentForm from "@/app/(root)/components/PaymentForm";
 
 interface AddPaymentDialogProps {
   agency: IProfile;
   isAdmin?: boolean;
+  amount?: string;
+  type?: "Default" | "Action";
 }
 
-const AddPaymentDialog = ({ agency, isAdmin }: AddPaymentDialogProps) => {
+const AddPaymentDialog = ({
+  agency,
+  isAdmin,
+  amount,
+  type,
+}: AddPaymentDialogProps) => {
   const [open, setOpen] = useState(false);
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button
-          size="sm"
-          className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-        >
-          <Plus size={16} /> Request Payment
-        </Button>
+        {type === "Action" ? (
+          <Button
+            variant="ghost"
+            className="w-full justify-start text-purple-500 gap-2"
+          >
+            <Pencil className="w-4 h-4" />
+            Request Payment
+          </Button>
+        ) : (
+          <Button
+            size="sm"
+            className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+          >
+            <Plus size={16} /> Request Payment
+          </Button>
+        )}
       </DialogTrigger>
 
       <DialogContent
@@ -52,6 +69,7 @@ const AddPaymentDialog = ({ agency, isAdmin }: AddPaymentDialogProps) => {
           type="Create"
           agency={agency}
           isAdmin={isAdmin}
+          amount={amount}
           onSuccess={() => setOpen(false)}
         />
       </DialogContent>

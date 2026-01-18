@@ -20,6 +20,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Types } from "mongoose";
+import AddPaymentDialog from "@/components/shared/AddPaymentDialog";
 
 interface ICombinedItem {
   _id: Types.ObjectId;
@@ -69,10 +70,13 @@ interface ICombinedItem {
 
 const CommissionCalcTable = ({
   leads,
+  isAdmin,
+  agency,
 }: {
   leads: ICombinedItem[];
   isAdmin: boolean;
   email?: string;
+  agency: IProfile;
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState<"name" | null>(null);
@@ -324,6 +328,7 @@ const CommissionCalcTable = ({
                             No receipt yet
                           </span>
                         )}
+                        <AddPaymentDialog type="Action" amount={commissionAmount.toString()} isAdmin={isAdmin} agency={agency}/>
                       </PopoverContent>
                     </Popover>
                   </TableCell>

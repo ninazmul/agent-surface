@@ -84,7 +84,7 @@ const Page = async () => {
     const agentEmails = [email, ...(profile?.subAgents || [])];
 
     const allLeads = await Promise.all(
-      agentEmails.map((agent) => getLeadsByAgency(agent))
+      agentEmails.map((agent) => getLeadsByAgency(agent)),
     );
 
     leads = allLeads.flat().filter(Boolean);
@@ -93,7 +93,7 @@ const Page = async () => {
   // Filter only Converted leads
   leads = leads.filter(
     (lead: ILead) =>
-      lead.quotationStatus === true && lead.paymentStatus === "Accepted"
+      lead.quotationStatus === true && lead.paymentStatus === "Accepted",
   );
 
   let quotations: IQuotation[] = [];
@@ -105,14 +105,14 @@ const Page = async () => {
       adminCountry.length === 0
         ? allQuotations
         : allQuotations.filter((r: ILead) =>
-            adminCountry.includes(r.home.country)
+            adminCountry.includes(r.home.country),
           );
   } else {
     const profile = await getProfileByEmail(email);
     const agentEmails = [email, ...(profile?.subAgents || [])];
 
     const allQuotations = await Promise.all(
-      agentEmails.map((agent) => getQuotationsByAgency(agent))
+      agentEmails.map((agent) => getQuotationsByAgency(agent)),
     );
 
     quotations = allQuotations.flat().filter(Boolean);
@@ -121,7 +121,8 @@ const Page = async () => {
   // Filter only Converted quotations
   quotations = quotations.filter(
     (quotation: IQuotation) =>
-      quotation.quotationStatus === true && quotation.paymentStatus === "Accepted"
+      quotation.quotationStatus === true &&
+      quotation.paymentStatus === "Accepted",
   );
 
   const mapLeadToCombined = (item: ILead): ICombinedItem => ({
@@ -149,13 +150,16 @@ const Page = async () => {
     <>
       <section className="p-4">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <h3 className="h3-bold text-center sm:text-left">
-            Lead Commission
-          </h3>
+          <h3 className="h3-bold text-center sm:text-left">Lead Commission</h3>
         </div>
 
         <div className="overflow-x-auto">
-          <CommissionCalcTable leads={combinedData} isAdmin={adminStatus} email={email} />
+          <CommissionCalcTable
+            leads={combinedData}
+            isAdmin={adminStatus}
+            email={email}
+            agency={myProfile}
+          />
         </div>
       </section>
     </>

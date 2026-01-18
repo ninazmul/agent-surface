@@ -18,6 +18,7 @@ import { createNotification } from "@/lib/actions/notification.actions";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { useEffect } from "react";
 
 const PaymentFormSchema = z.object({
   agency: z.string().min(3, "Agency must be at least 3 characters."),
@@ -37,6 +38,7 @@ type PaymentFormProps = {
   PaymentId?: string;
   agency?: IProfile;
   isAdmin?: boolean;
+  amount?: string;
   onSuccess?: () => void;
 };
 
@@ -45,13 +47,14 @@ const PaymentForm = ({
   Payment,
   PaymentId,
   agency,
+  amount,
   onSuccess,
 }: PaymentFormProps) => {
   const form = useForm<z.infer<typeof PaymentFormSchema>>({
     resolver: zodResolver(PaymentFormSchema),
     defaultValues: {
       agency: Payment?.agency || "",
-      amount: Payment?.amount || "",
+      amount: Payment?.amount || amount || "",
       paymentMethod: Payment?.paymentMethod || "",
       accountDetails: Payment?.accountDetails || "",
       country: Payment?.country || "",
@@ -59,6 +62,12 @@ const PaymentForm = ({
         (Payment?.progress as "Pending" | "In Progress" | "Paid") || "Pending",
     },
   });
+
+  useEffect(() => {
+    if (amount) {
+      form.setValue("amount", amount, { shouldValidate: true });
+    }
+  }, [amount, form]);
 
   const onSubmit = async (values: z.infer<typeof PaymentFormSchema>) => {
     try {
@@ -166,7 +175,7 @@ const PaymentForm = ({
               <FormItem>
                 <FormLabel>Amount</FormLabel>
                 <FormControl>
-                  <Input {...field} placeholder="Enter amount" />
+                  <Input {...field} disabled={!!amount} placeholder="Enter amount" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
