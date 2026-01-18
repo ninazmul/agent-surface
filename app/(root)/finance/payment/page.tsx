@@ -1,6 +1,5 @@
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
-import { Button } from "@/components/ui/button";
 import {
   getAllPayments,
   getPaymentsByAgency,
@@ -14,7 +13,7 @@ import { redirect } from "next/navigation";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { IPayment } from "@/lib/database/models/payment.model";
 import PaymentTable from "../../components/PaymentTable";
-import { Plus } from "lucide-react";
+import AddPaymentDialog from "@/components/shared/AddPaymentDialog";
 
 const Page = async () => {
   const { sessionClaims } = await auth();
@@ -47,7 +46,7 @@ const Page = async () => {
     const agentEmails = [email, ...(profile?.subAgents || [])];
 
     const payResults = await Promise.all(
-      agentEmails.map((agent) => getPaymentsByAgency(agent))
+      agentEmails.map((agent) => getPaymentsByAgency(agent)),
     );
 
     payments = payResults.flat().filter(Boolean);
@@ -59,18 +58,15 @@ const Page = async () => {
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
           <h3 className="h3-bold text-center sm:text-left">Payment Withdraw</h3>
 
-          <a href={`/finance/payment/create`} className="w-full sm:w-auto">
-            <Button
-              size="sm"
-              className="rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
-            >
-              <Plus size={16} /> Request Payment
-            </Button>
-          </a>
+          <AddPaymentDialog agency={myProfile} isAdmin={adminStatus} />
         </div>
 
         <div className="overflow-x-auto">
-          <PaymentTable payments={payments} isAdmin={adminStatus} />
+          <PaymentTable
+            payments={payments}
+            isAdmin={adminStatus}
+            agency={myProfile}
+          />
         </div>
       </section>
     </>

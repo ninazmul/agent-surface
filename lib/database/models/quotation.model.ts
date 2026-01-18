@@ -49,6 +49,7 @@ export interface IQuotation extends Document {
     method: string;
     fileUrl: string;
   }[];
+  isPaid?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -124,6 +125,7 @@ const QuotationSchema = new Schema(
       ],
       default: [],
     },
+    isPaid: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

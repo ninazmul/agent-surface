@@ -12,7 +12,6 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useRouter } from "next/navigation";
 import { createPayment, updatePayment } from "@/lib/actions/payment.actions";
 import { IPayment } from "@/lib/database/models/payment.model";
 import { createNotification } from "@/lib/actions/notification.actions";
@@ -38,6 +37,7 @@ type PaymentFormProps = {
   PaymentId?: string;
   agency?: IProfile;
   isAdmin?: boolean;
+  onSuccess?: () => void;
 };
 
 const PaymentForm = ({
@@ -45,9 +45,8 @@ const PaymentForm = ({
   Payment,
   PaymentId,
   agency,
+  onSuccess,
 }: PaymentFormProps) => {
-  const router = useRouter();
-
   const form = useForm<z.infer<typeof PaymentFormSchema>>({
     resolver: zodResolver(PaymentFormSchema),
     defaultValues: {
@@ -81,7 +80,7 @@ const PaymentForm = ({
           });
           form.reset();
           toast.success("Payment request created successfully!");
-          router.push("/finance");
+          onSuccess?.();
         }
       } else if (type === "Update" && PaymentId) {
         const updated = await updatePayment(PaymentId, {
@@ -96,7 +95,7 @@ const PaymentForm = ({
             route: `/finance`,
           });
           toast.success("Payment request updated successfully!");
-          router.push("/finance");
+          onSuccess?.();
         }
       }
     } catch (error) {
@@ -105,119 +104,129 @@ const PaymentForm = ({
   };
 
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm space-y-4"
-      >
-        {/* Agency Field (react-select) */}
-        <FormField
-          control={form.control}
-          name="agency"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Agency</FormLabel>
-              <FormControl>
-                <Input
-                  disabled
-                  {...field}
-                  placeholder="Your Agency..."
-                  value={agency?.email}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Country Field (auto-filled, disabled) */}
-        <FormField
-          control={form.control}
-          name="country"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Country</FormLabel>
-              <FormControl>
-                <Input
-                  disabled
-                  {...field}
-                  placeholder="Country"
-                  value={agency?.country}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Amount Field */}
-        <FormField
-          control={form.control}
-          name="amount"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Amount</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="Enter amount" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Payment Method Field */}
-        <FormField
-          control={form.control}
-          name="paymentMethod"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Payment Method</FormLabel>
-              <FormControl>
-                <select
-                  {...field}
-                  className="w-full rounded-md border border-input bg-background dark:bg-gray-700 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                >
-                  <option value="">Select Method</option>
-                  <option value="Bank">Bank</option>
-                  <option value="Paypal">Paypal</option>
-                  <option value="Wise">Wise</option>
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Account Details Field */}
-        <FormField
-          control={form.control}
-          name="accountDetails"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Additional Details</FormLabel>
-              <FormControl>
-                <Input {...field} placeholder="e.g. IBAN, Email, etc." />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          size="lg"
-          disabled={form.formState.isSubmitting}
-          className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+        space-y-4
+      "
         >
-          {form.formState.isSubmitting
-            ? "Submitting..."
-            : type === "Create"
-            ? "Create Payment"
-            : "Update Payment"}
-        </Button>
-      </form>
-    </Form>
+          {/* Agency Field (react-select) */}
+          <FormField
+            control={form.control}
+            name="agency"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Agency</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled
+                    {...field}
+                    placeholder="Your Agency..."
+                    value={agency?.email}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Country Field (auto-filled, disabled) */}
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Country</FormLabel>
+                <FormControl>
+                  <Input
+                    disabled
+                    {...field}
+                    placeholder="Country"
+                    value={agency?.country}
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Amount Field */}
+          <FormField
+            control={form.control}
+            name="amount"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Amount</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="Enter amount" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Payment Method Field */}
+          <FormField
+            control={form.control}
+            name="paymentMethod"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Payment Method</FormLabel>
+                <FormControl>
+                  <select
+                    {...field}
+                    className="w-full rounded-md border border-input bg-background dark:bg-gray-700 px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                  >
+                    <option value="">Select Method</option>
+                    <option value="Bank">Bank</option>
+                    <option value="Paypal">Paypal</option>
+                    <option value="Wise">Wise</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Account Details Field */}
+          <FormField
+            control={form.control}
+            name="accountDetails"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Additional Details</FormLabel>
+                <FormControl>
+                  <Input {...field} placeholder="e.g. IBAN, Email, etc." />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          {/* Submit Button */}
+          <Button
+            type="submit"
+            size="lg"
+            disabled={form.formState.isSubmitting}
+            className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+          >
+            {form.formState.isSubmitting
+              ? "Submitting..."
+              : type === "Create"
+                ? "Create Payment"
+                : "Update Payment"}
+          </Button>
+        </form>
+      </Form>
+    </div>
   );
 };
 

@@ -18,7 +18,6 @@ import {
   SortAsc,
   SortDesc,
   RefreshCcw,
-  Pencil,
   Banknote,
   DollarSign,
   CreditCard,
@@ -31,15 +30,19 @@ import {
 } from "@/components/ui/popover";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import UpdatePaymentDialog from "@/components/shared/UpdatePaymentDialog";
+import { IProfile } from "@/lib/database/models/profile.model";
 
 const progressStatuses = ["Pending", "In Progress", "Paid"];
 
 const PaymentTable = ({
   payments,
   isAdmin,
+  agency,
 }: {
   payments: IPayment[];
   isAdmin: boolean;
+  agency: IProfile;
 }) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -60,8 +63,8 @@ const PaymentTable = ({
         payment.accountDetails,
         payment.progress,
       ].some((value) =>
-        (value ?? "").toLowerCase().includes(searchQuery.toLowerCase())
-      )
+        (value ?? "").toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
     );
 
     if (sortKey) {
@@ -263,7 +266,7 @@ const PaymentTable = ({
                         onClick={() =>
                           handleToggleProgress(
                             payment._id.toString(),
-                            payment.progress
+                            payment.progress,
                           )
                         }
                         className={`px-4 py-2 text-xs font-medium rounded-full border text-center flex items-center justify-center gap-1 ${progressStyles[status]}`}
@@ -279,13 +282,11 @@ const PaymentTable = ({
                   <>
                     <TableCell>
                       <div className="flex gap-2">
-                        <a
-                          href={`/finance/payment/${payment._id.toString()}/update`}
-                        >
-                          <Button variant="ghost" size="icon">
-                            <Pencil className="w-4 h-4 text-black" />
-                          </Button>
-                        </a>
+                        <UpdatePaymentDialog
+                          payment={payment}
+                          paymentId={payment._id.toString()}
+                          agency={agency}
+                        />
                         <Button
                           onClick={() =>
                             setConfirmDeleteId(payment._id.toString())
