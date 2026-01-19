@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 import { SignatureModal } from "./SignatureModal";
 import AgreementModal from "./AgreementModal";
 import AddProfileDialog from "@/components/shared/AddProfileDialog";
+import ViewContactAgreement from "@/components/shared/ViewContactAgreement";
 
 interface ProfilePageProps {
   adminStatus: boolean;
@@ -369,32 +370,7 @@ export default function ProfilePage({
                         Legal Documents
                       </h3>
 
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {/* Agreement Document */}
-                        <button
-                          onClick={() => setOpenAgreementModal(true)}
-                          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-all"
-                        >
-                          View Document
-                        </button>
-
-                        {/* Signature Preview */}
-                        {myProfile?.signatureDocument && (
-                          <div className="flex flex-col items-center justify-center gap-2 rounded-xl bg-white dark:bg-gray-800 border p-3">
-                            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                              Digital Signature
-                            </p>
-                            <Image
-                              src={myProfile.signatureDocument}
-                              alt="Approved Signature"
-                              className="h-24 w-auto object-contain mix-blend-multiply dark:mix-blend-normal dark:invert-[0.05]"
-                            />
-                            <span className="text-xs text-green-600 dark:text-green-400 font-medium">
-                              ✔ Verified & Approved
-                            </span>
-                          </div>
-                        )}
-                      </div>
+                      <ViewContactAgreement profile={myProfile} />
                     </div>
                   )}
 

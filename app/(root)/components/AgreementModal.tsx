@@ -173,7 +173,7 @@ export default function AgreementModal({
                       }}
                     />
                   )}
-                  <div className="mt-8 flex flex-wrap items-center justify-between gap-8">
+                  <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-8">
                     {/* AB SIGNATURE */}
                     <div className="w-1/3">
                       <p className="font-semibold">

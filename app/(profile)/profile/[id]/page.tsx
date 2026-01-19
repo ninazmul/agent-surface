@@ -145,25 +145,6 @@ const ProfileDetails = async ({ params }: PageProps) => {
         <div className="mb-6">
           <ViewContactAgreement profile={profile} />
         </div>
-
-        {/* Signature Preview */}
-        {profile?.signatureDocument && (
-          <div className="flex flex-col items-center gap-3 rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4 shadow-sm">
-            <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
-              Digital Signature
-            </p>
-            <div className="h-24 w-48 flex items-center justify-center bg-gray-50 rounded-md overflow-hidden">
-              <Image
-                src={profile.signatureDocument}
-                alt="Approved Signature"
-                className="h-full w-auto object-contain mix-blend-multiply dark:mix-blend-normal dark:invert-[0.05]"
-              />
-            </div>
-            <span className="text-xs text-green-600 dark:text-green-400 font-semibold">
-              ✔ Verified & Approved
-            </span>
-          </div>
-        )}
       </section>
 
       {/* Agent Relationship */}
