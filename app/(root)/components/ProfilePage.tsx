@@ -13,7 +13,7 @@ import { getLeadByEmail } from "@/lib/actions/lead.actions";
 import { useTheme } from "next-themes";
 import toast from "react-hot-toast";
 import { SignatureModal } from "./SignatureModal";
-import AgreementModal from "./AgreementPDF";
+import AgreementModal from "./AgreementModal";
 import AddProfileDialog from "@/components/shared/AddProfileDialog";
 
 interface ProfilePageProps {

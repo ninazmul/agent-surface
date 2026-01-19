@@ -1,6 +1,6 @@
 "use client";
 
-import AgreementModal from "@/app/(root)/components/AgreementPDF";
+import AgreementModal from "@/app/(root)/components/AgreementModal";
 import { useState } from "react";
 
 function ViewContactAgreement() {
@@ -11,7 +11,8 @@ function ViewContactAgreement() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <p className="text-green-600 dark:text-green-400">
-            This is the agreement you have accepted. Please review the terms carefully.
+            This is the agreement you have accepted. Please review the terms
+            carefully.
           </p>
         </div>
         <button
