@@ -47,6 +47,7 @@ import {
 } from "@/components/ui/dialog";
 import { IProfile } from "@/lib/database/models/profile.model";
 import {
+  getAllAgents,
   getProfileByEmail,
   getSubAgentsByEmail,
 } from "@/lib/actions/profile.actions";
@@ -60,7 +61,6 @@ import { getAllPromotions } from "@/lib/actions/promotion.actions";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { createTrack, getTracksByStudent } from "@/lib/actions/track.actions";
 import { IStudentEvent, ITrack } from "@/lib/database/models/track.model";
-import { getAllAdmins } from "@/lib/actions/admin.actions";
 import Image from "next/image";
 import UpdateLeadDialog from "@/components/shared/UpdateLeadDialog";
 import { IServices } from "@/lib/database/models/service.model";
@@ -123,7 +123,7 @@ const LeadTable = ({
   useEffect(() => {
     const fetchProfiles = async () => {
       if (isAdmin) {
-        const data = await getAllAdmins();
+        const data = await getAllAgents();
         setAllProfiles(data || []);
       } else {
         const data = await getSubAgentsByEmail(email);
@@ -141,7 +141,7 @@ const LeadTable = ({
           if (!lead.author) return;
           const profile = await getProfileByEmail(lead.author);
           if (profile) newProfiles[lead.author] = profile;
-        })
+        }),
       );
       setProfiles(newProfiles);
     };
@@ -152,7 +152,7 @@ const LeadTable = ({
     const fetchPromotions = async () => {
       const allPromotions = await getAllPromotions();
       setPromotions(
-        allPromotions.map((p: IPromotion) => ({ title: p.title, sku: p.sku }))
+        allPromotions.map((p: IPromotion) => ({ title: p.title, sku: p.sku })),
       );
     };
     fetchPromotions();
@@ -164,8 +164,8 @@ const LeadTable = ({
       [lead.name, lead.email, lead.number, lead.home?.country, lead.progress]
         .filter(Boolean)
         .some((value) =>
-          value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-        )
+          value.toString().toLowerCase().includes(searchQuery.toLowerCase()),
+        ),
     );
 
     // Promotion type filter
@@ -177,7 +177,7 @@ const LeadTable = ({
     // --- NEW: Filter by promotion SKU ---
     if (promotionSkuFilter !== "all") {
       filtered = filtered.filter(
-        (lead) => lead.promotionSku === promotionSkuFilter
+        (lead) => lead.promotionSku === promotionSkuFilter,
       );
     }
 
@@ -260,8 +260,8 @@ const LeadTable = ({
           prev.map((lead) =>
             lead._id.toString() === leadId
               ? ({ ...lead, progress: newProgress } as ILead)
-              : lead
-          )
+              : lead,
+          ),
         );
 
         router.refresh();
@@ -292,8 +292,8 @@ const LeadTable = ({
           prev.map((lead) =>
             lead._id.toString() === leadId
               ? ({ ...lead, status: newStatus } as ILead)
-              : lead
-          )
+              : lead,
+          ),
         );
 
         router.refresh();
@@ -320,8 +320,8 @@ const LeadTable = ({
                   ...lead,
                   isPinned: !current,
                 } as PinUnpinStatus)
-              : lead
-          )
+              : lead,
+          ),
         );
       }
     } catch (error) {
@@ -367,7 +367,7 @@ const LeadTable = ({
               route: `/leads`,
               status: emailContent.subject || "No subject",
             });
-          })
+          }),
         );
 
         setEmailModalOpen(false);
@@ -388,7 +388,7 @@ const LeadTable = ({
 
     // Get assigned users common to all selected leads
     const selectedLeadObjects = localLeads.filter((l) =>
-      selectedLeads.includes(l._id.toString())
+      selectedLeads.includes(l._id.toString()),
     );
 
     const commonAssignedUsers = selectedLeadObjects.length
@@ -413,10 +413,10 @@ const LeadTable = ({
           const currentAssigned = lead?.assignedTo || [];
 
           const toAdd = assignedUsers.filter(
-            (u) => !currentAssigned.includes(u)
+            (u) => !currentAssigned.includes(u),
           );
           const toRemove = currentAssigned.filter(
-            (u) => !assignedUsers.includes(u)
+            (u) => !assignedUsers.includes(u),
           );
 
           await Promise.all([
@@ -430,7 +430,7 @@ const LeadTable = ({
             route: `/leads/${leadId}`,
             status: `Assigned: ${assignedUsers.join(", ")}`,
           });
-        })
+        }),
       );
 
       toast.success("Lead assignments updated");
@@ -442,12 +442,12 @@ const LeadTable = ({
             lead.assignedTo = [
               ...(lead.assignedTo || []),
               ...assignedUsers.filter(
-                (u) => !(lead.assignedTo || []).includes(u)
+                (u) => !(lead.assignedTo || []).includes(u),
               ),
             ];
           }
           return lead;
-        })
+        }),
       );
 
       // Clear state & close modal
@@ -481,7 +481,7 @@ const LeadTable = ({
             value={promotionFilter}
             onChange={(e) =>
               setPromotionFilter(
-                e.target.value as "all" | "promotion" | "general"
+                e.target.value as "all" | "promotion" | "general",
               )
             }
             className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
@@ -544,7 +544,7 @@ const LeadTable = ({
                   onChange={(e) => {
                     if (e.target.checked) {
                       setSelectedLeads(
-                        paginatedLeads.map((r) => r._id.toString())
+                        paginatedLeads.map((r) => r._id.toString()),
                       );
                     } else setSelectedLeads([]);
                   }}
@@ -620,7 +620,7 @@ const LeadTable = ({
                             ]);
                           } else {
                             setSelectedLeads((prev) =>
-                              prev.filter((id) => id !== lead._id.toString())
+                              prev.filter((id) => id !== lead._id.toString()),
                             );
                           }
                         }}
@@ -695,16 +695,16 @@ const LeadTable = ({
                               lead.isPromotion
                                 ? "bg-purple-100 text-purple-700 border-purple-300"
                                 : lead.source
-                                ? "bg-blue-100 text-blue-700 border-blue-300"
-                                : "bg-gray-100 text-gray-700 border-gray-300"
+                                  ? "bg-blue-100 text-blue-700 border-blue-300"
+                                  : "bg-gray-100 text-gray-700 border-gray-300"
                             }`}
                           >
                             {lead.isPromotion
                               ? "Promotion"
                               : lead.source
-                              ? lead.source.charAt(0).toUpperCase() +
-                                lead.source.slice(1)
-                              : "General"}
+                                ? lead.source.charAt(0).toUpperCase() +
+                                  lead.source.slice(1)
+                                : "General"}
                           </span>
                         </span>
                       </a>
@@ -820,19 +820,19 @@ const LeadTable = ({
                         onChange={(e) =>
                           handleProgressChange(
                             lead._id.toString(),
-                            e.target.value
+                            e.target.value,
                           )
                         }
                         className={`px-4 py-2 text-xs font-medium rounded-full border text-center ${
                           lead.progress === "Open"
                             ? "bg-gray-100 text-gray-700"
                             : lead.progress === "Contacted"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : lead.progress === "Converted"
-                            ? "bg-green-100 text-green-700"
-                            : lead.progress === "Closed"
-                            ? "bg-red-100 text-red-700"
-                            : ""
+                              ? "bg-yellow-100 text-yellow-700"
+                              : lead.progress === "Converted"
+                                ? "bg-green-100 text-green-700"
+                                : lead.progress === "Closed"
+                                  ? "bg-red-100 text-red-700"
+                                  : ""
                         }`}
                       >
                         <option value="Open">Open</option>
@@ -849,19 +849,19 @@ const LeadTable = ({
                         onChange={(e) =>
                           handleStatusChange(
                             lead._id.toString(),
-                            e.target.value
+                            e.target.value,
                           )
                         }
                         className={`px-4 py-2 text-xs font-medium rounded-full border text-center ${
                           lead.status === "Perception"
                             ? "bg-gray-100 text-gray-700"
                             : lead.status === "Cold"
-                            ? "bg-blue-100 text-blue-700"
-                            : lead.status === "Warm"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : lead.status === "Hot"
-                            ? "bg-red-100 text-red-700"
-                            : ""
+                              ? "bg-blue-100 text-blue-700"
+                              : lead.status === "Warm"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : lead.status === "Hot"
+                                  ? "bg-red-100 text-red-700"
+                                  : ""
                         }`}
                       >
                         <option value="Perception">👀 Perception</option>
@@ -974,7 +974,7 @@ const LeadTable = ({
                             onClick={() =>
                               handlePinToggle(
                                 lead._id.toString(),
-                                lead.isPinned ?? false
+                                lead.isPinned ?? false,
                               )
                             }
                           >
@@ -1072,7 +1072,7 @@ const LeadTable = ({
                                 className="w-full justify-start text-yellow-500 gap-2"
                                 onClick={async () => {
                                   const data = await getTracksByStudent(
-                                    lead.email
+                                    lead.email,
                                   );
                                   setTrackData(data);
                                   setIsTrackModalOpen(true);
@@ -1296,7 +1296,7 @@ const LeadTable = ({
                                     month: "short",
                                     day: "numeric",
                                     year: "numeric",
-                                  }
+                                  },
                                 )}
                               </span>
                             </div>
@@ -1314,7 +1314,7 @@ const LeadTable = ({
                           </div>
                         </div>
                       );
-                    }
+                    },
                   )}
                 </div>
               </div>
@@ -1351,7 +1351,7 @@ const LeadTable = ({
                           setAssignedUsers((prev) => [...prev, user.email]);
                         } else {
                           setAssignedUsers((prev) =>
-                            prev.filter((u) => u !== user.email)
+                            prev.filter((u) => u !== user.email),
                           );
                         }
                       }}

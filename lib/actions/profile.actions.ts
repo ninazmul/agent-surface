@@ -72,7 +72,6 @@ export const getProfileByEmail = async (email: string) => {
 
 // ====== GET PROFILES BY EMAIL
 export const getProfilesByEmail = async (email: string) => {
-
   try {
     await connectToDatabase();
 
@@ -90,11 +89,29 @@ export const getProfilesByEmail = async (email: string) => {
   }
 };
 
+export const getAllAgents = async () => {
+  try {
+    await connectToDatabase();
+
+    const agents = await Profile.find({ role: "Agent" }).lean();
+
+    return JSON.parse(JSON.stringify(agents));
+  } catch (error) {
+    console.error("Error fetching agents:", error);
+    handleError(error);
+    return [];
+  }
+};
+
 export const getSubAgentsByEmail = async (email: string) => {
   try {
     const parentProfile = await Profile.findOne({ email });
 
-    if (!parentProfile || !parentProfile.subAgents || parentProfile.subAgents.length === 0) {
+    if (
+      !parentProfile ||
+      !parentProfile.subAgents ||
+      parentProfile.subAgents.length === 0
+    ) {
       return [];
     }
 
@@ -112,7 +129,7 @@ export const getSubAgentsByEmail = async (email: string) => {
 // ====== UPDATE PROFILE
 export const updateProfile = async (
   profileId: string,
-  updateData: Partial<ProfileParams>
+  updateData: Partial<ProfileParams>,
 ) => {
   try {
     await connectToDatabase();
@@ -120,7 +137,7 @@ export const updateProfile = async (
     const updatedProfile = await Profile.findByIdAndUpdate(
       profileId,
       updateData,
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedProfile) {
@@ -140,9 +157,7 @@ export const deleteProfile = async (profileId: string) => {
   try {
     await connectToDatabase();
 
-    const deletedProfile = await Profile.findByIdAndDelete(
-      profileId
-    );
+    const deletedProfile = await Profile.findByIdAndDelete(profileId);
 
     if (!deletedProfile) {
       throw new Error("Profile not found");
@@ -158,7 +173,6 @@ export const deleteProfile = async (profileId: string) => {
 
 // ====== CHECK PROFILE EXISTENCE BY EMAIL
 export const isRegisteredByEmail = async (email: string): Promise<boolean> => {
-
   try {
     await connectToDatabase();
 
@@ -183,7 +197,6 @@ export const isRegisteredByEmail = async (email: string): Promise<boolean> => {
 
 // ====== CHECK SUBMIT PROFILE EXISTENCE BY EMAIL
 export const isSubmittedByEmail = async (email: string): Promise<boolean> => {
-
   try {
     await connectToDatabase();
 
@@ -205,7 +218,7 @@ export const isSubmittedByEmail = async (email: string): Promise<boolean> => {
 // ====== ADD SUBAGENT TO PROFILE
 export const addSubAgentByEmailToProfile = async (
   agentEmail: string,
-  subAgentEmail: string
+  subAgentEmail: string,
 ) => {
   try {
     await connectToDatabase();
@@ -226,10 +239,9 @@ export const addSubAgentByEmailToProfile = async (
   }
 };
 
-
 export const uploadSignatureDocument = async (
   profileId: string,
-  signatureDocument: string
+  signatureDocument: string,
 ) => {
   try {
     await connectToDatabase();
@@ -237,7 +249,7 @@ export const uploadSignatureDocument = async (
     const profile = await Profile.findByIdAndUpdate(
       profileId,
       { signatureDocument },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!profile) {
