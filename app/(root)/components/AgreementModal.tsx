@@ -120,24 +120,32 @@ export default function AgreementModal({
 
                 <div className="flex-1 overflow-y-auto pr-2">
                   <div>
-                    <h1 className="font-bold text-xl">
+                    <h1 className="font-bold text-2xl text-center mb-6">
                       Education Agency Agreement
                     </h1>
                     <div className="mt-4 mb-2 space-y-4">
                       <h3 className="font-semibold">
                         This Education Agency Agreement is made:
                       </h3>
-                      <p className="font-semibold">
-                        Between - Academic Bridge Limited, a Private Training
-                        school, having its head office at 33 Gardiner Place,
-                        Dublin1 - D01W625, Dublin Ireland (&quot;AB&quot;).
+                      <p className="">
+                        <span className="font-semibold">
+                          Between - Academic Bridge Limited
+                        </span>
+                        , a Private Training school, having its head office at
+                        33 Gardiner Place, Dublin1 - D01W625, Dublin Ireland
+                        <span className="font-semibold">(&quot;AB&quot;)</span>.
                       </p>
                       <p className="font-semibold">
-                        and - {profile?.name || "N/A"},at :{" "}
-                        {profile?.location || "N/A"},{" "}
+                        <span className="font-semibold">
+                          and - {profile?.name || "N/A"}
+                        </span>
+                        , at : {profile?.location || "N/A"},{" "}
                         {profile?.country || "N/A"}
-                        (&quot;Agent&quot;), which advises, counsels and
-                        recruits prospective international students from
+                        <span className="font-semibold">
+                          (&quot;Agent&quot;)
+                        </span>
+                        , which advises, counsels and recruits prospective
+                        international students from
                         {profile?.country || "N/A"}
                       </p>
                     </div>
