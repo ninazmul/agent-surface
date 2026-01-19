@@ -11,7 +11,7 @@ export default async function SettingsPage() {
   }
 
   return (
-    <main className="p-4 min-h-screen bg-gray-50">
+    <main className="p-4 min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-2xl font-semibold mb-6">General Settings</h1>
         <SettingForm initialData={setting ?? undefined} onSubmit={onSubmit} />

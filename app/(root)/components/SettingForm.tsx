@@ -76,7 +76,7 @@ export default function SettingForm({ initialData, onSubmit }: Props) {
 
   return (
     <Form {...form}>
-      <form className="p-6 bg-white rounded-xl shadow-sm space-y-6">
+      <form className="m-4 p-4 bg-white dark:bg-gray-800 rounded-2xl space-y-6">
         <Accordion type="multiple" defaultValue={["branding", "basic"]}>
           {/* ================= BRANDING SECTION ================= */}
           <AccordionItem value="branding">
@@ -342,7 +342,7 @@ export default function SettingForm({ initialData, onSubmit }: Props) {
                 name="contractAgreement"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Privacy Policy</FormLabel>
+                    <FormLabel>Contract Agreement</FormLabel>
                     <FormControl>
                       <RichTextEditor
                         value={field.value || ""}
