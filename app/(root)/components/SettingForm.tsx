@@ -76,32 +76,88 @@ export default function SettingForm({ initialData, onSubmit }: Props) {
 
   return (
     <Form {...form}>
-      <form className="m-4 p-4 bg-white dark:bg-gray-800 rounded-2xl space-y-6">
-        <Accordion type="multiple" defaultValue={["branding", "basic"]}>
-          {/* ================= BRANDING SECTION ================= */}
-          <AccordionItem value="branding">
-            <AccordionTrigger className="text-xl font-semibold">
+      <form className="space-y-6 p-6 bg-gray-50 dark:bg-gray-900 rounded-2xl shadow-md">
+        <Accordion
+          type="multiple"
+          defaultValue={["branding", "basic"]}
+          className="space-y-4"
+        >
+          {/* ================= BRANDING ================= */}
+          <AccordionItem
+            value="branding"
+            className="bg-white dark:bg-gray-800 shadow rounded-lg"
+          >
+            <AccordionTrigger className="text-lg font-semibold text-gray-800 dark:text-gray-100 px-4 py-2 rounded-t-lg hover:bg-gray-100 dark:hover:bg-gray-700">
               Branding
             </AccordionTrigger>
-            <AccordionContent className="pt-4 space-y-4">
+            <AccordionContent className="p-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="logo"
+                render={({ field }) => (
+                  <FormItem className="space-y-1">
+                    <FormLabel>Logo *</FormLabel>
+                    <FormControl>
+                      <FileUploader
+                        fileUrl={field.value || ""}
+                        onFieldChange={(url) => {
+                          form.setValue("logo", url, { shouldValidate: true });
+                          saveField();
+                        }}
+                        setFiles={() => {}}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="favicon"
+                render={({ field }) => (
+                  <FormItem className="space-y-1">
+                    <FormLabel>Favicon *</FormLabel>
+                    <FormControl>
+                      <FileUploader
+                        fileUrl={field.value || ""}
+                        onFieldChange={(url) => {
+                          form.setValue("favicon", url, {
+                            shouldValidate: true,
+                          });
+                          saveField();
+                        }}
+                        setFiles={() => {}}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </AccordionContent>
+          </AccordionItem>
+
+          {/* ================= BASIC INFO ================= */}
+          <AccordionItem
+            value="basic"
+            className="bg-white dark:bg-gray-800 shadow rounded-lg"
+          >
+            <AccordionTrigger className="text-lg font-semibold text-gray-800 dark:text-gray-100 px-4 py-2 rounded-t-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+              Basic Information
+            </AccordionTrigger>
+            <AccordionContent className="p-4 space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Logo */}
                 <FormField
                   control={form.control}
-                  name="logo"
+                  name="name"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Logo *</FormLabel>
+                    <FormItem className="space-y-1">
+                      <FormLabel>Site Name *</FormLabel>
                       <FormControl>
-                        <FileUploader
-                          fileUrl={field.value || ""}
-                          onFieldChange={(url) => {
-                            form.setValue("logo", url, {
-                              shouldValidate: true,
-                            });
-                            saveField();
-                          }}
-                          setFiles={() => {}}
+                        <Input
+                          placeholder="Site name"
+                          {...field}
+                          onBlur={saveField}
                         />
                       </FormControl>
                       <FormMessage />
@@ -109,23 +165,17 @@ export default function SettingForm({ initialData, onSubmit }: Props) {
                   )}
                 />
 
-                {/* Favicon */}
                 <FormField
                   control={form.control}
-                  name="favicon"
+                  name="tagline"
                   render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Favicon *</FormLabel>
+                    <FormItem className="space-y-1">
+                      <FormLabel>Tagline</FormLabel>
                       <FormControl>
-                        <FileUploader
-                          fileUrl={field.value || ""}
-                          onFieldChange={(url) => {
-                            form.setValue("favicon", url, {
-                              shouldValidate: true,
-                            });
-                            saveField();
-                          }}
-                          setFiles={() => {}}
+                        <Input
+                          placeholder="Tagline"
+                          {...field}
+                          onBlur={saveField}
                         />
                       </FormControl>
                       <FormMessage />
@@ -133,56 +183,12 @@ export default function SettingForm({ initialData, onSubmit }: Props) {
                   )}
                 />
               </div>
-            </AccordionContent>
-          </AccordionItem>
-
-          {/* ================= BASIC INFO SECTION ================= */}
-          <AccordionItem value="basic">
-            <AccordionTrigger className="text-xl font-semibold">
-              Basic Information
-            </AccordionTrigger>
-            <AccordionContent className="pt-4 space-y-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Site Name *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Site name"
-                        {...field}
-                        onBlur={saveField}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="tagline"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tagline</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Tagline"
-                        {...field}
-                        onBlur={saveField}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
 
               <FormField
                 control={form.control}
                 name="description"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-1">
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <RichTextEditor
@@ -198,48 +204,50 @@ export default function SettingForm({ initialData, onSubmit }: Props) {
                 )}
               />
 
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Email *</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="email"
-                        placeholder="Email"
-                        {...field}
-                        onBlur={saveField}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel>Email *</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="email"
+                          placeholder="Email"
+                          {...field}
+                          onBlur={saveField}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="phoneNumber"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Phone Number *</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Phone number"
-                        {...field}
-                        onBlur={saveField}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="phoneNumber"
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel>Phone Number *</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Phone number"
+                          {...field}
+                          onBlur={saveField}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
 
               <FormField
                 control={form.control}
                 name="address"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className="space-y-1">
                     <FormLabel>Address</FormLabel>
                     <FormControl>
                       <Textarea {...field} rows={3} onBlur={saveField} />
@@ -252,110 +260,46 @@ export default function SettingForm({ initialData, onSubmit }: Props) {
           </AccordionItem>
 
           {/* ================= POLICIES ================= */}
-          <AccordionItem value="policies">
-            <AccordionTrigger className="text-xl font-semibold">
+          <AccordionItem
+            value="policies"
+            className="bg-white dark:bg-gray-800 shadow rounded-lg"
+          >
+            <AccordionTrigger className="text-lg font-semibold text-gray-800 dark:text-gray-100 px-4 py-2 rounded-t-lg hover:bg-gray-100 dark:hover:bg-gray-700">
               Policies & Information
             </AccordionTrigger>
-            <AccordionContent className="pt-4 space-y-4">
-              <FormField
-                control={form.control}
-                name="aboutUs"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>About Us</FormLabel>
-                    <FormControl>
-                      <RichTextEditor
-                        value={field.value || ""}
-                        onChange={(val) => {
-                          field.onChange(val);
-                          saveField();
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="returnPolicy"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Return Policy</FormLabel>
-                    <FormControl>
-                      <RichTextEditor
-                        value={field.value || ""}
-                        onChange={(val) => {
-                          field.onChange(val);
-                          saveField();
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="termsOfService"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Terms of Service</FormLabel>
-                    <FormControl>
-                      <RichTextEditor
-                        value={field.value || ""}
-                        onChange={(val) => {
-                          field.onChange(val);
-                          saveField();
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="privacyPolicy"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Privacy Policy</FormLabel>
-                    <FormControl>
-                      <RichTextEditor
-                        value={field.value || ""}
-                        onChange={(val) => {
-                          field.onChange(val);
-                          saveField();
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="contractAgreement"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Contract Agreement</FormLabel>
-                    <FormControl>
-                      <RichTextEditor
-                        value={field.value || ""}
-                        onChange={(val) => {
-                          field.onChange(val);
-                          saveField();
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+            <AccordionContent className="p-4 space-y-4">
+              {[
+                "aboutUs",
+                "returnPolicy",
+                "termsOfService",
+                "privacyPolicy",
+                "contractAgreement",
+              ].map((fieldName) => (
+                <FormField
+                  key={fieldName}
+                  control={form.control}
+                  name={fieldName as keyof SettingFormValues}
+                  render={({ field }) => (
+                    <FormItem className="space-y-1">
+                      <FormLabel>
+                        {fieldName
+                          .replace(/([A-Z])/g, " $1")
+                          .replace(/^./, (str) => str.toUpperCase())}
+                      </FormLabel>
+                      <FormControl>
+                        <RichTextEditor
+                          value={field.value || ""}
+                          onChange={(val) => {
+                            field.onChange(val);
+                            saveField();
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ))}
             </AccordionContent>
           </AccordionItem>
         </Accordion>
