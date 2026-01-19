@@ -167,7 +167,7 @@ export default function AgreementModal({
                     {/* AB SIGNATURE */}
                     <div className="w-full lg:w-1/3">
                       <p className="font-semibold">Signed by AB Academic Bridge Ltd:</p>
-                      <div className="w-full h-[150px] md:h-[200px] relative">
+                      <div className="w-full h-[50px] md:h-[100px] relative">
                         <Image
                           src="/assets/images/1.png"
                           alt="AB Partner Portal Signature"
@@ -182,7 +182,7 @@ export default function AgreementModal({
                     {/* AGENT SIGNATURE */}
                     <div className="w-full lg:w-1/3">
                       <p className="font-semibold">Executed as an agreement</p>
-                      <div className="w-full h-[150px] md:h-[200px] relative">
+                      <div className="w-full h-[50px] md:h-[100px] relative">
                         {profile?.signatureDocument ? (
                           <Image
                             src={profile.signatureDocument}
