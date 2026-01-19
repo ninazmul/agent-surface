@@ -124,12 +124,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
   return (
     <div className="space-y-2">
       {/* Toolbar */}
-      <div
-        className="flex flex-wrap items-center gap-2 border border-gray-300 rounded-md bg-gray-50 px-2 py-1
-                dark:border-gray-600 dark:bg-gray-800
-                focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500
-                dark:focus-within:ring-indigo-400 dark:focus-within:border-indigo-400"
-      >
+      <div className="flex flex-wrap items-center gap-2 border border-gray-300 rounded-md bg-gray-50 px-2 py-1 dark:border-gray-600 dark:bg-gray-800 focus-within:ring-2 focus-within:ring-indigo-500 focus-within:border-indigo-500 dark:focus-within:ring-indigo-400 dark:focus-within:border-indigo-400">
         {/* Bold */}
         <button
           type="button"
