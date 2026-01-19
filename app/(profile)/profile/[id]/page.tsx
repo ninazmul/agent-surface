@@ -143,7 +143,7 @@ const ProfileDetails = async ({ params }: PageProps) => {
         </h2>
 
         <div className="mb-6">
-          <ViewContactAgreement />
+          <ViewContactAgreement profile={profile} />
         </div>
 
         {/* Signature Preview */}

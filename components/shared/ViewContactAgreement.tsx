@@ -1,9 +1,14 @@
 "use client";
 
 import AgreementModal from "@/app/(root)/components/AgreementModal";
+import { IProfile } from "@/lib/database/models/profile.model";
 import { useState } from "react";
 
-function ViewContactAgreement() {
+interface ViewContactAgreementProps {
+  profile: IProfile;
+}
+
+function ViewContactAgreement({ profile }: ViewContactAgreementProps) {
   const [openAgreementModal, setOpenAgreementModal] = useState(false);
 
   return (
@@ -24,6 +29,7 @@ function ViewContactAgreement() {
       </div>
       {/* Modal */}
       <AgreementModal
+        profile={profile}
         open={openAgreementModal}
         onClose={() => setOpenAgreementModal(false)}
       />

@@ -1,17 +1,23 @@
 "use client";
 
 import { getSetting } from "@/lib/actions/setting.actions";
+import { IProfile } from "@/lib/database/models/profile.model";
 import { ISetting } from "@/lib/database/models/setting.model";
 import { Dialog, Transition } from "@headlessui/react";
 import Image from "next/image";
 import { Fragment, useEffect, useState } from "react";
 
 interface AgreementModalProps {
+  profile: IProfile;
   open: boolean;
   onClose: () => void;
 }
 
-export default function AgreementModal({ open, onClose }: AgreementModalProps) {
+export default function AgreementModal({
+  profile,
+  open,
+  onClose,
+}: AgreementModalProps) {
   const [settings, setSettings] = useState<ISetting | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -113,6 +119,28 @@ export default function AgreementModal({ open, onClose }: AgreementModalProps) {
                 </Dialog.Title>
 
                 <div className="flex-1 overflow-y-auto pr-2">
+                  <div>
+                    <h1 className="font-bold text-xl">
+                      Education Agency Agreement
+                    </h1>
+                    <div className="mt-4 mb-2 space-y-4">
+                      <h3 className="font-semibold">
+                        This Education Agency Agreement is made:
+                      </h3>
+                      <p className="font-semibold">
+                        Between - Academic Bridge Limited, a Private Training
+                        school, having its head office at 33 Gardiner Place,
+                        Dublin1 - D01W625, Dublin Ireland (&quot;AB&quot;).
+                      </p>
+                      <p className="font-semibold">
+                        and - {profile.name},at : {profile.location},{" "}
+                        {profile.country}
+                        (&quot;Agent&quot;), which advises, counsels and
+                        recruits prospective international students from
+                        {profile.country}
+                      </p>
+                    </div>
+                  </div>
                   {settings.contractAgreement && (
                     <div
                       className="
