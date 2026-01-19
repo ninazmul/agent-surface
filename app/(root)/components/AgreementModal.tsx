@@ -191,7 +191,18 @@ export default function AgreementModal({
                       <p className="font-semibold">
                         Fernando Comar — Sales Manager
                       </p>
-                      <p className="font-semibold">Date: 11-05-2025</p>
+                      <p className="font-semibold">
+                        Date:{" "}
+                        {profile?.signatureDate &&
+                          new Date(profile.signatureDate).toLocaleString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            },
+                          )}
+                      </p>
                     </div>
 
                     {/* AGENT SIGNATURE */}
@@ -213,7 +224,18 @@ export default function AgreementModal({
                         )}
                       </div>
                       <p className="font-semibold">Signed by (The Agent):</p>
-                      <p className="font-semibold">Date: 11-05-2025</p>
+                      <p className="font-semibold">
+                        Date:{" "}
+                        {profile?.signatureDate &&
+                          new Date(profile.signatureDate).toLocaleString(
+                            "en-GB",
+                            {
+                              day: "2-digit",
+                              month: "2-digit",
+                              year: "numeric",
+                            },
+                          )}
+                      </p>
                     </div>
                   </div>
                 </div>

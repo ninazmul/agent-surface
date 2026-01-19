@@ -242,13 +242,17 @@ export const addSubAgentByEmailToProfile = async (
 export const uploadSignatureDocument = async (
   profileId: string,
   signatureDocument: string,
+  signatureDate: Date,
 ) => {
   try {
     await connectToDatabase();
 
     const profile = await Profile.findByIdAndUpdate(
       profileId,
-      { signatureDocument },
+      {
+        signatureDocument,
+        signatureDate,
+      },
       { new: true, runValidators: true },
     );
 

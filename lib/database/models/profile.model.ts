@@ -22,6 +22,7 @@ export interface IProfile extends Document {
   salesTarget?: string;
   commission?: string;
   signatureDocument?: string;
+  signatureDate?: Date;
   createdAt: Date;
 }
 
@@ -46,6 +47,7 @@ const ProfileSchema = new Schema<IProfile>({
   salesTarget: { type: String, required: false },
   commission: { type: String, required: false },
   signatureDocument: { type: String, required: false },
+  signatureDate: { type: Date, required: false },
   createdAt: { type: Date, default: Date.now },
 });
 

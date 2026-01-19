@@ -22,6 +22,7 @@ import DigitalSignaturePad from "@/components/shared/DigitalSignaturePad";
 /* ---------------- Schema ---------------- */
 const signatureSchema = z.object({
   signatureDocument: z.string().min(1, "Signature file is required"),
+  signatureDate: z.date(),
 });
 
 type SignatureFormProps = {
@@ -41,6 +42,7 @@ export function SignatureDocumentForm({
     resolver: zodResolver(signatureSchema),
     defaultValues: {
       signatureDocument: "",
+      signatureDate: new Date(),
     },
   });
 
@@ -55,7 +57,10 @@ export function SignatureDocumentForm({
         uploadedSignatureDocumentUrl = uploaded[0].url;
       }
 
-      await uploadSignatureDocument(profileId, uploadedSignatureDocumentUrl);
+      // Ensure signatureDate is current date
+      const signatureDate = new Date();
+
+      await uploadSignatureDocument(profileId, uploadedSignatureDocumentUrl, signatureDate);
 
       toast.success("Signature submitted successfully");
 
@@ -83,6 +88,8 @@ export function SignatureDocumentForm({
                 <DigitalSignaturePad
                   onSave={(file) => {
                     setSignatureDocument([file]);
+                    // Automatically set signatureDate to current date
+                    form.setValue("signatureDate", new Date());
                     field.onChange("signature.png"); // satisfies Zod
                   }}
                 />

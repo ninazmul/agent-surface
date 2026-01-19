@@ -468,6 +468,7 @@ export type ProfileParams = {
   salesTarget?: string;
   commission?: string;
   signatureDocument?: string;
+  signatureDate?: Date;
   createdAt: Date;
 };
 
