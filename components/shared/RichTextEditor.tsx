@@ -63,7 +63,11 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
     editorProps: {
       attributes: {
         className:
-          "tiptap-editor min-h-[200px] border border-gray-200 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-indigo-400",
+          "tiptap-editor min-h-[200px] p-2 rounded-md " +
+          "border border-gray-300 dark:border-gray-600 " + // always visible border
+          "bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 " +
+          "focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 " + // highlight on focus
+          "dark:focus:ring-indigo-400 dark:focus:border-indigo-400",
       },
     },
     immediatelyRender: false,
@@ -197,16 +201,18 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
             align === "left"
               ? AlignLeft
               : align === "center"
-              ? AlignCenter
-              : align === "right"
-              ? AlignRight
-              : AlignJustify;
+                ? AlignCenter
+                : align === "right"
+                  ? AlignRight
+                  : AlignJustify;
           return (
             <button
               key={align}
               type="button"
               onClick={() => editor.chain().focus().setTextAlign(align).run()}
-              className={toolbarButtonClasses(editor.isActive({ textAlign: align }))}
+              className={toolbarButtonClasses(
+                editor.isActive({ textAlign: align }),
+              )}
             >
               <Icon size={18} />
             </button>
@@ -278,9 +284,16 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
       {/* Preview */}
       {previewImage && (
         <div className="border rounded-md p-2 bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-          <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Image Preview:</p>
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+            Image Preview:
+          </p>
           <div className="relative w-full h-[200px]">
-            <Image src={previewImage} alt="Preview" fill className="object-contain rounded-md" />
+            <Image
+              src={previewImage}
+              alt="Preview"
+              fill
+              className="object-contain rounded-md"
+            />
           </div>
         </div>
       )}
