@@ -192,15 +192,20 @@ export default function AgreementModal({
                     </div>
                     <div>
                       <p className="font-semibold">Executed as an agreement</p>
-                      {profile && profile.signatureDocument && (
+                      {profile?.signatureDocument ? (
                         <Image
-                          src={profile?.signatureDocument}
-                          alt="AB Partner Portal Signature"
-                          width={120}
-                          height={120}
+                          src={profile.signatureDocument}
+                          alt="Agent Signature"
+                          width={500}
+                          height={200}
                           className="object-contain dark:hidden"
                         />
+                      ) : (
+                        <div className="w-full h-[200px] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
+                          Reserved for Agent Signature
+                        </div>
                       )}
+
                       <p className="font-semibold">Signed by (The Agent):</p>
                       <p className="font-semibold">Date: 11-05-2025</p>
                     </div>
