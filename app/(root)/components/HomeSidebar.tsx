@@ -41,6 +41,7 @@ import {
   DatabaseZap,
   DatabaseIcon,
   DatabaseBackup,
+  Settings,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -180,6 +181,7 @@ const sidebarItems = [
   { key: "services", title: "Services", url: "/services", icon: Megaphone },
   { key: "admins", title: "Admins", url: "/admins", icon: Shield },
   { key: "about", title: "About Us", url: "/about", icon: BookOpen },
+  { key: "settings", title: "settings", url: "/settings", icon: Settings },
 ];
 
 type HomeSidebarProps = {

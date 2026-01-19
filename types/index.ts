@@ -532,3 +532,27 @@ export type ResourcePriceListParams = {
   link: string;
   createdAt: Date;
 };
+
+export type SettingParams = {
+  logo: string;
+  favicon: string;
+  name: string;
+  tagline?: string;
+  description?: string;
+  email: string;
+  phoneNumber: string;
+  address?: string;
+  facebook?: string;
+  instagram?: string;
+  twitter?: string;
+  facebookGroup?: string;
+  youtube?: string;
+  aboutUs?: string;
+  returnPolicy?: string;
+  termsOfService?: string;
+  privacyPolicy?: string;
+  contractAgreement?: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
