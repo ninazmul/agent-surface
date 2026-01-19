@@ -175,7 +175,7 @@ export default function AgreementModal({
                   )}
                   <div className="mt-8 flex flex-col md:flex-row items-center justify-between gap-8">
                     {/* AB SIGNATURE */}
-                    <div className="w-1/3">
+                    <div className="w-full md:w-1/2 lg:w-1/3">
                       <p className="font-semibold">
                         Signed by AB Academic Bridge Ltd:
                       </p>
@@ -196,7 +196,7 @@ export default function AgreementModal({
                     </div>
 
                     {/* AGENT SIGNATURE */}
-                    <div className="w-1/3">
+                    <div className="w-full md:w-1/2 lg:w-1/3">
                       <p className="font-semibold">Executed as an agreement</p>
 
                       <div className="w-full h-[200px] relative">
