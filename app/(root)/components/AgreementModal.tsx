@@ -180,7 +180,7 @@ export default function AgreementModal({
                         Signed by AB Academic Bridge Ltd:
                       </p>
 
-                      <div className="w-72 h-[200px] relative">
+                      <div className="w-full h-[200px] relative">
                         <Image
                           src="/assets/images/1.png"
                           alt="AB Partner Portal Signature"
@@ -199,7 +199,7 @@ export default function AgreementModal({
                     <div>
                       <p className="font-semibold">Executed as an agreement</p>
 
-                      <div className="w-72 h-[200px] relative">
+                      <div className="w-full h-[200px] relative">
                         {profile?.signatureDocument ? (
                           <Image
                             src={profile.signatureDocument}
