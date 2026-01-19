@@ -3,6 +3,7 @@
 import { getSetting } from "@/lib/actions/setting.actions";
 import { ISetting } from "@/lib/database/models/setting.model";
 import { Dialog, Transition } from "@headlessui/react";
+import Image from "next/image";
 import { Fragment, useEffect, useState } from "react";
 
 interface AgreementModalProps {
@@ -82,7 +83,33 @@ export default function AgreementModal({ open, onClose }: AgreementModalProps) {
             >
               <Dialog.Panel className="w-full max-w-5xl h-[90vh] bg-white dark:bg-gray-800 rounded-2xl p-4 shadow-xl flex flex-col">
                 <Dialog.Title className="text-lg font-semibold mb-4">
-                  Agreement
+                  <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-6">
+                    <Image
+                      src="/assets/images/logo.png"
+                      alt="AB Partner Portal Logo"
+                      width={120}
+                      height={120}
+                      className="object-contain dark:hidden"
+                    />
+                    <Image
+                      src="/assets/images/logo-white.png"
+                      alt="AB Partner Portal Logo"
+                      width={120}
+                      height={120}
+                      className="object-contain hidden dark:block"
+                    />
+                    <div className="text-right text-xs text-gray-600 dark:text-gray-300 space-y-0.5">
+                      <p>
+                        33 Gardiner Place, Dublin 1 • Ireland +353 1 878 8616
+                      </p>
+                      <p>
+                        info@academicbridge.ie •{" "}
+                        <span className="font-semibold text-primary-700">
+                          www.academicbridge.ie
+                        </span>
+                      </p>
+                    </div>
+                  </div>
                 </Dialog.Title>
 
                 <div className="flex-1 overflow-y-auto pr-2">
