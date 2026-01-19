@@ -8,7 +8,7 @@ import Image from "next/image";
 import { Fragment, useEffect, useState } from "react";
 
 interface AgreementModalProps {
-  profile: IProfile;
+  profile?: IProfile;
   open: boolean;
   onClose: () => void;
 }
@@ -133,11 +133,12 @@ export default function AgreementModal({
                         Dublin1 - D01W625, Dublin Ireland (&quot;AB&quot;).
                       </p>
                       <p className="font-semibold">
-                        and - {profile.name},at : {profile.location},{" "}
-                        {profile.country}
+                        and - {profile?.name || "N/A"},at :{" "}
+                        {profile?.location || "N/A"},{" "}
+                        {profile?.country || "N/A"}
                         (&quot;Agent&quot;), which advises, counsels and
                         recruits prospective international students from
-                        {profile.country}
+                        {profile?.country || "N/A"}
                       </p>
                     </div>
                   </div>
