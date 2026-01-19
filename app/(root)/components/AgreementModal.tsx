@@ -173,18 +173,19 @@ export default function AgreementModal({
                   )}
 
                   {/* SIGNATURES */}
-                  <div className="mt-8 flex flex-col lg:flex-row items-center justify-between gap-10">
+                  <div className="mt-8 flex flex-row flex-wrap items-start justify-between gap-6 text-xs md:text-sm">
                     {/* AB SIGNATURE */}
-                    <div className="w-full lg:w-1/3">
+                    <div className="flex-1 flex flex-col items-start text-left min-w-[140px]">
                       <p className="font-semibold">
                         Signed by AB Academic Bridge Ltd:
                       </p>
-                      <div className="w-full h-[50px] md:h-[100px] relative content-start">
+                      <div className="w-full max-w-[120px] md:max-w-full h-[50px] md:h-[100px] relative my-2">
                         <Image
                           src="/assets/images/1.png"
                           alt="AB Partner Portal Signature"
                           fill
                           className="object-contain"
+                          style={{ objectPosition: "top" }}
                         />
                       </div>
                       <p className="font-semibold">
@@ -194,18 +195,19 @@ export default function AgreementModal({
                     </div>
 
                     {/* AGENT SIGNATURE */}
-                    <div className="w-full lg:w-1/3">
+                    <div className="flex-1 flex flex-col items-start text-left min-w-[140px]">
                       <p className="font-semibold">Executed as an agreement</p>
-                      <div className="w-full h-[50px] md:h-[100px] relative content-start">
+                      <div className="w-full max-w-[120px] md:max-w-full h-[50px] md:h-[100px] relative my-2">
                         {profile?.signatureDocument ? (
                           <Image
                             src={profile.signatureDocument}
                             alt="Agent Signature"
                             fill
                             className="object-contain"
+                            style={{ objectPosition: "top" }}
                           />
                         ) : (
-                          <div className="w-full h-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
+                          <div className="w-full h-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-start justify-center text-gray-500 dark:text-gray-400 text-xs md:text-sm px-1 py-1">
                             Reserved for Agent Signature
                           </div>
                         )}
