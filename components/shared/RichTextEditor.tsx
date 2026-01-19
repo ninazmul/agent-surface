@@ -62,8 +62,8 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
     onUpdate: ({ editor }) => onChange(editor.getHTML()),
     editorProps: {
       attributes: {
-        class:
-          "tiptap-editor min-h-[200px] border border-gray-200 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500",
+        className:
+          "tiptap-editor min-h-[200px] border border-gray-200 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-gray-900 dark:bg-gray-900 dark:text-gray-100 dark:border-gray-700 dark:focus:ring-indigo-400",
       },
     },
     immediatelyRender: false,
@@ -77,7 +77,6 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
 
   if (!editor) return null;
 
-  // Image insert with preview and upload
   const addImage = async () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -86,12 +85,10 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
       const file = input.files?.[0];
       if (!file) return;
 
-      // Show preview using base64
       const reader = new FileReader();
       reader.onload = () => setPreviewImage(reader.result as string);
       reader.readAsDataURL(file);
 
-      // Confirm before uploading
       const confirmUpload = confirm("Do you want to insert this image?");
       if (!confirmUpload) {
         setPreviewImage(null);
@@ -113,17 +110,22 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
     input.click();
   };
 
+  const toolbarButtonClasses = (isActive: boolean) =>
+    `p-1 rounded ${
+      isActive
+        ? "bg-indigo-100 text-indigo-600 dark:bg-indigo-700 dark:text-indigo-300"
+        : "hover:bg-gray-100 dark:hover:bg-gray-800"
+    }`;
+
   return (
     <div className="space-y-2">
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2 border px-2 py-1 rounded-md bg-gray-50">
+      <div className="flex flex-wrap items-center gap-2 border px-2 py-1 rounded-md bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700">
         {/* Bold */}
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBold().run()}
-          className={`p-1 rounded ${
-            editor.isActive("bold") ? "bg-indigo-100 text-indigo-600" : ""
-          }`}
+          className={toolbarButtonClasses(editor.isActive("bold"))}
         >
           <Bold size={18} />
         </button>
@@ -132,9 +134,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleItalic().run()}
-          className={`p-1 rounded ${
-            editor.isActive("italic") ? "bg-indigo-100 text-indigo-600" : ""
-          }`}
+          className={toolbarButtonClasses(editor.isActive("italic"))}
         >
           <Italic size={18} />
         </button>
@@ -143,9 +143,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleUnderline().run()}
-          className={`p-1 rounded ${
-            editor.isActive("underline") ? "bg-indigo-100 text-indigo-600" : ""
-          }`}
+          className={toolbarButtonClasses(editor.isActive("underline"))}
         >
           U
         </button>
@@ -154,9 +152,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleStrike().run()}
-          className={`p-1 rounded ${
-            editor.isActive("strike") ? "bg-indigo-100 text-indigo-600" : ""
-          }`}
+          className={toolbarButtonClasses(editor.isActive("strike"))}
         >
           <Strikethrough size={18} />
         </button>
@@ -165,9 +161,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleCode().run()}
-          className={`p-1 rounded ${
-            editor.isActive("code") ? "bg-indigo-100 text-indigo-600" : ""
-          }`}
+          className={toolbarButtonClasses(editor.isActive("code"))}
         >
           <CodeIcon size={18} />
         </button>
@@ -176,9 +170,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleHighlight().run()}
-          className={`p-1 rounded ${
-            editor.isActive("highlight") ? "bg-indigo-100 text-indigo-600" : ""
-          }`}
+          className={toolbarButtonClasses(editor.isActive("highlight"))}
         >
           H
         </button>
@@ -187,20 +179,14 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBulletList().run()}
-          className={`p-1 rounded ${
-            editor.isActive("bulletList") ? "bg-indigo-100 text-indigo-600" : ""
-          }`}
+          className={toolbarButtonClasses(editor.isActive("bulletList"))}
         >
           <List size={18} />
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
-          className={`p-1 rounded ${
-            editor.isActive("orderedList")
-              ? "bg-indigo-100 text-indigo-600"
-              : ""
-          }`}
+          className={toolbarButtonClasses(editor.isActive("orderedList"))}
         >
           <ListOrdered size={18} />
         </button>
@@ -220,11 +206,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
               key={align}
               type="button"
               onClick={() => editor.chain().focus().setTextAlign(align).run()}
-              className={`p-1 rounded ${
-                editor.isActive({ textAlign: align })
-                  ? "bg-indigo-100 text-indigo-600"
-                  : ""
-              }`}
+              className={toolbarButtonClasses(editor.isActive({ textAlign: align }))}
             >
               <Icon size={18} />
             </button>
@@ -244,9 +226,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
               .setLink({ href: url })
               .run();
           }}
-          className={`p-1 rounded ${
-            editor.isActive("link") ? "bg-indigo-100 text-indigo-600" : ""
-          }`}
+          className={toolbarButtonClasses(editor.isActive("link"))}
         >
           <LinkIcon size={18} />
         </button>
@@ -255,7 +235,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
         <button
           type="button"
           onClick={addImage}
-          className="p-1 rounded hover:bg-gray-100"
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           <ImageIcon size={18} />
         </button>
@@ -264,9 +244,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
         <button
           type="button"
           onClick={() => editor.chain().focus().toggleBlockquote().run()}
-          className={`p-1 rounded ${
-            editor.isActive("blockquote") ? "bg-indigo-100 text-indigo-600" : ""
-          }`}
+          className={toolbarButtonClasses(editor.isActive("blockquote"))}
         >
           <Quote size={18} />
         </button>
@@ -275,7 +253,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
         <button
           type="button"
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
-          className="p-1 rounded"
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           <Minus size={18} />
         </button>
@@ -284,30 +262,25 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
         <button
           type="button"
           onClick={() => editor.chain().focus().undo().run()}
-          className="p-1 rounded"
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           <Undo2 size={18} />
         </button>
         <button
           type="button"
           onClick={() => editor.chain().focus().redo().run()}
-          className="p-1 rounded"
+          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           <Redo2 size={18} />
         </button>
       </div>
 
-      {/* Preview using Next.js Image */}
+      {/* Preview */}
       {previewImage && (
-        <div className="border rounded-md p-2 bg-gray-50">
-          <p className="text-sm text-gray-600 mb-1">Image Preview:</p>
+        <div className="border rounded-md p-2 bg-gray-50 border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">Image Preview:</p>
           <div className="relative w-full h-[200px]">
-            <Image
-              src={previewImage}
-              alt="Preview"
-              fill
-              className="object-contain rounded-md"
-            />
+            <Image src={previewImage} alt="Preview" fill className="object-contain rounded-md" />
           </div>
         </div>
       )}
@@ -317,7 +290,7 @@ export const RichTextEditor = ({ value, onChange }: Props) => {
 
       <style jsx>{`
         .tiptap-editor a {
-          @apply text-blue-600 underline;
+          @apply text-blue-600 dark:text-blue-400 underline;
         }
         .tiptap-editor img {
           @apply max-w-full rounded-md my-2;
