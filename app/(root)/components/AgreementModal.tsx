@@ -86,30 +86,27 @@ export default function AgreementModal({
               leaveTo="opacity-0 scale-95"
             >
               <Dialog.Panel className="w-full md:max-w-5xl h-screen md:h-[90vh] bg-white dark:bg-gray-800 rounded-none md:rounded-2xl p-3 md:p-4 shadow-xl flex flex-col">
-                
                 {/* HEADER */}
                 <Dialog.Title className="mb-4">
-                  <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4 border-b border-gray-200 pb-4 mb-6">
-                    <div className="flex justify-center md:justify-start">
-                      <Image
-                        src="/assets/images/logo.png"
-                        alt="AB Partner Portal Logo"
-                        width={100}
-                        height={100}
-                        className="object-contain dark:hidden"
-                      />
-                      <Image
-                        src="/assets/images/logo-white.png"
-                        alt="AB Partner Portal Logo"
-                        width={100}
-                        height={100}
-                        className="object-contain hidden dark:block"
-                      />
-                    </div>
-
-                    <div className="text-center md:text-right text-xs text-gray-600 dark:text-gray-300 space-y-1">
-                      <p>33 Gardiner Place, Dublin 1 • Ireland</p>
-                      <p>+353 1 878 8616</p>
+                  <div className="flex justify-between items-center border-b border-gray-200 pb-4 mb-6">
+                    <Image
+                      src="/assets/images/logo.png"
+                      alt="AB Partner Portal Logo"
+                      width={120}
+                      height={120}
+                      className="object-contain dark:hidden"
+                    />
+                    <Image
+                      src="/assets/images/logo-white.png"
+                      alt="AB Partner Portal Logo"
+                      width={120}
+                      height={120}
+                      className="object-contain hidden dark:block"
+                    />
+                    <div className="text-right text-xs text-gray-600 dark:text-gray-300 space-y-0.5">
+                      <p>
+                        33 Gardiner Place, Dublin 1 • Ireland +353 1 878 8616
+                      </p>
                       <p>
                         info@academicbridge.ie •{" "}
                         <span className="font-semibold text-primary-700">
@@ -131,13 +128,25 @@ export default function AgreementModal({
                       This Education Agency Agreement is made:
                     </h3>
                     <p>
-                      <span className="font-semibold">Between - Academic Bridge Limited</span>, a Private Training school, having its head office at
-                      33 Gardiner Place, Dublin1 - D01W625, Dublin Ireland
+                      <span className="font-semibold">
+                        Between - Academic Bridge Limited
+                      </span>
+                      , a Private Training school, having its head office at 33
+                      Gardiner Place, Dublin1 - D01W625, Dublin Ireland
                       <span className="font-semibold">(&quot;AB&quot;)</span>.
                     </p>
                     <p>
-                      <span className="font-semibold">and - {profile?.name || "N/A"}</span>, at: {profile?.location || "N/A"}, {profile?.country || "N/A"}
-                      <span className="font-semibold"> (&quot;Agent&quot;)</span>, which advises, counsels, and recruits prospective international students from {profile?.country || "N/A"}.
+                      <span className="font-semibold">
+                        and - {profile?.name || "N/A"}
+                      </span>
+                      , at: {profile?.location || "N/A"},{" "}
+                      {profile?.country || "N/A"}
+                      <span className="font-semibold">
+                        {" "}
+                        (&quot;Agent&quot;)
+                      </span>
+                      , which advises, counsels, and recruits prospective
+                      international students from {profile?.country || "N/A"}.
                     </p>
                   </div>
 
@@ -157,16 +166,19 @@ export default function AgreementModal({
                         prose-a:text-blue-600 prose-a:underline hover:prose-a:text-blue-800
                         prose-img:rounded-md prose-img:shadow-sm prose-img:my-3
                       "
-                      dangerouslySetInnerHTML={{ __html: settings.contractAgreement }}
+                      dangerouslySetInnerHTML={{
+                        __html: settings.contractAgreement,
+                      }}
                     />
                   )}
 
                   {/* SIGNATURES */}
                   <div className="mt-8 flex flex-col lg:flex-row items-center justify-between gap-10">
-                    
                     {/* AB SIGNATURE */}
                     <div className="w-full lg:w-1/3">
-                      <p className="font-semibold">Signed by AB Academic Bridge Ltd:</p>
+                      <p className="font-semibold">
+                        Signed by AB Academic Bridge Ltd:
+                      </p>
                       <div className="w-full h-[50px] md:h-[100px] relative">
                         <Image
                           src="/assets/images/1.png"
@@ -175,7 +187,9 @@ export default function AgreementModal({
                           className="object-contain"
                         />
                       </div>
-                      <p className="font-semibold">Fernando Comar — Sales Manager</p>
+                      <p className="font-semibold">
+                        Fernando Comar — Sales Manager
+                      </p>
                       <p className="font-semibold">Date: 11-05-2025</p>
                     </div>
 
@@ -211,7 +225,6 @@ export default function AgreementModal({
                     Close
                   </button>
                 </div>
-
               </Dialog.Panel>
             </Transition.Child>
           </div>
