@@ -1,254 +1,110 @@
-"use client";
+import { getSetting } from "@/lib/actions/setting.actions";
+import { ISetting } from "@/lib/database/models/setting.model";
 
-const PrivacyPolicy = () => {
+export default async function PoliciesPage() {
+  const settings: ISetting | null = await getSetting();
+
+  if (!settings) {
+    return (
+      <section className="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
+        <div className="wrapper max-w-5xl mx-auto px-6">
+          <h1 className="text-4xl font-extrabold mb-12 text-gray-900 dark:text-white text-center">
+            Policies
+          </h1>
+          <p className="text-center text-gray-700 dark:text-gray-300">
+            No policy information available at this time.
+          </p>
+        </div>
+      </section>
+    );
+  }
+
   return (
-    <section className="m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
-      <h1 className="text-2xl font-bold mb-4">
-        Privacy Policy & Data Protection Agreement
-      </h1>
-      <p className="mb-2">
-        <strong>Effective Date:</strong> 25-08-2025
-      </p>
-      <p className="mb-2">
-        <strong>Last Updated:</strong> 03-07-2025
-      </p>
-      <p className="mb-4">
-        By creating an account, you confirm that you have read, understood, and
-        agreed to this Privacy Policy. You acknowledge that we collect, process,
-        and store your personal data in compliance with applicable laws,
-        including the General Data Protection Regulation (GDPR), and that your
-        continued use of our platform signifies acceptance of this agreement.
-      </p>
+    <section className="py-12 bg-gray-50 dark:bg-gray-900 min-h-screen">
+      <div className="wrapper max-w-5xl mx-auto px-6">
+        <h1 className="text-4xl font-extrabold mb-12 text-gray-900 dark:text-white text-center">
+          Policies
+        </h1>
 
-      <h2 className="text-xl font-semibold mt-4 mb-2">1. Introduction</h2>
-      <p className="mb-2">
-        AB Partner Portal (“we,” “our,” or “us”) operates a platform that
-        connects colleges, universities, agents, and students. This Privacy
-        Policy explains:
-      </p>
-      <ul className="list-disc list-inside mb-2">
-        <li>What personal data we collect</li>
-        <li>How we use, share, and protect it</li>
-        <li>Your rights under GDPR</li>
-        <li>Limitations of our responsibility</li>
-      </ul>
-      <p className="mb-2">
-        We are committed to maintaining the privacy and security of all users.
-        However, by using this platform, you agree that we cannot be held liable
-        for any misuse of data caused by third parties, unauthorized access
-        beyond our control, or false information provided by users.
-      </p>
+        <div className="grid grid-cols-1 gap-12">
+          {/* Return Policy */}
+          {settings.returnPolicy && (
+            <div
+              id="return-policy"
+              className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"
+            >
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
+                Return Policy
+              </h2>
+              <div
+                dangerouslySetInnerHTML={{ __html: settings.returnPolicy }}
+              />
+            </div>
+          )}
 
-      <h2 className="text-xl font-semibold mt-4 mb-2">2. Data We Collect</h2>
-      <ul className="list-disc list-inside mb-2">
-        <li>
-          Institutional Data: Names of colleges/universities, contact persons,
-          official details.
-        </li>
-        <li>
-          Agent Data: Agency name, representative details, phone, email,
-          application activity.
-        </li>
-        <li>
-          Student Data: Name, nationality, contact details, academic history,
-          identification documents, visa documents, and application status.
-        </li>
-        <li>
-          System Data: IP addresses, browser/device details, session logs,
-          cookies.
-        </li>
-        <li>
-          Financial Data: Payment records (processed securely by third-party
-          providers, never stored in full by us).
-        </li>
-      </ul>
-      <p className="mb-2">
-        You agree that the data you provide is accurate and truthful. We are not
-        responsible for errors or consequences arising from inaccurate or
-        misleading data submitted by users.
-      </p>
+          {/* Terms of Service */}
+          {settings.termsOfService && (
+            <div
+              id="terms-of-service"
+              className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"
+            >
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
+                Terms of Service
+              </h2>
+              <div
+                className="
+                prose prose-base max-w-none dark:prose-invert
+                prose-headings:font-semibold prose-headings:text-gray-900
+                prose-p:text-gray-700 prose-p:leading-relaxed
+                prose-strong:font-semibold prose-strong:text-gray-900
+                prose-em:italic prose-em:text-gray-800
+                prose-u:underline
+                prose-ul:list-disc prose-ul:pl-5
+                prose-ol:list-decimal prose-ol:pl-5
+                prose-li:marker:text-gray-500
+                prose-blockquote:border-l-2 prose-blockquote:border-gray-300 prose-blockquote:pl-3 prose-blockquote:text-gray-600 italic
+                prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-pink-600
+                prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-md prose-pre:p-3
+                prose-a:text-blue-600 prose-a:underline hover:prose-a:text-blue-800
+                prose-img:rounded-md prose-img:shadow-sm prose-img:my-3
+                "
+                dangerouslySetInnerHTML={{ __html: settings.termsOfService }}
+              />
+            </div>
+          )}
 
-      <h2 className="text-xl font-semibold mt-4 mb-2">
-        3. Purpose of Data Collection
-      </h2>
-      <ul className="list-disc list-inside mb-2">
-        <li>
-          Enable communication between students, agents, and institutions.
-        </li>
-        <li>Process applications, manage leads, and track enrollments.</li>
-        <li>
-          Provide secure login, profile management, and account verification.
-        </li>
-        <li>
-          Generate reports and analytics for institutional decision-making.
-        </li>
-        <li>Prevent fraud, unauthorized access, or misuse of services.</li>
-        <li>Fulfill legal, regulatory, and compliance requirements.</li>
-      </ul>
-      <p className="mb-2">We do not sell personal data to third parties.</p>
-
-      <h2 className="text-xl font-semibold mt-4 mb-2">
-        4. Legal Basis for Processing (GDPR)
-      </h2>
-      <ul className="list-disc list-inside mb-2">
-        <li>
-          <strong>Consent</strong> – You provide consent by registering and
-          ticking acceptance of this Privacy Policy.
-        </li>
-        <li>
-          <strong>Contractual Necessity</strong> – To deliver platform services
-          as per Terms of Service.
-        </li>
-        <li>
-          <strong>Legitimate Interest</strong> – For fraud prevention,
-          analytics, and service improvement.
-        </li>
-        <li>
-          <strong>Legal Obligation</strong> – To comply with tax, audit, and
-          regulatory requirements.
-        </li>
-      </ul>
-
-      <h2 className="text-xl font-semibold mt-4 mb-2">
-        5. Data Sharing and Third Parties
-      </h2>
-      <p className="mb-2">We may share data with:</p>
-      <ul className="list-disc list-inside mb-2">
-        <li>Colleges/Universities – To process student applications.</li>
-        <li>Agents – To manage applications and communication.</li>
-        <li>
-          Service Providers – IT hosting, payment processors, email systems,
-          analytics providers.
-        </li>
-        <li>Regulators or Authorities – If legally required.</li>
-      </ul>
-      <p className="mb-2">
-        We are not responsible for how third parties (e.g., institutions,
-        agents, or payment providers) handle your data once it is transferred to
-        them. You are encouraged to review their respective privacy policies.
-      </p>
-
-      <h2 className="text-xl font-semibold mt-4 mb-2">6. Data Retention</h2>
-      <ul className="list-disc list-inside mb-2">
-        <li>
-          We retain your data only as long as necessary for application,
-          enrollment, or compliance purposes.
-        </li>
-        <li>Data may be retained longer if required by law.</li>
-        <li>When no longer needed, data is securely deleted or anonymized.</li>
-      </ul>
-
-      <h2 className="text-xl font-semibold mt-4 mb-2">7. Data Security</h2>
-      <p className="mb-2">
-        We implement strict technical and organizational measures including:
-      </p>
-      <ul className="list-disc list-inside mb-2">
-        <li>End-to-end SSL encryption.</li>
-        <li>Secure servers and restricted access.</li>
-        <li>Regular audits and security protocols.</li>
-      </ul>
-      <p className="mb-2">
-        Disclaimer: While we take all reasonable precautions, no system can
-        guarantee absolute security. By using our platform, you accept that we
-        cannot be held liable for data breaches caused by cyberattacks,
-        unauthorized access, or circumstances beyond our reasonable control.
-      </p>
-
-      <h2 className="text-xl font-semibold mt-4 mb-2">
-        8. International Data Transfers
-      </h2>
-      <p className="mb-2">
-        Where personal data is transferred outside the European Economic Area
-        (EEA), we use Standard Contractual Clauses (SCCs) or equivalent
-        safeguards to ensure compliance with GDPR.
-      </p>
-
-      <h2 className="text-xl font-semibold mt-4 mb-2">9. User Rights (GDPR)</h2>
-      <p className="mb-2">Under GDPR, you have the right to:</p>
-      <ul className="list-disc list-inside mb-2">
-        <li>Access, correct, or delete your data.</li>
-        <li>Request limitation of processing.</li>
-        <li>
-          Withdraw consent at any time (withdrawal does not affect lawful
-          processing prior to withdrawal).
-        </li>
-        <li>Request data portability.</li>
-        <li>File a complaint with your local data protection authority.</li>
-      </ul>
-      <p className="mb-2">
-        Requests should be sent to:{" "}
-        <a
-          href="mailto:abpartnerportal@gmail.com"
-          className="text-blue-600 underline"
-        >
-          abpartnerportal@gmail.com
-        </a>
-        .
-      </p>
-
-      <h2 className="text-xl font-semibold mt-4 mb-2">10. Cookies Policy</h2>
-      <ul className="list-disc list-inside mb-2">
-        <li>Authentication and login security.</li>
-        <li>Performance and analytics.</li>
-        <li>User experience optimization.</li>
-      </ul>
-      <p className="mb-2">
-        You can disable cookies in browser settings, but this may affect
-        platform functionality.
-      </p>
-
-      <h2 className="text-xl font-semibold mt-4 mb-2">
-        11. Limitation of Liability
-      </h2>
-      <ul className="list-disc list-inside mb-2">
-        <li>
-          We are not liable for any damages, losses, or claims arising from
-          misuse of data by third parties (colleges, agents, payment providers,
-          or external services).
-        </li>
-        <li>
-          We are not responsible for data provided incorrectly or fraudulently
-          by users.
-        </li>
-        <li>
-          We are not liable for indirect, incidental, or consequential damages
-          related to the use of our platform.
-        </li>
-        <li>
-          Your use of the platform is at your own risk, and you accept
-          responsibility for securing your login credentials.
-        </li>
-      </ul>
-
-      <h2 className="text-xl font-semibold mt-4 mb-2">
-        12. Changes to Privacy Policy
-      </h2>
-      <p className="mb-2">
-        We may update this Privacy Policy from time to time. Updates will be
-        effective immediately upon posting. Users will be notified of material
-        changes via the platform or email.
-      </p>
-
-      <h2 className="text-xl font-semibold mt-4 mb-2">
-        13. Contact Information
-      </h2>
-      <p className="mb-2">
-        For privacy-related concerns, contact us at:
-        <br />
-        <strong>AB Partner Portal</strong>
-        <br />
-        Email:{" "}
-        <a
-          href="mailto:abpartnerportal@gmail.com"
-          className="text-blue-600 underline"
-        >
-          abpartnerportal@gmail.com
-        </a>
-        <br />
-        {/* Phone: +353 83 033 5708 */}
-      </p>
+          {/* Privacy Policy */}
+          {settings.privacyPolicy && (
+            <div
+              id="privacy-policy"
+              className="bg-white dark:bg-gray-800 p-8 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700"
+            >
+              <h2 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-white">
+                Privacy Policy
+              </h2>
+              <div
+                className="
+                prose prose-base max-w-none dark:prose-invert
+                prose-headings:font-semibold prose-headings:text-gray-900
+                prose-p:text-gray-700 prose-p:leading-relaxed
+                prose-strong:font-semibold prose-strong:text-gray-900
+                prose-em:italic prose-em:text-gray-800
+                prose-u:underline
+                prose-ul:list-disc prose-ul:pl-5
+                prose-ol:list-decimal prose-ol:pl-5
+                prose-li:marker:text-gray-500
+                prose-blockquote:border-l-2 prose-blockquote:border-gray-300 prose-blockquote:pl-3 prose-blockquote:text-gray-600 italic
+                prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-pink-600
+                prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-pre:rounded-md prose-pre:p-3
+                prose-a:text-blue-600 prose-a:underline hover:prose-a:text-blue-800
+                prose-img:block prose-img:mx-auto prose-img:rounded-md prose-img:shadow-md prose-img:my-4 prose-img:max-w-full prose-img:h-auto
+                "
+                dangerouslySetInnerHTML={{ __html: settings.privacyPolicy }}
+              />
+            </div>
+          )}
+        </div>
+      </div>
     </section>
   );
-};
-
-export default PrivacyPolicy;
+}
