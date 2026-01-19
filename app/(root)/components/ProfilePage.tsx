@@ -608,6 +608,7 @@ export default function ProfilePage({
 
       {/* Modals */}
       <AgreementModal
+        profile={myProfile as IProfile}
         open={openAgreementModal}
         onClose={() => setOpenAgreementModal(false)}
       />
