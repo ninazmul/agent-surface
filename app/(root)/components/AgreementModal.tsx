@@ -174,37 +174,47 @@ export default function AgreementModal({
                     />
                   )}
                   <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                    {/* AB SIGNATURE */}
                     <div>
                       <p className="font-semibold">
                         Signed by AB Academic Bridge Ltd:
                       </p>
-                      <Image
-                        src="/assets/images/1.png"
-                        alt="AB Partner Portal Signature"
-                        width={120}
-                        height={120}
-                        className="object-contain dark:hidden"
-                      />{" "}
+
+                      <div className="w-full h-[200px] flex items-center">
+                        <Image
+                          src="/assets/images/1.png"
+                          alt="AB Partner Portal Signature"
+                          width={400}
+                          height={200}
+                          className="object-contain max-h-full max-w-full dark:hidden"
+                        />
+                      </div>
+
                       <p className="font-semibold">
-                        Fernando Comar Sales Manager
+                        Fernando Comar — Sales Manager
                       </p>
                       <p className="font-semibold">Date: 11-05-2025</p>
                     </div>
+
+                    {/* AGENT SIGNATURE */}
                     <div>
                       <p className="font-semibold">Executed as an agreement</p>
-                      {profile?.signatureDocument ? (
-                        <Image
-                          src={profile.signatureDocument}
-                          alt="Agent Signature"
-                          width={500}
-                          height={200}
-                          className="object-contain dark:hidden"
-                        />
-                      ) : (
-                        <div className="w-full h-[200px] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
-                          Reserved for Agent Signature
-                        </div>
-                      )}
+
+                      <div className="w-full h-[200px] flex items-center justify-center">
+                        {profile?.signatureDocument ? (
+                          <Image
+                            src={profile.signatureDocument}
+                            alt="Agent Signature"
+                            width={400}
+                            height={200}
+                            className="object-contain max-h-full max-w-full dark:hidden"
+                          />
+                        ) : (
+                          <div className="w-full h-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex items-center justify-center text-gray-500 dark:text-gray-400 text-sm">
+                            Reserved for Agent Signature
+                          </div>
+                        )}
+                      </div>
 
                       <p className="font-semibold">Signed by (The Agent):</p>
                       <p className="font-semibold">Date: 11-05-2025</p>
