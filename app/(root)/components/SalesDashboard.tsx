@@ -26,6 +26,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const { dashboardData, setDashboardData } = useDashboardData();
+  const [roleResolved, setRoleResolved] = useState(false);
 
   // Fetch leads data
   useEffect(() => {
@@ -35,20 +36,22 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
 
         const userID = await getUserByClerkId(userId);
         const email = await getUserEmailById(userID);
-        const adminStatus = await isAdmin(email);
-        const adminCountries = await getAdminCountriesByEmail(email);
 
-        const fetchedLeads = await getAllLeads();
+        const adminStatus = await isAdmin(email);
+
         let allLeads: ILead[] = [];
 
         if (adminStatus) {
+          const adminCountries = await getAdminCountriesByEmail(email);
+          const fetchedLeads = await getAllLeads();
+
           allLeads =
             adminCountries.length === 0
-              ? fetchedLeads
+              ? fetchedLeads // ✅ admin without country sees all
               : fetchedLeads.filter((l: ILead) =>
                   l.home?.country
                     ? adminCountries.includes(l.home.country)
-                    : false
+                    : false,
                 );
         } else {
           allLeads = await getLeadsByAgency(email);
@@ -58,31 +61,37 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
           ...(dashboardData || {}),
           leads: allLeads,
         });
+
+        setRoleResolved(true); // 🔓 unlock
       } catch (err) {
         console.error("Sales data load error:", err);
+        setRoleResolved(true); // fail-safe
       }
     };
 
-    if (!dashboardData?.leads?.length) fetchData();
-  }, [dashboardData, setDashboardData, userId]);
+    if (!roleResolved) fetchData();
+  }, [userId, roleResolved, dashboardData, setDashboardData]);
 
   const allLeads = useMemo(() => {
+    if (!roleResolved) return []; // ⛔ nothing leaks
+
     const raw = leads.length ? leads : dashboardData?.leads || [];
     return raw.filter(Boolean).filter((l) => l.createdAt || l.updatedAt);
-  }, [leads, dashboardData?.leads]);
+  }, [leads, dashboardData?.leads, roleResolved]);
 
   const filteredLeads = useMemo(() => {
+    if (!roleResolved) return [];
     const now = new Date();
     const rangeStart =
       filter === "week"
         ? subWeeks(now, 1)
         : filter === "month"
-        ? subMonths(now, 1)
-        : filter === "quarter"
-        ? subQuarters(now, 1)
-        : filter === "year"
-        ? subYears(now, 1)
-        : null;
+          ? subMonths(now, 1)
+          : filter === "quarter"
+            ? subQuarters(now, 1)
+            : filter === "year"
+              ? subYears(now, 1)
+              : null;
 
     return allLeads
       .filter((l) => l?.paymentStatus === "Accepted")
@@ -99,29 +108,34 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
         return !rangeStart || date >= rangeStart;
       })
       .filter((l) => (country === "All" ? true : l.home?.country === country));
-  }, [allLeads, filter, startDate, endDate, country]);
+  }, [roleResolved, filter, allLeads, startDate, endDate, country]);
 
   const parseNumber = (v?: string) =>
     parseFloat((v || "0").replace(/,/g, "").trim()) || 0;
 
   // Total sales calculation
-  const totalSales = useMemo(
-    () =>
-      filteredLeads.reduce((sum, lead) => {
-        const courseTotal = Array.isArray(lead.course)
-          ? lead.course.reduce((s, c) => s + Number(c.courseFee || 0), 0)
-          : 0;
-        const servicesTotal = Array.isArray(lead.services)
-          ? lead.services.reduce((s, c) => s + parseNumber(c.amount), 0)
-          : 0;
-        const discount = parseNumber(lead.discount);
-        return sum + courseTotal + servicesTotal - discount;
-      }, 0),
-    [filteredLeads]
-  );
+  const totalSales = useMemo(() => {
+    if (!roleResolved) return 0;
+
+    return filteredLeads.reduce((sum, lead) => {
+      const courseTotal = Array.isArray(lead.course)
+        ? lead.course.reduce((s, c) => s + Number(c.courseFee || 0), 0)
+        : 0;
+
+      const servicesTotal = Array.isArray(lead.services)
+        ? lead.services.reduce((s, c) => s + parseNumber(c.amount), 0)
+        : 0;
+
+      const discount = parseNumber(lead.discount);
+
+      return sum + courseTotal + servicesTotal - discount;
+    }, 0);
+  }, [filteredLeads, roleResolved]);
 
   // Sales by country
   const salesByCountry = useMemo(() => {
+    if (!roleResolved) return {};
+
     const result: Record<string, number> = {};
     filteredLeads.forEach((lead) => {
       const c = lead.home?.country?.trim() || "Unknown";
@@ -135,12 +149,12 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
       result[c] = (result[c] || 0) + courseTotal + servicesTotal - discount;
     });
     return result;
-  }, [filteredLeads]);
+  }, [filteredLeads, roleResolved]);
 
   const countries = useMemo(
     () =>
       Array.from(new Set(allLeads.map((l) => l.home?.country || "Unknown"))),
-    [allLeads]
+    [allLeads],
   );
 
   const handleResetFilters = () => {
@@ -171,7 +185,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
 
   // Top 3 countries for legend
   const salesCountries = Object.keys(salesByCountry).sort(
-    (a, b) => (salesByCountry[b] || 0) - (salesByCountry[a] || 0)
+    (a, b) => (salesByCountry[b] || 0) - (salesByCountry[a] || 0),
   );
   const top3Countries = salesCountries.slice(0, 3);
   const colors = ["#7C3AED", "#F97316", "#3B82F6"];
@@ -277,7 +291,7 @@ const SalesDashboard: React.FC<SalesDashboardProps> = ({ leads = [] }) => {
             </p>
             <div className="flex items-end gap-2">
               <span className="text-2xl font-bold text-black dark:text-white">
-                €{totalSales.toLocaleString()}
+                €{roleResolved ? totalSales.toLocaleString() : "0"}
               </span>
               <span className="text-sm text-indigo-600 dark:text-indigo-400 font-semibold">
                 {getFilterText(filter).replace("This ", "")}
