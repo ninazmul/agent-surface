@@ -104,7 +104,7 @@ const AssignedLeadTable = ({
           if (!lead.author) return;
           const profile = await getProfileByEmail(lead.author);
           if (profile) newProfiles[lead.author] = profile;
-        })
+        }),
       );
       setProfiles(newProfiles);
     };
@@ -115,7 +115,7 @@ const AssignedLeadTable = ({
     const fetchPromotions = async () => {
       const allPromotions = await getAllPromotions();
       setPromotions(
-        allPromotions.map((p: IPromotion) => ({ title: p.title, sku: p.sku }))
+        allPromotions.map((p: IPromotion) => ({ title: p.title, sku: p.sku })),
       );
     };
     fetchPromotions();
@@ -127,8 +127,8 @@ const AssignedLeadTable = ({
       [lead.name, lead.email, lead.number, lead.home?.country, lead.progress]
         .filter(Boolean)
         .some((value) =>
-          value.toString().toLowerCase().includes(searchQuery.toLowerCase())
-        )
+          value.toString().toLowerCase().includes(searchQuery.toLowerCase()),
+        ),
     );
 
     // Promotion type filter
@@ -140,7 +140,7 @@ const AssignedLeadTable = ({
     // --- NEW: Filter by promotion SKU ---
     if (promotionSkuFilter !== "all") {
       filtered = filtered.filter(
-        (lead) => lead.promotionSku === promotionSkuFilter
+        (lead) => lead.promotionSku === promotionSkuFilter,
       );
     }
 
@@ -223,8 +223,8 @@ const AssignedLeadTable = ({
           prev.map((lead) =>
             lead._id.toString() === leadId
               ? ({ ...lead, progress: newProgress } as ILead)
-              : lead
-          )
+              : lead,
+          ),
         );
 
         router.refresh();
@@ -255,8 +255,8 @@ const AssignedLeadTable = ({
           prev.map((lead) =>
             lead._id.toString() === leadId
               ? ({ ...lead, status: newStatus } as ILead)
-              : lead
-          )
+              : lead,
+          ),
         );
 
         router.refresh();
@@ -283,8 +283,8 @@ const AssignedLeadTable = ({
                   ...lead,
                   isPinned: !current,
                 } as PinUnpinStatus)
-              : lead
-          )
+              : lead,
+          ),
         );
       }
     } catch (error) {
@@ -330,7 +330,7 @@ const AssignedLeadTable = ({
               route: `/leads`,
               status: emailContent.subject || "No subject",
             });
-          })
+          }),
         );
 
         setEmailModalOpen(false);
@@ -363,7 +363,7 @@ const AssignedLeadTable = ({
             value={promotionFilter}
             onChange={(e) =>
               setPromotionFilter(
-                e.target.value as "all" | "promotion" | "general"
+                e.target.value as "all" | "promotion" | "general",
               )
             }
             className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
@@ -426,7 +426,7 @@ const AssignedLeadTable = ({
                   onChange={(e) => {
                     if (e.target.checked) {
                       setSelectedLeads(
-                        paginatedLeads.map((r) => r._id.toString())
+                        paginatedLeads.map((r) => r._id.toString()),
                       );
                     } else setSelectedLeads([]);
                   }}
@@ -502,7 +502,7 @@ const AssignedLeadTable = ({
                             ]);
                           } else {
                             setSelectedLeads((prev) =>
-                              prev.filter((id) => id !== lead._id.toString())
+                              prev.filter((id) => id !== lead._id.toString()),
                             );
                           }
                         }}
@@ -578,16 +578,16 @@ const AssignedLeadTable = ({
                               lead.isPromotion
                                 ? "bg-purple-100 text-purple-700 border-purple-300"
                                 : lead.source
-                                ? "bg-blue-100 text-blue-700 border-blue-300"
-                                : "bg-gray-100 text-gray-700 border-gray-300"
+                                  ? "bg-blue-100 text-blue-700 border-blue-300"
+                                  : "bg-gray-100 text-gray-700 border-gray-300"
                             }`}
                           >
                             {lead.isPromotion
                               ? "Promotion"
                               : lead.source
-                              ? lead.source.charAt(0).toUpperCase() +
-                                lead.source.slice(1)
-                              : "General"}
+                                ? lead.source.charAt(0).toUpperCase() +
+                                  lead.source.slice(1)
+                                : "General"}
                           </span>
                         </span>
                       </a>
@@ -657,7 +657,7 @@ const AssignedLeadTable = ({
                                     >
                                       {user}
                                     </li>
-                                  )
+                                  ),
                                 )}
                               </ul>
                             </PopoverContent>
@@ -730,19 +730,19 @@ const AssignedLeadTable = ({
                         onChange={(e) =>
                           handleProgressChange(
                             lead._id.toString(),
-                            e.target.value
+                            e.target.value,
                           )
                         }
                         className={`px-4 py-2 text-xs font-medium rounded-full border text-center ${
                           lead.progress === "Open"
                             ? "bg-gray-100 text-gray-700"
                             : lead.progress === "Contacted"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : lead.progress === "Converted"
-                            ? "bg-green-100 text-green-700"
-                            : lead.progress === "Closed"
-                            ? "bg-red-100 text-red-700"
-                            : ""
+                              ? "bg-yellow-100 text-yellow-700"
+                              : lead.progress === "Converted"
+                                ? "bg-green-100 text-green-700"
+                                : lead.progress === "Closed"
+                                  ? "bg-red-100 text-red-700"
+                                  : ""
                         }`}
                       >
                         <option value="Open">Open</option>
@@ -759,19 +759,19 @@ const AssignedLeadTable = ({
                         onChange={(e) =>
                           handleStatusChange(
                             lead._id.toString(),
-                            e.target.value
+                            e.target.value,
                           )
                         }
                         className={`px-4 py-2 text-xs font-medium rounded-full border text-center ${
                           lead.status === "Perception"
                             ? "bg-gray-100 text-gray-700"
                             : lead.status === "Cold"
-                            ? "bg-blue-100 text-blue-700"
-                            : lead.status === "Warm"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : lead.status === "Hot"
-                            ? "bg-red-100 text-red-700"
-                            : ""
+                              ? "bg-blue-100 text-blue-700"
+                              : lead.status === "Warm"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : lead.status === "Hot"
+                                  ? "bg-red-100 text-red-700"
+                                  : ""
                         }`}
                       >
                         <option value="Perception">👀 Perception</option>
@@ -884,7 +884,7 @@ const AssignedLeadTable = ({
                             onClick={() =>
                               handlePinToggle(
                                 lead._id.toString(),
-                                lead.isPinned ?? false
+                                lead.isPinned ?? false,
                               )
                             }
                           >
@@ -965,24 +965,22 @@ const AssignedLeadTable = ({
                             </Button>
                           </a>
 
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start text-yellow-500 gap-2"
+                            onClick={async () => {
+                              const data = await getTracksByStudent(lead.email);
+                              setTrackData(data);
+                              setIsTrackModalOpen(true);
+                            }}
+                          >
+                            <TrainTrackIcon className="w-4 h-4 text-yellow-500" />
+                            View Track
+                          </Button>
+
                           {/* Delete */}
                           {isAdmin && (
                             <>
-                              <Button
-                                variant="ghost"
-                                className="w-full justify-start text-yellow-500 gap-2"
-                                onClick={async () => {
-                                  const data = await getTracksByStudent(
-                                    lead.email
-                                  );
-                                  setTrackData(data);
-                                  setIsTrackModalOpen(true);
-                                }}
-                              >
-                                <TrainTrackIcon className="w-4 h-4 text-yellow-500" />
-                                View Track
-                              </Button>
-
                               <Button
                                 onClick={() =>
                                   setConfirmDeleteId(lead._id.toString())

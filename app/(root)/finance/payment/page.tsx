@@ -56,7 +56,7 @@ const Page = async () => {
     <>
       <section className="p-4">
         <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <h3 className="h3-bold text-center sm:text-left">Payment Withdraw</h3>
+          <h3 className="h3-bold text-center sm:text-left">Request Payment</h3>
 
           <AddPaymentDialog agency={myProfile} isAdmin={adminStatus} />
         </div>

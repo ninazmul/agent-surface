@@ -1064,24 +1064,22 @@ const LeadTable = ({
                             Assign Lead
                           </Button>
 
+                          <Button
+                            variant="ghost"
+                            className="w-full justify-start text-yellow-500 gap-2"
+                            onClick={async () => {
+                              const data = await getTracksByStudent(lead.email);
+                              setTrackData(data);
+                              setIsTrackModalOpen(true);
+                            }}
+                          >
+                            <TrainTrackIcon className="w-4 h-4 text-yellow-500" />
+                            View Track
+                          </Button>
+
                           {/* Delete */}
                           {isAdmin && (
                             <>
-                              <Button
-                                variant="ghost"
-                                className="w-full justify-start text-yellow-500 gap-2"
-                                onClick={async () => {
-                                  const data = await getTracksByStudent(
-                                    lead.email,
-                                  );
-                                  setTrackData(data);
-                                  setIsTrackModalOpen(true);
-                                }}
-                              >
-                                <TrainTrackIcon className="w-4 h-4 text-yellow-500" />
-                                View Track
-                              </Button>
-
                               <Button
                                 onClick={() =>
                                   setConfirmDeleteId(lead._id.toString())
