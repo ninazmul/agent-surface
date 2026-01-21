@@ -43,11 +43,11 @@ export default function ContactAgreementCertificateTemplate({
           of Representation
         </h2>
         <p className="text-sm mt-4 text-gray-700">Proudly Presented To</p>
-        <h3 className="text-2xl italic font-semibold mt-2">{data.name}</h3>
+        <h3 className="text-2xl italic underline font-semibold mt-2">{data.name}</h3>
       </div>
 
       {/* Certificate Body */}
-      <div className="text-base leading-relaxed text-center px-10 mb-6 relative z-10">
+      <div className="text-base leading-relaxed text-start px-10 mb-6 relative z-10">
         <p className="mb-4">
           This is to certify that{" "}
           <span className="font-semibold">{data.name}</span> for Academic
@@ -90,7 +90,7 @@ export default function ContactAgreementCertificateTemplate({
         </p>
 
         {/* Authorized By Section */}
-        <div className="text-center">
+        <div className="text-start">
           <p className="uppercase text-sm font-semibold tracking-wide text-gray-700">
             Authorized By:
           </p>
