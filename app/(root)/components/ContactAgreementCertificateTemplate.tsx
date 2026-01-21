@@ -47,8 +47,8 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Certificate Body */}
-      <div className="text-base leading-relaxed text-center px-10 mb-10 relative z-10">
-        <p className="mb-6">
+      <div className="text-base leading-relaxed text-center px-10 mb-6 relative z-10">
+        <p className="mb-4">
           This is to certify that{" "}
           <span className="font-semibold">{data.name}</span> for Academic
           Consultancy, having its registered office at{" "}
@@ -58,17 +58,17 @@ export default function ContactAgreementCertificateTemplate({
           , is an officially authorized representative of Academic Bridge Ltd,
           located at 33 Gardiner Place, Dublin 1, Ireland.
         </p>
-        <p className="mb-6">
+        <p className="mb-4">
           The institution&apos;s policies and guidelines grant{" "}
           <span className="font-semibold">{data.name}</span> the authority to
           promote and facilitate admissions, provide counselling services, and
           act as a liaison between students and Academic Bridge.
         </p>
-        <p className="mb-6">
+        <p className="mb-4">
           This certificate is issued in good faith and remains valid until 2026,
           unless revoked earlier by mutual agreement or policy changes.
         </p>
-        <p className="font-medium mt-4">
+        <p className="font-medium mb-4">
           Issued on:{" "}
           {data.signatureDate &&
             new Date(data.signatureDate).toLocaleDateString("en-GB", {
@@ -79,7 +79,7 @@ export default function ContactAgreementCertificateTemplate({
         </p>
 
         {/* Authorized By Section */}
-        <div className="mt-6 text-center">
+        <div className="text-center">
           <p className="uppercase text-sm font-semibold tracking-wide text-gray-700">
             Authorized By:
           </p>
@@ -88,7 +88,7 @@ export default function ContactAgreementCertificateTemplate({
           </p>
 
           {/* Contact Block Image (directly after Authorized By) */}
-          <div className="w-[300px] h-[80px] relative mx-auto mt-4">
+          <div className="w-[300px] h-[150px] relative mx-auto mt-1">
             <Image
               src="/assets/images/1.png"
               alt="Academic Bridge Contact Info"
@@ -101,7 +101,7 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Footer Signatures */}
-      <div className="flex justify-between items-end px-10 pt-8 border-t border-gray-300 relative z-10">
+      <div className="flex justify-between items-end px-10 pt-6 border-t border-gray-300 relative z-10">
         <div className="text-center">
           <Image
             src="/assets/images/gerard.png"
@@ -129,7 +129,7 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Seal */}
-      <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 rotate-[25deg] z-10 drop-shadow-lg">
+      <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 z-10 drop-shadow-lg">
         <div className="w-[120px] h-[120px] relative my-2">
           <Image
             src="/assets/images/seal.png"
