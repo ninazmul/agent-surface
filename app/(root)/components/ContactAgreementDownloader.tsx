@@ -139,10 +139,10 @@ export default function ContactAgreementDownloader({
   return (
     <div>
       {/* Download Button */}
-      <div className="flex justify-end mb-4">
+      <div className="">
         <button
           onClick={handleDownload}
-          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg shadow"
+          className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg"
         >
           <Download className="w-4 h-4" />
           Download Agreement

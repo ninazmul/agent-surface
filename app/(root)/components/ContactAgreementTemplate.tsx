@@ -54,8 +54,10 @@ export default function ContactAgreementTemplate({
         style={{ pageBreakInside: "avoid" }}
       >
         {/* AB */}
-        <div className="flex-1">
-          <p className="font-semibold mb-2">Signed by Academic Bridge Ltd:</p>
+        <div className="flex-1 justify-start">
+          <p className="font-semibold mb-2">
+            Signed by AB Academic Bridge Ltd:
+          </p>
           <Image
             src="/assets/images/1.png"
             alt="AB Signature"
@@ -64,8 +66,7 @@ export default function ContactAgreementTemplate({
             className="object-contain mb-2"
             unoptimized
           />
-          <p className="font-semibold">Fernando Comar</p>
-          <p>Sales Manager</p>
+          <p className="font-semibold">Fernando Comar — Sales Manager</p>
           <p>
             Date:{" "}
             {data?.signatureDate &&
@@ -74,8 +75,8 @@ export default function ContactAgreementTemplate({
         </div>
 
         {/* AGENT */}
-        <div className="flex-1">
-          <p className="font-semibold mb-2">Signed by the Agent:</p>
+        <div className="flex-1 justify-end">
+          <p className="font-semibold mb-2">Executed as an agreement</p>
 
           {data?.signatureDocument ? (
             <Image
@@ -91,6 +92,7 @@ export default function ContactAgreementTemplate({
               Reserved for Agent Signature
             </div>
           )}
+          <p className="font-semibold">Signed by (The Agent):</p>
 
           <p>
             Date:{" "}
