@@ -43,11 +43,11 @@ export default function ContactAgreementCertificateTemplate({
           of Representation
         </h2>
         <p className="text-sm mt-4 text-gray-700">Proudly Presented To</p>
-        <h3 className="text-3xl italic font-semibold mt-2">{data.name}</h3>
+        <h3 className="text-2xl italic font-semibold mt-2">{data.name}</h3>
       </div>
 
       {/* Certificate Body */}
-      <div className="text-base leading-relaxed text-center px-12 mb-10 relative z-10">
+      <div className="text-base leading-relaxed text-center px-10 mb-10 relative z-10">
         <p className="mb-6">
           This is to certify that{" "}
           <span className="font-semibold">{data.name}</span> for Academic
@@ -87,8 +87,8 @@ export default function ContactAgreementCertificateTemplate({
             Academic Bridge
           </p>
 
-          {/* Contact Block Image */}
-          <div className="w-[300px] h-[200px] relative mx-auto mt-4">
+          {/* Contact Block Image (directly after Authorized By) */}
+          <div className="w-[300px] h-[80px] relative mx-auto mt-4">
             <Image
               src="/assets/images/1.png"
               alt="Academic Bridge Contact Info"
@@ -101,7 +101,7 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Footer Signatures */}
-      <div className="flex justify-between items-end px-12 pt-8 border-t border-gray-300 relative z-10">
+      <div className="flex justify-between items-end px-10 pt-8 border-t border-gray-300 relative z-10">
         <div className="text-center">
           <Image
             src="/assets/images/gerard.png"
@@ -129,8 +129,8 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Seal */}
-      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10 drop-shadow-lg">
-        <div className="w-[160px] h-[160px] relative my-2">
+      <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 rotate-[25deg] z-10 drop-shadow-lg">
+        <div className="w-[120px] h-[120px] relative my-2">
           <Image
             src="/assets/images/seal.png"
             alt="Official Seal"
