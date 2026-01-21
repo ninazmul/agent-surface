@@ -54,7 +54,7 @@ export default function ContactAgreementTemplate({
         style={{ pageBreakInside: "avoid" }}
       >
         {/* AB */}
-        <div className="flex-1 justify-start">
+        <div className="flex-1">
           <p className="font-semibold mb-2">
             Signed by AB Academic Bridge Ltd:
           </p>
@@ -75,7 +75,7 @@ export default function ContactAgreementTemplate({
         </div>
 
         {/* AGENT */}
-        <div className="flex-1 justify-end">
+        <div className="flex-1">
           <p className="font-semibold mb-2">Executed as an agreement</p>
 
           {data?.signatureDocument ? (
