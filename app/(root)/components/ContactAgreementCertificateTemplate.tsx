@@ -129,7 +129,7 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Seal */}
-      <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 z-10 drop-shadow-lg">
+      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10 drop-shadow-lg">
         <div className="w-[120px] h-[120px] relative my-2">
           <Image
             src="/assets/images/seal.png"
