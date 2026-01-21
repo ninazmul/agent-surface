@@ -112,7 +112,7 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Footer Signatures */}
-      <div className="flex justify-between items-end px-10 pt-6 border-t border-gray-300 relative z-10">
+      <div className="flex justify-between items-end px-10 pt-6 relative z-10">
         <div className="text-center">
           <Image
             src="/assets/images/gerard.png"
@@ -140,7 +140,7 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Seal */}
-      <div className="absolute bottom-28 left-1/2 transform -translate-x-1/2 z-10 drop-shadow-lg">
+      <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-10 drop-shadow-lg">
         <div className="w-[120px] h-[120px] relative my-2">
           <Image
             src="/assets/images/seal.png"
