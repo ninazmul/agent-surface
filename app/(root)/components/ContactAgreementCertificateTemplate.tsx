@@ -94,6 +94,7 @@ export default function ContactAgreementCertificateTemplate({
               alt="Academic Bridge Contact Info"
               fill
               className="object-contain"
+              unoptimized
             />
           </div>
         </div>
@@ -136,6 +137,7 @@ export default function ContactAgreementCertificateTemplate({
             fill
             className="object-contain"
             style={{ objectPosition: "center" }}
+            unoptimized
           />
         </div>
       </div>
