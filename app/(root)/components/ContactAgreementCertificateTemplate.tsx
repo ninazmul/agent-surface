@@ -65,8 +65,19 @@ export default function ContactAgreementCertificateTemplate({
           act as a liaison between students and Academic Bridge.
         </p>
         <p className="mb-4">
-          This certificate is issued in good faith and remains valid until 2026,
-          unless revoked earlier by mutual agreement or policy changes.
+          This certificate is issued in good faith and remains valid until{" "}
+          {data.signatureDate
+            ? new Date(
+                new Date(data.signatureDate).setFullYear(
+                  new Date(data.signatureDate).getFullYear() + 1,
+                ),
+              ).toLocaleDateString("en-GB", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })
+            : "N/A"}
+          , unless revoked earlier by mutual agreement or policy changes.
         </p>
         <p className="font-medium mb-4">
           Issued on:{" "}
@@ -129,7 +140,7 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Seal */}
-      <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 z-10 drop-shadow-lg">
+      <div className="absolute bottom-24 left-1/2 transform -translate-x-1/2 z-10 drop-shadow-lg">
         <div className="w-[120px] h-[120px] relative my-2">
           <Image
             src="/assets/images/seal.png"
