@@ -13,22 +13,6 @@ export default function ContactAgreementTemplate({
 }: ContactAgreementTemplateProps) {
   return (
     <div className="w-[210mm] bg-white text-gray-800 font-serif px-10 py-8">
-      {/* LOGO ROW */}
-      <div className="flex justify-between items-center mb-6">
-        <Image
-          src="/assets/images/logo.png"
-          alt="AB Partner Portal Logo"
-          width={120}
-          height={120}
-          className="object-contain"
-          unoptimized
-        />
-        <div className="text-right text-xs text-gray-600 space-y-0.5">
-          <p>33 Gardiner Place, Dublin 1 • Ireland</p>
-          <p>+353 1 878 8616</p>
-        </div>
-      </div>
-
       {/* TITLE */}
       <h1 className="font-bold text-xl text-center mb-6">
         Education Agency Agreement
