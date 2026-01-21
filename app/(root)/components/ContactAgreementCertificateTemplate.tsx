@@ -43,7 +43,9 @@ export default function ContactAgreementCertificateTemplate({
           of Representation
         </h2>
         <p className="text-sm mt-4 text-gray-700">Proudly Presented To</p>
-        <h3 className="text-2xl italic underline font-semibold mt-2">{data.name}</h3>
+        <h3 className="text-2xl italic underline font-semibold mt-2">
+          {data.name}
+        </h3>
       </div>
 
       {/* Certificate Body */}
@@ -99,7 +101,7 @@ export default function ContactAgreementCertificateTemplate({
           </p>
 
           {/* Contact Block Image (directly after Authorized By) */}
-          <div className="w-[160px] h-[100px] relative mx-auto mt-1">
+          <div className="w-[160px] h-[100px] relative mt-1">
             <Image
               src="/assets/images/1.png"
               alt="Academic Bridge Contact Info"
