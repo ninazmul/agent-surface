@@ -9,7 +9,7 @@ export default function ContactAgreementCertificateTemplate({
   data,
 }: ContactAgreementCertificateTemplateProps) {
   return (
-    <div className="relative w-[210mm] min-h-[297mm] p-12 bg-white text-gray-900 font-serif border-[16px] border-yellow-600 shadow-xl">
+    <div className="relative w-[210mm] min-h-[297mm] p-12 bg-white text-gray-900 font-serif border-[16px] border-yellow-600 shadow-2xl">
       {/* Watermark */}
       <div className="absolute inset-0 flex items-center justify-center opacity-5">
         <Image
@@ -77,6 +77,26 @@ export default function ContactAgreementCertificateTemplate({
               year: "numeric",
             })}
         </p>
+
+        {/* Authorized By Section */}
+        <div className="mt-6 text-center">
+          <p className="uppercase text-sm font-semibold tracking-wide text-gray-700">
+            Authorized By:
+          </p>
+          <p className="text-base font-bold text-gray-900 mt-1">
+            Academic Bridge
+          </p>
+
+          {/* Contact Block Image (directly after Authorized By) */}
+          <div className="w-[300px] h-[80px] relative mx-auto mt-4">
+            <Image
+              src="/assets/images/1.png"
+              alt="Academic Bridge Contact Info"
+              fill
+              className="object-contain"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Footer Signatures */}
@@ -108,9 +128,15 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Seal */}
-      <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 z-10">
-        <div className="w-32 h-32 rounded-full border-4 border-yellow-600 flex items-center justify-center text-yellow-600 font-bold text-lg">
-          Official Seal
+      <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 rotate-[25deg] z-10 drop-shadow-lg">
+        <div className="w-[120px] h-[120px] relative my-2">
+          <Image
+            src="/assets/images/seal.png"
+            alt="Official Seal"
+            fill
+            className="object-contain"
+            style={{ objectPosition: "center" }}
+          />
         </div>
       </div>
     </div>
