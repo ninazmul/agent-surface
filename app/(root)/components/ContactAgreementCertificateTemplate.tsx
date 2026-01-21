@@ -43,7 +43,7 @@ export default function ContactAgreementCertificateTemplate({
           of Representation
         </h2>
         <p className="text-sm mt-4 text-gray-700">Proudly Presented To</p>
-        <h3 className="text-2xl italic underline font-semibold mt-2">
+        <h3 className="text-2xl italic font-semibold my-2 border-b border-yellow-600 inline-block px-4">
           {data.name}
         </h3>
       </div>
