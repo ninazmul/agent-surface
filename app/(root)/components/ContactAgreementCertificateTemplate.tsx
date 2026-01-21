@@ -23,7 +23,7 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Header Logo */}
-      <div className="flex justify-center mb-8 relative z-10">
+      <div className="flex justify-center mb-4 relative z-10">
         <Image
           src="/assets/images/logo.png"
           alt="Academic Bridge Logo"
@@ -35,7 +35,7 @@ export default function ContactAgreementCertificateTemplate({
       </div>
 
       {/* Certificate Title */}
-      <div className="text-center mb-10 relative z-10">
+      <div className="text-center mb-6 relative z-10">
         <h1 className="text-5xl font-bold tracking-wide text-gray-900 uppercase">
           Certificate
         </h1>
@@ -88,7 +88,7 @@ export default function ContactAgreementCertificateTemplate({
           </p>
 
           {/* Contact Block Image (directly after Authorized By) */}
-          <div className="w-[300px] h-[150px] relative mx-auto mt-1">
+          <div className="w-[160px] h-[100px] relative mx-auto mt-1">
             <Image
               src="/assets/images/1.png"
               alt="Academic Bridge Contact Info"
