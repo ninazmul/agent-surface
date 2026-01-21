@@ -6,6 +6,7 @@ import { ISetting } from "@/lib/database/models/setting.model";
 import { Dialog, Transition } from "@headlessui/react";
 import Image from "next/image";
 import { Fragment, useEffect, useState } from "react";
+import ContactAgreementDownloader from "./ContactAgreementDownloader";
 
 interface AgreementModalProps {
   profile?: IProfile;
@@ -241,7 +242,11 @@ export default function AgreementModal({
                 </div>
 
                 {/* CLOSE BUTTON */}
-                <div className="mt-4 flex justify-end sticky bottom-0 bg-white dark:bg-gray-800 pt-3">
+                <div className="mt-4 flex justify-end items-center gap-4 sticky bottom-0 bg-white dark:bg-gray-800 pt-3">
+                  <ContactAgreementDownloader
+                    data={profile!}
+                    settings={settings}
+                  />
                   <button
                     onClick={onClose}
                     className="px-4 py-2 bg-primary text-white rounded-lg"
