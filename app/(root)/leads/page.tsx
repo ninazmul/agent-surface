@@ -64,7 +64,7 @@ const Page = async () => {
     const agentEmails = [email, ...(profile?.subAgents || [])];
 
     const allLeads = await Promise.all(
-      agentEmails.map((agent) => getLeadsByAgency(agent))
+      agentEmails.map((agent) => getLeadsByAgency(agent)),
     );
 
     leads = allLeads.flat().filter(Boolean);
@@ -118,14 +118,7 @@ const Page = async () => {
               isAdmin={adminStatus}
             />
 
-            {adminStatus && (
-              <div>
-                <ExportLeadsExcelClient
-                  data={leads}
-                  fileName="all_leads.xlsx"
-                />
-              </div>
-            )}
+            <ExportLeadsExcelClient data={leads} fileName="all_leads.xlsx" />
 
             {adminStatus && (
               <div>
