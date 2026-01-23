@@ -6,7 +6,7 @@ import ProfileForm from "./ProfileForm";
 import { Button } from "@/components/ui/button";
 import ProfileTable from "./ProfileTable";
 import SalesTargetProgress from "./SalesTargetProgress";
-import { Copy, Edit, FileEdit, Plus, Share2 } from "lucide-react";
+import { Copy, FileEdit, Plus, Share2 } from "lucide-react";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useEffect, useState } from "react";
 import { getLeadByEmail } from "@/lib/actions/lead.actions";
@@ -16,6 +16,7 @@ import { SignatureModal } from "./SignatureModal";
 import AgreementModal from "./AgreementModal";
 import AddProfileDialog from "@/components/shared/AddProfileDialog";
 import ViewContactAgreement from "@/components/shared/ViewContactAgreement";
+import UpdateProfileDialog2 from "@/components/shared/UpdateProfileDialog2";
 
 interface ProfilePageProps {
   adminStatus: boolean;
@@ -246,19 +247,11 @@ export default function ProfilePage({
 
                       {/* Edit Button */}
                       <div className="flex-shrink-0 mt-2 sm:mt-0">
-                        <a
-                          href={`/profile/${myProfile?._id.toString()}/update`}
-                        >
-                          <Button
-                            variant="outline"
-                            className="flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-black text-white dark:bg-gray-600 dark:text-gray-100 hover:bg-gray-800 hover:text-white rounded-md w-max"
-                          >
-                            <span className="text-xs sm:text-sm md:text-base">
-                              Edit Profile
-                            </span>
-                            <Edit className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
-                          </Button>
-                        </a>
+                        <UpdateProfileDialog2
+                          profile={myProfile}
+                          profileId={myProfile._id.toString()}
+                          agent={agent}
+                        />
                       </div>
                     </div>
                   </div>
