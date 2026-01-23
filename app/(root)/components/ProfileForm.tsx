@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Controller, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import * as z from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useUploadThing } from "@/lib/uploadthing";
 import { FileUploader } from "@/components/shared/FileUploader";
 import {
@@ -50,18 +50,10 @@ export const profileFormSchema = z
     subAgents: z.array(z.string()).optional(),
     status: z.string().min(3, "Status must be valid."),
   })
-  .refine(
-    (data) => {
-      if (data.role === "Sub Agent" && !data.countryAgent) {
-        return false;
-      }
-      return true;
-    },
-    {
-      message: "Country Agent must be selected for Sub Agents",
-      path: ["countryAgent"],
-    },
-  );
+  .refine((data) => data.role !== "Sub Agent" || !!data.countryAgent, {
+    path: ["countryAgent"],
+    message: "Country Agent is required",
+  });
 
 type ProfileFormProps = {
   type: "Create" | "Update";
@@ -132,6 +124,15 @@ const ProfileForm = ({
 
   const selectedRole = form.watch("role");
   const selectedCountry = form.watch("country");
+
+  useEffect(() => {
+    if (selectedRole === "Sub Agent" && isAgent && email) {
+      form.setValue("countryAgent", email, {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
+    }
+  }, [selectedRole, isAgent, email, form]);
 
   async function onSubmit(values: z.infer<typeof profileFormSchema>) {
     let uploadedLogoUrl = values.logo;
@@ -353,32 +354,34 @@ const ProfileForm = ({
                 )}
               />
               {selectedRole === "Sub Agent" && (
-                <FormItem>
-                  <FormLabel>Country Agent</FormLabel>
-                  <FormControl>
-                    {isAgent ? (
-                      // Automatically set countryAgent to current user's email
-                      <input
-                        type="text"
-                        value={email || ""}
-                        readOnly
-                        className="w-full p-2 border rounded dark:bg-gray-200"
-                      />
-                    ) : (
-                      <Controller
-                        control={form.control}
-                        name="countryAgent"
-                        render={({ field }) => {
-                          const options = Array.isArray(agent)
-                            ? agent
-                                .filter((a) => a.country === selectedCountry)
-                                .map((a) => ({
-                                  label: `${a.name} (${a.email})`,
-                                  value: a.email,
-                                }))
-                            : [];
+                <FormField
+                  control={form.control}
+                  name="countryAgent"
+                  render={({ field }) => {
+                    // Options for non-Agent users
+                    const options = Array.isArray(agent)
+                      ? agent
+                          .filter((a) => a.country === selectedCountry)
+                          .map((a) => ({
+                            label: `${a.name} (${a.email})`,
+                            value: a.email,
+                          }))
+                      : [];
 
-                          return (
+                    return (
+                      <FormItem>
+                        <FormLabel>Country Agent</FormLabel>
+                        <FormControl>
+                          {isAgent ? (
+                            // Read-only input for Agent users
+                            <Input
+                              {...field}
+                              value={email || field.value}
+                              readOnly
+                              className="w-full p-2 border rounded dark:bg-gray-200"
+                            />
+                          ) : (
+                            // Select dropdown for other users
                             <Select
                               options={options}
                               isSearchable
@@ -393,13 +396,13 @@ const ProfileForm = ({
                               placeholder="Search and select agent"
                               classNamePrefix="react-select"
                             />
-                          );
-                        }}
-                      />
-                    )}
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
+                          )}
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    );
+                  }}
+                />
               )}
             </div>
           </div>
