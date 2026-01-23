@@ -6,7 +6,7 @@ import ProfileForm from "./ProfileForm";
 import { Button } from "@/components/ui/button";
 import ProfileTable from "./ProfileTable";
 import SalesTargetProgress from "./SalesTargetProgress";
-import { Copy, FileEdit, Plus, Share2 } from "lucide-react";
+import { Copy, FileEdit, Share2 } from "lucide-react";
 import { ILead } from "@/lib/database/models/lead.model";
 import { useEffect, useState } from "react";
 import { getLeadByEmail } from "@/lib/actions/lead.actions";
@@ -17,6 +17,7 @@ import AgreementModal from "./AgreementModal";
 import AddProfileDialog from "@/components/shared/AddProfileDialog";
 import ViewContactAgreement from "@/components/shared/ViewContactAgreement";
 import UpdateProfileDialog2 from "@/components/shared/UpdateProfileDialog2";
+import AddSubAgentDialog from "@/components/shared/AddSubAgentDialog";
 
 interface ProfilePageProps {
   adminStatus: boolean;
@@ -452,14 +453,11 @@ export default function ProfilePage({
                       Your Sub Agents
                     </h3>
                     <div className="flex items-center justify-around gap-2">
-                      <a href={"/profile/create"} className="w-full sm:w-auto">
-                        <Button
-                          size="sm"
-                          className="rounded-xl w-full sm:w-auto bg-purple-500 hover:bg-purple-600 text-white flex items-center gap-1"
-                        >
-                          Add Sub Agent <Plus />
-                        </Button>
-                      </a>
+                      <AddSubAgentDialog
+                        agent={agent}
+                        isAgent={isAgent}
+                        email={email}
+                      />
                       {/* Copy Link */}
                       <Button
                         size="sm"
