@@ -137,15 +137,17 @@ const ProfileDetails = async ({ params }: PageProps) => {
       </section>
 
       {/* Contact agreement */}
-      <section className="mb-10">
-        <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-6 border-b pb-2">
-          Contact Agreement
-        </h2>
+      {profile.role !== "Sub Agent" && profile.role !== "Student" && (
+        <section className="mb-10">
+          <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-6 border-b pb-2">
+            Contact Agreement
+          </h2>
 
-        <div className="mb-6">
-          <ViewContactAgreement profile={profile} />
-        </div>
-      </section>
+          <div className="mb-6">
+            <ViewContactAgreement profile={profile} />
+          </div>
+        </section>
+      )}
 
       {/* Agent Relationship */}
       {profile.role === "Sub Agent" && profile.countryAgent && (
