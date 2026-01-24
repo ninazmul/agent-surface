@@ -211,6 +211,7 @@ export default function NotificationTable({ notifications, email }: Props) {
           <Button
             size="sm"
             variant="destructive"
+            className="rounded-xl"
             onClick={deleteAll}
             disabled={isDeletingAll || !localNotifications.size}
           >
@@ -259,6 +260,7 @@ export default function NotificationTable({ notifications, email }: Props) {
                 <Button
                   size="sm"
                   variant="destructive"
+                  className="rounded-xl"
                   onClick={async () => {
                     await deleteNotification(n._id.toString());
                     setLocalNotifications((prev) => {
