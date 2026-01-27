@@ -26,6 +26,13 @@ interface MessageTableProps {
   role: Role;
 }
 
+interface MessageProps {
+  _id: string;
+  text: string;
+  senderEmail: string;
+  senderRole: string;
+  timestamp: Date;
+}
 const POLL_INTERVAL = 5000;
 
 const MessageTable = ({ email, role }: MessageTableProps) => {
@@ -84,10 +91,38 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     }
   }, [email, role]);
 
+  const appendMessageLocally = (targetEmail: string, message: MessageProps) => {
+    setThreads((prev) =>
+      prev.map((t) =>
+        t.userEmail === targetEmail
+          ? ({ ...t, messages: [...t.messages, message] } as IMessage)
+          : t,
+      ),
+    );
+
+    setSelectedThread((prev) =>
+      prev && prev.userEmail === targetEmail
+        ? ({ ...prev, messages: [...prev.messages, message] } as IMessage)
+        : prev,
+    );
+  };
+
   // ====== SEND MESSAGE ======
   const handleSendMessage = useCallback(async () => {
     const targetEmail = selectedThread?.userEmail || newMessageUser;
     if (!targetEmail || !newMessageText.trim()) return;
+
+    const optimisticMessage = {
+      _id: crypto.randomUUID(),
+      text: newMessageText,
+      senderEmail: email,
+      senderRole: isAdminUser ? "Admin" : role,
+      timestamp: new Date(),
+    };
+
+    // 🔥 Instant UI update
+    appendMessageLocally(targetEmail, optimisticMessage);
+    setNewMessageText("");
 
     try {
       setSending(true);
@@ -95,14 +130,11 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
         userEmail: targetEmail,
         senderEmail: email,
         senderRole: isAdminUser ? "Admin" : role,
-        text: newMessageText,
+        text: optimisticMessage.text,
       });
-      setNewMessageText("");
-      fetchThreads();
-      toast.success("Message sent");
-    } catch (err) {
-      console.error(err);
+    } catch {
       toast.error("Failed to send message");
+      // Optional: rollback here
     } finally {
       setSending(false);
     }
@@ -113,7 +145,6 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     email,
     role,
     isAdminUser,
-    fetchThreads,
   ]);
 
   // ====== AVAILABLE USERS ======
