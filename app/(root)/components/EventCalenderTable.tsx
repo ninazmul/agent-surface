@@ -110,6 +110,7 @@ const EventCalendar = ({
             description: event.description,
             type: event.eventType,
             offerExpiryDate: event.offerExpiryDate,
+            eventLink: event.eventLink,
           },
         };
       })
