@@ -75,6 +75,15 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
       const fetchedThreads = await getMessagesForUser(email, role);
       setThreads(fetchedThreads);
 
+      // ✅ AUTO SELECT OWN THREAD (NON-ADMIN)
+      if (!isAdminUser && fetchedThreads.length > 0) {
+        const ownThread =
+          fetchedThreads.find((t) => t.userEmail === email) ||
+          fetchedThreads[0];
+
+        setSelectedThread((prev) => (prev ? prev : ownThread));
+      }
+
       // Preload profiles
       const map: Record<string, { name?: string; logo?: string }> = {};
       await Promise.all(
@@ -89,7 +98,7 @@ const MessageTable = ({ email, role }: MessageTableProps) => {
     } catch (err) {
       console.error("Failed to fetch threads:", err);
     }
-  }, [email, role]);
+  }, [email, role, isAdminUser]);
 
   const appendMessageLocally = (targetEmail: string, message: MessageProps) => {
     setThreads((prev) =>
