@@ -1,7 +1,6 @@
 "use server";
 
 import { connectToDatabase } from "../database";
-import { getProfileByEmail } from "./profile.actions";
 import { getAdminCountriesByEmail, isAdmin } from "./admin.actions";
 import Message, {
   IChatMessage,
@@ -62,55 +61,32 @@ export const createOrAppendMessage = async ({
 // ---------- GET MESSAGES BASED ON ROLE ----------
 export const getMessagesForUser = async (
   email: string,
-  role: Role
+  role: Role,
 ): Promise<IMessage[]> => {
   try {
     await connectToDatabase();
 
-    // Fetch all messages as plain objects
     const allMessages = (await Message.find()
       .sort({ updatedAt: -1 })
-      .lean()) as unknown as IMessage[]; // cast via unknown first
+      .lean()) as unknown as IMessage[];
 
-    let threads: IMessage[] = [];
-
+    // 🔐 ADMIN: full access (optionally scoped)
     if (role === "Admin") {
-      const adminCountries = await getAdminCountriesByEmail(email);
-      threads = adminCountries.length
-        ? allMessages.filter(
-            (m) => !m.country || adminCountries.includes(m.country)
-          )
-        : allMessages;
-    } else if (role === "Agent") {
-      const profile = await getProfileByEmail(email);
-      const subAgents = profile?.subAgents || [];
-
-      threads = allMessages.filter(
-        (m) =>
-          m.userEmail === profile?.email ||
-          subAgents.includes(m.userEmail) ||
-          m.messages.some(
-            (msg) => msg.senderRole === "Admin" || msg.senderEmail === email
-          )
-      );
-    } else if (role === "Sub Agent") {
-      const profile = await getProfileByEmail(email);
-      if (!profile?.agentEmail) return [];
-
-      threads = allMessages.filter(
-        (m) =>
-          m.userEmail === profile.agentEmail ||
-          m.messages.some((msg) => msg.senderEmail === email)
-      );
-    } else if (role === "Student") {
-      threads = allMessages.filter((m) =>
-        m.messages.some(
-          (msg) => msg.senderRole === "Admin" || msg.senderEmail === email
-        )
-      );
+      return allMessages;
     }
 
-    return threads;
+    // 🔐 NON-ADMIN: participant-only access
+    return allMessages.filter((thread) => {
+      // User owns the thread
+      if (thread.userEmail === email) return true;
+
+      // User sent at least one message
+      if (thread.messages.some((msg) => msg.senderEmail === email)) {
+        return true;
+      }
+
+      return false;
+    });
   } catch (err) {
     console.error("getMessagesForUser error:", err);
     throw new Error("Failed to fetch messages");
@@ -133,14 +109,14 @@ export const deleteMessageThread = async (threadId: string) => {
 // ---------- DELETE SINGLE MESSAGE ----------
 export const deleteSingleMessage = async (
   threadId: string,
-  messageId: string
+  messageId: string,
 ) => {
   try {
     await connectToDatabase();
     const updated = await Message.findByIdAndUpdate(
       threadId,
       { $pull: { messages: { _id: messageId } } },
-      { new: true }
+      { new: true },
     );
     if (!updated) throw new Error("Thread or message not found");
     return updated.toObject();
