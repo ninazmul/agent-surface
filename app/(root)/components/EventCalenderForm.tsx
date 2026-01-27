@@ -2,7 +2,7 @@
 
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -19,6 +19,9 @@ import {
   updateEventCalendar,
 } from "@/lib/actions/eventCalender.actions";
 import toast from "react-hot-toast";
+import { IProfile } from "@/lib/database/models/profile.model";
+import countries from "world-countries";
+import Select from "react-select";
 
 // Zod schema
 const EventCalendarFormSchema = z.object({
@@ -34,6 +37,9 @@ const EventCalendarFormSchema = z.object({
     "webinar_event",
     "holiday_closure",
   ]),
+  eventLink: z.string().url().optional(),
+  agencies: z.array(z.string()).optional(),
+  countries: z.array(z.string()).optional(),
   startDate: z.string().min(1, "Start date is required."),
   endDate: z.string().optional(),
   offerExpiryDate: z.string().optional(),
@@ -43,6 +49,7 @@ type EventCalendarFormProps = {
   type: "Create" | "Update";
   Event?: IEventCalendar;
   EventId?: string;
+  agencies: IProfile[];
   onSuccess?: () => void;
 };
 
@@ -50,8 +57,21 @@ const EventCalendarForm = ({
   type,
   Event,
   EventId,
+  agencies,
   onSuccess,
 }: EventCalendarFormProps) => {
+  const countryOptions = countries
+    .map((country) => ({
+      value: country.name.common,
+      label: `${country.flag} ${country.name.common}`,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label)); // Optional: alphabetically sort
+
+  const agencyOptions = agencies.map((agency) => ({
+    value: agency.email,
+    label: agency.name,
+  }));
+
   const form = useForm<z.infer<typeof EventCalendarFormSchema>>({
     resolver: zodResolver(EventCalendarFormSchema),
     defaultValues: {
@@ -174,6 +194,87 @@ const EventCalendarForm = ({
                           Holiday / College Closure
                         </option>
                       </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* EventLink */}
+              <FormField
+                control={form.control}
+                name="eventLink"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event Link</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter event link" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Agencies */}
+              <FormField
+                control={form.control}
+                name="agencies"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Agencies</FormLabel>
+                    <FormControl>
+                      <Controller
+                        control={form.control}
+                        name="agencies"
+                        render={({ field }) => (
+                          <Select
+                            isMulti
+                            options={agencyOptions}
+                            value={agencyOptions.filter((opt) =>
+                              field.value?.includes(opt.value),
+                            )}
+                            onChange={(selected) =>
+                              field.onChange(selected.map((opt) => opt.value))
+                            }
+                            placeholder="Select agencies..."
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                          />
+                        )}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Countries */}
+              <FormField
+                control={form.control}
+                name="countries"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Allowed Countries</FormLabel>
+                    <FormControl>
+                      <Controller
+                        control={form.control}
+                        name="countries"
+                        render={({ field }) => (
+                          <Select
+                            isMulti
+                            options={countryOptions}
+                            value={countryOptions.filter((opt) =>
+                              field.value?.includes(opt.value),
+                            )}
+                            onChange={(selected) =>
+                              field.onChange(selected.map((opt) => opt.value))
+                            }
+                            placeholder="Select countries..."
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                          />
+                        )}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

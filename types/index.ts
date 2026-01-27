@@ -38,6 +38,9 @@ export type EventCalenderParams = {
   title: string;
   description: string;
   eventType: EventType;
+  eventLink?: string;
+  agencies?: string[];
+  countries?: string[];
   startDate: Date | string; // Accept string if from form input
   endDate?: Date | string;
   offerExpiryDate?: Date | string;

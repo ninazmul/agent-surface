@@ -2,9 +2,10 @@
 
 import { handleError } from "../utils";
 import { connectToDatabase } from "../database";
-import EventCalendar from "../database/models/eventCalender.model";
+import EventCalendar, { IEventCalendar } from "../database/models/eventCalender.model";
 import { EventCalenderParams } from "@/types";
 import { revalidatePath } from "next/cache";
+import { IProfile } from "../database/models/profile.model";
 
 // ====== CREATE EVENT CALENDAR
 export const createEventCalendar = async (params: EventCalenderParams) => {
@@ -30,22 +31,54 @@ export const getAllEventCalendars = async () => {
   }
 };
 
-// ====== GET EVENT CALENDARS BY EMAIL
-export const getEventCalendarsByEmail = async (email: string) => {
-  try {
-    await connectToDatabase();
-    const events = await EventCalendar.find({ email }).sort({ startDate: -1 }).lean();
+export const getFilteredEvents = async ({
+  email,
+  isAdmin,
+  adminCountries,
+  profile,
+}: {
+  email: string;
+  isAdmin: boolean;
+  adminCountries?: string[];
+  profile?: IProfile;
+}) => {
+  const events = await getAllEventCalendars();
+  const now = Date.now();
 
-    if (!events.length) {
-      console.warn(`No EventCalendar items found for email: ${email}`);
-      return [];
+  let filtered = events;
+
+  if (isAdmin) {
+    // Admin country scope
+    if (adminCountries && adminCountries.length > 0) {
+      filtered = events.filter((event: IEventCalendar) => {
+        if (!event.countries || event.countries.length === 0) return true;
+        return event.countries.some((c) => adminCountries.includes(c));
+      });
     }
+  } else {
+    const userCountry = profile?.country;
 
-    return JSON.parse(JSON.stringify(events));
-  } catch (error) {
-    console.error("Error fetching EventCalendar items by email:", error);
-    handleError(error);
+    filtered = events.filter((event: IEventCalendar) => {
+      const countryMatch =
+        !event.countries || event.countries.length === 0
+          ? true
+          : userCountry && event.countries.includes(userCountry);
+
+      const agencyMatch =
+        !event.agencies || event.agencies.length === 0
+          ? true
+          : event.agencies.includes(email);
+
+      return countryMatch || agencyMatch;
+    });
   }
+
+  // 🔑 Date window (mandatory for events)
+  return filtered.filter((event: IEventCalendar) => {
+    const start = new Date(event.startDate!).getTime();
+    const end = new Date(event.endDate!).getTime();
+    return start <= now && end >= now;
+  });
 };
 
 // ====== UPDATE EVENT CALENDAR

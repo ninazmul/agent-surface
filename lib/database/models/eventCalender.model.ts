@@ -15,10 +15,12 @@ export interface IEventCalendar extends Document {
   title: string;
   description: string;
   eventType: EventType;
+  eventLink?: string;
   startDate: Date;
   endDate?: Date; // For multi-day events
   offerExpiryDate?: Date; // For promotions
-  email?: string;
+  agencies?: string[];
+  countries?: string[];
   createdAt: Date;
 }
 
@@ -38,6 +40,9 @@ const EventCalendarSchema = new Schema<IEventCalendar>({
       "holiday_closure"
     ],
   },
+  eventLink: { type: String },
+  agencies: { type: [String], default: undefined },
+  countries: { type: [String], default: undefined },
   startDate: { type: Date, required: true },
   endDate: { type: Date },
   offerExpiryDate: { type: Date },

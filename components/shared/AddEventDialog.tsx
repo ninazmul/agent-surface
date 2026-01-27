@@ -11,8 +11,13 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import EventCalendarForm from "@/app/(root)/components/EventCalenderForm";
+import { IProfile } from "@/lib/database/models/profile.model";
 
-const AddEventDialog = () => {
+type AddEventDialogProps = {
+  agencies: IProfile[];
+};
+
+const AddEventDialog = ({ agencies }: AddEventDialogProps) => {
   const [open, setOpen] = useState(false);
 
   return (
@@ -42,7 +47,11 @@ const AddEventDialog = () => {
           <DialogTitle>Create Event</DialogTitle>
         </DialogHeader>
 
-        <EventCalendarForm type="Create" onSuccess={() => setOpen(false)} />
+        <EventCalendarForm
+          type="Create"
+          agencies={agencies}
+          onSuccess={() => setOpen(false)}
+        />
       </DialogContent>
     </Dialog>
   );
