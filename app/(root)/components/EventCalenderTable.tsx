@@ -352,80 +352,66 @@ const EventCalendar = ({
       </div>
 
       {/* Event Detail Modal */}
-      {selectedEvent && (
-        <div
-          className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
-          onClick={() => setSelectedEvent(null)}
-          role="dialog"
-        >
-          <div
-            className="bg-cyan-50 text-black p-6 rounded-2xl shadow-lg max-w-md w-full"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 className="text-xl font-bold mb-2">{selectedEvent.title}</h3>
-            <p className="mb-2">
-              <strong>Type:</strong>{" "}
-              {selectedEvent.extendedProps.type?.replace(/_/g, " ") || "N/A"}
-            </p>
-            <p className="mb-2">{selectedEvent.extendedProps.description}</p>
-            <p className="mb-2">
-              <strong>Start:</strong>{" "}
-              {new Date(selectedEvent.start).toLocaleString(undefined, {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
-            <p className="mb-2">
-              <strong>End:</strong>{" "}
-              {selectedEvent.end
-                ? new Date(selectedEvent.end).toLocaleString(undefined, {
-                    year: "numeric",
-                    month: "short",
-                    day: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
-                : "-"}
-            </p>
-            {selectedEvent.extendedProps.offerExpiryDate && (
-              <p className="mb-2 text-yellow-700 font-semibold">
-                Offer Expires:{" "}
-                {new Date(
-                  selectedEvent.extendedProps.offerExpiryDate,
-                ).toLocaleString(undefined, {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-            )}
-            {selectedEvent.extendedProps.eventLink && (
-              <p className="mb-2">
-                <strong>Event Link:</strong>{" "}
-                <a
-                  href={selectedEvent.extendedProps.eventLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-blue-600 underline hover:text-blue-800"
-                >
-                  Join Here
-                </a>
-              </p>
-            )}
-            <button
+      {selectedEvent &&
+        (() => {
+          const now = new Date();
+          const isMeetingOpen =
+            now >= selectedEvent.start &&
+            (!selectedEvent.end || now <= selectedEvent.end);
+
+          return (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
               onClick={() => setSelectedEvent(null)}
-              className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
             >
-              Close
-            </button>
-          </div>
-        </div>
-      )}
+              <div
+                className="bg-cyan-50 p-6 rounded-2xl max-w-md w-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-xl font-bold mb-2">
+                  {selectedEvent.title}
+                </h3>
+
+                <p className="mb-2">
+                  {selectedEvent.extendedProps.description}
+                </p>
+
+                <p className="mb-2">
+                  <strong>Start:</strong> {selectedEvent.start.toLocaleString()}
+                </p>
+
+                <p className="mb-2">
+                  <strong>End:</strong> {selectedEvent.end?.toLocaleString()}
+                </p>
+
+                {/* ✅ Meeting Join Logic */}
+                {selectedEvent.extendedProps.eventLink && isMeetingOpen && (
+                  <a
+                    href={selectedEvent.extendedProps.eventLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block mt-4 text-center bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
+                  >
+                    🚀 Join Meeting
+                  </a>
+                )}
+
+                {selectedEvent.extendedProps.eventLink && !isMeetingOpen && (
+                  <p className="mt-3 text-sm italic text-gray-600">
+                    ⏳ Meeting link will be available during the scheduled time.
+                  </p>
+                )}
+
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  className="mt-4 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          );
+        })()}
     </div>
   );
 };
