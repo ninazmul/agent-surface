@@ -78,11 +78,15 @@ const EventCalendarForm = ({
       title: Event?.title || "",
       description: Event?.description || "",
       eventType: Event?.eventType || "application_deadline",
-      startDate:
-        Event?.startDate?.toString().split("T")[0] ||
-        new Date().toISOString().split("T")[0],
-      endDate: Event?.endDate?.toString().split("T")[0] || "",
-      offerExpiryDate: Event?.offerExpiryDate?.toString().split("T")[0] || "",
+      startDate: Event?.startDate
+        ? new Date(Event.startDate).toISOString().slice(0, 16) // YYYY-MM-DDTHH:mm
+        : new Date().toISOString().slice(0, 16),
+      endDate: Event?.endDate
+        ? new Date(Event.endDate).toISOString().slice(0, 16)
+        : "",
+      offerExpiryDate: Event?.offerExpiryDate
+        ? new Date(Event.offerExpiryDate).toISOString().slice(0, 16)
+        : "",
     },
   });
 
@@ -291,50 +295,51 @@ const EventCalendarForm = ({
                 Choose when the event will begin and end.
               </p>
 
-              {/* Start Date */}
+              {/* Start Date & Time */}
               <FormField
                 control={form.control}
                 name="startDate"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Start Date</FormLabel>
+                    <FormLabel>Start Date & Time</FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input type="datetime-local" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* End Date */}
+              {/* End Date & Time */}
               <FormField
                 control={form.control}
                 name="endDate"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      End Date <span className="text-gray-400">(optional)</span>
+                      End Date & Time{" "}
+                      <span className="text-gray-400">(optional)</span>
                     </FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input type="datetime-local" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Offer Expiry Date */}
+              {/* Offer Expiry Date & Time */}
               <FormField
                 control={form.control}
                 name="offerExpiryDate"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>
-                      Offer Expiry Date{" "}
+                      Offer Expiry Date & Time{" "}
                       <span className="text-gray-400">(optional)</span>
                     </FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input type="datetime-local" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -31,7 +31,7 @@ type CalendarEvent = {
     description: string;
     type?: string;
     offerExpiryDate?: Date | string;
-    email?: string;
+    eventLink?: string;
   };
 };
 
@@ -369,12 +369,24 @@ const EventCalendar = ({
             <p className="mb-2">{selectedEvent.extendedProps.description}</p>
             <p className="mb-2">
               <strong>Start:</strong>{" "}
-              {new Date(selectedEvent.start).toLocaleDateString()}
+              {new Date(selectedEvent.start).toLocaleString(undefined, {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </p>
             <p className="mb-2">
               <strong>End:</strong>{" "}
               {selectedEvent.end
-                ? new Date(selectedEvent.end).toLocaleDateString()
+                ? new Date(selectedEvent.end).toLocaleString(undefined, {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
                 : "-"}
             </p>
             {selectedEvent.extendedProps.offerExpiryDate && (
@@ -382,13 +394,26 @@ const EventCalendar = ({
                 Offer Expires:{" "}
                 {new Date(
                   selectedEvent.extendedProps.offerExpiryDate,
-                ).toLocaleDateString()}
+                ).toLocaleString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </p>
             )}
-            {selectedEvent.extendedProps.email && (
+            {selectedEvent.extendedProps.eventLink && (
               <p className="mb-2">
-                <strong>Contact Email:</strong>{" "}
-                {selectedEvent.extendedProps.email}
+                <strong>Event Link:</strong>{" "}
+                <a
+                  href={selectedEvent.extendedProps.eventLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 underline hover:text-blue-800"
+                >
+                  Join Here
+                </a>
               </p>
             )}
             <button
