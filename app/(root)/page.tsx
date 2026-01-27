@@ -51,7 +51,7 @@ ChartJS.register(
   Title,
   BarElement,
   CategoryScale,
-  LinearScale
+  LinearScale,
 );
 
 const Dashboard = () => {
@@ -145,7 +145,7 @@ const Dashboard = () => {
       if (isAdminStatus) {
         const filterByCountry = <T,>(
           data: T[] | null,
-          getCountry: (item: T) => string | undefined
+          getCountry: (item: T) => string | undefined,
         ): T[] =>
           (data || []).filter((item) => {
             const country = getCountry(item);
@@ -155,14 +155,14 @@ const Dashboard = () => {
         setDownloads(
           filterByCountry(
             summary.downloads,
-            (d) => (d as IDownload)?.country
-          ) as IDownload[]
+            (d) => (d as IDownload)?.country,
+          ) as IDownload[],
         );
         setLeads(
           filterByCountry(
             summary.leads,
-            (l) => (l as ILead)?.home?.country
-          ) as ILead[]
+            (l) => (l as ILead)?.home?.country,
+          ) as ILead[],
         );
       } else {
         const agentEmails: string[] = [
@@ -172,23 +172,23 @@ const Dashboard = () => {
 
         const [downloadResults, leadResults] = await Promise.all([
           Promise.allSettled(
-            agentEmails.map((agent) => getDownloadsByAgency(agent))
+            agentEmails.map((agent) => getDownloadsByAgency(agent)),
           ),
           Promise.allSettled(
-            agentEmails.map((agent) => getLeadsByAgency(agent))
+            agentEmails.map((agent) => getLeadsByAgency(agent)),
           ),
         ]);
 
         const filteredDownloads: IDownload[] = downloadResults
           .filter((res) => res.status === "fulfilled")
           .flatMap(
-            (res) => (res as PromiseFulfilledResult<IDownload[]>).value || []
+            (res) => (res as PromiseFulfilledResult<IDownload[]>).value || [],
           );
 
         const filteredLeads: ILead[] = leadResults
           .filter(
             (res): res is PromiseFulfilledResult<ILead[]> =>
-              res.status === "fulfilled"
+              res.status === "fulfilled",
           )
           .flatMap((res) => res.value || [])
           .filter((l): l is ILead => !!l);
@@ -200,7 +200,7 @@ const Dashboard = () => {
       // Cache in localStorage
       localStorage.setItem(
         "dashboardData",
-        JSON.stringify({ ...summary, myProfile: safeProfile })
+        JSON.stringify({ ...summary, myProfile: safeProfile }),
       );
     } catch (error) {
       console.error("Dashboard load failed:", error);
@@ -252,6 +252,7 @@ const Dashboard = () => {
         />
 
         <DistributionOverview
+          adminStatus={adminStatus}
           admins={admins}
           leads={leads}
           resources={resources}

@@ -62,12 +62,9 @@ const CombinedBar: React.FC<CombinedBarProps> = ({
   maxValue,
   fill = "#000",
 }) => {
-  // HARD CLAMPS — SVG MUST NEVER SEE NaN
   const safeHeight = Number.isFinite(height) && height > 0 ? height : 0;
-
   const safeValue =
     value !== undefined && Number.isFinite(value) && value > 0 ? value : 0;
-
   const safeMax = Number.isFinite(maxValue) && maxValue > 0 ? maxValue : 1;
 
   const filledHeight = (safeValue / safeMax) * safeHeight;
@@ -75,7 +72,6 @@ const CombinedBar: React.FC<CombinedBarProps> = ({
 
   return (
     <g>
-      {/* background track */}
       <rect
         x={x}
         y={y}
@@ -85,8 +81,6 @@ const CombinedBar: React.FC<CombinedBarProps> = ({
         rx={4}
         ry={4}
       />
-
-      {/* filled bar */}
       <rect
         x={x}
         y={filledY}
@@ -126,29 +120,30 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
   const safePromotions = Array.isArray(promotions) ? promotions : [];
   const safeServices = Array.isArray(services) ? services : [];
 
-  /* ---------------- LABELS ---------------- */
-  const labels = [
-    { key: "Admins", value: safeAdmins.length },
-    { key: "Leads", value: safeLeads.length },
-    { key: "Resources", value: safeResources.length },
-    { key: "Courses", value: safeCourses.length },
-    { key: "Downloads", value: safeDownloads.length },
-    { key: "Calendars", value: safeCalendars.length },
-    { key: "Profiles", value: safeProfiles.length },
-    { key: "Promotions", value: safePromotions.length },
-    { key: "Services", value: safeServices.length },
-  ].filter(
-    (item) => adminStatus || !["Admins", "Profiles", "Users"].includes(item.key)
+  /* ---------------- ROLE-AWARE METRICS ---------------- */
+  const allMetrics = [
+    { key: "Admins", value: safeAdmins.length, adminOnly: true },
+    { key: "Leads", value: safeLeads.length, adminOnly: false },
+    { key: "Resources", value: safeResources.length, adminOnly: false },
+    { key: "Courses", value: safeCourses.length, adminOnly: false },
+    { key: "Downloads", value: safeDownloads.length, adminOnly: false },
+    { key: "Calendars", value: safeCalendars.length, adminOnly: false },
+    { key: "Profiles", value: safeProfiles.length, adminOnly: true },
+    { key: "Promotions", value: safePromotions.length, adminOnly: false },
+    { key: "Services", value: safeServices.length, adminOnly: false },
+  ];
+
+  const visibleMetrics = allMetrics.filter(
+    (item) => adminStatus || !item.adminOnly,
   );
 
   /* ---------------- CHART DATA ---------------- */
-  const chartData = labels.map((item) => ({
+  const chartData = visibleMetrics.map((item) => ({
     category: item.key,
     count: Number(item.value) || 0,
   }));
 
   const counts = chartData.map((d) => d.count);
-
   const maxCount =
     counts.length && Math.max(...counts) > 0 ? Math.max(...counts) : 1;
 
@@ -176,7 +171,6 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
       </CardHeader>
 
       <CardContent>
-        {/* CHART */}
         <div className="w-full h-[400px] lg:h-[500px]">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart
@@ -188,7 +182,6 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
                 tick={{ fontSize: 14, fill: "#6B7280" }}
               />
               <Tooltip />
-
               <Bar
                 dataKey="count"
                 isAnimationActive={false}
@@ -197,7 +190,6 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
                     value?: number;
                     fill?: string;
                   };
-
                   return (
                     <CombinedBar
                       {...p}
@@ -222,7 +214,7 @@ export const DataOverviewChart: React.FC<DataOverviewChartProps> = ({
 
         {/* LEGEND */}
         <div className="mt-6 flex flex-wrap gap-4">
-          {labels.map((item, index) => (
+          {visibleMetrics.map((item, index) => (
             <div key={item.key} className="flex items-center gap-2">
               <div
                 className="w-4 h-4 rounded-sm"

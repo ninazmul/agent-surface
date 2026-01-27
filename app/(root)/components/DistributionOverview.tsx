@@ -15,6 +15,7 @@ import { IDownload } from "@/lib/database/models/download.model";
 import { ILead } from "@/lib/database/models/lead.model";
 
 interface DistributionOverviewProps {
+  adminStatus: boolean;
   admins: IAdmin[] | null;
   leads: ILead[] | null;
   resources: IResource[] | null;
@@ -28,25 +29,16 @@ interface DistributionOverviewProps {
 
 type DateFilterOption = "30days" | "7days" | "all";
 
-// Filter function
+// ---------------- DATE FILTER ----------------
 const filterByDate = <T extends { createdAt?: string | Date }>(
   data: T[],
-  dateFilter: DateFilterOption
+  dateFilter: DateFilterOption,
 ) => {
   if (dateFilter === "all") return data;
 
   const now = new Date();
-  let cutoff: Date;
-
-  if (dateFilter === "30days") {
-    cutoff = new Date();
-    cutoff.setDate(now.getDate() - 30);
-  } else if (dateFilter === "7days") {
-    cutoff = new Date();
-    cutoff.setDate(now.getDate() - 7);
-  } else {
-    return data;
-  }
+  const cutoff = new Date();
+  cutoff.setDate(now.getDate() - (dateFilter === "7days" ? 7 : 30));
 
   return data.filter((item) => {
     if (!item.createdAt) return false;
@@ -55,7 +47,9 @@ const filterByDate = <T extends { createdAt?: string | Date }>(
   });
 };
 
+// ---------------- COMPONENT ----------------
 const DistributionOverview = ({
+  adminStatus,
   admins,
   leads,
   resources,
@@ -68,7 +62,7 @@ const DistributionOverview = ({
 }: DistributionOverviewProps) => {
   const [dateFilter, setDateFilter] = useState<DateFilterOption>("30days");
 
-  // Filtered datasets
+  // ---------------- FILTERED DATASETS ----------------
   const filteredAdmins = useMemo(() => {
     const safeAdmins = Array.isArray(admins) ? admins : [];
     return filterByDate(safeAdmins, dateFilter);
@@ -116,37 +110,60 @@ const DistributionOverview = ({
     return filterByDate(safeServices, dateFilter);
   }, [services, dateFilter]);
 
-  const totalCount =
-    filteredAdmins.length +
-    filteredLeads.length +
-    filteredResources.length +
-    filteredCourses.length +
-    filteredDownloads.length +
-    filteredEventCalendars.length +
-    filteredProfiles.length +
-    filteredPromotions.length +
-    filteredServices.length;
+  // ---------------- ROLE-AWARE METRICS ----------------
+  const allMetrics = useMemo(
+    () => [
+      { label: "Admins", data: filteredAdmins, adminOnly: true },
+      { label: "Leads", data: filteredLeads, adminOnly: false },
+      { label: "Resources", data: filteredResources, adminOnly: false },
+      { label: "Courses", data: filteredCourses, adminOnly: false },
+      { label: "Downloads", data: filteredDownloads, adminOnly: false },
+      {
+        label: "Event Calendars",
+        data: filteredEventCalendars,
+        adminOnly: false,
+      },
+      { label: "Profiles", data: filteredProfiles, adminOnly: true },
+      { label: "Promotions", data: filteredPromotions, adminOnly: false },
+      { label: "Services", data: filteredServices, adminOnly: false },
+    ],
+    [
+      filteredAdmins,
+      filteredLeads,
+      filteredResources,
+      filteredCourses,
+      filteredDownloads,
+      filteredEventCalendars,
+      filteredProfiles,
+      filteredPromotions,
+      filteredServices,
+    ],
+  );
 
-  const distributionData = [
-    { label: "Admins", count: filteredAdmins.length },
-    { label: "Leads", count: filteredLeads.length },
-    { label: "Resources", count: filteredResources.length },
-    { label: "Courses", count: filteredCourses.length },
-    { label: "Downloads", count: filteredDownloads.length },
-    { label: "Event Calendars", count: filteredEventCalendars.length },
-    { label: "Profiles", count: filteredProfiles.length },
-    { label: "Promotions", count: filteredPromotions.length },
-    { label: "Services", count: filteredServices.length },
-  ]
-    .map((item) => ({
-      ...item,
-      percentage:
-        totalCount > 0
-          ? ((item.count / totalCount) * 100).toFixed(2) + "%"
-          : "0%",
-    }))
-    // Sort descending by count (highest first)
-    .sort((a, b) => b.count - a.count);
+  const visibleMetrics = useMemo(
+    () => allMetrics.filter((metric) => adminStatus || !metric.adminOnly),
+    [allMetrics, adminStatus],
+  );
+
+  const totalCount = useMemo(
+    () => visibleMetrics.reduce((acc, curr) => acc + curr.data.length, 0),
+    [visibleMetrics],
+  );
+
+  const distributionData = useMemo(
+    () =>
+      visibleMetrics
+        .map((metric) => ({
+          label: metric.label,
+          count: metric.data.length,
+          percentage:
+            totalCount > 0
+              ? ((metric.data.length / totalCount) * 100).toFixed(2) + "%"
+              : "0%",
+        }))
+        .sort((a, b) => b.count - a.count),
+    [visibleMetrics, totalCount],
+  );
 
   return (
     <div className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6 h-full flex flex-col">
@@ -168,13 +185,13 @@ const DistributionOverview = ({
 
       <div className="flex-shrink-0">
         <ChartLineDots
-          admins={filteredAdmins}
+          admins={adminStatus ? filteredAdmins : []}
           leads={filteredLeads}
           resources={filteredResources}
           courses={filteredCourses}
           downloads={filteredDownloads}
           eventCalendars={filteredEventCalendars}
-          profiles={filteredProfiles}
+          profiles={adminStatus ? filteredProfiles : []}
           promotions={filteredPromotions}
           services={filteredServices}
         />
