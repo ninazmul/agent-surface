@@ -6,6 +6,7 @@ import { ILead } from "@/lib/database/models/lead.model";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { subWeeks, subMonths, subQuarters, subYears } from "date-fns";
 import { getQuotationByEmail } from "@/lib/actions/quotation.actions";
+import { getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { IQuotation } from "@/lib/database/models/quotation.model";
 
 type FinancialData = {
@@ -16,14 +17,10 @@ type FinancialData = {
 };
 
 interface LeadsFinancialProps {
-  leads: ILead[] | null;
   profiles: IProfile[] | null;
 }
 
-const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
-  leads = [],
-  profiles = [],
-}) => {
+const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ profiles = [] }) => {
   const [filter, setFilter] = useState<string>("month");
   const [startDate, setStartDate] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
@@ -39,44 +36,52 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
     setShowMore(false);
   };
 
-  /* ---------------- FETCH FINANCIAL DATA ---------------- */
   useEffect(() => {
     const fetchFinancialData = async () => {
-      try {
-        const now = new Date();
-        let fromDate: Date | null = null;
+      if (!Array.isArray(profiles) || profiles.length === 0) {
+        setData([]);
+        return;
+      }
 
-        if (filter === "custom" && startDate && endDate) {
-          fromDate = new Date(startDate);
-        } else {
-          switch (filter) {
-            case "week":
-              fromDate = subWeeks(now, 1);
-              break;
-            case "month":
-              fromDate = subMonths(now, 1);
-              break;
-            case "quarter":
-              fromDate = subQuarters(now, 1);
-              break;
-            case "year":
-              fromDate = subYears(now, 1);
-              break;
-            case "all":
-              fromDate = null;
-              break;
-          }
+      const now = new Date();
+      let fromDate: Date | null = null;
+
+      if (filter === "custom" && startDate && endDate) {
+        fromDate = new Date(startDate);
+      } else {
+        switch (filter) {
+          case "week":
+            fromDate = subWeeks(now, 1);
+            break;
+          case "month":
+            fromDate = subMonths(now, 1);
+            break;
+          case "quarter":
+            fromDate = subQuarters(now, 1);
+            break;
+          case "year":
+            fromDate = subYears(now, 1);
+            break;
+          case "all":
+            fromDate = null;
+            break;
         }
+      }
 
-        const safeLeads = Array.isArray(leads) ? leads : [];
+      const allFinancialData: FinancialData[] = [];
 
-        const filteredLeads = safeLeads.filter((l) => {
-          if (!l) return false;
+      // Loop through profiles (agents)
+      for (const profile of profiles) {
+        if (!profile?.email) continue;
+        if (selectedAgent !== "all" && selectedAgent !== profile.email)
+          continue;
+
+        // Fetch leads for this agent
+        const agentLeads: ILead[] = await getLeadsByAgency(profile.email);
+
+        const filteredLeads = agentLeads.filter((l) => {
           const created = l.createdAt ? new Date(l.createdAt) : null;
-          const dateCheck = fromDate && created ? created >= fromDate : true;
-          const agentCheck =
-            selectedAgent === "all" ? true : l.author === selectedAgent;
-          return dateCheck && agentCheck;
+          return fromDate && created ? created >= fromDate : true;
         });
 
         const voidLeads = filteredLeads.filter((l) => l?.isVoid);
@@ -92,11 +97,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
           }),
         );
 
-        const result: FinancialData[] = [];
-
         for (const lead of filteredLeads) {
-          if (!lead) continue;
-
           let source: ILead | IQuotation = lead;
           if (lead.isVoid) {
             const q = voidQuotes.find((x) => x?.email === lead.email);
@@ -130,35 +131,32 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
           const due = total - paid;
 
           if (total || paid || due) {
-            result.push({
-              studentName: lead?.name || "Unknown",
+            allFinancialData.push({
+              studentName: lead.name || "Unknown",
               totalAmount: total,
               paid,
               due,
             });
           }
         }
-
-        // Sort fully paid (due = 0) first
-        const sortedResult = result.sort((a, b) => {
-          if (a.due === 0 && b.due !== 0) return -1;
-          if (a.due !== 0 && b.due === 0) return 1;
-          return 0;
-        });
-
-        setData(sortedResult);
-      } catch (err) {
-        console.error("Failed to fetch financial data", err);
       }
+
+      // Sort fully paid first
+      const sortedData = allFinancialData.sort((a, b) => {
+        if (a.due === 0 && b.due !== 0) return -1;
+        if (a.due !== 0 && b.due === 0) return 1;
+        return 0;
+      });
+
+      setData(sortedData);
     };
 
     fetchFinancialData();
-  }, [leads, profiles, filter, startDate, endDate, selectedAgent]);
+  }, [profiles, filter, startDate, endDate, selectedAgent]);
 
-  /* ---------------- CARDS TO SHOW ---------------- */
   const cardsToShow = useMemo(() => {
-    if (data.length === 0) return Array(3).fill(null); // placeholder when no data
-    return showMore ? data : data.slice(0, 6); // show first 6 by default
+    if (data.length === 0) return Array(6).fill(null); // placeholders
+    return showMore ? data : data.slice(0, 6);
   }, [data, showMore]);
 
   return (

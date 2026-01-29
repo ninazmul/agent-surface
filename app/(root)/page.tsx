@@ -265,7 +265,7 @@ const Dashboard = () => {
         />
 
         {adminStatus && <LeadsToEnrolled profiles={profiles} />}
-        {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
+        {adminStatus && <LeadsFinancial profiles={profiles} />}
       </div>
     </div>
   );
