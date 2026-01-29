@@ -42,6 +42,7 @@ import {
   DatabaseIcon,
   DatabaseBackup,
   Settings,
+  PlayCircle,
 } from "lucide-react";
 import { useTheme } from "next-themes";
 import Image from "next/image";
@@ -181,7 +182,8 @@ const sidebarItems = [
   { key: "services", title: "Services", url: "/services", icon: Megaphone },
   { key: "admins", title: "Admins", url: "/admins", icon: Shield },
   { key: "about", title: "About Us", url: "/about", icon: BookOpen },
-  { key: "settings", title: "settings", url: "/settings", icon: Settings },
+  { key: "settings", title: "Settings", url: "/settings", icon: Settings },
+  { key: "tutorial", title: "Tutorial", url: "/tutorial", icon: PlayCircle },
 ];
 
 type HomeSidebarProps = {
@@ -217,6 +219,8 @@ const HomeSidebar = ({
     "notifications",
     "profile",
     "about",
+    "tutorial",
+
   ];
 
   const filteredSidebarItems = sidebarItems.filter((item) => {
@@ -232,6 +236,7 @@ const HomeSidebar = ({
         "resources",
         "downloads",
         "about",
+        "tutorial",
       ].includes(item.key);
     }
     return allowedForNonAdmins.includes(item.key);
