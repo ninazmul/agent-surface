@@ -5,6 +5,10 @@ export async function GET(request: Request) {
   const playlistId = searchParams.get("playlistId");
   const API_KEY = process.env.YOUTUBE_API_KEY;
 
+  if (!API_KEY) {
+    return NextResponse.json({ error: "Missing API key" }, { status: 500 });
+  }
+
   if (!playlistId) {
     return NextResponse.json({ error: "Missing playlistId" }, { status: 400 });
   }
@@ -12,6 +16,13 @@ export async function GET(request: Request) {
   const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${playlistId}&key=${API_KEY}`;
 
   const res = await fetch(url);
+  if (!res.ok) {
+    return NextResponse.json(
+      { error: "Failed to fetch from YouTube" },
+      { status: res.status },
+    );
+  }
+
   const data = await res.json();
 
   return NextResponse.json(data.items || []);
