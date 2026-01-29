@@ -140,9 +140,13 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({
     if (agentsData.length <= 6) setShowMore(false);
   }, [agentsData]);
 
-  const cardsToShow = showMore
-    ? agentsData
-    : [...agentsData, ...Array(Math.max(3 - agentsData.length, 0)).fill(null)];
+  const cardsToShow = useMemo(() => {
+    if (agentsData.length === 0) {
+      return Array(3).fill(null);
+    }
+
+    return showMore ? agentsData : agentsData.slice(0, 3);
+  }, [agentsData, showMore]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
