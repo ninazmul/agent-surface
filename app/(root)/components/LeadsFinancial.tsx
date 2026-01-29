@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { ILead } from "@/lib/database/models/lead.model";
 import { IProfile } from "@/lib/database/models/profile.model";
@@ -37,12 +37,11 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
     setEndDate("");
     setSelectedAgent("all");
     setShowMore(false);
-    setData([]);
   };
 
+  /* ---------------- FETCH FINANCIAL DATA ---------------- */
   useEffect(() => {
     const fetchFinancialData = async () => {
-      setData([]);
       try {
         const now = new Date();
         let fromDate: Date | null = null;
@@ -81,6 +80,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
         });
 
         const voidLeads = filteredLeads.filter((l) => l?.isVoid);
+
         const voidQuotes = await Promise.all(
           voidLeads.map(async (l) => {
             try {
@@ -89,7 +89,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
             } catch {
               return null;
             }
-          })
+          }),
         );
 
         const result: FinancialData[] = [];
@@ -106,14 +106,14 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
           const courseAmount = Array.isArray(source?.course)
             ? source.course.reduce(
                 (sum, c) => sum + Number(c?.courseFee || 0),
-                0
+                0,
               )
             : 0;
 
           const serviceAmount = Array.isArray(source?.services)
             ? source.services.reduce(
                 (sum, s) => sum + Number(s?.amount || 0),
-                0
+                0,
               )
             : 0;
 
@@ -123,7 +123,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
           const paid = Array.isArray(source?.transcript)
             ? source.transcript.reduce(
                 (sum, t) => sum + Number(t?.amount || 0),
-                0
+                0,
               )
             : 0;
 
@@ -155,10 +155,11 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({
     fetchFinancialData();
   }, [leads, profiles, filter, startDate, endDate, selectedAgent]);
 
-  // Ensure at least 6 cards are shown
-  const cardsToShow = showMore
-    ? data
-    : [...data, ...Array(Math.max(6 - data.length, 0)).fill(null)];
+  /* ---------------- CARDS TO SHOW ---------------- */
+  const cardsToShow = useMemo(() => {
+    if (data.length === 0) return Array(3).fill(null); // placeholder when no data
+    return showMore ? data : data.slice(0, 6); // show first 6 by default
+  }, [data, showMore]);
 
   return (
     <section className="bg-white dark:bg-gray-900 shadow-md rounded-2xl p-4 mb-6">
