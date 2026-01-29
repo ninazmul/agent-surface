@@ -13,7 +13,7 @@ type AgentProgress = {
 } & Record<string, number>;
 
 interface LeadsToEnrolledProps {
-  profiles: IProfile[] | null;
+  profiles?: IProfile[] | null;
   loading?: boolean;
 }
 
@@ -211,17 +211,6 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({ profiles = [] }) => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
         {cardsToShow.map((agent, index) => {
-          if (!agent) {
-            return (
-              <Card
-                key={`empty-${index}`}
-                className="p-4 h-40 bg-gray-100 dark:bg-gray-800 shadow-sm rounded-2xl border border-gray-100 flex items-center justify-center text-gray-400"
-              >
-                No Data
-              </Card>
-            );
-          }
-
           const maxCount = Math.max(
             ...leadStages.map((stage) => agent?.[stage] || 0),
             1,
@@ -229,15 +218,15 @@ const LeadsToEnrolled: React.FC<LeadsToEnrolledProps> = ({ profiles = [] }) => {
 
           return (
             <Card
-              key={agent.agentName}
+              key={agent?.agentName || `empty-${index}`}
               className="p-4 h-full bg-gray-100 dark:bg-gray-800 shadow-sm rounded-2xl border border-gray-100"
             >
               <h3 className="text-xl font-semibold text-gray-900 dark:text-gray-100 mb-4">
-                {agent.agentName}
+                {agent?.agentName || "No Agent"}
               </h3>
 
               {leadStages.map((stage) => {
-                const count = agent[stage] || 0;
+                const count = agent?.[stage] || 0;
                 const progress = (count / maxCount) * 100;
 
                 const stageColor = {
