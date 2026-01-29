@@ -264,7 +264,7 @@ const Dashboard = () => {
           services={services}
         />
 
-        {adminStatus && <LeadsToEnrolled leads={leads} profiles={profiles} />}
+        {adminStatus && <LeadsToEnrolled profiles={profiles} />}
         {adminStatus && <LeadsFinancial leads={leads} profiles={profiles} />}
       </div>
     </div>
