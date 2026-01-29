@@ -29,7 +29,7 @@ const LeadsFinancial: React.FC<LeadsFinancialProps> = ({ profiles = [] }) => {
   const [showMore, setShowMore] = useState(false);
 
   const handleReset = () => {
-    setFilter("week");
+    setFilter("month");
     setStartDate("");
     setEndDate("");
     setSelectedAgent("all");
