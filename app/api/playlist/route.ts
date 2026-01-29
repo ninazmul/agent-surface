@@ -1,5 +1,11 @@
 import { NextResponse } from "next/server";
 
+interface PlaylistItem {
+  snippet?: {
+    title?: string;
+  };
+}
+
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const playlistId = searchParams.get("playlistId");
@@ -31,10 +37,18 @@ export async function GET(request: Request) {
     }
 
     const data = await res.json();
-    return NextResponse.json(data.items ?? []);
-  } catch (err) {
+
+    // Filter out deleted/private videos here too (extra safety)
+    const items = (data.items ?? []).filter(
+      (item: PlaylistItem) =>
+        item.snippet?.title !== "Deleted video" &&
+        item.snippet?.title !== "Private video"
+    );
+
+    return NextResponse.json(items);
+  } catch {
     return NextResponse.json(
-      { error: "Failed to fetch from YouTube", err },
+      { error: "Failed to fetch from YouTube" },
       { status: 500 }
     );
   }

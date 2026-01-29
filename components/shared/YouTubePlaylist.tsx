@@ -4,7 +4,11 @@ interface Video {
   snippet: {
     title: string;
     resourceId: { videoId: string };
-    thumbnails: { medium: { url: string } };
+    thumbnails: {
+      default?: { url: string };
+      medium?: { url: string };
+      high?: { url: string };
+    };
   };
 }
 
@@ -22,7 +26,7 @@ export default async function YouTubePlaylist({ playlistId }: Props) {
   try {
     const res = await fetch(
       `${baseUrl}/api/playlist?playlistId=${playlistId}`,
-      { cache: "no-store" }
+      { cache: "no-store" },
     );
 
     if (!res.ok) {
@@ -34,35 +38,50 @@ export default async function YouTubePlaylist({ playlistId }: Props) {
     return <p className="text-red-500">Error fetching playlist.</p>;
   }
 
-  if (!videos.length) {
-    return <p>No videos found in this playlist.</p>;
+  // Filter out deleted/private videos
+  const filteredVideos = videos.filter(
+    (video) =>
+      video.snippet.title !== "Deleted video" &&
+      video.snippet.title !== "Private video",
+  );
+
+  if (!filteredVideos.length) {
+    return <p>No valid videos found in this playlist.</p>;
   }
 
   return (
     <div>
-      <h2 className="text-2xl font-bold mb-4">Playlist Videos</h2>
+      <h2 className="text-2xl font-bold mb-4">All Tutorials</h2>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {videos.map((video) => (
-          <a
-            key={video.snippet.resourceId.videoId}
-            href={`https://www.youtube.com/watch?v=${video.snippet.resourceId.videoId}`}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="border rounded overflow-hidden shadow hover:shadow-lg transition block"
-          >
-            <Image
-              src={video.snippet.thumbnails.medium.url}
-              width={320}
-              height={180}
-              alt={video.snippet.title}
-              className="w-full"
-            />
-            <p className="p-2 font-medium line-clamp-2">
-              {video.snippet.title}
-            </p>
-          </a>
-        ))}
+        {filteredVideos.map((video) => {
+          const thumbUrl =
+            video.snippet.thumbnails.medium?.url ||
+            video.snippet.thumbnails.high?.url ||
+            video.snippet.thumbnails.default?.url ||
+            "/assets/images/placeholder.png";
+
+          return (
+            <a
+              key={video.snippet.resourceId.videoId}
+              href={`https://www.youtube.com/watch?v=${video.snippet.resourceId.videoId}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="border rounded-2xl overflow-hidden shadow hover:shadow-lg transition block"
+            >
+              <Image
+                src={thumbUrl}
+                width={320}
+                height={180}
+                alt={video.snippet.title}
+                className="w-full"
+              />
+              <p className="p-2 font-medium line-clamp-1 truncate">
+                {video.snippet.title}
+              </p>
+            </a>
+          );
+        })}
       </div>
     </div>
   );
