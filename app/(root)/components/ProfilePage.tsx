@@ -1,0 +1,608 @@
+"use client";
+
+import { IProfile } from "@/lib/database/models/profile.model";
+import Image from "next/image";
+import ProfileForm from "./ProfileForm";
+import { Button } from "@/components/ui/button";
+import ProfileTable from "./ProfileTable";
+import SalesTargetProgress from "./SalesTargetProgress";
+import { Copy, FileEdit, Share2 } from "lucide-react";
+import { ILead } from "@/lib/database/models/lead.model";
+import { useEffect, useState } from "react";
+import { getLeadByEmail } from "@/lib/actions/lead.actions";
+import { useTheme } from "next-themes";
+import toast from "react-hot-toast";
+import { SignatureModal } from "./SignatureModal";
+import AgreementModal from "./AgreementModal";
+import AddProfileDialog from "@/components/shared/AddProfileDialog";
+import ViewContactAgreement from "@/components/shared/ViewContactAgreement";
+import UpdateProfileDialog2 from "@/components/shared/UpdateProfileDialog2";
+import AddSubAgentDialog from "@/components/shared/AddSubAgentDialog";
+
+interface ProfilePageProps {
+  adminStatus: boolean;
+  profiles: IProfile[];
+  myProfile?: IProfile | null;
+  countryAgent: IProfile | null;
+  agent: IProfile[];
+  subAgents: IProfile[];
+  isAgent?: boolean;
+  myLeads?: ILead[];
+  email: string;
+}
+
+export default function ProfilePage({
+  adminStatus,
+  profiles,
+  myProfile,
+  countryAgent,
+  agent,
+  subAgents,
+  isAgent,
+  myLeads,
+  email,
+}: ProfilePageProps) {
+  const { theme } = useTheme();
+  const [myLead, setMyLead] = useState<ILead | null>(null);
+  const [openSignatureModal, setOpenSignatureModal] = useState(false);
+  const [openAgreementModal, setOpenAgreementModal] = useState(false);
+
+  // Fetch leads client-side
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const lead = await getLeadByEmail(myProfile?.email || "");
+        setMyLead(lead || null);
+      } catch (error) {
+        console.error("Error fetching leads:", error);
+      }
+    };
+
+    fetchData();
+  }, [myProfile?.email]);
+  return (
+    <div className="space-y-10 pb-10">
+      {/* User Profile Section */}
+      <section className="">
+        {!adminStatus && !myProfile && (
+          <div className="max-w-5xl mx-auto m-4 p-4 bg-white dark:bg-gray-900 rounded-2xl">
+            <div className="text-center space-y-2 mb-6">
+              <h2 className="text-2xl font-bold text-indigo-800 dark:text-gray-100">
+                Create Your Agency Profile
+              </h2>
+              <p className="text-sm text-indigo-600 dark:text-gray-300">
+                Welcome! To get started, please complete your agency details.
+                Our team will review and approve your profile shortly.
+              </p>
+            </div>
+
+            <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-4 p-4 bg-purple-50 dark:bg-gray-800 border border-purple-200 rounded-lg">
+              <Image
+                src={
+                  theme === "dark"
+                    ? "/assets/images/logo-white.png"
+                    : "/assets/images/logo.png"
+                }
+                alt="AB logo"
+                width={120}
+                height={40}
+                className="self-center sm:self-start"
+              />
+              <p className="text-sm text-indigo-700 dark:text-gray-100">
+                Completing your agency profile helps us ensure secure payouts,
+                verified access, and full feature availability within the
+                system.
+              </p>
+            </div>
+
+            <ProfileForm type="Create" agent={agent} />
+          </div>
+        )}
+
+        {myProfile && (
+          <section className="p-4">
+            <h3 className="h3-bold text-center sm:text-left mb-4">Profile</h3>
+            {/* Profile Status or Update */}
+
+            {myProfile?.status === "Pending" && (
+              <div className="mt-8 overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+                {/* Header Section */}
+                <div className="border-b border-gray-100 bg-gray-50/50 px-6 py-4 dark:border-gray-800 dark:bg-gray-800/50">
+                  <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                    Finalize Your Registration
+                  </h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Complete the steps below to activate your account.
+                  </p>
+                </div>
+
+                <div className="p-6 space-y-8">
+                  {/* Step 1: Review Agreement */}
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400 font-medium text-sm">
+                      1
+                    </div>
+                    <div className="flex-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                        <div>
+                          <h4 className="font-medium text-gray-900 dark:text-white">
+                            Review Legal Agreement
+                          </h4>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Please read the terms and conditions carefully.
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setOpenAgreementModal(true)}
+                          className="inline-flex items-center justify-center rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 dark:hover:bg-gray-700 transition-all"
+                        >
+                          View Document
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Step 2: Signature */}
+                  <div className="flex items-start gap-4">
+                    <div
+                      className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full font-medium text-sm transition-colors ${
+                        myProfile?.signatureDocument
+                          ? "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+                          : "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+                      }`}
+                    >
+                      {myProfile?.signatureDocument ? "✓" : "2"}
+                    </div>
+
+                    <div className="flex-1">
+                      <h4 className="font-medium text-gray-900 dark:text-white">
+                        Digital Signature
+                      </h4>
+
+                      {myProfile?.signatureDocument ? (
+                        <div className="mt-4 flex flex-col items-center sm:items-start gap-4">
+                          <div className="rounded-lg bg-green-50 px-4 py-2 text-sm text-green-700 dark:bg-green-900/20 dark:text-green-300 border border-green-100 dark:border-green-800/30">
+                            Signature successfully captured and under review.
+                          </div>
+                          <div className="group relative rounded-xl border border-gray-200 bg-gray-50 p-2 dark:border-gray-700 dark:bg-gray-800">
+                            <Image
+                              src={myProfile.signatureDocument}
+                              alt="Submitted Signature"
+                              className="h-24 w-auto object-contain mix-blend-multiply dark:mix-blend-normal dark:invert-[0.05]"
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="mt-4">
+                          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                            You must provide a signature to proceed with the
+                            review.
+                          </p>
+                          <Button
+                            onClick={() => setOpenSignatureModal(true)}
+                            className="bg-primary hover:bg-primary/90 text-white shadow-md shadow-primary/20 px-8 py-2.5 transition-all"
+                          >
+                            Sign Agreement
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Status Footer */}
+                <div className="bg-yellow-50/50 px-6 py-3 dark:bg-yellow-900/10 border-t border-yellow-100 dark:border-yellow-900/20 text-center">
+                  <span className="text-xs font-medium uppercase tracking-wider text-yellow-700 dark:text-yellow-500">
+                    Current Status: Profile Under Review
+                  </span>
+                </div>
+                <SignatureModal
+                  open={openSignatureModal}
+                  onClose={() => setOpenSignatureModal(false)}
+                  profileName={myProfile?.name}
+                  profileId={myProfile?._id.toString()}
+                />
+              </div>
+            )}
+
+            {myProfile?.status === "Approved" && (
+              <div className="grid grid-cols-3 lg:grid-cols-5 gap-4 rounded-2xl bg-white dark:bg-gray-800 p-4">
+                <div className="col-span-3 space-y-4">
+                  {/* Header */}
+                  <div className="flex flex-row items-center justify-between gap-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                    {/* Profile Image */}
+                    <div className="flex-shrink-0 mx-auto sm:mx-0">
+                      <Image
+                        src={myProfile?.logo || "/assets/images/profile.png"}
+                        alt={myProfile?.name || "N/A"}
+                        width={150}
+                        height={200}
+                        className="w-24 h-32 sm:w-28 sm:h-36 md:w-32 md:h-40 rounded-lg object-cover border"
+                      />
+                    </div>
+
+                    {/* Profile Info */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-4">
+                      {/* Name and Role */}
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-4 w-full">
+                        <div className="flex flex-col gap-1 sm:gap-2">
+                          <h2 className="text-base sm:text-lg md:text-xl font-semibold text-black dark:text-gray-100 flex flex-wrap items-center gap-2">
+                            <span className="break-words">
+                              {myProfile?.name}
+                            </span>
+                            <span
+                              className={`inline-flex items-center justify-center px-2 py-1 rounded-md text-xs md:text-base font-medium ${
+                                myProfile?.status === "Approved"
+                                  ? "bg-green-300 text-green-800"
+                                  : "bg-yellow-300 text-yellow-800"
+                              }`}
+                            >
+                              {myProfile?.status}
+                            </span>
+                          </h2>
+                          <p className="text-xs sm:text-sm md:text-base px-2 py-1 rounded-md bg-purple-500 text-white w-max">
+                            {myProfile?.role}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Edit Button */}
+                      <div className="flex-shrink-0 mt-2 sm:mt-0">
+                        <UpdateProfileDialog2
+                          profile={myProfile}
+                          profileId={myProfile._id.toString()}
+                          agent={agent}
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Basic Info */}
+                  <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                    <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
+                      Agent Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
+                      <div>
+                        <p className="text-lg text-gray-700">Name:</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.name}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-lg text-gray-700">Location:</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.location}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-lg text-gray-700">Email:</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.email}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-lg text-gray-700">Phone:</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.number}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-lg text-gray-700">Created At:</p>
+                        <p>
+                          {myProfile?.createdAt
+                            ? new Date(myProfile.createdAt).toLocaleDateString()
+                            : "N/A"}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-lg text-gray-700">Country:</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.country}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-lg text-gray-700">Country Agent:</p>
+                        {countryAgent?.name ? (
+                          <p className="break-words whitespace-normal">
+                            {countryAgent.name}{" "}
+                            <span className="text-indigo-500 text-xs">
+                              ({countryAgent.email})
+                            </span>
+                          </p>
+                        ) : (
+                          "N/A"
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bank Info */}
+                  <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                    <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
+                      Bank Information
+                    </h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
+                      <div>
+                        <p className="text-lg text-gray-700">Bank Name:</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.bankName}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-lg text-gray-700">SWIFT Code:</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.swiftCode}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-lg text-gray-700">Branch Address:</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.branchAddress}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-lg text-gray-700">Account Number:</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.accountNumber}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-lg text-gray-700">Routing Number:</p>
+                        <p className="break-words whitespace-normal">
+                          {myProfile?.routingNumber}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Legal Documents (View Only) */}
+                  {(myProfile?.agreementDocument ||
+                    myProfile?.signatureDocument) && (
+                    <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                      <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-4">
+                        Legal Documents
+                      </h3>
+
+                      <ViewContactAgreement profile={myProfile} />
+                    </div>
+                  )}
+
+                  {/* Documents */}
+                  {(myProfile?.licenseDocument ||
+                    myProfile?.agreementDocument) && (
+                    <div className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                      <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
+                        Documents
+                      </h3>
+
+                      <div className="flex items-center justify-around gap-4 text-sm">
+                        {myProfile?.licenseDocument && (
+                          <a
+                            href={myProfile.licenseDocument}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-4 py-2 text-sm font-medium rounded-full bg-white dark:bg-gray-800 border text-center hover:bg-gray-200 dark:hover:bg-gray-600 transition w-full"
+                          >
+                            📄 View License Document
+                          </a>
+                        )}
+
+                        {myProfile?.agreementDocument && (
+                          <a
+                            href={myProfile.agreementDocument}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="px-4 py-2 text-sm font-medium rounded-full bg-white dark:bg-gray-800 border text-center hover:bg-gray-200 dark:hover:bg-gray-600 transition w-full"
+                          >
+                            📄 View Agreement Document
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {myProfile && (
+                    <SalesTargetProgress
+                      profile={{
+                        ...myProfile,
+                        salesTarget: myProfile?.salesTarget
+                          ? Number(myProfile.salesTarget)
+                          : 0,
+                        email: myProfile?.email || "",
+                      }}
+                      leads={myLeads || []}
+                    />
+                  )}
+
+                  {myProfile?.role === "Student" && (
+                    <>
+                      {myLead ? (
+                        <div className="text-center pt-4">
+                          {" "}
+                          <a href={`/lead/${myLead._id.toString()}`}>
+                            <Button
+                              variant="outline"
+                              className="text-blue-700 w-full max-w-5xl font-semibold bg-blue-100 hover:bg-blue-200 inline-flex items-center gap-2"
+                            >
+                              <FileEdit />
+                              My lead Portal
+                            </Button>
+                          </a>
+                        </div>
+                      ) : (
+                        <div className="text-center pt-4">
+                          {" "}
+                          <a href={`/lead/create`}>
+                            <Button
+                              variant="outline"
+                              className="text-blue-700 w-full max-w-5xl font-semibold bg-blue-100 hover:bg-blue-200 inline-flex items-center gap-2"
+                            >
+                              <FileEdit />
+                              Create Lead
+                            </Button>
+                          </a>
+                        </div>
+                      )}
+                    </>
+                  )}
+                </div>
+                <div className="col-span-3 lg:col-span-2 space-y-4 bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+                  <div className="flex flex-wrap items-center justify-between gap-4">
+                    <h3 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
+                      Your Sub Agents
+                    </h3>
+                    <div className="flex items-center justify-around gap-2">
+                      <AddSubAgentDialog
+                        agent={agent}
+                        isAgent={isAgent}
+                        email={email}
+                      />
+                      {/* Copy Link */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-xl flex items-center gap-1"
+                        onClick={() => {
+                          navigator.clipboard.writeText(
+                            `${window.location.origin}/profile/create`,
+                          );
+                          toast.success("Link copied");
+                        }}
+                      >
+                        <Copy size={16} />
+                      </Button>
+
+                      {/* Share Link */}
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="rounded-xl flex items-center gap-1"
+                        onClick={async () => {
+                          const link = `${window.location.origin}/profile/create`;
+                          if (navigator.share) {
+                            await navigator.share({
+                              title: "Create Profile",
+                              url: link,
+                            });
+                          } else {
+                            navigator.clipboard.writeText(link);
+                            toast.success("Link copied (Share unavailable)");
+                          }
+                        }}
+                      >
+                        <Share2 size={16} />
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 gap-4">
+                    {subAgents.map((agent) => (
+                      <a
+                        href={`/profile/${agent._id.toString()}`}
+                        key={agent._id.toString()}
+                        className="rounded-2xl bg-white dark:bg-gray-800 p-4 hover:shadow-md transition"
+                      >
+                        <div className="flex items-center gap-4">
+                          <Image
+                            src={
+                              agent?.logo ||
+                              "/assets/images/default-profile.png"
+                            }
+                            alt={agent?.name || "N/A"}
+                            width={150} // 3 units
+                            height={200} // 4 units
+                            className="w-16 md:w-20 h-12 md:h-28 rounded-lg object-cover border"
+                          />
+                          <div className="space-y-2">
+                            <h4 className="text-md font-medium text-black dark:text-gray-100">
+                              {agent.name}
+                            </h4>
+                            <p className="text-sm text-black dark:text-gray-300">
+                              {agent.email}
+                            </p>
+                            <div className="flex items-center gap-4">
+                              <p className="text-xs px-3 py-1 rounded-full bg-green-500 text-white w-max">
+                                {agent.country}
+                              </p>
+                              <p className="text-xs px-3 py-1 rounded-full bg-white border text-black w-max">
+                                {agent.country}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+          </section>
+        )}
+      </section>
+
+      {adminStatus && (
+        <section className="p-4">
+          {/* Header */}
+          <div className="px-2 sm:px-4 flex flex-col md:flex-row items-center justify-between gap-3">
+            <h3 className="h3-bold text-center sm:text-left">All Profiles</h3>
+
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+              {/* Add Profile */}
+              <AddProfileDialog agent={agent} isAgent={isAgent} email={email} />
+
+              {/* Copy Link */}
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-xl flex items-center gap-1"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    `${window.location.origin}/profile/create`,
+                  );
+                  toast.success("Link copied");
+                }}
+              >
+                <Copy size={16} />
+                Copy
+              </Button>
+
+              {/* Share Link */}
+              <Button
+                size="sm"
+                variant="outline"
+                className="rounded-xl flex items-center gap-1"
+                onClick={async () => {
+                  const link = `${window.location.origin}/profile/create`;
+                  if (navigator.share) {
+                    await navigator.share({
+                      title: "Create Profile",
+                      url: link,
+                    });
+                  } else {
+                    navigator.clipboard.writeText(link);
+                    toast.success("Link copied (Share unavailable)");
+                  }
+                }}
+              >
+                <Share2 size={16} />
+                Share
+              </Button>
+            </div>
+          </div>
+
+          {/* Table */}
+          <div className="overflow-x-auto my-8">
+            <ProfileTable profiles={profiles} agent={agent} />
+          </div>
+        </section>
+      )}
+
+      {/* Modals */}
+      <AgreementModal
+        profile={myProfile as IProfile}
+        open={openAgreementModal}
+        onClose={() => setOpenAgreementModal(false)}
+      />
+    </div>
+  );
+}

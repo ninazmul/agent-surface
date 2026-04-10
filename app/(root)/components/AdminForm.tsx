@@ -1,0 +1,295 @@
+"use client";
+
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm, Controller } from "react-hook-form";
+import Select from "react-select";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { createAdmin, updateAdmin } from "@/lib/actions/admin.actions";
+import { IAdmin } from "@/lib/database/models/admin.model";
+import countries from "world-countries";
+import { MultiValue } from "react-select";
+import toast from "react-hot-toast";
+
+type OptionType = {
+  value: string;
+  label: string;
+};
+
+const rolePermissionOptions = [
+  { value: "dashboard", label: "Dashboard" },
+  { value: "users", label: "Users" },
+  { value: "quotations", label: "Quotations" },
+  { value: "events", label: "Events" },
+  { value: "leads", label: "Leads" },
+  { value: "courses", label: "Courses" },
+  { value: "resources", label: "Resources" },
+  { value: "promotions", label: "Promotions" },
+  { value: "finance", label: "Finance" },
+  { value: "invoices", label: "Invoices" },
+  { value: "downloads", label: "Downloads" },
+  { value: "messages", label: "Messages" },
+  { value: "notifications", label: "Notifications" },
+  { value: "services", label: "Services" },
+  { value: "profile", label: "Profile" },
+  { value: "admins", label: "Admins" },
+  { value: "about", label: "About Us" },
+  { value: "settings", label: "Settings" },
+  { value: "tutorial", label: "Tutorial" },
+];
+
+const countryOptions = countries
+  .map((country) => ({
+    value: country.name.common,
+    label: `${country.flag} ${country.name.common}`,
+  }))
+  .sort((a, b) => a.label.localeCompare(b.label)); // Optional: alphabetically sort
+
+const AdminFormSchema = z.object({
+  name: z.string().min(3, "Name must be at least 3 characters."),
+  email: z.string().email("Invalid email format"),
+  rolePermissions: z
+    .array(z.string())
+    .min(1, "Select at least one permission."),
+  countries: z.array(z.string()).optional(),
+});
+
+type AdminFormProps = {
+  type: "Create" | "Update";
+  Admin?: IAdmin;
+  AdminId?: string;
+  onSuccess?: () => void;
+};
+
+const AdminForm = ({ type, Admin, AdminId, onSuccess }: AdminFormProps) => {
+  const form = useForm<z.infer<typeof AdminFormSchema>>({
+    resolver: zodResolver(AdminFormSchema),
+    defaultValues: {
+      name: Admin?.name || "",
+      email: Admin?.email || "",
+      rolePermissions: Admin?.rolePermissions || [],
+      countries: Admin?.countries || [],
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof AdminFormSchema>) => {
+    try {
+      const adminData = {
+        name: values.name,
+        email: values.email,
+        rolePermissions: values.rolePermissions,
+        countries: values.countries || [],
+      };
+
+      if (type === "Create") {
+        const created = await createAdmin(adminData);
+        if (created) {
+          form.reset();
+          toast.success("Admin created Successfully!");
+          onSuccess?.();
+        }
+      } else if (type === "Update" && AdminId) {
+        const updated = await updateAdmin(AdminId, adminData);
+        if (updated) {
+          toast.success("Admin's profile updated Successfully!");
+          onSuccess?.();
+        }
+      }
+    } catch (error) {
+      console.error("Admin form submission failed", error);
+    }
+  };
+
+  return (
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+        space-y-4
+      "
+        >
+          {/* ===== Admin Info ===== */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold">Admin Information</h2>
+
+            {/* Name */}
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Full Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter full name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Email */}
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email Address</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter admin email" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* ===== Access Control ===== */}
+          <div className="space-y-4">
+            <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-100">
+              Access Permissions
+            </h2>
+
+            {/* Role Permissions */}
+            <FormField
+              control={form.control}
+              name="rolePermissions"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Role Permissions</FormLabel>
+                  <FormControl>
+                    <Controller
+                      control={form.control}
+                      name="rolePermissions"
+                      render={({ field }) => {
+                        const selectAllOption: OptionType = {
+                          value: "*",
+                          label: "Select All",
+                        };
+
+                        const handleChange = (
+                          selectedOptions: MultiValue<OptionType>,
+                        ) => {
+                          if (!selectedOptions) return field.onChange([]);
+
+                          const values = selectedOptions.map(
+                            (opt) => opt.value,
+                          );
+
+                          const allValues = rolePermissionOptions.map(
+                            (opt) => opt.value,
+                          );
+
+                          if (values.includes("*")) {
+                            field.onChange(allValues);
+                          } else {
+                            field.onChange(values);
+                          }
+                        };
+
+                        const currentValues = field.value || [];
+                        const isAllSelected = rolePermissionOptions.every(
+                          (opt) => currentValues.includes(opt.value),
+                        );
+
+                        const value: OptionType[] = isAllSelected
+                          ? [selectAllOption, ...rolePermissionOptions].filter(
+                              (opt) => currentValues.includes(opt.value),
+                            )
+                          : rolePermissionOptions.filter((opt) =>
+                              currentValues.includes(opt.value),
+                            );
+
+                        return (
+                          <Select
+                            isMulti
+                            options={[
+                              selectAllOption,
+                              ...rolePermissionOptions,
+                            ]}
+                            value={value}
+                            onChange={handleChange}
+                            placeholder="Select permissions..."
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                          />
+                        );
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {/* Countries */}
+            <FormField
+              control={form.control}
+              name="countries"
+              render={() => (
+                <FormItem>
+                  <FormLabel>Allowed Countries</FormLabel>
+                  <FormControl>
+                    <Controller
+                      control={form.control}
+                      name="countries"
+                      render={({ field }) => (
+                        <Select
+                          isMulti
+                          options={countryOptions}
+                          value={countryOptions.filter((opt) =>
+                            field.value?.includes(opt.value),
+                          )}
+                          onChange={(selected) =>
+                            field.onChange(selected.map((opt) => opt.value))
+                          }
+                          placeholder="Select countries..."
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                        />
+                      )}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          {/* ===== Submit Button ===== */}
+          <div className="pt-4">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={form.formState.isSubmitting}
+              className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+            >
+              {form.formState.isSubmitting
+                ? "Submitting..."
+                : type === "Create"
+                  ? "Create Admin"
+                  : "Update Admin"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+};
+
+export default AdminForm;

@@ -1,0 +1,59 @@
+import {
+  getAdminCountriesByEmail,
+  getAdminRolePermissionsByEmail,
+  getAllAdmins,
+  isAdmin,
+} from "@/lib/actions/admin.actions";
+import AdminTable from "../components/AdminTable";
+import { auth } from "@clerk/nextjs/server";
+import { getUserEmailById } from "@/lib/actions/user.actions";
+import { redirect } from "next/navigation";
+import { IAdmin } from "@/lib/database/models/admin.model";
+import AddAdminDialog from "@/components/shared/AddAdminDialog";
+
+const Page = async () => {
+  const { sessionClaims } = await auth();
+  const userId = sessionClaims?.userId as string;
+  const email = await getUserEmailById(userId);
+  const adminStatus = await isAdmin(email);
+  const adminCountries = await getAdminCountriesByEmail(email);
+  const rolePermissions = await getAdminRolePermissionsByEmail(email);
+
+  // ====== HARD BLOCK: Non-admins (Agent / Sub Agent / Student)
+  if (!adminStatus) {
+    redirect("/profile"); // or "/"
+  }
+
+  // ====== ADMIN PERMISSION CHECK
+  if (!rolePermissions.includes("admins")) {
+    redirect("/");
+  }
+
+  const allAdmins = await getAllAdmins();
+
+  const admins: IAdmin[] =
+    adminCountries.length === 0
+      ? allAdmins
+      : allAdmins.filter((admin: IAdmin) =>
+          admin.countries?.some((country) => adminCountries.includes(country)),
+        );
+
+  return (
+    <>
+      <section className="p-4">
+        {/* Header + Actions */}
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
+          <h3 className="h3-bold text-center sm:text-left">All Admins</h3>
+
+          <AddAdminDialog />
+        </div>
+
+        <div className="overflow-x-auto">
+          <AdminTable admins={admins} currentAdminCountries={adminCountries} />
+        </div>
+      </section>
+    </>
+  );
+};
+
+export default Page;

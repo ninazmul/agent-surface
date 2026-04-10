@@ -1,0 +1,419 @@
+"use client";
+
+import { useEffect, useMemo, useState, useCallback } from "react";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  format,
+  startOfWeek,
+  endOfWeek,
+  startOfMonth,
+  endOfMonth,
+  startOfYear,
+  endOfYear,
+  startOfDay,
+  endOfDay,
+  isValid,
+} from "date-fns";
+import AddEventDialog from "@/components/shared/AddEventDialog";
+import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
+import { IProfile } from "@/lib/database/models/profile.model";
+
+/* -------------------- Types -------------------- */
+
+type CalendarEvent = {
+  id: string;
+  title: string;
+  start: Date;
+  end: Date;
+  backgroundColor?: string;
+  borderColor?: string;
+  extendedProps: {
+    description: string;
+    type?: string;
+    offerExpiryDate?: Date | string;
+    eventLink?: string;
+  };
+};
+
+type DateFilterType = "week" | "month" | "year" | "custom";
+
+/* -------------------- Constants -------------------- */
+
+const typeColors: Record<string, { bg: string; border: string }> = {
+  application_deadline: { bg: "#f87171", border: "#b91c1c" },
+  enrollment_period: { bg: "#60a5fa", border: "#2563eb" },
+  course_start: { bg: "#34d399", border: "#059669" },
+  offer_promotion: { bg: "#fbbf24", border: "#b45309" },
+  webinar_event: { bg: "#a78bfa", border: "#6b21a8" },
+  holiday_closure: { bg: "#fcd34d", border: "#92400e" },
+  default: { bg: "#9ca3af", border: "#6b7280" },
+};
+
+/* -------------------- Helpers -------------------- */
+
+const parseDateSafe = (d?: string | Date | null): Date | null => {
+  if (!d) return null;
+  if (d instanceof Date) return isValid(d) ? d : null;
+
+  const str = String(d);
+  const iso = str.includes("T") ? str : `${str}T00:00:00`;
+  const dt = new Date(iso);
+
+  return isValid(dt) ? dt : null;
+};
+
+/* -------------------- Component -------------------- */
+
+const EventCalendar = ({
+  isAdmin,
+  agencies,
+  events,
+}: {
+  isAdmin: boolean;
+  agencies: IProfile[];
+  events: IEventCalendar[];
+}) => {
+  const [calendarEvents, setCalendarEvents] = useState<CalendarEvent[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(
+    null,
+  );
+  const [activeTypeFilter, setActiveTypeFilter] = useState<string>("all");
+  const [dateFilterType, setDateFilterType] = useState<DateFilterType>("month");
+  const [customRange, setCustomRange] = useState<{
+    start?: string;
+    end?: string;
+  }>({});
+
+  /* ---------- Map server events → calendar events ---------- */
+
+  useEffect(() => {
+    const formatted: CalendarEvent[] = events
+      .map((event) => {
+        const start = parseDateSafe(event.startDate);
+        const end = parseDateSafe(event.endDate || event.startDate);
+
+        if (!start || !end) return null;
+
+        const colors =
+          (event.eventType && typeColors[event.eventType]) ||
+          typeColors.default;
+
+        return {
+          id: event._id.toString(),
+          title: event.title,
+          start,
+          end,
+          backgroundColor: colors.bg,
+          borderColor: colors.border,
+          extendedProps: {
+            description: event.description,
+            type: event.eventType,
+            offerExpiryDate: event.offerExpiryDate,
+            eventLink: event.eventLink,
+          },
+        };
+      })
+      .filter(Boolean) as CalendarEvent[];
+
+    setCalendarEvents(formatted);
+  }, [events]);
+
+  /* -------------------- Date range logic -------------------- */
+
+  const getFilterRange = useCallback(() => {
+    switch (dateFilterType) {
+      case "week":
+        return {
+          start: startOfDay(startOfWeek(selectedDate)),
+          end: endOfDay(endOfWeek(selectedDate)),
+        };
+      case "month":
+        return {
+          start: startOfDay(startOfMonth(selectedDate)),
+          end: endOfDay(endOfMonth(selectedDate)),
+        };
+      case "year":
+        return {
+          start: startOfDay(startOfYear(selectedDate)),
+          end: endOfDay(endOfYear(selectedDate)),
+        };
+      case "custom": {
+        if (!customRange.start || !customRange.end) return null;
+        const start = parseDateSafe(customRange.start);
+        const end = parseDateSafe(customRange.end);
+        if (!start || !end) return null;
+        return { start: startOfDay(start), end: endOfDay(end) };
+      }
+      default:
+        return null;
+    }
+  }, [dateFilterType, selectedDate, customRange]);
+
+  const filterRange = useMemo(() => getFilterRange(), [getFilterRange]);
+
+  /* -------------------- Filtering -------------------- */
+
+  const filteredEvents = useMemo(() => {
+    return calendarEvents.filter((event) => {
+      const typeMatch =
+        activeTypeFilter === "all"
+          ? true
+          : event.extendedProps.type === activeTypeFilter;
+
+      if (!typeMatch) return false;
+      if (!filterRange) return true;
+
+      return event.start <= filterRange.end && event.end >= filterRange.start;
+    });
+  }, [calendarEvents, activeTypeFilter, filterRange]);
+
+  /* -------------------- Highlighted calendar days -------------------- */
+
+  const highlightedDates = useMemo(() => {
+    const set = new Map<number, Date>();
+
+    for (const evt of filteredEvents) {
+      for (
+        let d = startOfDay(evt.start);
+        d <= evt.end;
+        d.setDate(d.getDate() + 1)
+      ) {
+        const key = d.getTime();
+        if (!set.has(key)) set.set(key, new Date(d));
+      }
+    }
+
+    return Array.from(set.values());
+  }, [filteredEvents]);
+
+  /* -------------------- Events on selected date -------------------- */
+
+  const eventsOnSelectedDate = useMemo(() => {
+    const dayStart = startOfDay(selectedDate);
+    const dayEnd = endOfDay(selectedDate);
+
+    return filteredEvents.filter(
+      (evt) => evt.start <= dayEnd && evt.end >= dayStart,
+    );
+  }, [filteredEvents, selectedDate]);
+
+  /* -------------------- Render -------------------- */
+
+  return (
+    <div className="p-4 bg-white dark:bg-gray-800 rounded-2xl shadow-md">
+      {/* Filters */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 w-full md:w-2/3">
+        {/* Date Filter Dropdown */}
+        <div>
+          <select
+            value={dateFilterType}
+            onChange={(e) =>
+              setDateFilterType(e.target.value as DateFilterType)
+            }
+            className="border-none text-black dark:text-gray-100 text-xl"
+          >
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+            <option value="year">This Year</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+
+        {/* Custom Date Picker */}
+        {dateFilterType === "custom" && (
+          <div className="flex flex-col md:flex-row gap-2 w-full md:w-auto">
+            <div className="w-full md:w-auto">
+              <label className="block text-lg font-medium text-cyan-700 dark:text-gray-100">
+                From
+              </label>
+              <input
+                type="date"
+                value={customRange.start || ""}
+                onChange={(e) =>
+                  setCustomRange((prev) => ({ ...prev, start: e.target.value }))
+                }
+                className="w-full border rounded px-2 py-1 text-lg"
+              />
+            </div>
+            <div className="w-full md:w-auto">
+              <label className="block text-lg font-medium text-cyan-700 dark:text-gray-100">
+                To
+              </label>
+              <input
+                type="date"
+                value={customRange.end || ""}
+                onChange={(e) =>
+                  setCustomRange((prev) => ({ ...prev, end: e.target.value }))
+                }
+                className="w-full border rounded px-2 py-1 text-lg"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Calendar */}
+        <div className="w-full md:w-2/3 bg-gray-100 dark:bg-gray-500 border rounded-2xl">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            required={true}
+            modifiers={{
+              highlighted: highlightedDates,
+            }}
+            modifiersClassNames={{
+              highlighted:
+                "bg-blue-100 border-2 border-blue-500 dark:bg-gray-600",
+            }}
+            className="w-full"
+          />
+        </div>
+
+        <div className="w-full md:w-1/3">
+          {isAdmin && <AddEventDialog agencies={agencies} />}
+
+          <h3 className="text-xl font-semibold mb-2 text-cyan-700 dark:text-gray-100 mt-6">
+            {selectedDate ? format(selectedDate, "PPP") : "Select a date"}
+          </h3>
+
+          {eventsOnSelectedDate.length === 0 ? (
+            <p className="text-gray-500 dark:text-gray-300">
+              No events for this date.
+            </p>
+          ) : (
+            <div className="space-y-4">
+              <p className="text-gray-500 dark:text-gray-300">
+                Running Events:
+              </p>
+
+              {/* Events Grid */}
+              <ul className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {eventsOnSelectedDate.map((evt) => (
+                  <li
+                    key={evt.id}
+                    className="p-4 rounded-2xl cursor-pointer border h-full flex flex-col justify-between transition hover:shadow-lg"
+                    style={{
+                      backgroundColor: evt.backgroundColor,
+                      borderColor: evt.borderColor,
+                      borderWidth: "2px",
+                    }}
+                    onClick={() => setSelectedEvent(evt)}
+                  >
+                    <h4 className="text-lg font-bold dark:text-black">
+                      {evt.title}
+                    </h4>
+                    <p className="text-sm capitalize dark:text-black">
+                      {evt.extendedProps.type?.replace(/_/g, " ") || "N/A"}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+
+              {/* Event Type Filters */}
+              <div className="space-y-4">
+                <p className="text-gray-500 dark:text-gray-300">Event Types:</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {[
+                    "all",
+                    ...Object.keys(typeColors).filter((t) => t !== "default"),
+                  ].map((type) => {
+                    const isActive = activeTypeFilter === type;
+
+                    // "All" button full width on large screens
+                    const widthClass =
+                      type === "all"
+                        ? "w-full md:w-full md:col-span-2"
+                        : "w-auto";
+
+                    return (
+                      <div
+                        key={type}
+                        onClick={() => setActiveTypeFilter(type)}
+                        className={`${widthClass} uppercase text-center p-4 rounded-2xl cursor-pointer border h-full transition hover:shadow-lg
+                  ${
+                    isActive
+                      ? "bg-purple-500 text-white"
+                      : "bg-gray-100 dark:bg-gray-600 text-gray-700 dark:text-gray-200"
+                  }
+                  hover:bg-purple-400 dark:hover:bg-purple-500`}
+                      >
+                        {type.replace(/_/g, " ")}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Event Detail Modal */}
+      {selectedEvent &&
+        (() => {
+          const now = new Date();
+          const isMeetingOpen =
+            now >= selectedEvent.start &&
+            (!selectedEvent.end || now <= selectedEvent.end);
+
+          return (
+            <div
+              className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+              onClick={() => setSelectedEvent(null)}
+            >
+              <div
+                className="bg-cyan-50 p-6 rounded-2xl max-w-md w-full"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <h3 className="text-xl font-bold mb-2">
+                  {selectedEvent.title}
+                </h3>
+
+                <p className="mb-2">
+                  {selectedEvent.extendedProps.description}
+                </p>
+
+                <p className="mb-2">
+                  <strong>Start:</strong> {selectedEvent.start.toLocaleString()}
+                </p>
+
+                <p className="mb-2">
+                  <strong>End:</strong> {selectedEvent.end?.toLocaleString()}
+                </p>
+
+                {/* ✅ Meeting Join Logic */}
+                {selectedEvent.extendedProps.eventLink && isMeetingOpen && (
+                  <a
+                    href={selectedEvent.extendedProps.eventLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block mt-4 text-center bg-green-600 text-white py-2 rounded-lg hover:bg-green-700"
+                  >
+                    🚀 Join Meeting
+                  </a>
+                )}
+
+                {selectedEvent.extendedProps.eventLink && !isMeetingOpen && (
+                  <p className="mt-3 text-sm italic text-gray-600">
+                    ⏳ Meeting link will be available during the scheduled time.
+                  </p>
+                )}
+
+                <button
+                  onClick={() => setSelectedEvent(null)}
+                  className="mt-4 w-full bg-indigo-600 text-white py-2 rounded hover:bg-indigo-700"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          );
+        })()}
+    </div>
+  );
+};
+
+export default EventCalendar;

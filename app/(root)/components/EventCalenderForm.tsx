@@ -1,0 +1,372 @@
+"use client";
+
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Controller, useForm } from "react-hook-form";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
+import {
+  createEventCalendar,
+  updateEventCalendar,
+} from "@/lib/actions/eventCalender.actions";
+import toast from "react-hot-toast";
+import { IProfile } from "@/lib/database/models/profile.model";
+import countries from "world-countries";
+import Select from "react-select";
+
+// Zod schema
+const EventCalendarFormSchema = z.object({
+  title: z.string().min(3, "Title must be at least 3 characters."),
+  description: z
+    .string()
+    .min(10, "Description must be at least 10 characters."),
+  eventType: z.enum([
+    "application_deadline",
+    "enrollment_period",
+    "course_start",
+    "offer_promotion",
+    "webinar_event",
+    "holiday_closure",
+  ]),
+  eventLink: z.string().url().optional(),
+  agencies: z.array(z.string()).optional(),
+  countries: z.array(z.string()).optional(),
+  startDate: z.string().min(1, "Start date is required."),
+  endDate: z.string().optional(),
+  offerExpiryDate: z.string().optional(),
+});
+
+type EventCalendarFormProps = {
+  type: "Create" | "Update";
+  Event?: IEventCalendar;
+  EventId?: string;
+  agencies: IProfile[];
+  onSuccess?: () => void;
+};
+
+const EventCalendarForm = ({
+  type,
+  Event,
+  EventId,
+  agencies,
+  onSuccess,
+}: EventCalendarFormProps) => {
+  const countryOptions = countries
+    .map((country) => ({
+      value: country.name.common,
+      label: `${country.flag} ${country.name.common}`,
+    }))
+    .sort((a, b) => a.label.localeCompare(b.label)); // Optional: alphabetically sort
+
+  const agencyOptions = agencies.map((agency) => ({
+    value: agency.email,
+    label: agency.name,
+  }));
+
+  const form = useForm<z.infer<typeof EventCalendarFormSchema>>({
+    resolver: zodResolver(EventCalendarFormSchema),
+    defaultValues: {
+      title: Event?.title || "",
+      description: Event?.description || "",
+      eventType: Event?.eventType || "application_deadline",
+      startDate: Event?.startDate
+        ? new Date(Event.startDate).toISOString().slice(0, 16) // YYYY-MM-DDTHH:mm
+        : new Date().toISOString().slice(0, 16),
+      endDate: Event?.endDate
+        ? new Date(Event.endDate).toISOString().slice(0, 16)
+        : "",
+      offerExpiryDate: Event?.offerExpiryDate
+        ? new Date(Event.offerExpiryDate).toISOString().slice(0, 16)
+        : "",
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof EventCalendarFormSchema>) => {
+    try {
+      const payload = {
+        ...values,
+        startDate: new Date(values.startDate),
+        endDate: values.endDate ? new Date(values.endDate) : undefined,
+        offerExpiryDate: values.offerExpiryDate
+          ? new Date(values.offerExpiryDate)
+          : undefined,
+      };
+
+      if (type === "Create") {
+        const created = await createEventCalendar(payload);
+        if (created) {
+          form.reset();
+          toast.success("Event created Successfully!");
+          onSuccess?.();
+        }
+      } else if (type === "Update" && EventId) {
+        const updated = await updateEventCalendar(EventId, payload);
+        if (updated) {
+          toast.success("Event updated Successfully!");
+          onSuccess?.();
+        }
+      }
+    } catch (error) {
+      console.error("Event form submission failed", error);
+    }
+  };
+
+  return (
+    <div className="w-full min-w-0 overflow-x-hidden">
+      <Form {...form}>
+        <form
+          onSubmit={form.handleSubmit(onSubmit)}
+          className="
+        w-full
+        min-w-0
+        rounded-2xl
+        bg-white dark:bg-gray-800
+        p-4 sm:p-6
+        shadow-sm
+        space-y-4
+      "
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-2 pt-4">
+              <h2 className="text-xl font-semibold">Event Information</h2>
+              <p className="text-sm text-gray-500">
+                Write a brief description of the event.
+              </p>
+              {/* Title */}
+              <FormField
+                control={form.control}
+                name="title"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Title</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter event title" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Description */}
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter event description" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Event Type */}
+              <FormField
+                control={form.control}
+                name="eventType"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event Type</FormLabel>
+                    <FormControl>
+                      <select
+                        {...field}
+                        className="w-full rounded-md border border-gray-300 px-3 py-2 text-sm text-gray-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="application_deadline">
+                          Application Deadline
+                        </option>
+                        <option value="enrollment_period">
+                          Enrollment Period
+                        </option>
+                        <option value="course_start">Course Start Date</option>
+                        <option value="offer_promotion">
+                          Offer / Promotion
+                        </option>
+                        <option value="webinar_event">Webinar / Event</option>
+                        <option value="holiday_closure">
+                          Holiday / College Closure
+                        </option>
+                      </select>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* EventLink */}
+              <FormField
+                control={form.control}
+                name="eventLink"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Event Link</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter event link" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Agencies */}
+              <FormField
+                control={form.control}
+                name="agencies"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Agencies</FormLabel>
+                    <FormControl>
+                      <Controller
+                        control={form.control}
+                        name="agencies"
+                        render={({ field }) => (
+                          <Select
+                            isMulti
+                            options={agencyOptions}
+                            value={agencyOptions.filter((opt) =>
+                              field.value?.includes(opt.value),
+                            )}
+                            onChange={(selected) =>
+                              field.onChange(selected.map((opt) => opt.value))
+                            }
+                            placeholder="Select agencies..."
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                          />
+                        )}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Countries */}
+              <FormField
+                control={form.control}
+                name="countries"
+                render={() => (
+                  <FormItem>
+                    <FormLabel>Allowed Countries</FormLabel>
+                    <FormControl>
+                      <Controller
+                        control={form.control}
+                        name="countries"
+                        render={({ field }) => (
+                          <Select
+                            isMulti
+                            options={countryOptions}
+                            value={countryOptions.filter((opt) =>
+                              field.value?.includes(opt.value),
+                            )}
+                            onChange={(selected) =>
+                              field.onChange(selected.map((opt) => opt.value))
+                            }
+                            placeholder="Select countries..."
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                          />
+                        )}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {/* ===== Event Dates ===== */}
+            <div className="space-y-2 pt-4">
+              <h2 className="text-xl font-semibold text-gray-800">
+                Event Dates
+              </h2>
+              <p className="text-sm text-gray-500">
+                Choose when the event will begin and end.
+              </p>
+
+              {/* Start Date & Time */}
+              <FormField
+                control={form.control}
+                name="startDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Start Date & Time</FormLabel>
+                    <FormControl>
+                      <Input type="datetime-local" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* End Date & Time */}
+              <FormField
+                control={form.control}
+                name="endDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      End Date & Time{" "}
+                      <span className="text-gray-400">(optional)</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="datetime-local" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Offer Expiry Date & Time */}
+              <FormField
+                control={form.control}
+                name="offerExpiryDate"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Offer Expiry Date & Time{" "}
+                      <span className="text-gray-400">(optional)</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Input type="datetime-local" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="pt-6">
+            <Button
+              type="submit"
+              size="lg"
+              disabled={form.formState.isSubmitting}
+              className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+            >
+              {form.formState.isSubmitting
+                ? "Submitting..."
+                : type === "Create"
+                  ? "Create Event"
+                  : "Update Event"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </div>
+  );
+};
+
+export default EventCalendarForm;

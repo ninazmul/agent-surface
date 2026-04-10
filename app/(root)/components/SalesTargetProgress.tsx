@@ -1,0 +1,183 @@
+"use client";
+
+import { useSearchParams, useRouter } from "next/navigation";
+import { ILead } from "@/lib/database/models/lead.model";
+import { useEffect, useState, useMemo } from "react";
+
+type Props = {
+  profile?: { salesTarget?: number; email: string };
+  leads?: ILead[];
+};
+
+export default function SalesTargetProgress({ profile, leads }: Props) {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+  const [dateRange, setDateRange] = useState<"7d" | "1m" | "1y" | "custom">(
+    "7d"
+  );
+
+  // On mount, set default to last 7 days if no params
+  useEffect(() => {
+    const startParam = searchParams.get("startDate");
+    const endParam = searchParams.get("endDate");
+
+    if (startParam && endParam) {
+      setStartDate(new Date(startParam));
+      setEndDate(new Date(endParam));
+      setDateRange("custom");
+    } else {
+      const today = new Date();
+      const last7Days = new Date();
+      last7Days.setDate(today.getDate() - 6);
+      setStartDate(last7Days);
+      setEndDate(today);
+      setDateRange("7d");
+    }
+  }, [searchParams]);
+
+  const updateDateRange = (
+    range: "7d" | "1m" | "1y" | "custom",
+    customStart?: string,
+    customEnd?: string
+  ) => {
+    let start: Date, end: Date;
+    const today = new Date();
+
+    if (range === "7d") {
+      end = today;
+      start = new Date();
+      start.setDate(end.getDate() - 6);
+    } else if (range === "1m") {
+      end = today;
+      start = new Date();
+      start.setMonth(end.getMonth() - 1);
+    } else if (range === "1y") {
+      end = today;
+      start = new Date();
+      start.setFullYear(end.getFullYear() - 1);
+    } else if (range === "custom" && customStart && customEnd) {
+      start = new Date(customStart);
+      end = new Date(customEnd);
+    } else {
+      return;
+    }
+
+    setStartDate(start);
+    setEndDate(end);
+    setDateRange(range);
+
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("startDate", start.toISOString().split("T")[0]);
+    params.set("endDate", end.toISOString().split("T")[0]);
+    router.push(`?${params.toString()}`);
+  };
+
+  const parseNumber = (value: string | undefined) =>
+    parseFloat((value || "0").toString().replace(/,/g, "").trim()) || 0;
+
+  const salesAchieved = useMemo(() => {
+    if (!startDate || !endDate) return 0;
+
+    const paidLeads = leads?.filter((l) => l.paymentStatus === "Accepted");
+
+    const filteredLeads = paidLeads?.filter((lead) => {
+      const leadDate = new Date(lead.createdAt);
+      return leadDate >= startDate && leadDate <= endDate;
+    });
+
+    return filteredLeads?.reduce((sum, lead) => {
+      const courseAmount = Array.isArray(lead.course)
+        ? lead.course.reduce((s, c) => s + Number(c.courseFee || 0), 0)
+        : 0;
+      const discount = parseNumber(lead.discount);
+      const servicesTotal = Array.isArray(lead.services)
+        ? lead.services.reduce((s, serv) => s + parseNumber(serv.amount), 0)
+        : 0;
+
+      return sum + courseAmount + servicesTotal - discount;
+    }, 0);
+  }, [leads, startDate, endDate]);
+
+  if (!profile?.salesTarget) return null;
+
+  return (
+    <section className="bg-gray-100 dark:bg-gray-700 p-4 rounded-2xl">
+      <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
+        <h2 className="text-xl font-semibold text-black dark:text-gray-100 mb-2">
+          Sales Target Progress
+        </h2>
+
+        <div className="flex flex-wrap gap-3 w-full sm:w-auto">
+          <select
+            onChange={(e) =>
+              updateDateRange(e.target.value as "7d" | "1m" | "1y" | "custom")
+            }
+            className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+            value={dateRange}
+          >
+            <option value="7d">Last 7 Days</option>
+            <option value="1m">Last 1 Month</option>
+            <option value="1y">Last 1 Year</option>
+            <option value="custom">Custom</option>
+          </select>
+
+          {/* Only show custom inputs if "custom" is selected */}
+          {dateRange === "custom" && (
+            <>
+              <input
+                type="date"
+                value={startDate ? startDate.toISOString().split("T")[0] : ""}
+                onChange={(e) =>
+                  updateDateRange(
+                    "custom",
+                    e.target.value,
+                    endDate?.toISOString().split("T")[0]
+                  )
+                }
+                className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              />
+              <input
+                type="date"
+                value={endDate ? endDate.toISOString().split("T")[0] : ""}
+                onChange={(e) =>
+                  updateDateRange(
+                    "custom",
+                    startDate?.toISOString().split("T")[0],
+                    e.target.value
+                  )
+                }
+                className="w-full sm:w-auto px-4 py-2 rounded-2xl bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-200 border"
+              />
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Progress Display */}
+      <div>
+        <p className="mb-2 text-sm text-gray-600 dark:text-gray-300">
+          {salesAchieved?.toLocaleString()} /{" "}
+          {profile.salesTarget.toLocaleString()} €
+        </p>
+        <div className="w-full bg-gray-200 dark:text-gray-500 rounded-full h-3 overflow-hidden">
+          <div
+            className="bg-green-500 h-3"
+            style={{
+              width: `${Math.min(
+                ((salesAchieved || 0) / profile.salesTarget) * 100,
+                100
+              )}%`,
+            }}
+          />
+        </div>
+        <p className="mt-2 text-xs text-end text-orange-500">
+          {(((salesAchieved || 0) / profile.salesTarget) * 100).toFixed(1)}%
+          achieved
+        </p>
+      </div>
+    </section>
+  );
+}
