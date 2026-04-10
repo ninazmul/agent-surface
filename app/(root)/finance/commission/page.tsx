@@ -1,11 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAdminCountriesByEmail,
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { redirect } from "next/navigation";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -16,6 +8,7 @@ import {
 } from "@/lib/actions/quotation.actions";
 import { Types } from "mongoose";
 import CommissionCalcTable from "../../components/CommissionCalcTable";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 interface ICombinedItem {
   _id: Types.ObjectId;
@@ -54,21 +47,8 @@ interface ICombinedItem {
 }
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const adminCountry = await getAdminCountriesByEmail(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
-
-  if (!adminStatus && myProfile?.role === "Student") {
-    redirect("/profile");
-  }
-
-  if (adminStatus && !rolePermissions.includes("finance")) {
-    redirect("/");
-  }
+  const { email, adminStatus, adminCountry, myProfile } =
+    await getUserContext("finance");
 
   let leads: ILead[] = [];
 

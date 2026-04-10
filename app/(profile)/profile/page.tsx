@@ -4,29 +4,14 @@ import {
   getProfilesByEmail,
   getSubAgentsByEmail,
 } from "@/lib/actions/profile.actions";
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAdminCountriesByEmail,
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { redirect } from "next/navigation";
 import { IProfile } from "@/lib/database/models/profile.model";
 import ProfilePage from "@/app/(root)/components/ProfilePage";
 import { getLeadsByAgency } from "@/lib/actions/lead.actions";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const adminCountry = await getAdminCountriesByEmail(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-
-  if (adminStatus && !rolePermissions.includes("profile")) {
-    redirect("/");
-  }
+  const { email, adminStatus, adminCountry, myProfile } =
+    await getUserContext("profile");
 
   let profiles: IProfile[] = [];
 
@@ -44,7 +29,6 @@ const Page = async () => {
     profiles = (await getProfilesByEmail(email)) || [];
   }
 
-  const myProfile = await getProfileByEmail(email);
   const myLeads = await getLeadsByAgency(myProfile?.email || "");
   const subAgents = await getSubAgentsByEmail(email);
   const countryAgent = await getProfileByEmail(myProfile?.countryAgent || "");

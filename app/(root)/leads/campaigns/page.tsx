@@ -1,18 +1,15 @@
-import { getUserEmailById, isAdmin } from "@/lib/actions";
 import {
   getAllCampaignForms,
   getCampaignFormsByAuthor,
 } from "@/lib/actions/campaign.actions";
-import { auth } from "@clerk/nextjs/server";
 import CampaignFormsTable from "../../components/CampaignFormsTable";
 import CreateCampaignsDialog from "@/components/shared/CreateCampaignsDialog";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 export default async function CampaignDashboard() {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
+  const { email, adminStatus } = await getUserContext("leads");
 
+  // Fetch campaign forms depending on role
   const forms = adminStatus
     ? (await getAllCampaignForms())?.forms || []
     : await getCampaignFormsByAuthor(email);

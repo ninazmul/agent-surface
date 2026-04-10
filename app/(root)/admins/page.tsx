@@ -1,41 +1,20 @@
-import {
-  getAdminCountriesByEmail,
-  getAdminRolePermissionsByEmail,
-  getAllAdmins,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
+import { getAllAdmins } from "@/lib/actions/admin.actions";
 import AdminTable from "../components/AdminTable";
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import { redirect } from "next/navigation";
 import { IAdmin } from "@/lib/database/models/admin.model";
 import AddAdminDialog from "@/components/shared/AddAdminDialog";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const adminCountries = await getAdminCountriesByEmail(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
+  const { adminCountry } = await getUserContext("admins");
 
-  // ====== HARD BLOCK: Non-admins (Agent / Sub Agent / Student)
-  if (!adminStatus) {
-    redirect("/profile"); // or "/"
-  }
-
-  // ====== ADMIN PERMISSION CHECK
-  if (!rolePermissions.includes("admins")) {
-    redirect("/");
-  }
-
+  // Only admins reach here (non-admins are redirected inside getUserContext)
   const allAdmins = await getAllAdmins();
 
   const admins: IAdmin[] =
-    adminCountries.length === 0
+    adminCountry.length === 0
       ? allAdmins
       : allAdmins.filter((admin: IAdmin) =>
-          admin.countries?.some((country) => adminCountries.includes(country)),
+          admin.countries?.some((country) => adminCountry.includes(country)),
         );
 
   return (
@@ -49,7 +28,7 @@ const Page = async () => {
         </div>
 
         <div className="overflow-x-auto">
-          <AdminTable admins={admins} currentAdminCountries={adminCountries} />
+          <AdminTable admins={admins} currentAdminCountries={adminCountry} />
         </div>
       </section>
     </>

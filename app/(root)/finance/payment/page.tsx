@@ -1,36 +1,16 @@
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
 import {
   getAllPayments,
   getPaymentsByAgency,
 } from "@/lib/actions/payment.actions";
-import {
-  getAdminCountriesByEmail,
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { redirect } from "next/navigation";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { IPayment } from "@/lib/database/models/payment.model";
 import PaymentTable from "../../components/PaymentTable";
 import AddPaymentDialog from "@/components/shared/AddPaymentDialog";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const adminCountry = await getAdminCountriesByEmail(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
-
-  if (!adminStatus && myProfile?.role === "Student") {
-    redirect("/profile");
-  }
-
-  if (adminStatus && !rolePermissions.includes("finance")) {
-    redirect("/");
-  }
+  const { email, adminStatus, adminCountry, myProfile } =
+    await getUserContext("finance");
 
   let payments: IPayment[] = [];
 

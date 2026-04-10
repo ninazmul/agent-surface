@@ -1,36 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAdminCountriesByEmail,
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import { redirect } from "next/navigation";
 import MarketingResourceTable from "../../components/MarketingResourceTable";
 import { IMarketingResource } from "@/lib/database/models/marketing-resource.model";
 import { getAllMarketingResources } from "@/lib/actions/marketing-resource.actions";
 import AddMarketingResourceDialog from "@/components/shared/AddMarketingResourceDialog";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const adminCountry = await getAdminCountriesByEmail(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
+  const { adminStatus, adminCountry, myProfile } = await getUserContext("resources");
   const agentCountry = myProfile?.country;
-
-  // ====== ADMIN PATH (profile not required)
-  if (adminStatus && !rolePermissions.includes("resources")) {
-    redirect("/");
-  }
-
-  // ====== NON-ADMIN PATH (profile required)
-  if (!adminStatus && myProfile?.status !== "Approved") {
-    redirect("/profile");
-  }
 
   const allResources = await getAllMarketingResources();
 
@@ -42,13 +18,13 @@ const Page = async () => {
       !adminCountry || adminCountry.length === 0
         ? allResources
         : allResources.filter((r: IMarketingResource) =>
-            r.priceList.some((price) => adminCountry.includes(price.country))
+            r.priceList.some((price) => adminCountry.includes(price.country)),
           );
   } else {
     // Normal agent: show only resources where agent's country matches any resource price country
     if (agentCountry) {
       resources = allResources.filter((r: IMarketingResource) =>
-        (r.priceList || []).some((price) => price.country === agentCountry)
+        (r.priceList || []).some((price) => price.country === agentCountry),
       );
     }
   }

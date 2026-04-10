@@ -1,17 +1,9 @@
+import NotificationTable from "../components/NotificationTable";
 import {
   getAllNotifications,
   getNotificationsByAgency,
 } from "@/lib/actions/notification.actions";
-import NotificationTable from "../components/NotificationTable";
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAdminCountriesByEmail,
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import { redirect } from "next/navigation";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 import { INotification } from "@/lib/database/models/notification.model";
 
 type NotificationWithStatus = INotification & {
@@ -19,35 +11,9 @@ type NotificationWithStatus = INotification & {
 };
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-
-  if (!userId) redirect("/");
-
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const adminCountry = await getAdminCountriesByEmail(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
-
-  // ====== ADMIN PATH (profile not required)
-  if (adminStatus) {
-    if (!rolePermissions.includes("notifications")) {
-      redirect("/");
-    }
-  } 
-  // ====== NON-ADMIN PATH (profile required)
-  else {
-    // Profile must be Approved
-    if (myProfile?.status !== "Approved") {
-      redirect("/profile");
-    }
-
-    // Students are blocked
-    if (myProfile?.role === "Student") {
-      redirect("/profile");
-    }
-  }
+  // 🔑 One call enforces access rules and gives you user context
+  const { email, adminStatus, adminCountry, myProfile } =
+    await getUserContext("notifications");
 
   let notifications: NotificationWithStatus[] = [];
 
@@ -56,7 +22,7 @@ const Page = async () => {
 
     const filtered = adminCountry.length
       ? allNotifications.filter((n: INotification) =>
-          adminCountry.includes(n.country)
+          adminCountry.includes(n.country),
         )
       : allNotifications;
 
@@ -66,8 +32,7 @@ const Page = async () => {
       return { ...n, userStatus: status };
     });
   } else {
-    const profile = await getProfileByEmail(email);
-    const subAgents = profile?.subAgents || [];
+    const subAgents = myProfile?.subAgents || [];
 
     const myNotifications = await getNotificationsByAgency(email);
     const subAgentNotifications: INotification[] = [];
@@ -79,17 +44,16 @@ const Page = async () => {
 
     const merged = [...myNotifications, ...subAgentNotifications];
 
-    // Avoid duplicates by _id if necessary
+    // Avoid duplicates by _id
     const uniqueMap = new Map();
     for (const notif of merged) {
-      uniqueMap.set(notif._id.toString().toString(), notif);
+      uniqueMap.set(notif._id.toString(), notif);
     }
 
     notifications = Array.from(uniqueMap.values()).map((n) => {
-      const readEntry: { email: string; status: string } | undefined =
-        n.readBy?.find(
-          (r: { email: string; status: string }) => r.email === email
-        );
+      const readEntry = n.readBy?.find(
+        (r: { email: string }) => r.email === email,
+      );
       const status = readEntry?.status === "read" ? "Read" : "Unread";
       return { ...n, userStatus: status };
     });

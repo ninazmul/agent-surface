@@ -1,42 +1,27 @@
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import MessageTable from "../components/MessageTable";
 import { redirect } from "next/navigation";
 import { Role } from "@/lib/database/models/message.model";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
+  const { email, adminStatus, myProfile } =
+    await getUserContext("messages");
 
   let role: Role;
 
   if (adminStatus) {
-    const rolePermissions = await getAdminRolePermissionsByEmail(email);
-
-    if (!rolePermissions.includes("messages")) {
-      redirect("/");
-    }
-
-    role = "Admin"; // EXACT Role type ✓
+    // Admins must have "messages" permission (already enforced in getUserContext)
+    role = "Admin";
   } else {
-    // Non-admin -> resolve via profile
-    const profile = await getProfileByEmail(email);
-
+    // Non-admins: resolve via profile
     const allowedRoles: Role[] = ["Agent", "Sub Agent", "Student"];
 
-    if (!profile?.role || !allowedRoles.includes(profile.role)) {
-      redirect("/");
+    if (!myProfile?.role || !allowedRoles.includes(myProfile.role)) {
+      // If role is missing or not allowed, block access
+      return redirect("/");
     }
 
-    role = profile.role; // EXACT Role type ✓
+    role = myProfile.role as Role;
   }
 
   return (

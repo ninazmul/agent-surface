@@ -1,13 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
 import { getAllCourses } from "@/lib/actions/course.actions";
-import {
-  getAdminCountriesByEmail,
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { redirect } from "next/navigation";
 import {
   getAllRefunds,
   getRefundsByAgency,
@@ -16,23 +8,11 @@ import { IRefund } from "@/lib/database/models/refund.model";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import RefundTable from "../../components/RefundTable";
 import JsonToExcel from "../../components/JsonToExcel";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const adminCountry = await getAdminCountriesByEmail(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
-
-  if (!adminStatus && myProfile?.role === "Student") {
-    redirect("/profile");
-  }
-
-  if (adminStatus && !rolePermissions.includes("applications")) {
-    redirect("/");
-  }
+  const { email, adminStatus, adminCountry } =
+    await getUserContext("quotations");
 
   let refunds: IRefund[] = [];
 
@@ -48,7 +28,7 @@ const Page = async () => {
     const agentEmails = [email, ...(profile?.subAgents || [])];
 
     const allRefunds = await Promise.all(
-      agentEmails.map((agent) => getRefundsByAgency(agent))
+      agentEmails.map((agent) => getRefundsByAgency(agent)),
     );
 
     refunds = allRefunds.flat().filter(Boolean);

@@ -1,20 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import {
-  getAdminCountriesByEmail,
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { redirect } from "next/navigation";
-import { ILead } from "@/lib/database/models/lead.model";
 import QuotationTable from "../components/QuotationTable";
-import { IQuotation } from "@/lib/database/models/quotation.model";
+import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
 import {
   getAllQuotations,
   getQuotationsByAgency,
 } from "@/lib/actions/quotation.actions";
+import { getUserContext } from "@/lib/actions/userContext.actions";
+import { ILead } from "@/lib/database/models/lead.model";
+import { IQuotation } from "@/lib/database/models/quotation.model";
 import { Types } from "mongoose";
 
 interface ICombinedItem {
@@ -53,50 +45,22 @@ interface ICombinedItem {
 }
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const adminCountry = await getAdminCountriesByEmail(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
-
-  // ====== ADMIN PATH (profile not required)
-  if (adminStatus) {
-    if (!rolePermissions.includes("quotations")) {
-      redirect("/");
-    }
-  } 
-  // ====== NON-ADMIN PATH (profile required)
-  else {
-    // Profile must be Approved
-    if (myProfile?.status !== "Approved") {
-      redirect("/profile");
-    }
-
-    // Students are blocked
-    if (myProfile?.role === "Student") {
-      redirect("/profile");
-    }
-  }
+  // 🔑 One call enforces access rules and gives you user context
+  const { email, adminStatus, adminCountry, myProfile } =
+    await getUserContext("quotations");
 
   let leads: ILead[] = [];
-
   if (adminStatus) {
     const allLeads = await getAllLeads();
-
     leads =
       adminCountry.length === 0
         ? allLeads
         : allLeads.filter((r: ILead) => adminCountry.includes(r.home.country));
   } else {
-    const profile = await getProfileByEmail(email);
-    const agentEmails = [email, ...(profile?.subAgents || [])];
-
+    const agentEmails = [email, ...(myProfile?.subAgents || [])];
     const allLeads = await Promise.all(
-      agentEmails.map((agent) => getLeadsByAgency(agent))
+      agentEmails.map((agent) => getLeadsByAgency(agent)),
     );
-
     leads = allLeads.flat().filter(Boolean);
   }
 
@@ -104,24 +68,19 @@ const Page = async () => {
   leads = leads.filter((lead: ILead) => lead.progress === "Converted");
 
   let quotations: IQuotation[] = [];
-
   if (adminStatus) {
     const allQuotations = await getAllQuotations();
-
     quotations =
       adminCountry.length === 0
         ? allQuotations
-        : allQuotations.filter((r: ILead) =>
-            adminCountry.includes(r.home.country)
+        : allQuotations.filter((r: IQuotation) =>
+            adminCountry.includes(r.home.country),
           );
   } else {
-    const profile = await getProfileByEmail(email);
-    const agentEmails = [email, ...(profile?.subAgents || [])];
-
+    const agentEmails = [email, ...(myProfile?.subAgents || [])];
     const allQuotations = await Promise.all(
-      agentEmails.map((agent) => getQuotationsByAgency(agent))
+      agentEmails.map((agent) => getQuotationsByAgency(agent)),
     );
-
     quotations = allQuotations.flat().filter(Boolean);
   }
 
@@ -147,17 +106,15 @@ const Page = async () => {
   });
 
   return (
-    <>
-      <section className="p-4">
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
-          <h3 className="h3-bold text-center sm:text-left">Converted Leads</h3>
-        </div>
+    <section className="p-4">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 px-4">
+        <h3 className="h3-bold text-center sm:text-left">Converted Leads</h3>
+      </div>
 
-        <div className="overflow-x-auto my-8">
-          <QuotationTable leads={combinedData} />
-        </div>
-      </section>
-    </>
+      <div className="overflow-x-auto my-8">
+        <QuotationTable leads={combinedData} />
+      </div>
+    </section>
   );
 };
 

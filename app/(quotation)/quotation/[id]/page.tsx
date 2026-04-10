@@ -1,12 +1,10 @@
 import { getLeadById } from "@/lib/actions/lead.actions";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { getAllServices } from "@/lib/actions/service.actions";
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import { isAdmin } from "@/lib/actions/admin.actions";
 import QuotationClient from "@/app/(root)/components/QuotationClient";
 import { getAllCourses } from "@/lib/actions/course.actions";
 import { getQuotationById } from "@/lib/actions/quotation.actions";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -15,10 +13,7 @@ type PageProps = {
 export default async function QuotationPage({ params }: PageProps) {
   const { id } = await params;
 
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
+  const { email, adminStatus } = await getUserContext("quotation");
 
   // ✅ safely get lead without crashing
   let lead = null;
@@ -56,8 +51,8 @@ export default async function QuotationPage({ params }: PageProps) {
   const agency = agencyEmail ? await getProfileByEmail(agencyEmail) : null;
 
   if (!agency) {
-  return <p>Agency not found</p>;
-}
+    return <p>Agency not found</p>;
+  }
 
   return (
     <QuotationClient

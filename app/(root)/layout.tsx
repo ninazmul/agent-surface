@@ -1,39 +1,25 @@
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
-import { auth } from "@clerk/nextjs/server";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
 import HomeSidebar from "./components/HomeSidebar";
 import MessageCount from "./components/MessageCount";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAdminByEmail,
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
+import { getAdminByEmail } from "@/lib/actions/admin.actions";
 import NotificationsCount from "./components/Notifications";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import ThemeToggle from "@/components/shared/ThemeToggle";
 import { DashboardProvider } from "@/components/shared/DashboardProvider";
-import { redirect } from "next/navigation";
 import HelpModal from "@/components/shared/HelpForm";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
+  const { email, adminStatus, myProfile, rolePermissions } =
+    await getUserContext("/");
+
   const admin = await getAdminByEmail(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
-
-  if (!userId) redirect("/sign-in");
-  if (!adminStatus && myProfile?.status === "Pending") redirect("/profile");
-
   return (
     <SidebarProvider defaultOpen={true}>
       <HomeSidebar

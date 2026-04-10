@@ -3,21 +3,16 @@ import {
   getProfileByEmail,
 } from "@/lib/actions/profile.actions";
 import { getAllCourses } from "@/lib/actions/course.actions";
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import { getAdminCountriesByEmail, isAdmin } from "@/lib/actions/admin.actions";
 import { getAllServices } from "@/lib/actions/service.actions";
 import AdditionalQuotationForm from "@/app/(root)/components/AdditionalQuotationForm";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { ILead } from "@/lib/database/models/lead.model";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 // import { getAllServices } from "@/lib/actions/service.actions";
 
 const CreateLeadsPage = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const adminCountry = await getAdminCountriesByEmail(email);
+  const { email, adminStatus, adminCountry } =
+    await getUserContext("quotations");
 
   let agency = [];
   if (adminStatus) {
@@ -44,7 +39,7 @@ const CreateLeadsPage = async () => {
     const agentEmails = [email, ...(profile?.subAgents || [])];
 
     const allLeads = await Promise.all(
-      agentEmails.map((agent) => getLeadsByAgency(agent))
+      agentEmails.map((agent) => getLeadsByAgency(agent)),
     );
 
     leads = allLeads.flat().filter(Boolean);

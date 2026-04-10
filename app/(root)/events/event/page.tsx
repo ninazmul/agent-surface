@@ -8,29 +8,15 @@ import {
 } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { getAllEvents, getEventsByEmail } from "@/lib/actions/event.actions";
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import { redirect } from "next/navigation";
 import { IEvent } from "@/lib/database/models/event.model";
 import EventForm from "../../components/EventForm";
 import EventTable from "../../components/EventTable";
 import { Plus } from "lucide-react";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-
-  if (adminStatus && !rolePermissions.includes("events")) {
-    redirect("/");
-  }
+  const { email, adminStatus } = await getUserContext("events");
 
   let events: IEvent[] = [];
 

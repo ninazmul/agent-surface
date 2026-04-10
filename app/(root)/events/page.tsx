@@ -1,47 +1,26 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAdminCountriesByEmail,
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { getAllAgents, getProfileByEmail } from "@/lib/actions/profile.actions";
+import { getAllAgents } from "@/lib/actions/profile.actions";
 import { getAllEventCalendars } from "@/lib/actions/eventCalender.actions";
 import { IEventCalendar } from "@/lib/database/models/eventCalender.model";
 import EventCalendar from "../components/EventCalenderTable";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
+  const { email, adminStatus, adminCountry, myProfile } =
+    await getUserContext("events");
 
-  const adminStatus = await isAdmin(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
   const agencies = await getAllAgents();
-
-  // ===== ACCESS CONTROL
-  if (adminStatus) {
-    if (!rolePermissions.includes("events")) redirect("/");
-  } else {
-    if (myProfile?.status !== "Approved") redirect("/profile");
-    if (myProfile?.role === "Student") redirect("/profile");
-  }
-
   const allEvents = await getAllEventCalendars();
   let filteredEvents: IEventCalendar[] = [];
 
-  // ===== FILTERING (SAME PATTERN AS PROMOTIONS)
   if (adminStatus) {
-    const adminCountries = await getAdminCountriesByEmail(email);
-
+    // Admins: filter by their countries
     filteredEvents = allEvents.filter((event: IEventCalendar) => {
-      if (!adminCountries || adminCountries.length === 0) return true;
+      if (!adminCountry || adminCountry.length === 0) return true;
       if (!event.countries || event.countries.length === 0) return true;
-      return event.countries.some((c) => adminCountries.includes(c));
+      return event.countries.some((c) => adminCountry.includes(c));
     });
   } else {
+    // Non-admins: filter by their profile country or agency
     const userCountry = myProfile?.country || null;
 
     filteredEvents = allEvents.filter((event: IEventCalendar) => {

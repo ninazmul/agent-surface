@@ -1,11 +1,3 @@
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAdminCountriesByEmail,
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { redirect } from "next/navigation";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -16,6 +8,7 @@ import {
 } from "@/lib/actions/quotation.actions";
 import CommissionReceivedTable from "../../components/CommissionReceivedTable";
 import { Types } from "mongoose";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 interface ICombinedItem {
   _id: Types.ObjectId;
@@ -54,21 +47,8 @@ interface ICombinedItem {
 }
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const adminCountry = await getAdminCountriesByEmail(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
-
-  if (!adminStatus && myProfile?.role === "Student") {
-    redirect("/profile");
-  }
-
-  if (adminStatus && !rolePermissions.includes("finance")) {
-    redirect("/");
-  }
+  const { email, adminStatus, adminCountry } =
+    await getUserContext("finance");
 
   let leads: ILead[] = [];
 
@@ -84,7 +64,7 @@ const Page = async () => {
     const agentEmails = [email, ...(profile?.subAgents || [])];
 
     const allLeads = await Promise.all(
-      agentEmails.map((agent) => getLeadsByAgency(agent))
+      agentEmails.map((agent) => getLeadsByAgency(agent)),
     );
 
     leads = allLeads.flat().filter(Boolean);
@@ -93,7 +73,7 @@ const Page = async () => {
   // Filter only Converted leads
   leads = leads.filter(
     (lead: ILead) =>
-      lead.quotationStatus === true && lead.paymentStatus === "Accepted"
+      lead.quotationStatus === true && lead.paymentStatus === "Accepted",
   );
 
   let quotations: IQuotation[] = [];
@@ -105,14 +85,14 @@ const Page = async () => {
       adminCountry.length === 0
         ? allQuotations
         : allQuotations.filter((r: ILead) =>
-            adminCountry.includes(r.home.country)
+            adminCountry.includes(r.home.country),
           );
   } else {
     const profile = await getProfileByEmail(email);
     const agentEmails = [email, ...(profile?.subAgents || [])];
 
     const allQuotations = await Promise.all(
-      agentEmails.map((agent) => getQuotationsByAgency(agent))
+      agentEmails.map((agent) => getQuotationsByAgency(agent)),
     );
 
     quotations = allQuotations.flat().filter(Boolean);
@@ -121,7 +101,8 @@ const Page = async () => {
   // Filter only Converted quotations
   quotations = quotations.filter(
     (quotation: IQuotation) =>
-      quotation.quotationStatus === true && quotation.paymentStatus === "Accepted"
+      quotation.quotationStatus === true &&
+      quotation.paymentStatus === "Accepted",
   );
 
   const mapLeadToCombined = (item: ILead): ICombinedItem => ({
@@ -155,7 +136,11 @@ const Page = async () => {
         </div>
 
         <div className="overflow-x-auto">
-          <CommissionReceivedTable leads={combinedData} isAdmin={adminStatus} email={email} />
+          <CommissionReceivedTable
+            leads={combinedData}
+            isAdmin={adminStatus}
+            email={email}
+          />
         </div>
       </section>
     </>

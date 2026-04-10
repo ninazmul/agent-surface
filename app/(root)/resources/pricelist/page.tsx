@@ -1,36 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAdminCountriesByEmail,
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import { redirect } from "next/navigation";
 import { getAllResourcePriceLists } from "@/lib/actions/resource-pricelist.actions";
 import { IResourcePriceList } from "@/lib/database/models/resource-pricelist.model";
 import ResourcePriceListCards from "../../components/ResourcePriceListTable";
 import AddResourcePricelistDialog from "@/components/shared/AddResourcePricelistDialog";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const adminCountry = await getAdminCountriesByEmail(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
-  const agentCountry = myProfile?.country;
-
-  // ====== ADMIN PATH (profile not required)
-  if (adminStatus && !rolePermissions.includes("resources")) {
-    redirect("/");
-  }
-
-  // ====== NON-ADMIN PATH (profile required)
-  if (!adminStatus && myProfile?.status !== "Approved") {
-    redirect("/profile");
-  }
+  const { adminStatus, adminCountry, myProfile } = await getUserContext("resources");
+    const agentCountry = myProfile?.country;
 
   const allResources = await getAllResourcePriceLists();
 

@@ -1,36 +1,11 @@
 import { getAllResources } from "@/lib/actions/resource.actions";
 import ResourceTable from "../components/ResourceTable";
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import { redirect } from "next/navigation";
 import AddResourceDialog from "@/components/shared/AddResourceDialog";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
-
-  // ====== ADMIN PATH (profile not required)
-  if (adminStatus) {
-    if (!rolePermissions.includes("resources")) {
-      redirect("/");
-    }
-  }
-  // ====== NON-ADMIN PATH (profile required)
-  else {
-    // Profile must be Approved
-    if (myProfile?.status !== "Approved") {
-      redirect("/profile");
-    }
-  }
+  const { adminStatus } =
+    await getUserContext("resources");
 
   const resources = await getAllResources();
 

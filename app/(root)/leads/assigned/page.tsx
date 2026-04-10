@@ -1,39 +1,18 @@
-import { auth } from "@clerk/nextjs/server";
-import { getUserEmailById } from "@/lib/actions/user.actions";
-import {
-  getAllAssignedLeads,
-  getLeadsByAssignedUser,
-} from "@/lib/actions/lead.actions";
-import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import {
-  getAdminRolePermissionsByEmail,
-  isAdmin,
-} from "@/lib/actions/admin.actions";
-import { redirect } from "next/navigation";
-import { ILead } from "@/lib/database/models/lead.model";
 import AssignedLeadTable from "../../components/AssignedLeadTable";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
-  const { sessionClaims } = await auth();
-  const userId = sessionClaims?.userId as string;
-  const email = await getUserEmailById(userId);
-  const adminStatus = await isAdmin(email);
-  const rolePermissions = await getAdminRolePermissionsByEmail(email);
-  const myProfile = await getProfileByEmail(email);
+  const { email, adminStatus } = await getUserContext("leads");
 
-  if (!adminStatus && myProfile?.role === "Student") {
-    redirect("/profile");
-  }
-
-  if (adminStatus && !rolePermissions.includes("leads")) {
-    redirect("/");
-  }
-
-  let leads: ILead[] = [];
-
+  let leads = [];
   if (adminStatus) {
+    // Admins see all assigned leads
+    const { getAllAssignedLeads } = await import("@/lib/actions/lead.actions");
     leads = await getAllAssignedLeads();
   } else if (email) {
+    // Non-admins see only their assigned leads
+    const { getLeadsByAssignedUser } =
+      await import("@/lib/actions/lead.actions");
     leads = await getLeadsByAssignedUser(email);
   }
 
