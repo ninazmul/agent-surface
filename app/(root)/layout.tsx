@@ -16,14 +16,14 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { email, adminStatus, myProfile, rolePermissions } =
+  const { email, adminStatus, myProfile, accessibleKeys } =
     await getUserContext("/");
 
   const admin = await getAdminByEmail(email);
   return (
     <SidebarProvider defaultOpen={true}>
       <HomeSidebar
-        rolePermissions={rolePermissions}
+        accessibleKeys={accessibleKeys}
         isAdmin={adminStatus}
         role={myProfile?.role}
         profile={myProfile}

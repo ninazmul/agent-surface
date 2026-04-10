@@ -2,7 +2,11 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getUserEmailById } from "./user.actions";
 import { getProfileByEmail, getAllProfiles } from "./profile.actions";
-import { isAdmin, getAdminCountriesByEmail, getAdminRolePermissionsByEmail } from "./admin.actions";
+import {
+  isAdmin,
+  getAdminCountriesByEmail,
+  getAdminRolePermissionsByEmail,
+} from "./admin.actions";
 import { getAllLeads, getLeadsByAgency } from "./lead.actions";
 import { getAllCourses } from "./course.actions";
 import { getAllServices } from "./service.actions";
@@ -23,26 +27,67 @@ export async function getUserContext(requiredPermission?: string) {
     if (requiredPermission && !rolePermissions.includes(requiredPermission)) {
       redirect("/");
     }
-  } 
-  // ====== NON-ADMIN PATH
-  else {
-    // Must have a profile
-    if (!myProfile) {
-      redirect("/profile");
-    }
+  } else {
+    // ====== NON-ADMIN PATH
+    if (!myProfile) redirect("/profile");
+    if (myProfile.status !== "Approved") redirect("/profile");
 
-    // Profile must be Approved
-    if (myProfile.status !== "Approved") {
-      redirect("/profile");
-    }
-
-    // Students are blocked
-    if (myProfile.role === "Student") {
+    // Students are blocked from most modules
+    if (myProfile.role === "Student" && requiredPermission) {
       redirect("/profile");
     }
   }
 
-  // Agency resolution
+  // ====== Access rules by role
+  let accessibleKeys: string[] = [];
+  if (adminStatus) {
+    accessibleKeys = rolePermissions.length
+      ? rolePermissions.concat("profile") // always allow profile
+      : [
+          "dashboard",
+          "quotations",
+          "events",
+          "leads",
+          "resources",
+          "promotions",
+          "finance",
+          "invoices",
+          "downloads",
+          "messages",
+          "notifications",
+          "profile",
+          "about",
+          "tutorial",
+        ];
+  } else if (myProfile?.role === "Student") {
+    accessibleKeys = [
+      "profile",
+      "messages",
+      "resources",
+      "downloads",
+      "about",
+      "tutorial",
+    ];
+  } else if (myProfile?.role === "Agent" || myProfile?.role === "Sub Agent") {
+    accessibleKeys = [
+      "dashboard",
+      "quotations",
+      "events",
+      "leads",
+      "resources",
+      "promotions",
+      "finance",
+      "invoices",
+      "downloads",
+      "messages",
+      "notifications",
+      "profile",
+      "about",
+      "tutorial",
+    ];
+  }
+
+  // ====== Agency resolution
   let agency = [];
   if (adminStatus) {
     agency = await getAllProfiles();
@@ -50,7 +95,7 @@ export async function getUserContext(requiredPermission?: string) {
     if (myProfile) agency = [myProfile];
   }
 
-  // Leads resolution
+  // ====== Leads resolution
   let leads: ILead[] = [];
   if (adminStatus) {
     const allLeads = await getAllLeads();
@@ -60,11 +105,13 @@ export async function getUserContext(requiredPermission?: string) {
         : allLeads.filter((r: ILead) => adminCountry.includes(r.home.country));
   } else {
     const agentEmails = [email, ...(myProfile?.subAgents || [])];
-    const allLeads = await Promise.all(agentEmails.map((agent) => getLeadsByAgency(agent)));
+    const allLeads = await Promise.all(
+      agentEmails.map((agent) => getLeadsByAgency(agent)),
+    );
     leads = allLeads.flat().filter(Boolean);
   }
 
-  // Courses & Services
+  // ====== Courses & Services
   const courses = await getAllCourses();
   const services = await getAllServices();
 
@@ -74,6 +121,7 @@ export async function getUserContext(requiredPermission?: string) {
     adminCountry,
     rolePermissions,
     myProfile,
+    accessibleKeys, // 🔑 now included
     agency,
     leads,
     courses,
