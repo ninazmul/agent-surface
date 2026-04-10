@@ -188,28 +188,61 @@ const sidebarItems = [
 ];
 
 type HomeSidebarProps = {
-  accessibleKeys: string[]; // 🔑 comes from getUserContext
+  rolePermissions: string[];
+  isAdmin: boolean;
   role?: string;
   profile?: IProfile;
   admin?: IAdmin;
-  isAdmin: boolean;
 };
 
 const HomeSidebar = ({
-  accessibleKeys,
+  rolePermissions,
+  isAdmin,
   role,
   profile,
   admin,
-  isAdmin,
 }: HomeSidebarProps) => {
   const currentPath = usePathname();
   const { theme } = useTheme();
   const [openMenus, setOpenMenus] = useState<Record<string, boolean>>({});
 
-  // Filter items based on accessibleKeys provided by context
   const filteredSidebarItems = useMemo(() => {
-    return sidebarItems.filter((item) => accessibleKeys.includes(item.key));
-  }, [accessibleKeys]);
+    const allowedForNonAdmins = [
+      "dashboard",
+      "quotations",
+      "events",
+      "leads",
+      "resources",
+      "promotions",
+      "finance",
+      "invoices",
+      "downloads",
+      "messages",
+      "notifications",
+      "profile",
+      "about",
+      "tutorial",
+    ];
+
+    return sidebarItems.filter((item) => {
+      if (isAdmin) {
+        return rolePermissions?.length
+          ? rolePermissions.includes(item.key) || item.key === "profile"
+          : allowedForNonAdmins.includes(item.key);
+      }
+      if (role === "Student") {
+        return [
+          "profile",
+          "messages",
+          "resources",
+          "downloads",
+          "about",
+          "tutorial",
+        ].includes(item.key);
+      }
+      return allowedForNonAdmins.includes(item.key);
+    });
+  }, [isAdmin, role, rolePermissions]);
 
   useEffect(() => {
     filteredSidebarItems.forEach((item) => {
@@ -220,7 +253,7 @@ const HomeSidebar = ({
   }, [currentPath, filteredSidebarItems]);
 
   const menuItemClasses = (active: boolean) =>
-    `flex items-center justify-between px-10 py-2 rounded-lg transition-colors ${
+    `flex items-center justify-between px-10 py-2 rounded-lg transition-colors px-10 ${
       active
         ? isAdmin
           ? "text-purple-500"
@@ -229,7 +262,7 @@ const HomeSidebar = ({
     }`;
 
   const childItemClasses = (active: boolean) =>
-    `flex items-center space-x-2 py-1.5 rounded-lg text-sm transition-colors ${
+    `flex items-center space-x-2  py-1.5 rounded-lg text-sm transition-colors ${
       active
         ? "bg-indigo-500 text-white"
         : "hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-600 dark:text-gray-300"
@@ -253,8 +286,7 @@ const HomeSidebar = ({
               />
             </Link>
           </SidebarGroupLabel>
-
-          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl w-5/6">
+          <div className="flex items-center justify-center gap-2 px-4 py-2 bg-white dark:bg-gray-800 dark:text-gray-800 rounded-xl w-5/6">
             <UserButton
               appearance={{
                 elements: {
@@ -264,7 +296,7 @@ const HomeSidebar = ({
               }}
             />
             <div>
-              <h1 className="text-sm font-semibold dark:text-gray-100 truncate">
+              <h1 className="text-sm font-semibold dark:text-gray-100 line-clamp-1 truncate">
                 {profile?.name || admin?.name || "User Name"}
               </h1>
               <p className="text-xs text-gray-500 dark:text-gray-100">
@@ -272,7 +304,6 @@ const HomeSidebar = ({
               </p>
             </div>
           </div>
-
           <SidebarGroupContent>
             <SidebarMenu className="space-y-1">
               {filteredSidebarItems.map((item) => {

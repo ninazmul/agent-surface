@@ -24,6 +24,7 @@ export async function getUserContext(requiredPermission?: string) {
 
   // ====== ADMIN PATH
   if (adminStatus) {
+    // Permission check
     if (requiredPermission && !rolePermissions.includes(requiredPermission)) {
       redirect("/");
     }
@@ -101,7 +102,7 @@ export async function getUserContext(requiredPermission?: string) {
     const allLeads = await getAllLeads();
     leads =
       adminCountry.length === 0
-        ? allLeads
+        ? allLeads // full access if no country restriction
         : allLeads.filter((r: ILead) => adminCountry.includes(r.home.country));
   } else {
     const agentEmails = [email, ...(myProfile?.subAgents || [])];
@@ -121,7 +122,7 @@ export async function getUserContext(requiredPermission?: string) {
     adminCountry,
     rolePermissions,
     myProfile,
-    accessibleKeys, // 🔑 now included
+    accessibleKeys,
     agency,
     leads,
     courses,
