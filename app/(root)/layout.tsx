@@ -3,23 +3,41 @@ import { SignedIn, UserButton } from "@clerk/nextjs";
 import { Toaster } from "react-hot-toast";
 import HomeSidebar from "./components/HomeSidebar";
 import MessageCount from "./components/MessageCount";
-import { getAdminByEmail } from "@/lib/actions/admin.actions";
+import {
+  getAdminByEmail,
+  getAdminRolePermissionsByEmail,
+  isAdmin,
+} from "@/lib/actions/admin.actions";
 import NotificationsCount from "./components/Notifications";
 import Breadcrumbs from "@/components/shared/Breadcrumbs";
 import ThemeToggle from "@/components/shared/ThemeToggle";
 import { DashboardProvider } from "@/components/shared/DashboardProvider";
 import HelpModal from "@/components/shared/HelpForm";
-import { getUserContext } from "@/lib/actions/userContext.actions";
+import { auth } from "@clerk/nextjs/server";
+import { getProfileByEmail, getUserEmailById } from "@/lib/actions";
+import { redirect } from "next/navigation";
 
 export default async function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { email, adminStatus, myProfile, rolePermissions } =
-    await getUserContext("/");
+  const { sessionClaims } = await auth();
+  const userId = sessionClaims?.userId as string;
+  if (!userId) redirect("/sign-in");
+
+  const email = await getUserEmailById(userId);
+  const adminStatus = await isAdmin(email);
+  const myProfile = await getProfileByEmail(email);
+
+  // ✅ Only block if not admin AND profile not approved
+  if (!adminStatus && myProfile?.status !== "Approved") {
+    redirect("/profile");
+  }
 
   const admin = await getAdminByEmail(email);
+  const rolePermissions = await getAdminRolePermissionsByEmail(email);
+
   return (
     <SidebarProvider defaultOpen={true}>
       <HomeSidebar
