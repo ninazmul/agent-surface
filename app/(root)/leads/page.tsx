@@ -4,7 +4,7 @@ import { Download } from "lucide-react";
 import SendRemindersButton from "@/components/shared/SendRemindersButton";
 import ExportLeadsExcelClient from "@/components/shared/ExportToExcelClient";
 import AddLeadDialog from "@/components/shared/AddLeadDialog";
-import { getUserContext } from "@/lib/actions";
+import { getUserContext } from "@/lib/actions/userContext.actions";
 
 const Page = async () => {
   const { email, adminStatus, agency, leads, courses, services } =
