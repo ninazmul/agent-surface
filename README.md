@@ -58,10 +58,7 @@ cd ab-partner-portal
 npm install
 
 ### 3. Create .env.local
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-MONGODB_URI=your_mongodb_uri
-CLERK_SECRET_KEY=your_key
-some are private
+setup env file (This is private for this repo)
 
 ### 4. Run project
 npm run dev
