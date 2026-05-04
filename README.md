@@ -77,4 +77,3 @@ In the project directory, you can run:
 ## License
 
 This project is licensed under the MIT License.
-Ï
