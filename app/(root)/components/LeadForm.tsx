@@ -3,6 +3,13 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
+import { useMemo, useRef, useState, useEffect } from "react";
+import Select from "react-select";
+import countries from "world-countries";
+import { Info } from "lucide-react";
+import toast from "react-hot-toast";
+import { Types } from "mongoose";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,25 +20,19 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-// import { useRouter } from "next/navigation";
-import { createLead, updateLead } from "@/lib/actions/lead.actions";
-import { ILead } from "@/lib/database/models/lead.model";
-import { IProfile } from "@/lib/database/models/profile.model";
-import { createNotification } from "@/lib/actions/notification.actions";
-import { ICourse } from "@/lib/database/models/course.model";
-import countries from "world-countries";
 import { FileUploader } from "@/components/shared/FileUploader";
-import { useUploadThing } from "@/lib/uploadthing";
-import { useMemo, useState } from "react";
-import Select from "react-select";
-import { IServices } from "@/lib/database/models/service.model";
-import { createTrack } from "@/lib/actions/track.actions";
-import { Types } from "mongoose";
-import toast from "react-hot-toast";
-import { courseKey, normalizeCourses } from "@/lib/utils";
-import { Info } from "lucide-react";
 
-// ✅ Schema
+import { createLead, updateLead } from "@/lib/actions/lead.actions";
+import { createNotification } from "@/lib/actions/notification.actions";
+import { createTrack } from "@/lib/actions/track.actions";
+import { useUploadThing } from "@/lib/uploadthing";
+import { courseKey, normalizeCourses } from "@/lib/utils";
+
+import type { ILead } from "@/lib/database/models/lead.model";
+import type { IProfile } from "@/lib/database/models/profile.model";
+import type { ICourseByCountrySafe } from "@/lib/database/models/course.model";
+import type { IServices } from "@/lib/database/models/service.model";
+
 const LeadFormSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters."),
   email: z.string().email("Invalid email address."),
@@ -125,15 +126,18 @@ const LeadFormSchema = z.object({
     .optional(),
 });
 
+type LeadFormValues = z.infer<typeof LeadFormSchema>;
+
 type LeadFormProps = {
   type: "Create" | "Update";
   Lead?: ILead;
   LeadId?: string;
   agency?: IProfile[];
-  courses?: ICourse[];
+  courses?: ICourseByCountrySafe[];
   services?: IServices[];
   isAdmin?: boolean;
   email: string;
+  country?: string;
   onSuccess?: () => void;
 };
 
@@ -144,28 +148,28 @@ const LeadForm = ({
   agency,
   isAdmin,
   email,
+  country,
   courses,
   services,
   onSuccess,
 }: LeadFormProps) => {
-  // const router = useRouter();
   const { startUpload } = useUploadThing("mediaUploader");
 
   const [passportFile, setPassportFile] = useState<File[]>([]);
   const [arrivalFile, setArrivalFile] = useState<File[]>([]);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
+  const previousAgencyCountryRef = useRef<string | undefined>(undefined);
 
-  const countryOptions = countries.map((country) => ({
-    label: `${country.flag} ${country.name.common}`,
-    value: country.name.common,
-  }));
-
-  const selectableCourses = useMemo(
-    () => (courses ? normalizeCourses(courses) : []),
-    [courses],
+  const countryOptions = useMemo(
+    () =>
+      countries.map((item) => ({
+        label: `${item.flag} ${item.name.common}`,
+        value: item.name.common,
+      })),
+    [],
   );
 
-  const form = useForm<z.infer<typeof LeadFormSchema>>({
+  const form = useForm<LeadFormValues>({
     resolver: zodResolver(LeadFormSchema),
     defaultValues: {
       name: Lead?.name || "",
@@ -177,13 +181,11 @@ const LeadForm = ({
       home: Lead?.home || {
         address: "",
         zip: "",
-        country: "",
+        country: !isAdmin ? country || "" : "",
         state: "",
         city: "",
       },
-
       irish: Lead?.irish ?? undefined,
-
       passport: Lead?.passport
         ? {
             ...Lead.passport,
@@ -195,7 +197,6 @@ const LeadForm = ({
               : undefined,
           }
         : undefined,
-
       arrival: Lead?.arrival
         ? {
             ...Lead.arrival,
@@ -203,7 +204,6 @@ const LeadForm = ({
             time: Lead.arrival.time ? new Date(Lead.arrival.time) : undefined,
           }
         : undefined,
-
       course:
         Lead?.course?.map((c) => ({
           _id: c._id,
@@ -218,7 +218,6 @@ const LeadForm = ({
           },
           courseFee: c.courseFee,
         })) || [],
-
       services:
         Lead?.services?.map((s) => ({
           _id: s._id,
@@ -227,7 +226,6 @@ const LeadForm = ({
           amount: s.amount || "0",
           description: s.description,
         })) || [],
-
       note: Lead?.note || "",
       author: isAdmin ? Lead?.author || "" : email || "",
       progress:
@@ -243,9 +241,53 @@ const LeadForm = ({
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof LeadFormSchema>) => {
+  const selectedAuthor = useWatch({
+    control: form.control,
+    name: "author",
+  });
+
+  const selectedCourses =
+    useWatch({
+      control: form.control,
+      name: "course",
+    }) ?? [];
+
+  const selectedAgencyCountry = useMemo(() => {
+    if (!isAdmin) return country;
+
+    return agency?.find((item) => item.email === selectedAuthor)?.country;
+  }, [agency, country, isAdmin, selectedAuthor]);
+
+  const selectableCourses = useMemo(
+    () => (courses ? normalizeCourses(courses, selectedAgencyCountry) : []),
+    [courses, selectedAgencyCountry],
+  );
+
+  useEffect(() => {
+    if (!selectedAgencyCountry) return;
+
+    form.setValue("home.country", selectedAgencyCountry, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+
+    if (
+      previousAgencyCountryRef.current &&
+      previousAgencyCountryRef.current !== selectedAgencyCountry
+    ) {
+      form.setValue("course", [], {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    }
+
+    previousAgencyCountryRef.current = selectedAgencyCountry;
+  }, [form, selectedAgencyCountry]);
+
+  const onSubmit = async (values: LeadFormValues) => {
     const safeUpload = async (files: File[] | undefined) => {
       if (!files || files.length === 0) return "";
+
       try {
         const uploaded = await startUpload(files);
         return uploaded?.[0]?.url || "";
@@ -255,16 +297,28 @@ const LeadForm = ({
       }
     };
 
-    // Upload files if provided
     const uploadedPassport = await safeUpload(passportFile);
     const uploadedArrival = await safeUpload(arrivalFile);
 
+    const leadCountry = !isAdmin
+      ? country || values.home.country
+      : selectedAgencyCountry || values.home.country;
+
+    const leadValues = {
+      ...values,
+      home: {
+        ...values.home,
+        country: leadCountry,
+      },
+    };
+
     const resolveAuthor = () => {
-      // Update: preserve unless explicitly changed by admin
       if (type === "Update") {
         if (isAdmin && values.author) return values.author;
-        return Lead?.author; // 🔒 preserve existing
+        return Lead?.author;
       }
+
+      return values.author || email;
     };
 
     const finalAuthor = resolveAuthor();
@@ -272,17 +326,17 @@ const LeadForm = ({
     try {
       if (type === "Create") {
         const created = await createLead({
-          ...values,
-          author: values.author || email,
+          ...leadValues,
+          author: finalAuthor || email,
           passport: {
-            ...values.passport,
-            file: uploadedPassport || values?.passport?.file,
+            ...leadValues.passport,
+            file: uploadedPassport || leadValues.passport?.file,
           },
           arrival: {
-            ...values.arrival,
-            file: uploadedArrival || values?.arrival?.file,
+            ...leadValues.arrival,
+            file: uploadedArrival || leadValues.arrival?.file,
           },
-          course: values.course?.map((c) => ({
+          course: leadValues.course?.map((c) => ({
             _id: c._id,
             name: c.name,
             courseType: c.courseType,
@@ -292,45 +346,46 @@ const LeadForm = ({
             campus: c.campus,
             courseFee: c.courseFee,
           })),
-          services: values.services?.map((s) => ({
+          services: leadValues.services?.map((s) => ({
             ...s,
             _id: new Types.ObjectId(s._id),
           })),
-          others: values.others || [],
+          others: leadValues.others || [],
         });
 
         if (created) {
           await createNotification({
-            title: `New lead created for ${values.name}`,
-            agency: values.author || email,
-            country: values.home.country,
-            route: `/leads`,
+            title: `New lead created for ${leadValues.name}`,
+            agency: finalAuthor || email,
+            country: leadCountry,
+            route: "/leads",
           });
 
           await createTrack({
-            student: values.email,
-            event: `${values.name}'s Lead Created`,
+            student: leadValues.email,
+            event: `${leadValues.name}'s Lead Created`,
             route: `/leads/${created._id.toString()}`,
             status: "created",
           });
 
           toast.success("Lead created successfully!");
-          // router.push("/leads");
           onSuccess?.();
         }
-      } else if (type === "Update" && LeadId) {
+      }
+
+      if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
-          ...values,
+          ...leadValues,
           author: finalAuthor || Lead?.author || email,
           passport: {
-            ...(values.passport || {}),
-            file: uploadedPassport || values?.passport?.file,
+            ...(leadValues.passport || {}),
+            file: uploadedPassport || leadValues.passport?.file,
           },
           arrival: {
-            ...(values.arrival || {}),
-            file: uploadedArrival || values?.arrival?.file,
+            ...(leadValues.arrival || {}),
+            file: uploadedArrival || leadValues.arrival?.file,
           },
-          course: values.course?.map((c) => ({
+          course: leadValues.course?.map((c) => ({
             _id: c._id,
             name: c.name,
             courseType: c.courseType,
@@ -341,64 +396,52 @@ const LeadForm = ({
             courseFee: c.courseFee,
           })),
           services:
-            values.services?.map((s) => ({
+            leadValues.services?.map((s) => ({
               ...s,
               _id:
                 typeof s._id === "string" ? new Types.ObjectId(s._id) : s._id,
             })) || [],
-          date: values.date ? new Date(values.date) : new Date(),
-          others: values.others || [],
+          date: leadValues.date ? new Date(leadValues.date) : new Date(),
+          others: leadValues.others || [],
         });
+
         if (updated) {
           await createNotification({
-            title: `${values.name}'s lead updated!`,
+            title: `${leadValues.name}'s lead updated!`,
             agency: finalAuthor || Lead?.author || email,
-            country: values.home.country,
-            route: `/leads`,
+            country: leadCountry,
+            route: "/leads",
           });
 
           await createTrack({
-            student: values.email,
-            event: `${values.name}'s Lead Updated`,
+            student: leadValues.email,
+            event: `${leadValues.name}'s Lead Updated`,
             route: `/leads/${updated._id.toString()}`,
             status: "updated",
           });
+
           toast.success("Lead updated successfully!");
-          // router.push("/leads");
           onSuccess?.();
         }
       }
     } catch (error) {
       console.error("Lead form submission failed", error);
+      toast.error("Something went wrong");
     }
   };
-
-  const selectedCourses =
-    useWatch({
-      control: form.control,
-      name: "course",
-    }) ?? [];
 
   return (
     <div className="w-full min-w-0 overflow-x-hidden">
       <Form {...form}>
         <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            form.handleSubmit(onSubmit)(e);
+          onSubmit={(event) => {
+            event.preventDefault();
+            form.handleSubmit(onSubmit)(event);
           }}
-          className="
-        w-full
-        min-w-0
-        rounded-2xl
-        bg-white dark:bg-gray-800
-        p-4 sm:p-6
-        shadow-sm
-        space-y-4
-      "
+          className="w-full min-w-0 rounded-2xl bg-white dark:bg-gray-800 p-4 sm:p-6 shadow-sm space-y-4"
         >
-          {/* ✅ Personal Information */}
           <h3 className="text-xl font-semibold">Personal Information</h3>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               name="name"
@@ -413,6 +456,7 @@ const LeadForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               name="email"
               control={form.control}
@@ -426,6 +470,7 @@ const LeadForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               name="number"
               control={form.control}
@@ -439,6 +484,7 @@ const LeadForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               name="gender"
               control={form.control}
@@ -467,6 +513,7 @@ const LeadForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               name="maritalStatus"
               control={form.control}
@@ -496,6 +543,7 @@ const LeadForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               name="dateOfBirth"
               control={form.control}
@@ -507,16 +555,16 @@ const LeadForm = ({
                       type="date"
                       value={
                         field.value instanceof Date &&
-                        !isNaN(field.value.getTime())
+                        !Number.isNaN(field.value.getTime())
                           ? field.value.toISOString().slice(0, 10)
                           : ""
                       }
-                      placeholder="Date of Birth"
-                      onChange={(e) => {
-                        const dateValue = e.target.value
-                          ? new Date(e.target.value)
-                          : undefined;
-                        field.onChange(dateValue);
+                      onChange={(event) => {
+                        field.onChange(
+                          event.target.value
+                            ? new Date(event.target.value)
+                            : undefined,
+                        );
                       }}
                     />
                   </FormControl>
@@ -525,7 +573,6 @@ const LeadForm = ({
               )}
             />
 
-            {/* Agency (Admin only) */}
             {isAdmin && (
               <FormField
                 name="author"
@@ -535,21 +582,44 @@ const LeadForm = ({
                     <FormLabel>Agency</FormLabel>
                     <FormControl>
                       <Select
-                        options={agency?.map((a) => ({
-                          value: a.email,
-                          label: a.name || a.email,
+                        options={agency?.map((item) => ({
+                          value: item.email,
+                          label: item.name || item.email,
                         }))}
                         value={
                           agency
-                            ?.map((a) => ({
-                              value: a.email,
-                              label: a.name || a.email,
+                            ?.map((item) => ({
+                              value: item.email,
+                              label: item.name || item.email,
                             }))
                             .find((option) => option.value === field.value) ||
                           null
                         }
-                        onChange={(val) => field.onChange(val?.value)}
+                        onChange={(selected) => {
+                          field.onChange(selected?.value);
+
+                          const selectedAgency = agency?.find(
+                            (item) => item.email === selected?.value,
+                          );
+
+                          form.setValue("course", [], {
+                            shouldDirty: true,
+                            shouldValidate: true,
+                          });
+
+                          if (selectedAgency?.country) {
+                            form.setValue(
+                              "home.country",
+                              selectedAgency.country,
+                              {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              },
+                            );
+                          }
+                        }}
                         placeholder="Select agency"
+                        classNamePrefix="react-select"
                       />
                     </FormControl>
                     <FormMessage />
@@ -559,11 +629,11 @@ const LeadForm = ({
             )}
           </div>
 
-          {/* ===== Home Address ===== */}
           <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm">
             <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
               Home Address
             </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <FormField
                 name="home.address"
@@ -578,6 +648,7 @@ const LeadForm = ({
                   </FormItem>
                 )}
               />
+
               <FormField
                 name="home.city"
                 control={form.control}
@@ -591,6 +662,7 @@ const LeadForm = ({
                   </FormItem>
                 )}
               />
+
               <FormField
                 name="home.state"
                 control={form.control}
@@ -604,6 +676,7 @@ const LeadForm = ({
                   </FormItem>
                 )}
               />
+
               <FormField
                 name="home.zip"
                 control={form.control}
@@ -617,6 +690,7 @@ const LeadForm = ({
                   </FormItem>
                 )}
               />
+
               <FormField
                 control={form.control}
                 name="home.country"
@@ -627,9 +701,12 @@ const LeadForm = ({
                       <Select
                         options={countryOptions}
                         isSearchable
-                        value={countryOptions.find(
-                          (opt) => opt.value === field.value,
-                        )}
+                        isDisabled={!isAdmin && !!country}
+                        value={
+                          countryOptions.find(
+                            (option) => option.value === field.value,
+                          ) || null
+                        }
                         onChange={(selected) => field.onChange(selected?.value)}
                         placeholder="Select a country"
                         classNamePrefix="react-select"
@@ -642,64 +719,43 @@ const LeadForm = ({
             </div>
           </section>
 
-          {/* ===== IRISH Address ===== */}
           <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm">
             <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
               IRISH Address
             </h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                name="irish.address"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Address</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Your address in Ireland" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="irish.city"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>City</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Your city in Ireland" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="irish.state"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>State</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Your state in Ireland" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="irish.zip"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Zip</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Zip code in Ireland" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {(["address", "city", "state", "zip"] as const).map(
+                (fieldName) => (
+                  <FormField
+                    key={fieldName}
+                    name={`irish.${fieldName}`}
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {fieldName === "zip"
+                            ? "Zip"
+                            : fieldName.charAt(0).toUpperCase() +
+                              fieldName.slice(1)}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder={
+                              fieldName === "zip"
+                                ? "Zip code in Ireland"
+                                : `Your ${fieldName} in Ireland`
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ),
+              )}
+
               <FormField
                 control={form.control}
                 name="irish.country"
@@ -710,9 +766,11 @@ const LeadForm = ({
                       <Select
                         options={countryOptions}
                         isSearchable
-                        value={countryOptions.find(
-                          (opt) => opt.value === field.value,
-                        )}
+                        value={
+                          countryOptions.find(
+                            (option) => option.value === field.value,
+                          ) || null
+                        }
                         onChange={(selected) => field.onChange(selected?.value)}
                         placeholder="Select a country"
                         classNamePrefix="react-select"
@@ -725,180 +783,199 @@ const LeadForm = ({
             </div>
           </section>
 
-          {/* ✅ Courses & Services */}
           <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm space-y-6">
             <h3 className="text-xl font-semibold">Courses & Services</h3>
 
-            {/* Courses */}
             <div>
               <h4 className="font-semibold mb-2">Courses</h4>
-              <div className="flex gap-4 overflow-x-auto pb-2">
-                {selectableCourses.map((course) => {
-                  const isSelected = selectedCourses.some(
-                    (c) =>
-                      c._id === course._id &&
-                      c.campus.name === course.campus.name &&
-                      c.campus.shift === course.campus.shift,
-                  );
 
-                  const key = `course-${courseKey(course)}`;
-                  const isExpanded = expandedItem === key;
+              {isAdmin && !selectedAgencyCountry ? (
+                <p className="text-sm text-muted-foreground">
+                  Select an agency first to show courses with the correct
+                  country fee.
+                </p>
+              ) : selectableCourses.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No courses available for this country.
+                </p>
+              ) : (
+                <div className="flex gap-4 overflow-x-auto pb-2">
+                  {selectableCourses.map((course) => {
+                    const isSelected = selectedCourses.some(
+                      (selectedCourse) =>
+                        selectedCourse._id === course._id &&
+                        selectedCourse.campus.name === course.campus.name &&
+                        selectedCourse.campus.shift === course.campus.shift,
+                    );
 
-                  return (
-                    <div
-                      key={courseKey(course)}
-                      className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm
-                      w-[260px] transition-all duration-200 bg-white dark:bg-gray-900
-                      ${
-                        isSelected
-                          ? "border-blue-600 dark:border-blue-500"
-                          : "border-gray-200 dark:border-gray-700"
-                      }`}
-                    >
-                      {/* Top Row */}
-                      <div className="flex items-start justify-between">
-                        <h4 className="font-semibold text-base leading-tight">
-                          {course.name}
-                        </h4>
+                    const key = `course-${courseKey(course)}`;
+                    const isExpanded = expandedItem === key;
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setExpandedItem(isExpanded ? null : key)
-                          }
-                          className="text-gray-500 hover:text-blue-600 transition"
-                        >
-                          <Info size={16} />
-                        </button>
-                      </div>
-
-                      {/* Primary Info (Decision Data Only) */}
-                      <div className="mt-2 space-y-1 text-sm text-gray-600">
-                        <p>
-                          {course.campus.name} • {course.campus.shift}
-                        </p>
-                      </div>
-
-                      <p className="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
-                        €{course.courseFee}
-                      </p>
-
-                      {/* Expandable Details */}
-                      {isExpanded && (
-                        <div className="mt-3 pt-3 border-t text-xs text-gray-500 space-y-2">
-                          <p>Type: {course.courseType || "Not specified"}</p>
-
-                          <p>
-                            Duration: {course.courseDuration || "Not specified"}
-                          </p>
-
-                          <p>
-                            Start:{" "}
-                            {course.startDate
-                              ? new Date(course.startDate).toLocaleDateString()
-                              : "Not scheduled"}
-                          </p>
-
-                          <p>
-                            End:{" "}
-                            {course.endDate
-                              ? new Date(course.endDate).toLocaleDateString()
-                              : "Not scheduled"}
-                          </p>
-
-                          {course.description && (
-                            <div className="pt-2 text-gray-600 leading-relaxed text-justify">
-                              {course.description}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Select Button */}
-                      <Button
-                        type="button"
-                        variant={isSelected ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => {
-                          const current = form.getValues("course") || [];
-
-                          if (isSelected) {
-                            form.setValue(
-                              "course",
-                              current.filter(
-                                (c) =>
-                                  !(
-                                    c._id === course._id &&
-                                    c.campus.name === course.campus.name &&
-                                    c.campus.shift === course.campus.shift
-                                  ),
-                              ),
-                            );
-                          } else {
-                            if (course._id) {
-                              const snapshot = {
-                                _id: course._id,
-                                name: course.name,
-                                courseDuration: course.courseDuration,
-                                courseType: course.courseType || "General",
-                                startDate: course.startDate
-                                  ? new Date(course.startDate)
-                                  : undefined,
-                                endDate: course.endDate
-                                  ? new Date(course.endDate)
-                                  : undefined,
-                                campus: {
-                                  name: course.campus.name,
-                                  shift: course.campus.shift,
-                                },
-                                courseFee: course.courseFee,
-                              };
-
-                              form.setValue("course", [...current, snapshot]);
-                            }
-                          }
-                        }}
-                        className={`w-full mt-4 ${
+                    return (
+                      <div
+                        key={courseKey(course)}
+                        className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm w-[260px] transition-all duration-200 bg-white dark:bg-gray-900 ${
                           isSelected
-                            ? "bg-blue-600 text-white hover:bg-blue-700"
-                            : ""
+                            ? "border-blue-600 dark:border-blue-500"
+                            : "border-gray-200 dark:border-gray-700"
                         }`}
                       >
-                        {isSelected ? "Selected ✅" : "Select Course"}
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
+                        <div className="flex items-start justify-between">
+                          <h4 className="font-semibold text-base leading-tight">
+                            {course.name}
+                          </h4>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setExpandedItem(isExpanded ? null : key)
+                            }
+                            className="text-gray-500 hover:text-blue-600 transition"
+                          >
+                            <Info size={16} />
+                          </button>
+                        </div>
+
+                        <div className="mt-2 space-y-1 text-sm text-gray-600">
+                          <p>
+                            {course.campus.name} - {course.campus.shift}
+                          </p>
+
+                          {selectedAgencyCountry && (
+                            <p className="text-xs text-gray-500">
+                              Fee country: {selectedAgencyCountry}
+                            </p>
+                          )}
+                        </div>
+
+                        <p className="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
+                          €{course.courseFee}
+                        </p>
+
+                        {isExpanded && (
+                          <div className="mt-3 pt-3 border-t text-xs text-gray-500 space-y-2">
+                            <p>Type: {course.courseType || "Not specified"}</p>
+                            <p>
+                              Duration:{" "}
+                              {course.courseDuration || "Not specified"}
+                            </p>
+                            <p>
+                              Start:{" "}
+                              {course.startDate
+                                ? new Date(
+                                    course.startDate,
+                                  ).toLocaleDateString()
+                                : "Not scheduled"}
+                            </p>
+                            <p>
+                              End:{" "}
+                              {course.endDate
+                                ? new Date(course.endDate).toLocaleDateString()
+                                : "Not scheduled"}
+                            </p>
+
+                            {course.description && (
+                              <div className="pt-2 text-gray-600 leading-relaxed text-justify">
+                                {course.description}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        <Button
+                          type="button"
+                          variant={isSelected ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => {
+                            const current = form.getValues("course") || [];
+
+                            if (isSelected) {
+                              form.setValue(
+                                "course",
+                                current.filter(
+                                  (selectedCourse) =>
+                                    !(
+                                      selectedCourse._id === course._id &&
+                                      selectedCourse.campus.name ===
+                                        course.campus.name &&
+                                      selectedCourse.campus.shift ===
+                                        course.campus.shift
+                                    ),
+                                ),
+                                {
+                                  shouldValidate: true,
+                                  shouldDirty: true,
+                                },
+                              );
+                              return;
+                            }
+
+                            form.setValue(
+                              "course",
+                              [
+                                ...current,
+                                {
+                                  _id: course._id,
+                                  name: course.name,
+                                  courseDuration: course.courseDuration,
+                                  courseType: course.courseType || "General",
+                                  startDate: course.startDate
+                                    ? new Date(course.startDate)
+                                    : undefined,
+                                  endDate: course.endDate
+                                    ? new Date(course.endDate)
+                                    : undefined,
+                                  campus: {
+                                    name: course.campus.name,
+                                    shift: course.campus.shift,
+                                  },
+                                  courseFee: course.courseFee,
+                                },
+                              ],
+                              {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                              },
+                            );
+                          }}
+                          className={`w-full mt-4 ${
+                            isSelected
+                              ? "bg-blue-600 text-white hover:bg-blue-700"
+                              : ""
+                          }`}
+                        >
+                          {isSelected ? "Selected" : "Select Course"}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* Services */}
             <div>
               <h4 className="font-semibold mb-2">Services</h4>
               <div className="flex gap-4 overflow-x-auto pb-2">
-                {services?.map((service, index) => {
+                {services?.map((service) => {
                   const isSelected = form
                     .watch("services")
                     ?.some(
                       (s) =>
                         s._id && s._id.toString() === service._id?.toString(),
                     );
-                    
+
                   const key = `service-${service._id}`;
                   const isExpanded = expandedItem === key;
 
                   return (
                     <div
-                      key={index}
-                      className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm
-                      w-[260px] transition-all duration-200 bg-white dark:bg-gray-900
-                      ${
+                      key={service._id.toString()}
+                      className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm w-[260px] transition-all duration-200 bg-white dark:bg-gray-900 ${
                         isSelected
                           ? "border-blue-600 dark:border-blue-500"
                           : "border-gray-200 dark:border-gray-700"
                       }`}
                     >
-                      {/* Top Row */}
                       <div className="flex items-start justify-between">
                         <h4 className="font-semibold text-base leading-tight">
                           {service.title}
@@ -915,7 +992,6 @@ const LeadForm = ({
                         </button>
                       </div>
 
-                      {/* Primary Info (Decision Data Only) */}
                       <div className="mt-2 text-sm text-gray-600">
                         <p>{service.serviceType}</p>
                       </div>
@@ -924,14 +1000,12 @@ const LeadForm = ({
                         €{service.amount}
                       </p>
 
-                      {/* Expandable Details */}
                       {isExpanded && (
                         <div className="mt-3 pt-3 border-t text-xs text-gray-500 space-y-1">
                           {service.description && <p>{service.description}</p>}
                         </div>
                       )}
 
-                      {/* Select Button */}
                       <Button
                         type="button"
                         variant={isSelected ? "default" : "outline"}
@@ -946,9 +1020,17 @@ const LeadForm = ({
                                 (s) =>
                                   s._id.toString() !== service._id.toString(),
                               ),
+                              {
+                                shouldDirty: true,
+                                shouldValidate: true,
+                              },
                             );
-                          } else {
-                            form.setValue("services", [
+                            return;
+                          }
+
+                          form.setValue(
+                            "services",
+                            [
                               ...current,
                               {
                                 _id: service._id.toString(),
@@ -957,8 +1039,12 @@ const LeadForm = ({
                                 amount: service.amount || "",
                                 description: service.description || "",
                               },
-                            ]);
-                          }
+                            ],
+                            {
+                              shouldDirty: true,
+                              shouldValidate: true,
+                            },
+                          );
                         }}
                         className={`w-full mt-4 ${
                           isSelected
@@ -966,7 +1052,7 @@ const LeadForm = ({
                             : ""
                         }`}
                       >
-                        {isSelected ? "Selected ✅" : "Select Service"}
+                        {isSelected ? "Selected" : "Select Service"}
                       </Button>
                     </div>
                   );
@@ -975,8 +1061,8 @@ const LeadForm = ({
             </div>
           </section>
 
-          {/* ✅ Passport */}
           <h3 className="text-xl font-semibold">Passport</h3>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <FormField
               name="passport.visa"
@@ -1012,6 +1098,7 @@ const LeadForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               name="passport.number"
               control={form.control}
@@ -1025,6 +1112,7 @@ const LeadForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="passport.country"
@@ -1035,9 +1123,11 @@ const LeadForm = ({
                     <Select
                       options={countryOptions}
                       isSearchable
-                      value={countryOptions.find(
-                        (opt) => opt.value === field.value,
-                      )}
+                      value={
+                        countryOptions.find(
+                          (option) => option.value === field.value,
+                        ) || null
+                      }
                       onChange={(selected) => field.onChange(selected?.value)}
                       placeholder="Select a country"
                       classNamePrefix="react-select"
@@ -1047,6 +1137,7 @@ const LeadForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               name="passport.issueDate"
               control={form.control}
@@ -1058,21 +1149,23 @@ const LeadForm = ({
                       type="date"
                       value={
                         field.value instanceof Date &&
-                        !isNaN(field.value.getTime())
+                        !Number.isNaN(field.value.getTime())
                           ? field.value.toISOString().slice(0, 10)
                           : ""
                       }
-                      onChange={(e) => {
-                        const dateValue = e.target.value
-                          ? new Date(e.target.value)
-                          : undefined;
-                        field.onChange(dateValue);
+                      onChange={(event) => {
+                        field.onChange(
+                          event.target.value
+                            ? new Date(event.target.value)
+                            : undefined,
+                        );
                       }}
                     />
                   </FormControl>
                 </FormItem>
               )}
             />
+
             <FormField
               name="passport.expirationDate"
               control={form.control}
@@ -1084,21 +1177,23 @@ const LeadForm = ({
                       type="date"
                       value={
                         field.value instanceof Date &&
-                        !isNaN(field.value.getTime())
+                        !Number.isNaN(field.value.getTime())
                           ? field.value.toISOString().slice(0, 10)
                           : ""
                       }
-                      onChange={(e) => {
-                        const dateValue = e.target.value
-                          ? new Date(e.target.value)
-                          : undefined;
-                        field.onChange(dateValue);
+                      onChange={(event) => {
+                        field.onChange(
+                          event.target.value
+                            ? new Date(event.target.value)
+                            : undefined,
+                        );
                       }}
                     />
                   </FormControl>
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="passport.file"
@@ -1118,10 +1213,9 @@ const LeadForm = ({
             />
           </div>
 
-          {/* ✅ Arrival */}
           <h3 className="text-xl font-semibold">Arrival</h3>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {" "}
             <FormField
               name="arrival.flight"
               control={form.control}
@@ -1134,6 +1228,7 @@ const LeadForm = ({
                 </FormItem>
               )}
             />
+
             <FormField
               name="arrival.date"
               control={form.control}
@@ -1145,21 +1240,23 @@ const LeadForm = ({
                       type="date"
                       value={
                         field.value instanceof Date &&
-                        !isNaN(field.value.getTime())
+                        !Number.isNaN(field.value.getTime())
                           ? field.value.toISOString().slice(0, 10)
                           : ""
                       }
-                      onChange={(e) => {
-                        const dateValue = e.target.value
-                          ? new Date(e.target.value)
-                          : undefined;
-                        field.onChange(dateValue);
+                      onChange={(event) => {
+                        field.onChange(
+                          event.target.value
+                            ? new Date(event.target.value)
+                            : undefined,
+                        );
                       }}
                     />
                   </FormControl>
                 </FormItem>
               )}
             />
+
             <FormField
               name="arrival.time"
               control={form.control}
@@ -1169,21 +1266,30 @@ const LeadForm = ({
                   <FormControl>
                     <Input
                       type="time"
-                      value={new Date(field.value || new Date())
-                        .toISOString()
-                        .slice(11, 16)}
-                      onChange={(e) => {
-                        const d = new Date();
-                        const [h, m] = e.target.value.split(":");
-                        d.setHours(+h);
-                        d.setMinutes(+m);
-                        field.onChange(d);
+                      value={
+                        field.value instanceof Date &&
+                        !Number.isNaN(field.value.getTime())
+                          ? field.value.toISOString().slice(11, 16)
+                          : ""
+                      }
+                      onChange={(event) => {
+                        if (!event.target.value) {
+                          field.onChange(undefined);
+                          return;
+                        }
+
+                        const date = new Date();
+                        const [hours, minutes] = event.target.value.split(":");
+                        date.setHours(Number(hours));
+                        date.setMinutes(Number(minutes));
+                        field.onChange(date);
                       }}
                     />
                   </FormControl>
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="arrival.file"
@@ -1203,15 +1309,14 @@ const LeadForm = ({
             />
           </div>
 
-          {/* ✅ SECTION 6: Additional Documents (Others) */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">Additional Documents</h3>
-            {form.watch("others")?.map((item, index) => (
+
+            {form.watch("others")?.map((_, index) => (
               <div
                 key={index}
                 className="grid grid-cols-1 gap-4 items-center border p-4 rounded-md bg-muted/40"
               >
-                {/* File Name */}
                 <FormField
                   control={form.control}
                   name={`others.${index}.fileName`}
@@ -1226,7 +1331,6 @@ const LeadForm = ({
                   )}
                 />
 
-                {/* File Uploader */}
                 <FormField
                   control={form.control}
                   name={`others.${index}.fileUrl`}
@@ -1239,19 +1343,18 @@ const LeadForm = ({
                             fileUrl: string,
                             files?: File[],
                           ) => {
-                            // If a file is selected, upload it and set the URL
                             if (files && files.length > 0) {
                               const uploaded = await startUpload(files);
-                              if (uploaded && uploaded[0]) {
+                              if (uploaded?.[0]) {
                                 field.onChange(uploaded[0].url);
                               }
-                            } else {
-                              // If just a URL is provided, set it directly
-                              field.onChange(fileUrl);
+                              return;
                             }
+
+                            field.onChange(fileUrl);
                           }}
                           fileUrl={field.value || ""}
-                          setFiles={() => {}} // No-op to satisfy the prop type
+                          setFiles={() => {}}
                         />
                       </FormControl>
                       <FormMessage />
@@ -1259,17 +1362,19 @@ const LeadForm = ({
                   )}
                 />
 
-                {/* Remove Button */}
                 <Button
                   type="button"
                   variant="destructive"
                   onClick={() => {
                     const current = form.getValues("others") || [];
-                    const updated = [
-                      ...current.slice(0, index),
-                      ...current.slice(index + 1),
-                    ];
-                    form.setValue("others", updated);
+                    form.setValue(
+                      "others",
+                      [...current.slice(0, index), ...current.slice(index + 1)],
+                      {
+                        shouldDirty: true,
+                        shouldValidate: true,
+                      },
+                    );
                   }}
                 >
                   Remove
@@ -1277,82 +1382,60 @@ const LeadForm = ({
               </div>
             ))}
 
-            {/* Add New Document Button */}
             <Button
               type="button"
               variant="outline"
               onClick={() => {
                 const current = form.getValues("others") || [];
-                form.setValue("others", [
-                  ...current,
-                  { fileName: "", fileUrl: "" },
-                ]);
+                form.setValue(
+                  "others",
+                  [...current, { fileName: "", fileUrl: "" }],
+                  {
+                    shouldDirty: true,
+                    shouldValidate: true,
+                  },
+                );
               }}
             >
               Add Document
             </Button>
           </div>
 
-          {/* ✅ Social Links */}
           <div className="space-y-4">
             <h3 className="text-xl font-semibold">Social Links</h3>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <FormField
-                name="social.facebook"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Facebook</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Facebook profile link" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="social.instagram"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Instagram</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Instagram profile link" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="social.twitter"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Twitter</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Twitter profile link" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="social.skype"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Skype</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Skype username or link" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              {(["facebook", "instagram", "twitter", "skype"] as const).map(
+                (fieldName) => (
+                  <FormField
+                    key={fieldName}
+                    name={`social.${fieldName}`}
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>
+                          {fieldName.charAt(0).toUpperCase() +
+                            fieldName.slice(1)}
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder={
+                              fieldName === "skype"
+                                ? "Skype username or link"
+                                : `${fieldName} profile link`
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ),
+              )}
             </div>
           </div>
 
-          {/* ✅ Submit */}
           <Button
             type="submit"
             className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"

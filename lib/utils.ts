@@ -2,7 +2,7 @@ import { type ClassValue, clsx } from "clsx";
 
 import { twMerge } from "tailwind-merge";
 
-import { ICourse } from "@/lib/database/models/course.model";
+import { ICourseByCountrySafe } from "@/lib/database/models/course.model";
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -93,13 +93,13 @@ export const timeAgo = (input: string | Date) => {
 };
 
 export type SelectableCourse = {
-  _id: string; // make required
+  _id: string;
   name: string;
   description?: string;
   courseType?: string;
   courseDuration?: string;
-  startDate?: Date;
-  endDate?: Date;
+  startDate?: string;
+  endDate?: string;
   campus: {
     name: string;
     shift: "morning" | "afternoon" | "general";
@@ -107,45 +107,68 @@ export type SelectableCourse = {
   courseFee: string;
 };
 
-export const normalizeCourses = (courses: ICourse[]): SelectableCourse[] => {
-  return courses.flatMap((course) =>
-    (course.campuses || []).flatMap((campus) =>
-      (["morning", "afternoon", "general"] as const)
-        .filter(
-          (shift) =>
-            campus.shifts?.[shift]?.seats &&
-            campus.shifts?.[shift]?.fee &&
-            Number(campus.shifts[shift].seats) > 0 &&
-            Number(campus.shifts[shift].fee) > 0,
-        )
-        .map((shift) => ({
-          _id: course._id!.toString(),
-          name: course.name || "Unnamed Course",
-          description: course?.description || "",
-          courseType: course?.courseType || "General",
-          courseDuration: course.courseDuration || "",
-          startDate: course?.startDate || undefined,
-          endDate: course?.endDate || undefined,
-          campus: {
-            name: campus.campus || "Unknown Campus",
-            shift,
+const shiftNames = ["morning", "afternoon", "general"] as const;
+
+export const normalizeCourses = (
+  courses: ICourseByCountrySafe[],
+  selectedCountry?: string,
+): SelectableCourse[] => {
+  return courses.flatMap<SelectableCourse>((course) =>
+    (course.campuses || []).flatMap<SelectableCourse>((campus) =>
+      shiftNames.flatMap<SelectableCourse>((shiftName) => {
+        const shift = campus.shifts?.[shiftName];
+
+        if (!shift || Number(shift.seats) <= 0) return [];
+
+        let courseFee = "0";
+
+        if ("fee" in shift) {
+          courseFee = shift.fee ?? "0";
+        }
+
+        if ("fees" in shift) {
+          const matchedFee = selectedCountry
+            ? shift.fees?.find((fee) => fee.country === selectedCountry)
+            : undefined;
+
+          courseFee = matchedFee?.fee ?? "0";
+        }
+
+        if (Number(courseFee) <= 0) return [];
+
+        return [
+          {
+            _id: course._id,
+            name: course.name || "Unnamed Course",
+            description: course.description || "",
+            courseType: course.courseType || "General",
+            courseDuration: course.courseDuration || "",
+            startDate: course.startDate,
+            endDate: course.endDate,
+            campus: {
+              name: campus.campus || "Unknown Campus",
+              shift: shiftName,
+            },
+            courseFee,
           },
-          courseFee: campus.shifts?.[shift]?.fee?.toString() || "0",
-        })),
+        ];
+      }),
     ),
   );
 };
 
-export const courseKey = (c: SelectableCourse) =>
-  `${c._id}-${c.campus.name}-${c.campus.shift}`;
+export const courseKey = (course: SelectableCourse) => {
+  return `${course._id}-${course.campus.name}-${course.campus.shift}`;
+};
 
 export const getCourseFee = (
   course: SelectableCourse | string | number | null | undefined,
 ) => {
   if (typeof course === "object" && course?.courseFee != null) {
     const fee = Number(course.courseFee);
-    return isNaN(fee) ? 0 : fee;
+    return Number.isNaN(fee) ? 0 : fee;
   }
+
   const fee = Number(course);
-  return isNaN(fee) ? 0 : fee;
+  return Number.isNaN(fee) ? 0 : fee;
 };

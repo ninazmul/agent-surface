@@ -3,28 +3,34 @@ import {
   getProfileByEmail,
 } from "@/lib/actions/profile.actions";
 import LeadForm from "../../components/LeadForm";
-import { getAllCourses } from "@/lib/actions/course.actions";
+import { getCoursesByCountry } from "@/lib/actions/course.actions";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import { isAdmin } from "@/lib/actions/admin.actions";
 import { getAllServices } from "@/lib/actions/service.actions";
-// import { getAllServices } from "@/lib/actions/service.actions";
 
 const CreateLeadsPage = async () => {
   const { sessionClaims } = await auth();
+
   const userId = sessionClaims?.userId as string;
   const email = await getUserEmailById(userId);
   const adminStatus = await isAdmin(email);
 
   let agency = [];
+  let agencyCountry: string | undefined;
+
   if (adminStatus) {
     agency = await getAllProfiles();
   } else {
     const myAgency = await getProfileByEmail(email);
-    if (myAgency) agency = [myAgency];
+
+    if (myAgency) {
+      agency = [myAgency];
+      agencyCountry = myAgency.country;
+    }
   }
 
-  const courses = await getAllCourses();
+  const courses = await getCoursesByCountry(agencyCountry);
   const services = await getAllServices();
 
   return (
@@ -32,6 +38,7 @@ const CreateLeadsPage = async () => {
       <LeadForm
         email={email}
         agency={agency}
+        country={agencyCountry}
         courses={courses}
         services={services}
         isAdmin={adminStatus}
