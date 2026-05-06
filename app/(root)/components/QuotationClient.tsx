@@ -13,7 +13,7 @@ import PdfIframe from "@/app/(root)/components/PdfViewer";
 import { ILead } from "@/lib/database/models/lead.model";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { IServices } from "@/lib/database/models/service.model";
-import { ICourse } from "@/lib/database/models/course.model";
+import { ICourseByCountrySafe } from "@/lib/database/models/course.model";
 import QuotationVoidStatusUpdater from "./QuotationVoidStatusUpdater";
 import { IQuotation } from "@/lib/database/models/quotation.model";
 import { useUser } from "@clerk/nextjs";
@@ -38,7 +38,7 @@ export default function QuotationClient({
   lead: ILead | null;
   quotation: IQuotation | null;
   agency: IProfile | null;
-  course: ICourse[];
+  course: ICourseByCountrySafe[];
   services: IServices[];
   today: string;
   hasAccess: boolean;

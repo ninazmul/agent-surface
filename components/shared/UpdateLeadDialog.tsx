@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Pencil } from "lucide-react";
 import LeadForm from "@/app/(root)/components/LeadForm";
-import { ICourse } from "@/lib/database/models/course.model";
+import { ICourseByCountrySafe } from "@/lib/database/models/course.model";
 import { IServices } from "@/lib/database/models/service.model";
 import { IProfile } from "@/lib/database/models/profile.model";
 import { ILead } from "@/lib/database/models/lead.model";
@@ -19,7 +19,7 @@ import { ILead } from "@/lib/database/models/lead.model";
 interface UpdateLeadDialogProps {
   email: string;
   agency: IProfile[];
-  courses: ICourse[];
+  courses: ICourseByCountrySafe[];
   services: IServices[];
   isAdmin: boolean;
   lead: ILead;

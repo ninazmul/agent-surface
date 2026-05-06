@@ -4,7 +4,9 @@ import {
   getAllProfiles,
   getProfileByEmail,
 } from "@/lib/actions/profile.actions";
-import { getAllCourses } from "@/lib/actions/course.actions";
+import {
+  getCoursesByCountry,
+} from "@/lib/actions/course.actions";
 import { isAdmin } from "@/lib/actions/admin.actions";
 import LeadForm from "@/app/(root)/components/LeadForm";
 
@@ -15,14 +17,20 @@ const CreateLeadPage = async () => {
   const adminStatus = await isAdmin(email);
 
   let agency = [];
+  let agencyCountry: string | undefined;
+
   if (adminStatus) {
     agency = await getAllProfiles();
   } else {
     const myAgency = await getProfileByEmail(email);
-    if (myAgency) agency = [myAgency];
+
+    if (myAgency) {
+      agency = [myAgency];
+      agencyCountry = myAgency.country;
+    }
   }
 
-  const courses = await getAllCourses();
+  const courses = await getCoursesByCountry(agencyCountry);
 
   return (
     <section className="max-w-5xl mx-auto px-4 py-4">
@@ -30,6 +38,7 @@ const CreateLeadPage = async () => {
         email={email}
         type="Create"
         agency={agency}
+        country={agencyCountry}
         courses={courses}
         isAdmin={adminStatus}
       />

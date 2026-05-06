@@ -35,7 +35,7 @@ import {
 } from "@/components/ui/popover";
 import UpdatePromotionDialog from "@/components/shared/UpdatePromotionDialog";
 import { IProfile } from "@/lib/database/models/profile.model";
-import { ICourse } from "@/lib/database/models/course.model";
+import { ICourseByCountrySafe } from "@/lib/database/models/course.model";
 import { IServices } from "@/lib/database/models/service.model";
 
 const PromotionTable = ({
@@ -46,7 +46,7 @@ const PromotionTable = ({
 }: {
   promotions: IPromotion[];
   agency: IProfile[];
-  courses: ICourse[];
+  courses: ICourseByCountrySafe[];
   services: IServices[];
 }) => {
   const router = useRouter();

@@ -64,7 +64,7 @@ import { IStudentEvent, ITrack } from "@/lib/database/models/track.model";
 import Image from "next/image";
 import UpdateLeadDialog from "@/components/shared/UpdateLeadDialog";
 import { IServices } from "@/lib/database/models/service.model";
-import { ICourse } from "@/lib/database/models/course.model";
+import { ICourseByCountrySafe } from "@/lib/database/models/course.model";
 
 type PinUnpinStatus = ILead & { isPinned: "pinned" | "unpinned" };
 
@@ -81,7 +81,7 @@ const LeadTable = ({
   email: string;
   agency: IProfile[];
   services: IServices[];
-  courses: ICourse[];
+  courses: ICourseByCountrySafe[];
 }) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");

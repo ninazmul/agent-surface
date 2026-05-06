@@ -31,14 +31,14 @@ import Image from "next/image";
 import RefundForm from "./RefundForm";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { ICourse } from "@/lib/database/models/course.model";
+import { ICourseByCountrySafe } from "@/lib/database/models/course.model";
 
 const RefundTable = ({
   refunds,
   isAdmin,
 }: {
   refunds: IRefund[];
-  courses?: ICourse[];
+  courses?: ICourseByCountrySafe[];
   isAdmin?: boolean;
 }) => {
   const router = useRouter();
@@ -61,8 +61,8 @@ const RefundTable = ({
         refund.note,
         refund.progress,
       ].some((value) =>
-        (value ?? "").toLowerCase().includes(searchQuery.toLowerCase())
-      )
+        (value ?? "").toLowerCase().includes(searchQuery.toLowerCase()),
+      ),
     );
 
     if (sortKey) {
@@ -108,7 +108,7 @@ const RefundTable = ({
 
   const handleProgressChange = async (
     refundId: string,
-    newProgress: string
+    newProgress: string,
   ) => {
     try {
       const response = await updateRefund(refundId, {
@@ -218,7 +218,7 @@ const RefundTable = ({
                     onChange={(e) =>
                       handleProgressChange(
                         refund._id.toString(),
-                        e.target.value
+                        e.target.value,
                       )
                     }
                     disabled={!isAdmin}
@@ -226,12 +226,12 @@ const RefundTable = ({
                       refund.progress === "Pending"
                         ? "bg-gray-100 text-gray-700"
                         : refund.progress === "Processing"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : refund.progress === "Paid"
-                        ? "bg-green-100 text-green-700"
-                        : refund.progress === "Rejected"
-                        ? "bg-red-100 text-red-700"
-                        : ""
+                          ? "bg-yellow-100 text-yellow-700"
+                          : refund.progress === "Paid"
+                            ? "bg-green-100 text-green-700"
+                            : refund.progress === "Rejected"
+                              ? "bg-red-100 text-red-700"
+                              : ""
                     } ${!isAdmin && "appearance-none text-center"}`}
                   >
                     <option value="Pending">Pending</option>

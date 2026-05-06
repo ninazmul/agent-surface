@@ -2,7 +2,7 @@ import { getLeadById } from "@/lib/actions/lead.actions";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
 import { getAllServices } from "@/lib/actions/service.actions";
 import QuotationClient from "@/app/(root)/components/QuotationClient";
-import { getAllCourses } from "@/lib/actions/course.actions";
+import { getCoursesByCountry } from "@/lib/actions/course.actions";
 import { getQuotationById } from "@/lib/actions/quotation.actions";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById, isAdmin } from "@/lib/actions";
@@ -39,7 +39,7 @@ export default async function QuotationPage({ params }: PageProps) {
     return <p>Data not found.</p>;
   }
 
-  const course = await getAllCourses();
+  const course = await getCoursesByCountry();
   const services = await getAllServices();
   const today = new Date().toLocaleDateString("en-IE", {
     day: "numeric",

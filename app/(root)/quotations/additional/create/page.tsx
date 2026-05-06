@@ -2,7 +2,7 @@ import {
   getAllProfiles,
   getProfileByEmail,
 } from "@/lib/actions/profile.actions";
-import { getAllCourses } from "@/lib/actions/course.actions";
+import { getCoursesByCountry } from "@/lib/actions/course.actions";
 import { getAllServices } from "@/lib/actions/service.actions";
 import AdditionalQuotationForm from "@/app/(root)/components/AdditionalQuotationForm";
 import { getAllLeads, getLeadsByAgency } from "@/lib/actions/lead.actions";
@@ -22,7 +22,7 @@ const CreateLeadsPage = async () => {
     if (myAgency) agency = [myAgency];
   }
 
-  const courses = await getAllCourses();
+  const courses = await getCoursesByCountry();
   const services = await getAllServices();
 
   let leads: ILead[] = [];

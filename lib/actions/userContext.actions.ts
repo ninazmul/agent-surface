@@ -8,7 +8,7 @@ import {
   getAdminRolePermissionsByEmail,
 } from "./admin.actions";
 import { getAllLeads, getLeadsByAgency } from "./lead.actions";
-import { getAllCourses } from "./course.actions";
+import { getCoursesByCountry } from "./course.actions";
 import { getAllServices } from "./service.actions";
 import { ILead } from "@/lib/database/models/lead.model";
 
@@ -113,7 +113,7 @@ export async function getUserContext(requiredPermission?: string) {
   }
 
   // ====== Courses & Services
-  const courses = await getAllCourses();
+  const courses = await getCoursesByCountry();
   const services = await getAllServices();
 
   return {

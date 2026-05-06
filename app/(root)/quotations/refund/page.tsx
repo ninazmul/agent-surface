@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { getAllCourses } from "@/lib/actions/course.actions";
+import { getCoursesByCountry } from "@/lib/actions/course.actions";
 import {
   getAllRefunds,
   getRefundsByAgency,
@@ -34,7 +34,7 @@ const Page = async () => {
     refunds = allRefunds.flat().filter(Boolean);
   }
 
-  const courses = await getAllCourses();
+  const courses = await getCoursesByCountry();
 
   return (
     <>

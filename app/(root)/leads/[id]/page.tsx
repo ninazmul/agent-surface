@@ -1,5 +1,5 @@
 import { getLeadById } from "@/lib/actions/lead.actions";
-import { formatDateTime, getCourseFee, normalizeCourses } from "@/lib/utils";
+import { formatDateTime } from "@/lib/utils";
 import Image from "next/image";
 import { FileText } from "lucide-react";
 import { IServices } from "@/lib/database/models/service.model";
@@ -18,6 +18,20 @@ interface Address {
   state: string;
   city: string;
 }
+
+type LeadCourseSnapshot = {
+  _id: string;
+  name: string;
+  courseType?: string;
+  courseDuration?: string;
+  startDate?: string | Date;
+  endDate?: string | Date;
+  campus?: {
+    name: string;
+    shift: "morning" | "afternoon" | "general" | string;
+  };
+  courseFee?: string | number;
+};
 
 type PageProps = {
   params: Promise<{ id: string }>;
@@ -315,23 +329,37 @@ const leadDetails = async ({ params }: PageProps) => {
           <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-100 mb-4 border-b pb-2">
             Courses
           </h2>
+
           <div className="grid md:grid-cols-2 gap-6 text-sm">
-            {normalizeCourses(lead.course).map((c) => (
+            {(lead.course as LeadCourseSnapshot[]).map((course, index) => (
               <div
-                key={`${c._id}-${c.campus.name}-${c.campus.shift}`}
+                key={`${course._id}-${course.campus?.name}-${course.campus?.shift}-${index}`}
                 className="border rounded p-4 bg-gray-50 dark:bg-gray-800 flex flex-col gap-1 shadow-sm"
               >
-                <p className="font-semibold text-sm">{c.name}</p>
-                <p className="text-xs text-gray-300">
-                  {c.courseType} • {c.courseDuration} • {c.campus.name} (
-                  {c.campus.shift})
+                <p className="font-semibold text-sm">{course.name}</p>
+
+                <p className="text-xs text-gray-600 dark:text-gray-300">
+                  {course.courseType || "General"} •{" "}
+                  {course.courseDuration || "No duration"} •{" "}
+                  {course.campus?.name || "No campus"} (
+                  {course.campus?.shift || "No shift"})
                 </p>
-                <p className="text-xs text-gray-300">
-                  Fee: €{getCourseFee(c).toFixed(2)}
+
+                <p className="text-xs text-gray-600 dark:text-gray-300">
+                  Fee: €{Number(course.courseFee || 0).toFixed(2)}
                 </p>
-                {c.startDate && (
-                  <p className="text-xs text-gray-300">
-                    Start Date: {formatDateTime(c.startDate).dateOnly}
+
+                {course.startDate && (
+                  <p className="text-xs text-gray-600 dark:text-gray-300">
+                    Start Date:{" "}
+                    {formatDateTime(new Date(course.startDate)).dateOnly}
+                  </p>
+                )}
+
+                {course.endDate && (
+                  <p className="text-xs text-gray-600 dark:text-gray-300">
+                    End Date:{" "}
+                    {formatDateTime(new Date(course.endDate)).dateOnly}
                   </p>
                 )}
               </div>
@@ -347,7 +375,7 @@ const leadDetails = async ({ params }: PageProps) => {
             Requested Services
           </h2>
           <div className="grid md:grid-cols-2 gap-6 text-sm">
-            {lead.services.map((c: IServices, i: string) => (
+            {lead.services.map((c: IServices, i: number) => (
               <div
                 key={i}
                 className="border rounded p-4 bg-gray-50 dark:bg-gray-800 flex flex-col gap-2 shadow-sm"

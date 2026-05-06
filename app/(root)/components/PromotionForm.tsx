@@ -2,6 +2,21 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
+import * as z from "zod";
+import { useEffect, useMemo, useState } from "react";
+import { useUploadThing } from "@/lib/uploadthing";
+import { FileUploader } from "@/components/shared/FileUploader";
+import {
+  createPromotion,
+  updatePromotion,
+} from "@/lib/actions/promotion.actions";
+import { promotionDefaultValues } from "@/constants";
+import toast from "react-hot-toast";
+import countries from "world-countries";
+import Select from "react-select";
+import { Types } from "mongoose";
+import { Info } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -12,26 +27,17 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import * as z from "zod";
-import { useEffect, useMemo, useState } from "react";
-import { useUploadThing } from "@/lib/uploadthing";
-import { FileUploader } from "@/components/shared/FileUploader";
-import {
-  createPromotion,
-  updatePromotion,
-} from "@/lib/actions/promotion.actions";
-import { IPromotion } from "@/lib/database/models/promotion.model";
-import { promotionDefaultValues } from "@/constants";
-import toast from "react-hot-toast";
-import countries from "world-countries";
-import Select from "react-select";
-import { ICourse } from "@/lib/database/models/course.model";
-import { IServices } from "@/lib/database/models/service.model";
-import { IProfile } from "@/lib/database/models/profile.model";
 import { getProfileByEmail } from "@/lib/actions/profile.actions";
-import { Types } from "mongoose";
-import { courseKey, normalizeCourses } from "@/lib/utils";
-import { Info } from "lucide-react";
+import { normalizeCourses, type SelectableCourse } from "@/lib/utils";
+
+import type { IPromotion } from "@/lib/database/models/promotion.model";
+import type { ICourseByCountrySafe } from "@/lib/database/models/course.model";
+import type { IServices } from "@/lib/database/models/service.model";
+import type { IProfile } from "@/lib/database/models/profile.model";
+
+type PromotionSelectableCourse = SelectableCourse & {
+  feeCountry: string;
+};
 
 export const promotionFormSchema = z.object({
   title: z.string().min(2, "Title must be at least 2 characters."),
@@ -78,14 +84,30 @@ export const promotionFormSchema = z.object({
   sku: z.string(),
 });
 
+type PromotionFormValues = z.infer<typeof promotionFormSchema>;
+
 type PromotionFormProps = {
   type: "Create" | "Update";
   promotion?: IPromotion;
   promotionId?: string;
-  courses?: ICourse[];
+  courses?: ICourseByCountrySafe[];
   services?: IServices[];
   agencies: IProfile[];
   onSuccess?: () => void;
+};
+
+type CourseKeyLike = {
+  _id: string;
+  campus: {
+    name: string;
+    shift: "morning" | "afternoon" | "general";
+  };
+  courseFee?: string;
+  feeCountry?: string;
+};
+
+const promotionCourseKey = (course: CourseKeyLike) => {
+  return `${course._id}-${course.campus.name}-${course.campus.shift}-${course.courseFee || "0"}-${course.feeCountry || ""}`;
 };
 
 const PromotionForm = ({
@@ -99,98 +121,163 @@ const PromotionForm = ({
 }: PromotionFormProps) => {
   const [photo, setPhoto] = useState<File[]>([]);
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
-
-  const countryOptions = countries
-    .map((country) => ({
-      value: country.name.common,
-      label: `${country.flag} ${country.name.common}`,
-    }))
-    .sort((a, b) => a.label.localeCompare(b.label)); // Optional: alphabetically sort
-
-  const agencyOptions = agencies.map((agency) => ({
-    value: agency.email,
-    label: agency.name,
-  }));
-
-  const selectableCourses = useMemo(
-    () => (courses ? normalizeCourses(courses) : []),
-    [courses],
-  );
-
-  const initialValues =
-    promotion && type === "Update"
-      ? {
-          ...promotion,
-          course:
-            promotion?.course?.map((c) => ({
-              _id: c._id?.toString() ?? "",
-              name: c.name ?? "",
-              courseType: c.courseType,
-              courseDuration: c.courseDuration,
-              startDate: c.startDate ? new Date(c.startDate) : undefined,
-              endDate: c.endDate ? new Date(c.endDate) : undefined,
-              campus: c.campus
-                ? {
-                    name: c.campus.name ?? "",
-                    shift: (c.campus.shift === "morning" ||
-                    c.campus.shift === "afternoon" ||
-                    c.campus.shift === "general"
-                      ? c.campus.shift
-                      : "morning") as "morning" | "afternoon" | "general",
-                  }
-                : { name: "Unknown", shift: "morning" as const },
-              courseFee: c.courseFee ?? "0",
-            })) || [],
-
-          services:
-            promotion?.services?.map((s) => ({
-              _id: s._id.toString(),
-              title: s.title,
-              serviceType: s.serviceType,
-              amount: s.amount || "0",
-              description: s.description,
-            })) || [],
-          startDate: new Date(promotion.startDate),
-          endDate: new Date(promotion.endDate),
-          commissionPercent: promotion?.commissionPercent,
-          commissionAmount: promotion?.commissionAmount,
-          sku: promotion.sku || "",
-          countries: promotion.countries || [],
-          agencies: promotion.agencies || [],
-        }
-      : promotionDefaultValues;
-
   const { startUpload } = useUploadThing("mediaUploader");
 
-  const form = useForm<z.infer<typeof promotionFormSchema>>({
+  const countryOptions = useMemo(
+    () =>
+      countries
+        .map((country) => ({
+          value: country.name.common,
+          label: `${country.flag} ${country.name.common}`,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [],
+  );
+
+  const agencyOptions = useMemo(
+    () =>
+      agencies.map((agency) => ({
+        value: agency.email,
+        label: agency.name || agency.email,
+      })),
+    [agencies],
+  );
+
+  const initialValues: PromotionFormValues =
+    promotion && type === "Update"
+      ? {
+          title: promotion.title || "",
+          description: promotion.description || "",
+          criteria: promotion.criteria || "",
+          startDate: new Date(promotion.startDate),
+          endDate: new Date(promotion.endDate),
+          photo: promotion.photo || "",
+          agencies: promotion.agencies || [],
+          countries: promotion.countries || [],
+          course:
+            promotion.course?.map((course) => ({
+              _id: course._id?.toString() ?? "",
+              name: course.name ?? "",
+              courseType: course.courseType,
+              courseDuration: course.courseDuration,
+              startDate: course.startDate
+                ? new Date(course.startDate)
+                : undefined,
+              endDate: course.endDate ? new Date(course.endDate) : undefined,
+              campus: {
+                name: course.campus?.name ?? "Unknown",
+                shift:
+                  course.campus?.shift === "morning" ||
+                  course.campus?.shift === "afternoon" ||
+                  course.campus?.shift === "general"
+                    ? course.campus.shift
+                    : "morning",
+              },
+              courseFee: course.courseFee ?? "0",
+            })) || [],
+          services:
+            promotion.services?.map((service) => ({
+              _id: service._id.toString(),
+              title: service.title,
+              serviceType: service.serviceType,
+              amount: service.amount || "0",
+              description: service.description,
+            })) || [],
+          discount: promotion.discount || "",
+          commissionPercent: promotion.commissionPercent || "",
+          commissionAmount: promotion.commissionAmount || "",
+          sku: promotion.sku || "",
+        }
+      : {
+          title: promotionDefaultValues.title || "",
+          description: promotionDefaultValues.description || "",
+          criteria: promotionDefaultValues.criteria || "",
+          startDate: promotionDefaultValues.startDate
+            ? new Date(promotionDefaultValues.startDate)
+            : new Date(),
+          endDate: promotionDefaultValues.endDate
+            ? new Date(promotionDefaultValues.endDate)
+            : new Date(),
+          photo: promotionDefaultValues.photo || "",
+          agencies: [],
+          countries: [],
+          course: [],
+          services: [],
+          discount: "",
+          commissionPercent: "",
+          commissionAmount: "",
+          sku: "",
+        };
+
+  const form = useForm<PromotionFormValues>({
     resolver: zodResolver(promotionFormSchema),
     defaultValues: initialValues,
   });
+
+  const watchedCountries = useWatch({
+    control: form.control,
+    name: "countries",
+  });
+
+  const selectedCountries = useMemo(
+    () => watchedCountries ?? [],
+    [watchedCountries],
+  );
+
+  const selectedCourses =
+    useWatch({
+      control: form.control,
+      name: "course",
+    }) ?? [];
+
+  const selectedServices =
+    useWatch({
+      control: form.control,
+      name: "services",
+    }) ?? [];
+
+  const selectableCourses = useMemo<PromotionSelectableCourse[]>(() => {
+    if (!courses || selectedCountries.length === 0) return [];
+
+    return selectedCountries.flatMap((country) =>
+      normalizeCourses(courses, country).map((course) => ({
+        ...course,
+        feeCountry: country,
+      })),
+    );
+  }, [courses, selectedCountries]);
 
   const commissionPercent = form.watch("commissionPercent");
   const commissionAmount = form.watch("commissionAmount");
 
   useEffect(() => {
-    if (commissionPercent) {
-      form.setValue("commissionAmount", "");
-    }
-    if (commissionAmount) {
-      form.setValue("commissionPercent", "");
-    }
+    if (commissionPercent) form.setValue("commissionAmount", "");
+    if (commissionAmount) form.setValue("commissionPercent", "");
   }, [commissionPercent, commissionAmount, form]);
 
-  async function onSubmit(values: z.infer<typeof promotionFormSchema>) {
+  const selectedCountriesKey = useMemo(
+    () => selectedCountries.join("|"),
+    [selectedCountries],
+  );
+
+  useEffect(() => {
+    form.setValue("course", [], {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }, [form, selectedCountriesKey]);
+
+  async function onSubmit(values: PromotionFormValues) {
     let uploadedPhotoUrl = values.photo;
 
     if (photo.length > 0) {
       const uploaded = await startUpload(photo);
-      if (uploaded && uploaded.length > 0) {
-        uploadedPhotoUrl = uploaded[0].url;
-      }
+      uploadedPhotoUrl = uploaded?.[0]?.url || uploadedPhotoUrl;
     }
 
     async function notifyAgencies(emails: string[], promotionTitle: string) {
-      if (!emails || emails.length === 0) return;
+      if (emails.length === 0) return;
+
       try {
         await fetch("/api/send-promotion-email", {
           method: "POST",
@@ -202,8 +289,8 @@ const PromotionForm = ({
           }),
         });
         toast.success("Agencies notified via email!");
-      } catch (err) {
-        console.error("Failed to notify agencies", err);
+      } catch (error) {
+        console.error("Failed to notify agencies", error);
         toast.error("Failed to send emails to agencies.");
       }
     }
@@ -212,7 +299,7 @@ const PromotionForm = ({
       emails: string[],
       promotionTitle: string,
     ) {
-      if (!emails || emails.length === 0) return;
+      if (emails.length === 0) return;
 
       try {
         const numbers = await Promise.all(
@@ -223,7 +310,6 @@ const PromotionForm = ({
         );
 
         const validNumbers = numbers.filter(Boolean);
-
         if (validNumbers.length === 0) return;
 
         await fetch("/api/send-whatsapp", {
@@ -232,42 +318,46 @@ const PromotionForm = ({
           body: JSON.stringify({
             recipients: validNumbers,
             promotionTitle,
-            promotionLink: `/promotions`,
+            promotionLink: "/promotions",
           }),
         });
 
         toast.success("Agencies notified via WhatsApp!");
-      } catch (err) {
-        console.error("Failed to notify agencies via WhatsApp", err);
+      } catch (error) {
+        console.error("Failed to notify agencies via WhatsApp", error);
         toast.error("Failed to send WhatsApp messages to agencies.");
       }
     }
 
     try {
+      const payload = {
+        ...values,
+        photo: uploadedPhotoUrl || "",
+        course: values.course?.map((course) => ({
+          _id: course._id,
+          name: course.name,
+          courseType: course.courseType,
+          courseDuration: course.courseDuration,
+          startDate: course.startDate,
+          endDate: course.endDate,
+          campus: course.campus,
+          courseFee: course.courseFee,
+        })),
+        services: values.services?.map((service) => ({
+          ...service,
+          _id: new Types.ObjectId(service._id),
+        })),
+      };
+
       if (type === "Create") {
         const newPromotion = await createPromotion({
-          ...values,
-          photo: uploadedPhotoUrl || "",
-          course: values.course?.map((c) => ({
-            _id: c._id,
-            name: c.name,
-            courseType: c.courseType,
-            courseDuration: c.courseDuration,
-            startDate: c.startDate,
-            endDate: c.endDate,
-            campus: c.campus,
-            courseFee: c.courseFee,
-          })),
-          services: values.services?.map((s) => ({
-            ...s,
-            _id: new Types.ObjectId(s._id),
-          })),
+          ...payload,
           createdAt: new Date(),
         });
+
         if (newPromotion) {
           form.reset();
           toast.success("Promotion created successfully!");
-          // Notify all agencies on creation
           await notifyAgencies(values.agencies || [], newPromotion.title);
           await notifyAgenciesViaWhatsApp(
             values.agencies || [],
@@ -275,37 +365,23 @@ const PromotionForm = ({
           );
           onSuccess?.();
         }
-      } else if (type === "Update" && promotionId && promotion) {
-        const updatedPromotion = await updatePromotion(promotionId, {
-          ...values,
-          photo: uploadedPhotoUrl || "",
-          course: values.course?.map((c) => ({
-            _id: c._id,
-            name: c.name,
-            courseType: c.courseType,
-            courseDuration: c.courseDuration,
-            startDate: c.startDate,
-            endDate: c.endDate,
-            campus: c.campus,
-            courseFee: c.courseFee,
-          })),
-          services: values.services?.map((s) => ({
-            ...s,
-            _id: new Types.ObjectId(s._id),
-          })),
-        });
+
+        return;
+      }
+
+      if (type === "Update" && promotionId && promotion) {
+        const updatedPromotion = await updatePromotion(promotionId, payload);
+
         if (updatedPromotion) {
           form.reset();
           toast.success("Promotion updated successfully!");
 
-          // Compute newly added agencies
           const previousAgencies = promotion.agencies || [];
           const updatedAgencies = values.agencies || [];
           const newAgencies = updatedAgencies.filter(
             (email) => !previousAgencies.includes(email),
           );
 
-          // Notify only newly added agencies
           await notifyAgencies(newAgencies, updatedPromotion.title);
           await notifyAgenciesViaWhatsApp(newAgencies, updatedPromotion.title);
           onSuccess?.();
@@ -317,88 +393,37 @@ const PromotionForm = ({
     }
   }
 
-  const selectedCourses =
-    useWatch({
-      control: form.control,
-      name: "course",
-    }) ?? [];
-
   return (
     <div className="w-full min-w-0 overflow-x-hidden">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="
-        w-full
-        min-w-0
-        rounded-2xl
-        bg-white dark:bg-gray-800
-        p-4 sm:p-6
-        shadow-sm
-        space-y-4
-      "
+          className="w-full min-w-0 rounded-2xl bg-white dark:bg-gray-800 p-4 sm:p-6 shadow-sm space-y-4"
         >
           <h2 className="text-xl font-semibold">Promotion Information</h2>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Title */}
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter promotion title"
-                      {...field}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {(["title", "description", "criteria", "sku"] as const).map(
+              (name) => (
+                <FormField
+                  key={name}
+                  control={form.control}
+                  name={name}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {name.charAt(0).toUpperCase() + name.slice(1)}
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder={`Enter ${name}`} {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ),
+            )}
 
-            {/* Description */}
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter description"
-                      {...field}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Criteria */}
-            <FormField
-              control={form.control}
-              name="criteria"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Criteria</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter eligibility criteria"
-                      {...field}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Start Date */}
             <FormField
               control={form.control}
               name="startDate"
@@ -410,17 +435,17 @@ const PromotionForm = ({
                       type="date"
                       value={
                         field.value instanceof Date &&
-                        !isNaN(field.value.getTime())
+                        !Number.isNaN(field.value.getTime())
                           ? field.value.toISOString().split("T")[0]
                           : ""
                       }
-                      onChange={(e) => {
-                        const dateValue = e.target.value
-                          ? new Date(e.target.value)
-                          : undefined;
-                        field.onChange(dateValue);
-                      }}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      onChange={(event) =>
+                        field.onChange(
+                          event.target.value
+                            ? new Date(event.target.value)
+                            : undefined,
+                        )
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -428,7 +453,6 @@ const PromotionForm = ({
               )}
             />
 
-            {/* End Date */}
             <FormField
               control={form.control}
               name="endDate"
@@ -440,17 +464,17 @@ const PromotionForm = ({
                       type="date"
                       value={
                         field.value instanceof Date &&
-                        !isNaN(field.value.getTime())
+                        !Number.isNaN(field.value.getTime())
                           ? field.value.toISOString().split("T")[0]
                           : ""
                       }
-                      onChange={(e) => {
-                        const dateValue = e.target.value
-                          ? new Date(e.target.value)
-                          : undefined;
-                        field.onChange(dateValue);
-                      }}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
+                      onChange={(event) =>
+                        field.onChange(
+                          event.target.value
+                            ? new Date(event.target.value)
+                            : undefined,
+                        )
+                      }
                     />
                   </FormControl>
                   <FormMessage />
@@ -458,26 +482,6 @@ const PromotionForm = ({
               )}
             />
 
-            {/* SKU */}
-            <FormField
-              control={form.control}
-              name="sku"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>SKU</FormLabel>
-                  <FormControl>
-                    <Input
-                      placeholder="Enter SKU"
-                      {...field}
-                      className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            {/* Countries */}
             <FormField
               control={form.control}
               name="countries"
@@ -492,14 +496,15 @@ const PromotionForm = ({
                         <Select
                           isMulti
                           options={countryOptions}
-                          value={countryOptions.filter((opt) =>
-                            field.value?.includes(opt.value),
+                          value={countryOptions.filter((option) =>
+                            field.value?.includes(option.value),
                           )}
                           onChange={(selected) =>
-                            field.onChange(selected.map((opt) => opt.value))
+                            field.onChange(
+                              selected.map((option) => option.value),
+                            )
                           }
                           placeholder="Select countries..."
-                          className="react-select-container"
                           classNamePrefix="react-select"
                         />
                       )}
@@ -510,7 +515,6 @@ const PromotionForm = ({
               )}
             />
 
-            {/* Agencies */}
             <FormField
               control={form.control}
               name="agencies"
@@ -525,14 +529,15 @@ const PromotionForm = ({
                         <Select
                           isMulti
                           options={agencyOptions}
-                          value={agencyOptions.filter((opt) =>
-                            field.value?.includes(opt.value),
+                          value={agencyOptions.filter((option) =>
+                            field.value?.includes(option.value),
                           )}
                           onChange={(selected) =>
-                            field.onChange(selected.map((opt) => opt.value))
+                            field.onChange(
+                              selected.map((option) => option.value),
+                            )
                           }
                           placeholder="Select agencies..."
-                          className="react-select-container"
                           classNamePrefix="react-select"
                         />
                       )}
@@ -543,13 +548,12 @@ const PromotionForm = ({
               )}
             />
 
-            {/* Photo */}
             <FormField
               control={form.control}
               name="photo"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Upload Banner (Optional)</FormLabel>
+                  <FormLabel>Upload Banner Optional</FormLabel>
                   <FormControl className="h-72">
                     <FileUploader
                       onFieldChange={field.onChange}
@@ -563,161 +567,177 @@ const PromotionForm = ({
             />
           </div>
 
-          {/* ✅ Courses & Services */}
           <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm space-y-6">
             <h3 className="text-xl font-semibold">Courses & Services</h3>
 
-            {/* Courses */}
             <div>
               <h4 className="font-semibold mb-2">Courses</h4>
-              <div className="flex gap-4 overflow-x-auto pb-2">
-                {selectableCourses.map((course) => {
-                  const isSelected = selectedCourses.some(
-                    (c) =>
-                      c._id === course._id &&
-                      c.campus.name === course.campus.name &&
-                      c.campus.shift === course.campus.shift,
-                  );
 
-                  const key = `course-${courseKey(course)}`;
-                  const isExpanded = expandedItem === key;
+              {selectedCountries.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  Select at least one country first to show country-based course
+                  fees.
+                </p>
+              ) : selectableCourses.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  No courses available for the selected countries.
+                </p>
+              ) : (
+                <div className="flex gap-4 overflow-x-auto pb-2">
+                  {selectableCourses.map((course) => {
+                    const isSelected = selectedCourses.some(
+                      (selectedCourse) =>
+                        promotionCourseKey({
+                          ...selectedCourse,
+                          feeCountry: course.feeCountry,
+                        }) === promotionCourseKey(course),
+                    );
 
-                  return (
-                    <div
-                      key={courseKey(course)}
-                      className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm
-                      w-[260px] transition-all duration-200 bg-white dark:bg-gray-900
-                      ${
-                        isSelected
-                          ? "border-blue-600 dark:border-blue-500"
-                          : "border-gray-200 dark:border-gray-700"
-                      }`}
-                    >
-                      {/* Top Row */}
-                      <div className="flex items-start justify-between">
-                        <h4 className="font-semibold text-base leading-tight">
-                          {course.name}
-                        </h4>
+                    const key = `course-${promotionCourseKey(course)}`;
+                    const isExpanded = expandedItem === key;
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setExpandedItem(isExpanded ? null : key)
-                          }
-                          className="text-gray-500 hover:text-blue-600 transition"
-                        >
-                          <Info size={16} />
-                        </button>
-                      </div>
-
-                      {/* Primary Info (Decision Data Only) */}
-                      <div className="mt-2 space-y-1 text-sm text-gray-600">
-                        <p>
-                          {course.campus.name} • {course.campus.shift}
-                        </p>
-                      </div>
-
-                      <p className="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
-                        €{course.courseFee}
-                      </p>
-
-                      {/* Expandable Details */}
-                      {isExpanded && (
-                        <div className="mt-3 pt-3 border-t text-xs text-gray-500 space-y-2">
-                          <p>Type: {course.courseType || "Not specified"}</p>
-
-                          <p>
-                            Duration: {course.courseDuration || "Not specified"}
-                          </p>
-
-                          <p>
-                            Start:{" "}
-                            {course.startDate
-                              ? new Date(course.startDate).toLocaleDateString()
-                              : "Not scheduled"}
-                          </p>
-
-                          <p>
-                            End:{" "}
-                            {course.endDate
-                              ? new Date(course.endDate).toLocaleDateString()
-                              : "Not scheduled"}
-                          </p>
-
-                          {course.description && (
-                            <div className="pt-2 text-gray-600 leading-relaxed text-justify">
-                              {course.description}
-                            </div>
-                          )}
-                        </div>
-                      )}
-
-                      {/* Select Button */}
-                      <Button
-                        type="button"
-                        variant={isSelected ? "default" : "outline"}
-                        size="sm"
-                        onClick={() => {
-                          const current = form.getValues("course") || [];
-
-                          if (isSelected) {
-                            form.setValue(
-                              "course",
-                              current.filter(
-                                (c) =>
-                                  !(
-                                    c._id === course._id &&
-                                    c.campus.name === course.campus.name &&
-                                    c.campus.shift === course.campus.shift
-                                  ),
-                              ),
-                            );
-                          } else {
-                            if (course._id) {
-                              const snapshot = {
-                                _id: course._id,
-                                name: course.name,
-                                courseDuration: course.courseDuration,
-                                courseType: course.courseType || "General",
-                                startDate: course.startDate
-                                  ? new Date(course.startDate)
-                                  : undefined,
-                                endDate: course.endDate
-                                  ? new Date(course.endDate)
-                                  : undefined,
-                                campus: {
-                                  name: course.campus.name,
-                                  shift: course.campus.shift,
-                                },
-                                courseFee: course.courseFee,
-                              };
-
-                              form.setValue("course", [...current, snapshot]);
-                            }
-                          }
-                        }}
-                        className={`w-full mt-4 ${
+                    return (
+                      <div
+                        key={promotionCourseKey(course)}
+                        className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm w-[260px] bg-white dark:bg-gray-900 ${
                           isSelected
-                            ? "bg-blue-600 text-white hover:bg-blue-700"
-                            : ""
+                            ? "border-blue-600 dark:border-blue-500"
+                            : "border-gray-200 dark:border-gray-700"
                         }`}
                       >
-                        {isSelected ? "Selected ✅" : "Select Course"}
-                      </Button>
-                    </div>
-                  );
-                })}
-              </div>
+                        <div className="flex items-start justify-between">
+                          <h4 className="font-semibold text-base leading-tight">
+                            {course.name}
+                          </h4>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setExpandedItem(isExpanded ? null : key)
+                            }
+                            className="text-gray-500 hover:text-blue-600 transition"
+                          >
+                            <Info size={16} />
+                          </button>
+                        </div>
+
+                        <div className="mt-2 space-y-1 text-sm text-gray-600">
+                          <p>
+                            {course.campus.name} - {course.campus.shift}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Fee country: {course.feeCountry}
+                          </p>
+                        </div>
+
+                        <p className="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
+                          €{course.courseFee}
+                        </p>
+
+                        {isExpanded && (
+                          <div className="mt-3 pt-3 border-t text-xs text-gray-500 space-y-2">
+                            <p>Type: {course.courseType || "Not specified"}</p>
+                            <p>
+                              Duration:{" "}
+                              {course.courseDuration || "Not specified"}
+                            </p>
+                            <p>
+                              Start:{" "}
+                              {course.startDate
+                                ? new Date(
+                                    course.startDate,
+                                  ).toLocaleDateString()
+                                : "Not scheduled"}
+                            </p>
+                            <p>
+                              End:{" "}
+                              {course.endDate
+                                ? new Date(course.endDate).toLocaleDateString()
+                                : "Not scheduled"}
+                            </p>
+                            {course.description && (
+                              <div className="pt-2 text-gray-600 leading-relaxed text-justify">
+                                {course.description}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        <Button
+                          type="button"
+                          variant={isSelected ? "default" : "outline"}
+                          size="sm"
+                          onClick={() => {
+                            const current = form.getValues("course") || [];
+
+                            if (isSelected) {
+                              form.setValue(
+                                "course",
+                                current.filter(
+                                  (selectedCourse) =>
+                                    !(
+                                      selectedCourse._id === course._id &&
+                                      selectedCourse.campus.name ===
+                                        course.campus.name &&
+                                      selectedCourse.campus.shift ===
+                                        course.campus.shift &&
+                                      selectedCourse.courseFee ===
+                                        course.courseFee
+                                    ),
+                                ),
+                                { shouldDirty: true, shouldValidate: true },
+                              );
+                              return;
+                            }
+
+                            form.setValue(
+                              "course",
+                              [
+                                ...current,
+                                {
+                                  _id: course._id,
+                                  name: course.name,
+                                  courseDuration: course.courseDuration,
+                                  courseType: course.courseType || "General",
+                                  startDate: course.startDate
+                                    ? new Date(course.startDate)
+                                    : undefined,
+                                  endDate: course.endDate
+                                    ? new Date(course.endDate)
+                                    : undefined,
+                                  campus: {
+                                    name: course.campus.name,
+                                    shift: course.campus.shift,
+                                  },
+                                  courseFee: course.courseFee,
+                                },
+                              ],
+                              { shouldDirty: true, shouldValidate: true },
+                            );
+                          }}
+                          className={`w-full mt-4 ${
+                            isSelected
+                              ? "bg-blue-600 text-white hover:bg-blue-700"
+                              : ""
+                          }`}
+                        >
+                          {isSelected ? "Selected" : "Select Course"}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
-            {/* Services */}
             <div>
               <h4 className="font-semibold mb-2">Services</h4>
               <div className="flex gap-4 overflow-x-auto pb-2">
                 {services?.map((service) => {
-                  const isSelected = form
-                    .watch("services")
-                    ?.some((s) => s._id.toString() === service._id.toString());
+                  const isSelected = selectedServices.some(
+                    (selectedService) =>
+                      selectedService._id.toString() === service._id.toString(),
+                  );
 
                   const key = `service-${service._id}`;
                   const isExpanded = expandedItem === key;
@@ -725,15 +745,12 @@ const PromotionForm = ({
                   return (
                     <div
                       key={service._id.toString()}
-                      className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm
-                      w-[260px] transition-all duration-200 bg-white dark:bg-gray-900
-                      ${
+                      className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm w-[260px] bg-white dark:bg-gray-900 ${
                         isSelected
                           ? "border-blue-600 dark:border-blue-500"
                           : "border-gray-200 dark:border-gray-700"
                       }`}
                     >
-                      {/* Top Row */}
                       <div className="flex items-start justify-between">
                         <h4 className="font-semibold text-base leading-tight">
                           {service.title}
@@ -750,7 +767,6 @@ const PromotionForm = ({
                         </button>
                       </div>
 
-                      {/* Primary Info (Decision Data Only) */}
                       <div className="mt-2 text-sm text-gray-600">
                         <p>{service.serviceType}</p>
                       </div>
@@ -759,14 +775,12 @@ const PromotionForm = ({
                         €{service.amount}
                       </p>
 
-                      {/* Expandable Details */}
-                      {isExpanded && (
-                        <div className="mt-3 pt-3 border-t text-xs text-gray-500 space-y-1">
-                          {service.description && <p>{service.description}</p>}
+                      {isExpanded && service.description && (
+                        <div className="mt-3 pt-3 border-t text-xs text-gray-500">
+                          <p>{service.description}</p>
                         </div>
                       )}
 
-                      {/* Select Button */}
                       <Button
                         type="button"
                         variant={isSelected ? "default" : "outline"}
@@ -778,12 +792,18 @@ const PromotionForm = ({
                             form.setValue(
                               "services",
                               current.filter(
-                                (s) =>
-                                  s._id.toString() !== service._id.toString(),
+                                (selectedService) =>
+                                  selectedService._id.toString() !==
+                                  service._id.toString(),
                               ),
+                              { shouldDirty: true, shouldValidate: true },
                             );
-                          } else {
-                            form.setValue("services", [
+                            return;
+                          }
+
+                          form.setValue(
+                            "services",
+                            [
                               ...current,
                               {
                                 _id: service._id.toString(),
@@ -792,8 +812,9 @@ const PromotionForm = ({
                                 amount: service.amount || "",
                                 description: service.description || "",
                               },
-                            ]);
-                          }
+                            ],
+                            { shouldDirty: true, shouldValidate: true },
+                          );
                         }}
                         className={`w-full mt-4 ${
                           isSelected
@@ -801,7 +822,7 @@ const PromotionForm = ({
                             : ""
                         }`}
                       >
-                        {isSelected ? "Selected ✅" : "Select Service"}
+                        {isSelected ? "Selected" : "Select Service"}
                       </Button>
                     </div>
                   );
@@ -810,7 +831,6 @@ const PromotionForm = ({
             </div>
           </section>
 
-          {/* Discount */}
           <FormField
             control={form.control}
             name="discount"
@@ -818,11 +838,7 @@ const PromotionForm = ({
               <FormItem>
                 <FormLabel>Fixed Discount</FormLabel>
                 <FormControl>
-                  <Input
-                    placeholder="Enter fixed discount"
-                    {...field}
-                    className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
-                  />
+                  <Input placeholder="Enter fixed discount" {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -830,7 +846,6 @@ const PromotionForm = ({
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* CommissionPercent */}
             <FormField
               control={form.control}
               name="commissionPercent"
@@ -842,7 +857,6 @@ const PromotionForm = ({
                       placeholder="Enter commission percent"
                       {...field}
                       disabled={!!commissionAmount}
-                      className="w-full rounded-md border px-3 py-2 text-sm"
                     />
                   </FormControl>
                   <FormMessage />
@@ -850,7 +864,6 @@ const PromotionForm = ({
               )}
             />
 
-            {/* CommissionAmount */}
             <FormField
               control={form.control}
               name="commissionAmount"
@@ -862,7 +875,6 @@ const PromotionForm = ({
                       placeholder="Enter commission amount"
                       {...field}
                       disabled={!!commissionPercent}
-                      className="w-full rounded-md border px-3 py-2 text-sm"
                     />
                   </FormControl>
                   <FormMessage />
@@ -871,13 +883,12 @@ const PromotionForm = ({
             />
           </div>
 
-          {/* Submit Button */}
           <div className="pt-4">
             <Button
               type="submit"
               size="lg"
               disabled={form.formState.isSubmitting}
-              className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+              className="w-full rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
             >
               {form.formState.isSubmitting
                 ? "Submitting..."

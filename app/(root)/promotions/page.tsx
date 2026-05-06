@@ -3,7 +3,7 @@ import PromotionListClient from "../components/PromotionListClient";
 import AddPromotionDialog from "@/components/shared/AddPromotionDialog";
 import { getAllPromotions } from "@/lib/actions/promotion.actions";
 import { getAllProfiles } from "@/lib/actions/profile.actions";
-import { getAllCourses } from "@/lib/actions/course.actions";
+import { getCoursesByCountry } from "@/lib/actions/course.actions";
 import { getAllServices } from "@/lib/actions/service.actions";
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import { PromotionParams } from "@/types";
@@ -61,7 +61,7 @@ const Page = async () => {
     },
   );
 
-  const courses = await getAllCourses();
+  const courses = await getCoursesByCountry();
   const services = await getAllServices();
 
   return (

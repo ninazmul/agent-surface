@@ -1,4 +1,4 @@
-import { getAllCourses } from "@/lib/actions/course.actions";
+import { getCoursesByCountry } from "@/lib/actions/course.actions";
 import {
   getAllProfiles,
   getProfileByEmail,
@@ -23,18 +23,24 @@ const UpdatePage = async ({ params }: PageProps) => {
   const lead = await getLeadById(id);
   if (!lead) redirect("/applications");
 
-  const courses = await getAllCourses();
-  const services = await getAllServices();
-
   const adminStatus = await isAdmin(email);
 
   let agency = [];
+  let agencyCountry: string | undefined;
+
   if (adminStatus) {
     agency = await getAllProfiles();
   } else {
     const myAgency = await getProfileByEmail(email);
-    if (myAgency) agency = [myAgency];
+
+    if (myAgency) {
+      agency = [myAgency];
+      agencyCountry = myAgency.country;
+    }
   }
+
+  const courses = await getCoursesByCountry(agencyCountry);
+  const services = await getAllServices();
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
@@ -44,6 +50,7 @@ const UpdatePage = async ({ params }: PageProps) => {
         Lead={lead}
         LeadId={id}
         agency={agency}
+        country={agencyCountry}
         courses={courses}
         services={services}
         isAdmin={adminStatus}

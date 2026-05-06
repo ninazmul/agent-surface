@@ -4,7 +4,7 @@ import {
 } from "@/lib/actions/profile.actions";
 import { redirect } from "next/navigation";
 import { getLeadById } from "@/lib/actions/lead.actions";
-import { getAllCourses } from "@/lib/actions/course.actions";
+import { getCoursesByCountry } from "@/lib/actions/course.actions";
 import { auth } from "@clerk/nextjs/server";
 import { getUserEmailById } from "@/lib/actions/user.actions";
 import { isAdmin } from "@/lib/actions/admin.actions";
@@ -31,7 +31,7 @@ const UpdatePage = async ({ params }: PageProps) => {
   const lead = await getLeadById(id);
   if (!lead) redirect("/leads");
 
-  const courses = await getAllCourses();
+  const courses = await getCoursesByCountry();
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">

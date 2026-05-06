@@ -3,13 +3,13 @@
 import { IPromotion } from "@/lib/database/models/promotion.model";
 import PromotionCard from "./PromotionCard";
 import { IProfile } from "@/lib/database/models/profile.model";
-import { ICourse } from "@/lib/database/models/course.model";
+import { ICourseByCountrySafe } from "@/lib/database/models/course.model";
 import { IServices } from "@/lib/database/models/service.model";
 
 type Props = {
   email: string;
   agencies: IProfile[];
-  courses: ICourse[];
+  courses: ICourseByCountrySafe[];
   services: IServices[];
   promotions: IPromotion[];
   agency: IProfile;

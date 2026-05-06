@@ -2,6 +2,19 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm, useWatch } from "react-hook-form";
+import * as z from "zod";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import Select from "react-select";
+import { Types } from "mongoose";
+import { Info } from "lucide-react";
+import toast from "react-hot-toast";
+
+import {
+  createQuotation,
+  updateQuotation,
+} from "@/lib/actions/quotation.actions";
+import { createNotification } from "@/lib/actions/notification.actions";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -11,27 +24,15 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import * as z from "zod";
-import { useEffect, useMemo, useState } from "react";
-import {
-  createQuotation,
-  updateQuotation,
-} from "@/lib/actions/quotation.actions";
-import { IQuotation } from "@/lib/database/models/quotation.model";
-import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
-import { IProfile } from "@/lib/database/models/profile.model";
-import { ILead } from "@/lib/database/models/lead.model";
-import { IServices } from "@/lib/database/models/service.model";
-import { ICourse } from "@/lib/database/models/course.model";
-import { createNotification } from "@/lib/actions/notification.actions";
 import { Input } from "@/components/ui/input";
-import Select from "react-select";
-import { Types } from "mongoose";
-import { courseKey, normalizeCourses } from "@/lib/utils";
-import { Info } from "lucide-react";
 
-// ✅ Schema
+import type { IQuotation } from "@/lib/database/models/quotation.model";
+import type { IProfile } from "@/lib/database/models/profile.model";
+import type { ILead } from "@/lib/database/models/lead.model";
+import type { IServices } from "@/lib/database/models/service.model";
+import type { ICourseByCountrySafe } from "@/lib/database/models/course.model";
+import { courseKey, normalizeCourses } from "@/lib/utils";
+
 export const additionalQuotationFormSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters."),
   email: z.string().email("Invalid email address."),
@@ -83,6 +84,10 @@ export const additionalQuotationFormSchema = z.object({
   isAdditional: z.boolean().optional(),
 });
 
+type AdditionalQuotationFormValues = z.infer<
+  typeof additionalQuotationFormSchema
+>;
+
 type AdditionalQuotationFormProps = {
   type: "Create" | "Update";
   quotation?: IQuotation;
@@ -90,7 +95,7 @@ type AdditionalQuotationFormProps = {
   agency?: IProfile[];
   leads?: ILead[];
   services?: IServices[];
-  courses?: ICourse[];
+  courses?: ICourseByCountrySafe[];
   isAdmin?: boolean;
   email: string;
 };
@@ -108,12 +113,7 @@ const AdditionalQuotationForm = ({
   const router = useRouter();
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
-  const selectableCourses = useMemo(
-    () => (courses ? normalizeCourses(courses) : []),
-    [courses],
-  );
-
-  const form = useForm<z.infer<typeof additionalQuotationFormSchema>>({
+  const form = useForm<AdditionalQuotationFormValues>({
     resolver: zodResolver(additionalQuotationFormSchema),
     defaultValues: {
       name: quotation?.name || "",
@@ -132,129 +132,38 @@ const AdditionalQuotationForm = ({
         city: "",
       },
       course:
-        quotation?.course?.map((c) => ({
-          _id: c._id.toString(),
-          name: c.name,
-          courseType: c.courseType,
-          courseDuration: c.courseDuration,
-          startDate: c.startDate ? new Date(c.startDate) : undefined,
-          endDate: c.endDate ? new Date(c.endDate) : undefined,
+        quotation?.course?.map((course) => ({
+          _id: course._id.toString(),
+          name: course.name,
+          courseType: course.courseType,
+          courseDuration: course.courseDuration,
+          startDate: course.startDate ? new Date(course.startDate) : undefined,
+          endDate: course.endDate ? new Date(course.endDate) : undefined,
           campus: {
-            name: c.campus!.name,
-            shift: c.campus!.shift as "morning" | "afternoon" | "general",
+            name: course.campus?.name || "",
+            shift: course.campus?.shift as "morning" | "afternoon" | "general",
           },
-          courseFee: c.courseFee,
+          courseFee: course.courseFee,
         })) || [],
       services:
-        quotation?.services?.map((s) => ({
-          _id: s._id.toString(),
-          title: s.title,
-          serviceType: s.serviceType,
-          amount: s.amount || "0",
-          description: s.description,
+        quotation?.services?.map((service) => ({
+          _id: service._id.toString(),
+          title: service.title,
+          serviceType: service.serviceType,
+          amount: service.amount || "0",
+          description: service.description,
         })) || [],
-      author: isAdmin ? "" : email || "",
+      author: quotation?.author || (isAdmin ? "" : email || ""),
       date: quotation?.date ? new Date(quotation.date) : new Date(),
       isPinned: quotation?.isPinned || false,
-      isAdditional: quotation?.isAdditional || true,
+      isAdditional: quotation?.isAdditional ?? true,
     },
   });
 
-  async function onSubmit(
-    values: z.infer<typeof additionalQuotationFormSchema>,
-  ) {
-    try {
-      if (type === "Create") {
-        const newQuotation = await createQuotation({
-          ...values,
-          dateOfBirth: quotation?.dateOfBirth
-            ? new Date(quotation.dateOfBirth)
-            : new Date(),
-          course: values.course?.map((c) => ({
-            _id: c._id,
-            name: c.name,
-            courseType: c.courseType,
-            courseDuration: c.courseDuration,
-            startDate: c.startDate,
-            endDate: c.endDate,
-            campus: c.campus,
-            courseFee: c.courseFee,
-          })),
-          services: values.services?.map((s) => ({
-            ...s,
-            _id: new Types.ObjectId(s._id),
-          })),
-        });
-        if (newQuotation) {
-          await createNotification({
-            title: `New quotation request for ${values.name}`,
-            agency: values.author || "",
-            country: values.home.country,
-            route: `/quotations`,
-          });
-
-          form.reset();
-          toast.success("Quotation created successfully!");
-          router.push(`/quotations`);
-        }
-      } else if (type === "Update" && quotationId) {
-        const updatedQuotation = await updateQuotation(quotationId, {
-          ...values,
-          course: values.course?.map((c) => ({
-            _id: c._id,
-            name: c.name,
-            courseType: c.courseType,
-            courseDuration: c.courseDuration,
-            startDate: c.startDate,
-            endDate: c.endDate,
-            campus: c.campus,
-            courseFee: c.courseFee,
-          })),
-          services: values.services?.map((s) => ({
-            ...s,
-            _id: new Types.ObjectId(s._id),
-          })),
-        });
-        if (updatedQuotation) {
-          await createNotification({
-            title: `${values.name}'s quotation request updated!`,
-            agency: values.author || "",
-            country: values.home.country,
-            route: `/quotations`,
-          });
-          form.reset();
-          toast.success("Updated Successfully!");
-          router.push(`/quotations`);
-        }
-      }
-    } catch (error) {
-      console.error("Quotation failed", error);
-    }
-  }
-
-  useEffect(() => {
-    const subscription = form.watch((value, { name }) => {
-      if (name === "name") {
-        const selectedStudent = leads?.find((r) => r.name === value.name);
-        if (selectedStudent) {
-          form.setValue("email", selectedStudent.email);
-          form.setValue("number", selectedStudent.number);
-          form.setValue("home", selectedStudent.home);
-          form.setValue("gender", selectedStudent.gender);
-          form.setValue("maritalStatus", selectedStudent.maritalStatus);
-          form.setValue(
-            "dateOfBirth",
-            selectedStudent.dateOfBirth
-              ? new Date(selectedStudent.dateOfBirth)
-              : new Date(),
-          );
-          form.setValue("author", selectedStudent.author);
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe?.();
-  }, [form, leads]);
+  const selectedCountry = useWatch({
+    control: form.control,
+    name: "home.country",
+  });
 
   const selectedCourses =
     useWatch({
@@ -262,17 +171,134 @@ const AdditionalQuotationForm = ({
       name: "course",
     }) ?? [];
 
+  const selectedServices =
+    useWatch({
+      control: form.control,
+      name: "services",
+    }) ?? [];
+
+  const selectableCourses = useMemo(
+    () => (courses ? normalizeCourses(courses, selectedCountry) : []),
+    [courses, selectedCountry],
+  );
+
+  const leadOptions = useMemo(
+    () =>
+      leads?.map((lead) => ({
+        label: `${lead.name} (${lead.email})`,
+        value: lead.name,
+      })) || [],
+    [leads],
+  );
+
+  useEffect(() => {
+    const subscription = form.watch((value, { name }) => {
+      if (name !== "name") return;
+
+      const selectedStudent = leads?.find((lead) => lead.name === value.name);
+      if (!selectedStudent) return;
+
+      form.setValue("email", selectedStudent.email || "");
+      form.setValue("number", selectedStudent.number || "");
+      form.setValue(
+        "home",
+        selectedStudent.home || {
+          address: "",
+          zip: "",
+          country: "",
+          state: "",
+          city: "",
+        },
+      );
+      form.setValue("gender", selectedStudent.gender || "");
+      form.setValue("maritalStatus", selectedStudent.maritalStatus || "");
+      form.setValue(
+        "dateOfBirth",
+        selectedStudent.dateOfBirth
+          ? new Date(selectedStudent.dateOfBirth)
+          : new Date(),
+      );
+      form.setValue("author", selectedStudent.author || email);
+      form.setValue("course", [], {
+        shouldDirty: true,
+        shouldValidate: true,
+      });
+    });
+
+    return () => subscription.unsubscribe?.();
+  }, [email, form, leads]);
+
+  async function onSubmit(values: AdditionalQuotationFormValues) {
+    try {
+      const payload = {
+        ...values,
+        dateOfBirth: values.dateOfBirth,
+        course: values.course?.map((course) => ({
+          _id: course._id,
+          name: course.name,
+          courseType: course.courseType,
+          courseDuration: course.courseDuration,
+          startDate: course.startDate,
+          endDate: course.endDate,
+          campus: course.campus,
+          courseFee: course.courseFee,
+        })),
+        services: values.services?.map((service) => ({
+          ...service,
+          _id: new Types.ObjectId(service._id),
+        })),
+      };
+
+      if (type === "Create") {
+        const newQuotation = await createQuotation(payload);
+
+        if (newQuotation) {
+          await createNotification({
+            title: `New quotation request for ${values.name}`,
+            agency: values.author || "",
+            country: values.home.country,
+            route: "/quotations",
+          });
+
+          form.reset();
+          toast.success("Quotation created successfully!");
+          router.push("/quotations");
+        }
+
+        return;
+      }
+
+      if (type === "Update" && quotationId) {
+        const updatedQuotation = await updateQuotation(quotationId, payload);
+
+        if (updatedQuotation) {
+          await createNotification({
+            title: `${values.name}'s quotation request updated!`,
+            agency: values.author || "",
+            country: values.home.country,
+            route: "/quotations",
+          });
+
+          form.reset();
+          toast.success("Updated Successfully!");
+          router.push("/quotations");
+        }
+      }
+    } catch (error) {
+      console.error("Quotation failed", error);
+      toast.error("Quotation failed");
+    }
+  }
+
   return (
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className="rounded-2xl bg-white dark:bg-gray-800 p-6 shadow-sm space-y-4"
       >
-        {/* ✅ Personal Information */}
         <h3 className="text-xl font-semibold">Personal Information</h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Student Name (react-select) */}
           <FormItem>
             <FormLabel>Student</FormLabel>
             <FormControl>
@@ -281,17 +307,12 @@ const AdditionalQuotationForm = ({
                 name="name"
                 render={({ field }) => (
                   <Select
-                    options={leads?.map((r) => ({
-                      label: `${r.name} (${r.email})`,
-                      value: r.name,
-                    }))}
+                    options={leadOptions}
                     isSearchable
-                    value={leads
-                      ?.map((r) => ({
-                        label: `${r.name} (${r.email})`,
-                        value: r.name,
-                      }))
-                      .find((opt) => opt.value === field.value)}
+                    value={
+                      leadOptions.find((opt) => opt.value === field.value) ||
+                      null
+                    }
                     onChange={(selected) =>
                       field.onChange(selected?.value || "")
                     }
@@ -303,58 +324,31 @@ const AdditionalQuotationForm = ({
             </FormControl>
             <FormMessage />
           </FormItem>
-          <FormField
-            name="email"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="number"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Number</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="gender"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Gender</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            name="maritalStatus"
-            control={form.control}
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>MaritalStatus</FormLabel>
-                <FormControl>
-                  <Input {...field} disabled />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+
+          {(["email", "number", "gender", "maritalStatus"] as const).map(
+            (fieldName) => (
+              <FormField
+                key={fieldName}
+                name={fieldName}
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {fieldName === "maritalStatus"
+                        ? "Marital Status"
+                        : fieldName.charAt(0).toUpperCase() +
+                          fieldName.slice(1)}
+                    </FormLabel>
+                    <FormControl>
+                      <Input {...field} disabled />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ),
+          )}
+
           <FormField
             name="dateOfBirth"
             control={form.control}
@@ -366,17 +360,17 @@ const AdditionalQuotationForm = ({
                     type="date"
                     value={
                       field.value instanceof Date &&
-                      !isNaN(field.value.getTime())
+                      !Number.isNaN(field.value.getTime())
                         ? field.value.toISOString().slice(0, 10)
                         : ""
                     }
-                    placeholder="Date of Birth"
-                    onChange={(e) => {
-                      const dateValue = e.target.value
-                        ? new Date(e.target.value)
-                        : undefined;
-                      field.onChange(dateValue);
-                    }}
+                    onChange={(event) =>
+                      field.onChange(
+                        event.target.value
+                          ? new Date(event.target.value)
+                          : undefined,
+                      )
+                    }
                   />
                 </FormControl>
                 <FormMessage />
@@ -385,232 +379,212 @@ const AdditionalQuotationForm = ({
           />
         </div>
 
-        {/* ===== Home Address ===== */}
         <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm">
           <h3 className="text-xl font-semibold mb-4 text-gray-700 dark:text-gray-200">
             Home Address
           </h3>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormField
-              name="home.address"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Address</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Your address" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="home.city"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>City</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Your city" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="home.state"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>State</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Your state" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              name="home.zip"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Zip</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Zip code" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="home.country"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Country</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Country" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+            {(["address", "city", "state", "zip", "country"] as const).map(
+              (fieldName) => (
+                <FormField
+                  key={fieldName}
+                  name={`home.${fieldName}`}
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>
+                        {fieldName === "zip"
+                          ? "Zip"
+                          : fieldName.charAt(0).toUpperCase() +
+                            fieldName.slice(1)}
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          placeholder={
+                            fieldName === "zip"
+                              ? "Zip code"
+                              : fieldName.charAt(0).toUpperCase() +
+                                fieldName.slice(1)
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              ),
+            )}
           </div>
         </section>
-        {/* ✅ Courses & Services */}
+
         <section className="bg-gray-50 dark:bg-gray-800 p-4 rounded-xl shadow-sm space-y-6">
           <h3 className="text-xl font-semibold">Courses & Services</h3>
 
-          {/* Courses */}
           <div>
             <h4 className="font-semibold mb-2">Courses</h4>
-            <div className="flex gap-4 overflow-x-auto pb-2">
-              {selectableCourses.map((course) => {
-                const isSelected = selectedCourses.some(
-                  (c) =>
-                    c._id === course._id &&
-                    c.campus.name === course.campus.name &&
-                    c.campus.shift === course.campus.shift,
-                );
 
-                const key = `course-${courseKey(course)}`;
-                const isExpanded = expandedItem === key;
+            {!selectedCountry ? (
+              <p className="text-sm text-muted-foreground">
+                Select a student first to show country-based course fees.
+              </p>
+            ) : selectableCourses.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                No courses available for this country.
+              </p>
+            ) : (
+              <div className="flex gap-4 overflow-x-auto pb-2">
+                {selectableCourses.map((course) => {
+                  const isSelected = selectedCourses.some(
+                    (selectedCourse) =>
+                      selectedCourse._id === course._id &&
+                      selectedCourse.campus.name === course.campus.name &&
+                      selectedCourse.campus.shift === course.campus.shift,
+                  );
 
-                return (
-                  <div
-                    key={courseKey(course)}
-                    className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm
-          w-[260px] transition-all duration-200 bg-white dark:bg-gray-900
-          ${
-            isSelected
-              ? "border-blue-600 dark:border-blue-500"
-              : "border-gray-200 dark:border-gray-700"
-          }`}
-                  >
-                    {/* Top Row */}
-                    <div className="flex items-start justify-between">
-                      <h4 className="font-semibold text-base leading-tight">
-                        {course.name}
-                      </h4>
+                  const key = `course-${courseKey(course)}`;
+                  const isExpanded = expandedItem === key;
 
-                      <button
-                        type="button"
-                        onClick={() => setExpandedItem(isExpanded ? null : key)}
-                        className="text-gray-500 hover:text-blue-600 transition"
-                      >
-                        <Info size={16} />
-                      </button>
-                    </div>
-
-                    {/* Decision Data */}
-                    <div className="mt-2 text-sm text-gray-600">
-                      <p>
-                        {course.campus.name} • {course.campus.shift}
-                      </p>
-                    </div>
-
-                    <p className="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
-                      €{course.courseFee}
-                    </p>
-
-                    {/* Expandable Details */}
-                    {isExpanded && (
-                      <div className="mt-3 pt-3 border-t text-xs text-gray-500 space-y-2">
-                        <p>Type: {course.courseType || "Not specified"}</p>
-
-                        <p>
-                          Duration: {course.courseDuration || "Not specified"}
-                        </p>
-
-                        <p>
-                          Start:{" "}
-                          {course.startDate
-                            ? new Date(course.startDate).toLocaleDateString()
-                            : "Not scheduled"}
-                        </p>
-
-                        <p>
-                          End:{" "}
-                          {course.endDate
-                            ? new Date(course.endDate).toLocaleDateString()
-                            : "Not scheduled"}
-                        </p>
-
-                        {course.description && (
-                          <div className="pt-2 text-gray-600 leading-relaxed text-justify">
-                            {course.description}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    {/* Select Button */}
-                    <Button
-                      type="button"
-                      variant={isSelected ? "default" : "outline"}
-                      size="sm"
-                      onClick={() => {
-                        const current = form.getValues("course") || [];
-
-                        if (isSelected) {
-                          form.setValue(
-                            "course",
-                            current.filter(
-                              (c) =>
-                                !(
-                                  c._id === course._id &&
-                                  c.campus.name === course.campus.name &&
-                                  c.campus.shift === course.campus.shift
-                                ),
-                            ),
-                          );
-                        } else {
-                          if (course._id) {
-                            const snapshot = {
-                              _id: course._id,
-                              name: course.name,
-                              courseDuration: course.courseDuration,
-                              courseType: course.courseType || "General",
-                              startDate: course.startDate
-                                ? new Date(course.startDate)
-                                : undefined,
-                              endDate: course.endDate
-                                ? new Date(course.endDate)
-                                : undefined,
-                              campus: {
-                                name: course.campus.name,
-                                shift: course.campus.shift,
-                              },
-                              courseFee: course.courseFee,
-                            };
-
-                            form.setValue("course", [...current, snapshot]);
-                          }
-                        }
-                      }}
-                      className={`w-full mt-4 ${
+                  return (
+                    <div
+                      key={courseKey(course)}
+                      className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm w-[260px] bg-white dark:bg-gray-900 ${
                         isSelected
-                          ? "bg-blue-600 text-white hover:bg-blue-700"
-                          : ""
+                          ? "border-blue-600 dark:border-blue-500"
+                          : "border-gray-200 dark:border-gray-700"
                       }`}
                     >
-                      {isSelected ? "Selected ✅" : "Select Course"}
-                    </Button>
-                  </div>
-                );
-              })}
-            </div>
+                      <div className="flex items-start justify-between">
+                        <h4 className="font-semibold text-base leading-tight">
+                          {course.name}
+                        </h4>
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setExpandedItem(isExpanded ? null : key)
+                          }
+                          className="text-gray-500 hover:text-blue-600 transition"
+                        >
+                          <Info size={16} />
+                        </button>
+                      </div>
+
+                      <div className="mt-2 text-sm text-gray-600">
+                        <p>
+                          {course.campus.name} - {course.campus.shift}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Fee country: {selectedCountry}
+                        </p>
+                      </div>
+
+                      <p className="mt-3 text-lg font-semibold text-gray-900 dark:text-white">
+                        €{course.courseFee}
+                      </p>
+
+                      {isExpanded && (
+                        <div className="mt-3 pt-3 border-t text-xs text-gray-500 space-y-2">
+                          <p>Type: {course.courseType || "Not specified"}</p>
+                          <p>
+                            Duration: {course.courseDuration || "Not specified"}
+                          </p>
+                          <p>
+                            Start:{" "}
+                            {course.startDate
+                              ? new Date(course.startDate).toLocaleDateString()
+                              : "Not scheduled"}
+                          </p>
+                          <p>
+                            End:{" "}
+                            {course.endDate
+                              ? new Date(course.endDate).toLocaleDateString()
+                              : "Not scheduled"}
+                          </p>
+
+                          {course.description && (
+                            <div className="pt-2 text-gray-600 leading-relaxed text-justify">
+                              {course.description}
+                            </div>
+                          )}
+                        </div>
+                      )}
+
+                      <Button
+                        type="button"
+                        variant={isSelected ? "default" : "outline"}
+                        size="sm"
+                        onClick={() => {
+                          const current = form.getValues("course") || [];
+
+                          if (isSelected) {
+                            form.setValue(
+                              "course",
+                              current.filter(
+                                (selectedCourse) =>
+                                  !(
+                                    selectedCourse._id === course._id &&
+                                    selectedCourse.campus.name ===
+                                      course.campus.name &&
+                                    selectedCourse.campus.shift ===
+                                      course.campus.shift
+                                  ),
+                              ),
+                              { shouldDirty: true, shouldValidate: true },
+                            );
+                            return;
+                          }
+
+                          form.setValue(
+                            "course",
+                            [
+                              ...current,
+                              {
+                                _id: course._id,
+                                name: course.name,
+                                courseDuration: course.courseDuration,
+                                courseType: course.courseType || "General",
+                                startDate: course.startDate
+                                  ? new Date(course.startDate)
+                                  : undefined,
+                                endDate: course.endDate
+                                  ? new Date(course.endDate)
+                                  : undefined,
+                                campus: {
+                                  name: course.campus.name,
+                                  shift: course.campus.shift,
+                                },
+                                courseFee: course.courseFee,
+                              },
+                            ],
+                            { shouldDirty: true, shouldValidate: true },
+                          );
+                        }}
+                        className={`w-full mt-4 ${
+                          isSelected
+                            ? "bg-blue-600 text-white hover:bg-blue-700"
+                            : ""
+                        }`}
+                      >
+                        {isSelected ? "Selected" : "Select Course"}
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
-          {/* Services */}
           <div>
             <h4 className="font-semibold mb-2">Services</h4>
+
             <div className="flex gap-4 overflow-x-auto pb-2">
               {services?.map((service) => {
-                const isSelected = form
-                  .watch("services")
-                  ?.some((s) => s._id.toString() === service._id.toString());
+                const isSelected = selectedServices.some(
+                  (selectedService) =>
+                    selectedService._id.toString() === service._id.toString(),
+                );
 
                 const key = `service-${service._id}`;
                 const isExpanded = expandedItem === key;
@@ -618,15 +592,12 @@ const AdditionalQuotationForm = ({
                 return (
                   <div
                     key={service._id.toString()}
-                    className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm
-          w-[260px] transition-all duration-200 bg-white dark:bg-gray-900
-          ${
-            isSelected
-              ? "border-blue-600 dark:border-blue-500"
-              : "border-gray-200 dark:border-gray-700"
-          }`}
+                    className={`relative flex-shrink-0 rounded-2xl border p-4 shadow-sm w-[260px] bg-white dark:bg-gray-900 ${
+                      isSelected
+                        ? "border-blue-600 dark:border-blue-500"
+                        : "border-gray-200 dark:border-gray-700"
+                    }`}
                   >
-                    {/* Top Row */}
                     <div className="flex items-start justify-between">
                       <h4 className="font-semibold text-base leading-tight">
                         {service.title}
@@ -641,7 +612,6 @@ const AdditionalQuotationForm = ({
                       </button>
                     </div>
 
-                    {/* Decision Data */}
                     <div className="mt-2 text-sm text-gray-600">
                       <p>{service.serviceType}</p>
                     </div>
@@ -650,14 +620,12 @@ const AdditionalQuotationForm = ({
                       €{service.amount}
                     </p>
 
-                    {/* Expandable Details */}
                     {isExpanded && service.description && (
                       <div className="mt-3 pt-3 border-t text-xs text-gray-500">
                         <p>{service.description}</p>
                       </div>
                     )}
 
-                    {/* Select Button */}
                     <Button
                       type="button"
                       variant={isSelected ? "default" : "outline"}
@@ -669,12 +637,18 @@ const AdditionalQuotationForm = ({
                           form.setValue(
                             "services",
                             current.filter(
-                              (s) =>
-                                s._id.toString() !== service._id.toString(),
+                              (selectedService) =>
+                                selectedService._id.toString() !==
+                                service._id.toString(),
                             ),
+                            { shouldDirty: true, shouldValidate: true },
                           );
-                        } else {
-                          form.setValue("services", [
+                          return;
+                        }
+
+                        form.setValue(
+                          "services",
+                          [
                             ...current,
                             {
                               _id: service._id.toString(),
@@ -683,8 +657,9 @@ const AdditionalQuotationForm = ({
                               amount: service.amount || "",
                               description: service.description || "",
                             },
-                          ]);
-                        }
+                          ],
+                          { shouldDirty: true, shouldValidate: true },
+                        );
                       }}
                       className={`w-full mt-4 ${
                         isSelected
@@ -692,7 +667,7 @@ const AdditionalQuotationForm = ({
                           : ""
                       }`}
                     >
-                      {isSelected ? "Selected ✅" : "Select Service"}
+                      {isSelected ? "Selected" : "Select Service"}
                     </Button>
                   </div>
                 );
@@ -701,13 +676,12 @@ const AdditionalQuotationForm = ({
           </div>
         </section>
 
-        {/* ✅ Submit Button */}
         <div className="mt-6">
           <Button
             type="submit"
             size="lg"
             disabled={form.formState.isSubmitting}
-            className="w-full col-span-2 rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white flex items-center gap-1"
+            className="w-full rounded-xl bg-black hover:bg-gray-700 dark:bg-gray-700 dark:hover:bg-gray-600 text-white"
           >
             {form.formState.isSubmitting
               ? type === "Update"

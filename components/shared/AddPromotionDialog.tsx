@@ -10,14 +10,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
-import { ICourse } from "@/lib/database/models/course.model";
+import { ICourseByCountrySafe } from "@/lib/database/models/course.model";
 import { IServices } from "@/lib/database/models/service.model";
 import { IProfile } from "@/lib/database/models/profile.model";
 import PromotionForm from "@/app/(root)/components/PromotionForm";
 
 interface AddPromotionDialogProps {
   agency: IProfile[];
-  courses: ICourse[];
+  courses: ICourseByCountrySafe[];
   services: IServices[];
 }
 

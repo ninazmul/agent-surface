@@ -26,14 +26,14 @@ import { ILead } from "@/lib/database/models/lead.model";
 import PromotionLeadsStats from "./PromotionLeadsStats";
 import UpdatePromotionDialog from "@/components/shared/UpdatePromotionDialog";
 import { IProfile } from "@/lib/database/models/profile.model";
-import { ICourse } from "@/lib/database/models/course.model";
+import { ICourseByCountrySafe } from "@/lib/database/models/course.model";
 import { IServices } from "@/lib/database/models/service.model";
 import AddPromotionLeadDialog from "@/components/shared/AddPromotionLeadDialog";
 
 type Props = {
   email: string;
   agency: IProfile[];
-  courses: ICourse[];
+  courses: ICourseByCountrySafe[];
   services: IServices[];
   promotion: IPromotion;
   isAdmin?: boolean;

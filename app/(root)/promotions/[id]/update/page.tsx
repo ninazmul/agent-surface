@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getPromotionById } from "@/lib/actions/promotion.actions";
 import PromotionForm from "@/app/(root)/components/PromotionForm";
 import { getAllProfiles } from "@/lib/actions/profile.actions";
-import { getAllCourses } from "@/lib/actions/course.actions";
+import { getCoursesByCountry } from "@/lib/actions/course.actions";
 import { getAllServices } from "@/lib/actions/service.actions";
 
 type PageProps = {
@@ -14,7 +14,7 @@ const UpdatePage = async ({ params }: PageProps) => {
   const promotion = await getPromotionById(id);
   if (!promotion) redirect("/promotions");
 
-  const courses = await getAllCourses();
+  const courses = await getCoursesByCountry();
   const services = await getAllServices();
   const agencies = await getAllProfiles();
 
