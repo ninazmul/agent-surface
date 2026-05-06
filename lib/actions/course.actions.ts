@@ -83,18 +83,24 @@ export const getCoursesByCountry = async (
           const shiftValue = campus.shifts?.[shiftName];
           if (!shiftValue) return;
 
-          shifts[shiftName] = userCountry
-            ? {
-                seats: shiftValue.seats,
-                fee:
-                  shiftValue.fees?.find(
-                    (countryFee) => countryFee.country === userCountry,
-                  )?.fee ?? null,
-              }
-            : {
-                seats: shiftValue.seats,
-                fees: shiftValue.fees ?? [],
-              };
+          if (userCountry) {
+            // Case-insensitive regex match for country
+            const regex = new RegExp(`^${userCountry}$`, "i");
+            const matchedFee =
+              shiftValue.fees?.find((countryFee) =>
+                regex.test(countryFee.country.trim()),
+              )?.fee ?? null;
+
+            shifts[shiftName] = {
+              seats: shiftValue.seats,
+              fee: matchedFee,
+            };
+          } else {
+            shifts[shiftName] = {
+              seats: shiftValue.seats,
+              fees: shiftValue.fees ?? [],
+            };
+          }
         });
 
         return {

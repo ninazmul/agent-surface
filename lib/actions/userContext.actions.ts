@@ -22,28 +22,24 @@ export async function getUserContext(requiredPermission?: string) {
   const rolePermissions = await getAdminRolePermissionsByEmail(email);
   const myProfile = await getProfileByEmail(email);
 
-  // ====== ADMIN PATH
   if (adminStatus) {
-    // Permission check
     if (requiredPermission && !rolePermissions.includes(requiredPermission)) {
       redirect("/");
     }
   } else {
-    // ====== NON-ADMIN PATH
     if (!myProfile) redirect("/profile");
     if (myProfile.status !== "Approved") redirect("/profile");
 
-    // Students are blocked from most modules
     if (myProfile.role === "Student" && requiredPermission) {
       redirect("/profile");
     }
   }
 
-  // ====== Access rules by role
   let accessibleKeys: string[] = [];
+
   if (adminStatus) {
     accessibleKeys = rolePermissions.length
-      ? rolePermissions.concat("profile") // always allow profile
+      ? rolePermissions.concat("profile")
       : [
           "dashboard",
           "quotations",
@@ -88,32 +84,41 @@ export async function getUserContext(requiredPermission?: string) {
     ];
   }
 
-  // ====== Agency resolution
   let agency = [];
   if (adminStatus) {
     agency = await getAllProfiles();
-  } else {
-    if (myProfile) agency = [myProfile];
+  } else if (myProfile) {
+    agency = [myProfile];
   }
 
-  // ====== Leads resolution
   let leads: ILead[] = [];
   if (adminStatus) {
     const allLeads = await getAllLeads();
     leads =
       adminCountry.length === 0
-        ? allLeads // full access if no country restriction
-        : allLeads.filter((r: ILead) => adminCountry.includes(r.home.country));
+        ? allLeads
+        : allLeads.filter((lead: ILead) =>
+            adminCountry.includes(lead.home.country),
+          );
   } else {
     const agentEmails = [email, ...(myProfile?.subAgents || [])];
     const allLeads = await Promise.all(
-      agentEmails.map((agent) => getLeadsByAgency(agent)),
+      agentEmails.map((agentEmail) => getLeadsByAgency(agentEmail)),
     );
     leads = allLeads.flat().filter(Boolean);
   }
 
-  // ====== Courses & Services
-  const courses = await getCoursesByCountry();
+  let courseCountry: string | undefined;
+
+  if (adminStatus) {
+    if (adminCountry.length === 1) {
+      courseCountry = adminCountry[0];
+    }
+  } else {
+    courseCountry = myProfile?.country || undefined;
+  }
+
+  const courses = await getCoursesByCountry(courseCountry);
   const services = await getAllServices();
 
   return {
@@ -127,5 +132,6 @@ export async function getUserContext(requiredPermission?: string) {
     leads,
     courses,
     services,
+    courseCountry,
   };
 }

@@ -1,9 +1,12 @@
 "use client";
 
 import * as z from "zod";
+import { useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
+import countries from "world-countries";
+import ReactSelect from "react-select";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -17,7 +20,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
-  Select,
+  Select as UiSelect,
   SelectTrigger,
   SelectValue,
   SelectContent,
@@ -88,6 +91,17 @@ const shiftLabels: Record<ShiftName, string> = {
 const shiftNames: ShiftName[] = ["morning", "afternoon", "general"];
 
 const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
+  const countryOptions = useMemo(
+    () =>
+      countries
+        .map((country) => ({
+          value: country.name.common,
+          label: `${country.flag} ${country.name.common}`,
+        }))
+        .sort((a, b) => a.label.localeCompare(b.label)),
+    [],
+  );
+
   const form = useForm<CourseFormValues>({
     resolver: zodResolver(CourseFormSchema),
     defaultValues: {
@@ -120,9 +134,7 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
     return Number(value.replace(/[^0-9]/g, ""));
   };
 
-  const handleFeeInput = (value: string) => {
-    return value.replace(/[^0-9]/g, "");
-  };
+  const handleFeeInput = (value: string) => value.replace(/[^0-9]/g, "");
 
   const addShift = (campusIndex: number, shiftName: ShiftName) => {
     const currentShifts =
@@ -214,7 +226,7 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="w-full rounded-2xl bg-white dark:bg-gray-800 p-4 sm:p-6 shadow-sm space-y-4"
+          className="w-full rounded-2xl bg-white p-4 shadow-sm space-y-4 dark:bg-gray-800 sm:p-6"
         >
           <h2 className="text-xl font-semibold">Course Details</h2>
 
@@ -255,7 +267,7 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
               return (
                 <div
                   key={field.id}
-                  className="space-y-4 border p-4 rounded-xl bg-orange-50 dark:bg-gray-900"
+                  className="space-y-4 rounded-xl border bg-orange-50 p-4 dark:bg-gray-900"
                 >
                   <FormField
                     control={form.control}
@@ -334,7 +346,21 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
                                 render={({ field }) => (
                                   <FormItem>
                                     <FormControl>
-                                      <Input placeholder="Country" {...field} />
+                                      <ReactSelect
+                                        options={countryOptions}
+                                        isSearchable
+                                        value={
+                                          countryOptions.find(
+                                            (option) =>
+                                              option.value === field.value,
+                                          ) || null
+                                        }
+                                        onChange={(selected) =>
+                                          field.onChange(selected?.value || "")
+                                        }
+                                        placeholder="Select country"
+                                        classNamePrefix="react-select"
+                                      />
                                     </FormControl>
                                     <FormMessage />
                                   </FormItem>
@@ -449,7 +475,7 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Course Type</FormLabel>
-                <Select value={field.value} onValueChange={field.onChange}>
+                <UiSelect value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select course type optional" />
@@ -459,7 +485,7 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
                     <SelectItem value="Full Time">Full Time</SelectItem>
                     <SelectItem value="Part Time">Part Time</SelectItem>
                   </SelectContent>
-                </Select>
+                </UiSelect>
                 <FormMessage />
               </FormItem>
             )}
