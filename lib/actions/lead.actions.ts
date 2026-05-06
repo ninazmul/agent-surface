@@ -36,9 +36,8 @@ export const bulkCreateLeads = async (leads: LeadParams[]) => {
   }
 };
 
-
 export const bulkCreateLeadsFromSubmissions = async (
-  submissions: CampaignSubmission[]
+  submissions: CampaignSubmission[],
 ) => {
   const leads: LeadParams[] = submissions.map(({ answers, author }) => ({
     name: answers.name,
@@ -206,7 +205,7 @@ export const getAllAssignedLeads = async () => {
 // ====== UPDATE LEAD
 export const updateLead = async (
   leadId: string,
-  updateData: Partial<LeadParams>
+  updateData: Partial<LeadParams>,
 ) => {
   try {
     await connectToDatabase();
@@ -238,7 +237,7 @@ export const assignLeadToUser = async (leadId: string, email: string) => {
       {
         $addToSet: { assignedTo: email }, // adds email if not already in array
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedLead) {
@@ -255,10 +254,7 @@ export const assignLeadToUser = async (leadId: string, email: string) => {
 };
 
 // ====== UNASSIGN LEAD FROM USER
-export const unassignLeadFromUser = async (
-  leadId: string,
-  email: string
-) => {
+export const unassignLeadFromUser = async (leadId: string, email: string) => {
   try {
     await connectToDatabase();
 
@@ -267,7 +263,7 @@ export const unassignLeadFromUser = async (
       {
         $pull: { assignedTo: email }, // removes email if exists
       },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     );
 
     if (!updatedLead) {
@@ -279,6 +275,33 @@ export const unassignLeadFromUser = async (
     return JSON.parse(JSON.stringify(updatedLead));
   } catch (error) {
     console.error("Error unassigning lead:", error);
+    handleError(error);
+  }
+};
+
+// ====== ACCEPT OFFER LETTER
+export const acceptOfferLetter = async (leadId: string) => {
+  try {
+    await connectToDatabase();
+
+    const updatedLead = await Lead.findByIdAndUpdate(
+      leadId,
+      {
+        isOfferLetterAccepted: true,
+        offerLetterAcceptedAt: new Date(),
+      },
+      { new: true, runValidators: true },
+    ).lean();
+
+    if (!updatedLead) {
+      throw new Error("Lead not found");
+    }
+
+    revalidatePath("/leads");
+
+    return JSON.parse(JSON.stringify(updatedLead));
+  } catch (error) {
+    console.error("Error accepting offer letter:", error);
     handleError(error);
   }
 };

@@ -90,6 +90,8 @@ export interface ILead extends Document {
   assignedTo?: string[];
   source?: string;
   isPaid?: boolean;
+  isOfferLetterAccepted?: boolean;
+  offerLetterAcceptedAt?: Date | null;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -214,6 +216,8 @@ const LeadSchema = new Schema<ILead>(
     assignedTo: { type: [String], default: undefined },
     source: { type: String },
     isPaid: { type: Boolean, default: false },
+    isOfferLetterAccepted: { type: Boolean, default: false },
+    offerLetterAcceptedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );

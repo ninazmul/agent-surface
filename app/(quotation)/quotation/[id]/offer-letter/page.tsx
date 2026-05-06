@@ -57,6 +57,23 @@ const OfferLetter = async ({ params }: PageProps) => {
     redirect(`/leads/${id}`);
   }
 
+  // NEW: Block access until offer letter is accepted
+  if (!lead.isOfferLetterAccepted) {
+    return (
+      <div className="flex h-screen items-center justify-center bg-gray-50">
+        <div className="rounded-lg border border-gray-200 bg-white p-8 shadow-md">
+          <h2 className="mb-2 text-center text-lg font-semibold text-gray-800">
+            Offer Letter Pending
+          </h2>
+          <p className="text-center text-sm text-gray-600">
+            The offer letter has not yet been accepted. Please complete the
+            acceptance process to view the full letter.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   const rawServices = (lead.services || []) as LeadServiceSnapshot[];
 
   const services: OfferService[] = rawServices.map((service) => ({

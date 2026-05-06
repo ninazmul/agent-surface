@@ -112,7 +112,7 @@ const Page = async () => {
       </div>
 
       <div className="overflow-x-auto my-8">
-        <QuotationTable leads={combinedData} />
+        <QuotationTable leads={combinedData} isAdmin={adminStatus} />
       </div>
     </section>
   );

@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { deleteLead, getLeadByEmail } from "@/lib/actions/lead.actions";
+import {
+  acceptOfferLetter,
+  deleteLead,
+  getLeadByEmail,
+} from "@/lib/actions/lead.actions";
 import {
   Table,
   TableBody,
@@ -72,10 +76,18 @@ interface ICombinedItem {
   updatedAt?: Date | string;
   author?: string;
   isAdditional?: boolean;
+  isOfferLetterAccepted?: boolean;
+  offerLetterAcceptedAt?: Date | string;
   type: "Lead" | "Quotation";
 }
 
-const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
+const QuotationTable = ({
+  leads,
+  isAdmin,
+}: {
+  leads: ICombinedItem[];
+  isAdmin: boolean;
+}) => {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState<
@@ -89,6 +101,13 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
     "all" | "additional" | "general"
   >("all");
   const [leadIds, setLeadIds] = useState<Record<string, string>>({});
+
+  const [acceptedOfferLetters, setAcceptedOfferLetters] = useState<
+    Record<string, boolean>
+  >({});
+  const [acceptingOfferLetterId, setAcceptingOfferLetterId] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
     const fetchProfiles = async () => {
@@ -202,6 +221,39 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
       toast.error("Failed to delete lead.");
     } finally {
       setConfirmDeleteId(null);
+    }
+  };
+
+  useEffect(() => {
+    setAcceptedOfferLetters(
+      Object.fromEntries(
+        leads.map((lead) => [
+          lead._id.toString(),
+          Boolean(lead.isOfferLetterAccepted),
+        ]),
+      ),
+    );
+  }, [leads]);
+
+  const handleAcceptOfferLetter = async (leadId: string) => {
+    if (!isAdmin || acceptedOfferLetters[leadId]) return;
+
+    try {
+      setAcceptingOfferLetterId(leadId);
+      const updatedLead = await acceptOfferLetter(leadId);
+
+      if (updatedLead) {
+        setAcceptedOfferLetters((prev) => ({
+          ...prev,
+          [leadId]: true,
+        }));
+        toast.success("Offer letter approved.");
+        router.refresh();
+      }
+    } catch {
+      toast.error("Failed to approve offer letter.");
+    } finally {
+      setAcceptingOfferLetterId(null);
     }
   };
 
@@ -648,6 +700,32 @@ const QuotationTable = ({ leads }: { leads: ICombinedItem[] }) => {
                             <MessageCircle className="w-4 h-4 text-green-800" />
                             Share via WeChat
                           </Button>
+
+                          {/* Accept Offer Letter (Admin Only) */}
+                          {isAdmin && (
+                            <Button
+                              variant="ghost"
+                              className={`w-full justify-start gap-2 ${
+                                acceptedOfferLetters[lead._id.toString()]
+                                  ? "text-green-600"
+                                  : "text-yellow-600"
+                              }`}
+                              onClick={() =>
+                                handleAcceptOfferLetter(lead._id.toString())
+                              }
+                              disabled={
+                                acceptedOfferLetters[lead._id.toString()] ||
+                                acceptingOfferLetterId === lead._id.toString()
+                              }
+                            >
+                              <FileCheck className="w-4 h-4" />
+                              {acceptingOfferLetterId === lead._id.toString()
+                                ? "Accepting..."
+                                : acceptedOfferLetters[lead._id.toString()]
+                                  ? "Offer Letter Accepted"
+                                  : "Accept Offer Letter"}
+                            </Button>
+                          )}
                         </PopoverContent>
                       </Popover>
                     </TableCell>
