@@ -1,8 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
+import { Trash, SortAsc, SortDesc, Info } from "lucide-react";
+import toast from "react-hot-toast";
+
 import { deleteCourse } from "@/lib/actions/course.actions";
-import { ICourse } from "@/lib/database/models/course.model";
+import type {
+  ICountryFee,
+  ICourseSafe,
+} from "@/lib/database/models/course.model";
+
 import {
   Table,
   TableBody,
@@ -13,9 +21,6 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Trash, SortAsc, SortDesc, Info } from "lucide-react";
-import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import {
   Popover,
   PopoverContent,
@@ -23,8 +28,27 @@ import {
 } from "@/components/ui/popover";
 import UpdateCourseDialog from "@/components/shared/UpdateCourseDialog";
 
-const CourseTable = ({ courses }: { courses: ICourse[] }) => {
+type CourseTableProps = {
+  courses: ICourseSafe[];
+};
+
+type ShiftDisplay = {
+  seats: number;
+  fees?: ICountryFee[];
+};
+
+const formatDate = (date?: string) => {
+  if (!date) return "-";
+
+  const parsedDate = new Date(date);
+  if (Number.isNaN(parsedDate.getTime())) return "-";
+
+  return parsedDate.toLocaleDateString();
+};
+
+const CourseTable = ({ courses }: CourseTableProps) => {
   const router = useRouter();
+
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState<"name" | null>(null);
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -37,15 +61,12 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
       course.name.toLowerCase().includes(searchQuery.toLowerCase()),
     );
 
-    if (sortKey) {
+    if (sortKey === "name") {
       filtered.sort((a, b) => {
-        let valA: string | number = "";
-        let valB: string | number = "";
+        const valA = a.name.toLowerCase();
+        const valB = b.name.toLowerCase();
 
-        if (sortKey === "name") {
-          valA = a.name.toLowerCase();
-          valB = b.name.toLowerCase();
-        }
+        if (valA === valB) return 0;
 
         return sortOrder === "asc"
           ? valA < valB
@@ -60,19 +81,32 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
     return filtered;
   }, [courses, searchQuery, sortKey, sortOrder]);
 
+  const totalPages = Math.max(
+    1,
+    Math.ceil(filteredCourses.length / itemsPerPage),
+  );
+
   const paginatedCourses = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
+    const safeCurrentPage = Math.min(currentPage, totalPages);
+    const start = (safeCurrentPage - 1) * itemsPerPage;
+
     return filteredCourses.slice(start, start + itemsPerPage);
-  }, [filteredCourses, currentPage, itemsPerPage]);
+  }, [filteredCourses, currentPage, totalPages, itemsPerPage]);
 
   const handleDeleteCourse = async (id: string) => {
     try {
-      await deleteCourse(id);
+      const result = await deleteCourse(id);
+
+      if (!result) {
+        toast.error("Failed to delete course");
+        return;
+      }
+
       toast.success("Course deleted successfully");
       router.refresh();
     } catch (error) {
-      toast.error("Failed to delete course");
       console.error(error);
+      toast.error("Failed to delete course");
     } finally {
       setConfirmDeleteId(null);
     }
@@ -81,10 +115,35 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
   const handleSort = (key: "name") => {
     if (sortKey === key) {
       setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      setSortOrder("asc");
+      return;
     }
+
+    setSortKey(key);
+    setSortOrder("asc");
+  };
+
+  const renderShift = (label: string, shift?: ShiftDisplay) => {
+    if (!shift || shift.seats <= 0) return null;
+
+    return (
+      <div className="space-y-1">
+        <p className="font-medium">
+          {label}: {shift.seats} seats
+        </p>
+
+        {shift.fees && shift.fees.length > 0 ? (
+          <div className="pl-3 text-muted-foreground">
+            {shift.fees.map((fee, index) => (
+              <p key={`${fee.country}-${index}`}>
+                {fee.country}: €{fee.fee}
+              </p>
+            ))}
+          </div>
+        ) : (
+          <p className="pl-3 text-muted-foreground">No fees added</p>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -93,22 +152,26 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
         <Input
           placeholder="Search by course name"
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full sm:w-auto sm:min-w-[220px] rounded-2xl"
+          onChange={(event) => {
+            setSearchQuery(event.target.value);
+            setCurrentPage(1);
+          }}
+          className="w-full rounded-2xl sm:w-auto sm:min-w-[220px]"
         />
       </div>
 
       <div
         className="overflow-x-auto rounded-2xl bg-white dark:bg-gray-800"
         style={{ cursor: "grab" }}
-        onMouseDown={(e) => {
-          const el = e.currentTarget;
+        onMouseDown={(event) => {
+          const el = event.currentTarget;
           el.style.cursor = "grabbing";
-          const startX = e.pageX - el.offsetLeft;
+
+          const startX = event.pageX - el.offsetLeft;
           const scrollLeft = el.scrollLeft;
 
-          const onMouseMove = (eMove: MouseEvent) => {
-            const x = eMove.pageX - el.offsetLeft;
+          const onMouseMove = (moveEvent: MouseEvent) => {
+            const x = moveEvent.pageX - el.offsetLeft;
             const walk = x - startX;
             el.scrollLeft = scrollLeft - walk;
           };
@@ -126,179 +189,185 @@ const CourseTable = ({ courses }: { courses: ICourse[] }) => {
         <Table>
           <TableHeader className="bg-gray-900">
             <TableRow>
-              <TableHead className="text-white cursor-pointer">#</TableHead>
-              <TableHead className="text-white cursor-pointer">
-                <div
+              <TableHead className="text-white">#</TableHead>
+
+              <TableHead className="text-white">
+                <button
+                  type="button"
                   onClick={() => handleSort("name")}
-                  className="flex items-center gap-2 cursor-pointer select-none"
+                  className="flex items-center gap-2 select-none"
                 >
                   Name
                   {sortKey === "name" &&
-                    (sortOrder === "asc" ? <SortAsc /> : <SortDesc />)}
-                </div>
+                    (sortOrder === "asc" ? (
+                      <SortAsc className="h-4 w-4" />
+                    ) : (
+                      <SortDesc className="h-4 w-4" />
+                    ))}
+                </button>
               </TableHead>
-              <TableHead className="text-white cursor-pointer">Type</TableHead>
-              <TableHead className="text-white cursor-pointer">
-                Duration
-              </TableHead>
-              {/* Removed global Course Fee */}
-              <TableHead className="text-white cursor-pointer">
-                Start Date
-              </TableHead>
-              <TableHead className="text-white cursor-pointer">
-                End Date
-              </TableHead>
-              <TableHead className="text-white cursor-pointer">
-                Campuses
-              </TableHead>
-              <TableHead className="text-white cursor-pointer">
-                Actions
-              </TableHead>
+
+              <TableHead className="text-white">Type</TableHead>
+              <TableHead className="text-white">Duration</TableHead>
+              <TableHead className="text-white">Start Date</TableHead>
+              <TableHead className="text-white">End Date</TableHead>
+              <TableHead className="text-white">Campuses</TableHead>
+              <TableHead className="text-white">Actions</TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            {paginatedCourses.map((course, index) => (
-              <TableRow
-                key={course._id.toString()}
-                className="hover:bg-gray-100 dark:hover:bg-gray-800 border-b-0"
-              >
-                <TableCell>
-                  {(currentPage - 1) * itemsPerPage + index + 1}
-                </TableCell>
-                <TableCell>
-                  <div className="w-40 line-clamp-1 truncate">
-                    {course.name}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="whitespace-nowrap">
-                    {course.courseType || "-"}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="whitespace-nowrap">
-                    {course.courseDuration || "-"}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  {course.startDate
-                    ? new Date(course.startDate).toLocaleDateString()
-                    : "-"}
-                </TableCell>
-                <TableCell>
-                  {course.endDate
-                    ? new Date(course.endDate).toLocaleDateString()
-                    : "-"}
-                </TableCell>
+            {paginatedCourses.length > 0 ? (
+              paginatedCourses.map((course, index) => (
+                <TableRow
+                  key={course._id}
+                  className="border-b-0 hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <TableCell>
+                    {(currentPage - 1) * itemsPerPage + index + 1}
+                  </TableCell>
 
-                {/* Campuses Popover */}
-                <TableCell>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <span className="flex gap-2 items-center px-4 py-2 text-xs font-medium rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 border text-center">
-                        <Info className="w-4 h-4" />
-                        View
-                      </span>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-72 text-sm">
-                      <div className="space-y-2">
-                        {course.campuses.map((campus, idx) => (
-                          <div key={idx} className="border-b pb-2">
-                            <p className="font-medium">{campus.campus}</p>
-                            {campus.shifts?.morning?.seats &&
-                              campus.shifts?.morning?.seats > 0 && (
-                                <p>
-                                  Morning: {campus.shifts?.morning?.seats ?? 0}{" "}
-                                  seats — Fee: €
-                                  {campus.shifts?.morning?.fee ?? "N/A"}
-                                </p>
-                              )}
-                            {campus.shifts?.afternoon?.seats &&
-                              campus.shifts?.afternoon?.seats > 0 && (
-                                <p>
-                                  Afternoon:{" "}
-                                  {campus.shifts?.afternoon?.seats ?? 0} seats —
-                                  Fee: €{campus.shifts?.afternoon?.fee ?? "N/A"}
-                                </p>
-                              )}
-                            {campus.shifts?.general?.seats &&
-                              campus.shifts?.general?.seats > 0 && (
-                                <p>
-                                  general: {campus.shifts?.general?.seats ?? 0}{" "}
-                                  seats — Fee: €
-                                  {campus.shifts?.general?.fee ?? "N/A"}
-                                </p>
-                              )}
-                          </div>
-                        ))}
-                      </div>
-                    </PopoverContent>
-                  </Popover>
-                </TableCell>
+                  <TableCell>
+                    <div className="w-40 truncate">{course.name}</div>
+                  </TableCell>
 
-                {/* Actions */}
-                <TableCell className="w-max space-x-2 whitespace-nowrap">
-                  <UpdateCourseDialog
-                    course={course}
-                    courseId={course._id.toString()}
-                  />
-                  <Button
-                    onClick={() => setConfirmDeleteId(course._id.toString())}
-                    variant={"ghost"}
-                    size={"icon"}
-                  >
-                    <Trash className="w-4 h-4 text-red-600" />
-                  </Button>
+                  <TableCell>
+                    <div className="whitespace-nowrap">
+                      {course.courseType || "-"}
+                    </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <div className="whitespace-nowrap">
+                      {course.courseDuration || "-"}
+                    </div>
+                  </TableCell>
+
+                  <TableCell>{formatDate(course.startDate)}</TableCell>
+                  <TableCell>{formatDate(course.endDate)}</TableCell>
+
+                  <TableCell>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="rounded-full"
+                        >
+                          <Info className="h-4 w-4" />
+                          View
+                        </Button>
+                      </PopoverTrigger>
+
+                      <PopoverContent className="w-80 text-sm">
+                        <div className="space-y-3">
+                          {course.campuses.length > 0 ? (
+                            course.campuses.map((campus, index) => (
+                              <div
+                                key={`${campus.campus}-${index}`}
+                                className="space-y-2 border-b pb-3 last:border-b-0 last:pb-0"
+                              >
+                                <p className="font-semibold">{campus.campus}</p>
+
+                                {renderShift("Morning", campus.shifts?.morning)}
+                                {renderShift(
+                                  "Afternoon",
+                                  campus.shifts?.afternoon,
+                                )}
+                                {renderShift("General", campus.shifts?.general)}
+
+                                {!campus.shifts?.morning &&
+                                  !campus.shifts?.afternoon &&
+                                  !campus.shifts?.general && (
+                                    <p className="text-muted-foreground">
+                                      No shifts added
+                                    </p>
+                                  )}
+                              </div>
+                            ))
+                          ) : (
+                            <p className="text-muted-foreground">
+                              No campuses added
+                            </p>
+                          )}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
+                  </TableCell>
+
+                  <TableCell className="w-max space-x-2 whitespace-nowrap">
+                    <UpdateCourseDialog course={course} courseId={course._id} />
+
+                    <Button
+                      type="button"
+                      onClick={() => setConfirmDeleteId(course._id)}
+                      variant="ghost"
+                      size="icon"
+                    >
+                      <Trash className="h-4 w-4 text-red-600" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={8} className="py-8 text-center">
+                  No courses found
                 </TableCell>
               </TableRow>
-            ))}
+            )}
           </TableBody>
         </Table>
       </div>
-      {/* Pagination */}
-      <div className="flex justify-between items-center mt-4">
+
+      <div className="mt-4 flex items-center justify-between">
         <span className="text-sm text-muted-foreground">
           Showing {Math.min(itemsPerPage * currentPage, filteredCourses.length)}{" "}
           of {filteredCourses.length} courses
         </span>
+
         <div className="flex gap-2">
           <Button
             size="sm"
-            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
-            onClick={() => setCurrentPage((p) => p - 1)}
+            className="rounded-2xl bg-black text-white hover:bg-gray-500 disabled:bg-muted-foreground dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-500"
+            onClick={() => setCurrentPage((page) => Math.max(1, page - 1))}
             disabled={currentPage === 1}
           >
             Previous
           </Button>
+
           <Button
             size="sm"
-            className="rounded-2xl bg-black disabled:bg-muted-foreground  hover:bg-gray-500 dark:bg-gray-700 dark:hover:bg-gray-500 text-white dark:text-gray-100 w-full flex items-center gap-2 justify-center"
-            onClick={() => setCurrentPage((p) => p + 1)}
-            disabled={
-              currentPage === Math.ceil(filteredCourses.length / itemsPerPage)
+            className="rounded-2xl bg-black text-white hover:bg-gray-500 disabled:bg-muted-foreground dark:bg-gray-700 dark:text-gray-100 dark:hover:bg-gray-500"
+            onClick={() =>
+              setCurrentPage((page) => Math.min(totalPages, page + 1))
             }
+            disabled={currentPage >= totalPages}
           >
             Next
           </Button>
         </div>
       </div>
 
-      {/* Delete Confirmation Modal */}
       {confirmDeleteId && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white text-black p-6 rounded-md space-y-4 w-full max-w-sm shadow-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="w-full max-w-sm space-y-4 rounded-md bg-white p-6 text-black shadow-lg">
             <p className="text-center text-lg font-medium">
               Are you sure you want to delete this course?
             </p>
+
             <div className="flex justify-end space-x-2">
               <Button
+                type="button"
                 onClick={() => setConfirmDeleteId(null)}
                 variant="outline"
               >
                 Cancel
               </Button>
+
               <Button
+                type="button"
                 onClick={() => handleDeleteCourse(confirmDeleteId)}
                 variant="destructive"
               >

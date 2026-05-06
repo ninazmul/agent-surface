@@ -1,70 +1,112 @@
 import { Document, Schema, Types, model, models } from "mongoose";
 
-// Interface for shift-based seat availability with fee
-export interface IShiftAvailability {
-  morning?: {
-    seats: number;
-    fee?: string;
-  };
-  afternoon?: {
-    seats: number;
-    fee?: string;
-  };
-  general?: {
-    seats: number;
-    fee?: string;
-  };
+export interface ICountryFee {
+  country: string;
+  fee: string;
 }
 
-// Campus availability with shift-based seat count and fee
+export interface IShiftFee {
+  seats: number;
+  fees?: ICountryFee[];
+}
+
+export interface IShiftAvailability {
+  morning?: IShiftFee;
+  afternoon?: IShiftFee;
+  general?: IShiftFee;
+}
+
 export interface ICampusAvailability {
-  _id: Types.ObjectId;
   campus: string;
   shifts?: IShiftAvailability;
 }
 
-// Course interface
 export interface ICourse extends Document {
   _id: Types.ObjectId;
   name: string;
   description?: string;
   campuses: ICampusAvailability[];
-  courseDuration?: string;
+  courseDuration: string;
   courseType?: string;
   startDate?: Date;
   endDate?: Date;
   createdAt: Date;
 }
 
-// Shift availability schema with fee
-const ShiftAvailabilitySchema = new Schema<IShiftAvailability>(
+export interface IShiftFeeView {
+  seats: number;
+  fee: string | null;
+}
+
+export interface IShiftFeesView {
+  seats: number;
+  fees: ICountryFee[];
+}
+
+export interface IShiftAvailabilityByCountry {
+  morning?: IShiftFeeView | IShiftFeesView;
+  afternoon?: IShiftFeeView | IShiftFeesView;
+  general?: IShiftFeeView | IShiftFeesView;
+}
+
+export interface ICampusAvailabilitySafe {
+  campus: string;
+  shifts?: IShiftAvailability;
+}
+
+export interface ICourseSafe {
+  _id: string;
+  name: string;
+  description?: string;
+  campuses: ICampusAvailabilitySafe[];
+  courseDuration: string;
+  courseType?: string;
+  startDate?: string;
+  endDate?: string;
+  createdAt: string;
+}
+
+export interface ICourseByCountrySafe extends Omit<ICourseSafe, "campuses"> {
+  campuses: Array<
+    Omit<ICampusAvailabilitySafe, "shifts"> & {
+      shifts?: IShiftAvailabilityByCountry;
+    }
+  >;
+}
+
+const CountryFeeSchema = new Schema<ICountryFee>(
   {
-    morning: {
-      seats: { type: Number, required: false },
-      fee: { type: String, required: false },
-    },
-    afternoon: {
-      seats: { type: Number, required: false },
-      fee: { type: String, required: false },
-    },
-    general: {
-      seats: { type: Number, required: false },
-      fee: { type: String, required: false },
-    },
+    country: { type: String, required: true },
+    fee: { type: String, required: true },
   },
-  { _id: false }
+  { _id: false },
 );
 
-// Campus availability schema with shift-based seats and fee
+const ShiftFeeSchema = new Schema<IShiftFee>(
+  {
+    seats: { type: Number, required: true },
+    fees: { type: [CountryFeeSchema], required: false, default: [] },
+  },
+  { _id: false },
+);
+
+const ShiftAvailabilitySchema = new Schema<IShiftAvailability>(
+  {
+    morning: { type: ShiftFeeSchema, required: false },
+    afternoon: { type: ShiftFeeSchema, required: false },
+    general: { type: ShiftFeeSchema, required: false },
+  },
+  { _id: false },
+);
+
 const CampusAvailabilitySchema = new Schema<ICampusAvailability>(
   {
     campus: { type: String, required: true },
     shifts: { type: ShiftAvailabilitySchema, required: false },
   },
-  { _id: false }
+  { _id: false },
 );
 
-// Course schema
 const CourseSchema = new Schema<ICourse>({
   name: { type: String, required: true },
   description: { type: String, required: false },
@@ -76,7 +118,6 @@ const CourseSchema = new Schema<ICourse>({
   createdAt: { type: Date, default: Date.now },
 });
 
-// Model
 const Course = models.Course || model<ICourse>("Course", CourseSchema);
 
 export default Course;

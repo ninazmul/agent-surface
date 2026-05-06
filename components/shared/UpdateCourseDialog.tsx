@@ -11,10 +11,10 @@ import {
 } from "@/components/ui/dialog";
 import { Pencil } from "lucide-react";
 import CourseForm from "@/app/(root)/components/CourseForm";
-import { ICourse } from "@/lib/database/models/course.model";
+import { ICourseSafe } from "@/lib/database/models/course.model";
 
 interface UpdateCourseDialogProps {
-  course: ICourse;
+  course: ICourseSafe;
   courseId: string;
 }
 

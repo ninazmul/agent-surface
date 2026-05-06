@@ -3,6 +3,8 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useFieldArray, useWatch } from "react-hook-form";
+import toast from "react-hot-toast";
+
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -13,9 +15,7 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { createCourse, updateCourse } from "@/lib/actions/course.actions";
-import { ICourse } from "@/lib/database/models/course.model";
-import toast from "react-hot-toast";
+import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectTrigger,
@@ -23,9 +23,26 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 
-/* ================= ZOD SCHEMA ================= */
+import { createCourse, updateCourse } from "@/lib/actions/course.actions";
+import type {
+  ICourseSafe,
+  IShiftAvailability,
+} from "@/lib/database/models/course.model";
+
+const CountryFeeSchema = z.object({
+  country: z.string().min(2, "Country is required"),
+  fee: z
+    .string()
+    .min(1, "Fee is required")
+    .regex(/^[0-9]+$/, "Fee must be a positive number"),
+});
+
+const ShiftSchema = z.object({
+  seats: z.number().int().nonnegative("Seats cannot be negative"),
+  fees: z.array(CountryFeeSchema).optional().default([]),
+});
+
 const CourseFormSchema = z.object({
   name: z.string().min(3, "Course name must be at least 3 characters."),
   description: z.string().optional(),
@@ -35,74 +52,50 @@ const CourseFormSchema = z.object({
         campus: z.string().min(2, "Campus name is required"),
         shifts: z
           .object({
-            morning: z
-              .object({
-                seats: z.number().int().nonnegative("Seats cannot be negative"),
-                fee: z
-                  .string()
-                  .optional()
-                  .refine(
-                    (val) => !val || /^[0-9]+$/.test(val),
-                    "Fee must be a positive number",
-                  ),
-              })
-              .optional(),
-            afternoon: z
-              .object({
-                seats: z.number().int().nonnegative("Seats cannot be negative"),
-                fee: z
-                  .string()
-                  .optional()
-                  .refine(
-                    (val) => !val || /^[0-9]+$/.test(val),
-                    "Fee must be a positive number",
-                  ),
-              })
-              .optional(),
-            general: z
-              .object({
-                seats: z.number().int().nonnegative("Seats cannot be negative"),
-                fee: z
-                  .string()
-                  .optional()
-                  .refine(
-                    (val) => !val || /^[0-9]+$/.test(val),
-                    "Fee must be a positive number",
-                  ),
-              })
-              .optional(),
+            morning: ShiftSchema.optional(),
+            afternoon: ShiftSchema.optional(),
+            general: ShiftSchema.optional(),
           })
           .refine(
-            (shifts) => shifts?.morning || shifts?.afternoon || shifts?.general,
+            (shifts) => shifts.morning || shifts.afternoon || shifts.general,
             "At least one shift is required",
           ),
       }),
     )
     .min(1, "At least one campus is required"),
   courseDuration: z.string().min(1, "Course duration is required"),
-  courseType: z.enum(["Full Time", "Part Time"]).optional(), // optional now
-  startDate: z.date().optional(), // optional now
-  endDate: z.date().optional(), // optional now
+  courseType: z.enum(["Full Time", "Part Time"]).optional(),
+  startDate: z.date().optional(),
+  endDate: z.date().optional(),
 });
 
-/* ================= PROPS ================= */
+type CourseFormValues = z.infer<typeof CourseFormSchema>;
+type ShiftName = keyof IShiftAvailability;
+
 type CourseFormProps = {
   type: "Create" | "Update";
-  Course?: ICourse;
+  Course?: ICourseSafe;
   CourseId?: string;
   onSuccess?: () => void;
 };
 
-/* ================= COMPONENT ================= */
+const shiftLabels: Record<ShiftName, string> = {
+  morning: "Morning",
+  afternoon: "Afternoon",
+  general: "General",
+};
+
+const shiftNames: ShiftName[] = ["morning", "afternoon", "general"];
+
 const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
-  const form = useForm<z.infer<typeof CourseFormSchema>>({
+  const form = useForm<CourseFormValues>({
     resolver: zodResolver(CourseFormSchema),
     defaultValues: {
       name: Course?.name || "",
       description: Course?.description || "",
-      campuses: Course?.campuses?.map((c) => ({
-        campus: c.campus,
-        shifts: c.shifts || {},
+      campuses: Course?.campuses?.map((campus) => ({
+        campus: campus.campus,
+        shifts: campus.shifts || {},
       })) || [{ campus: "", shifts: {} }],
       courseDuration: Course?.courseDuration || "",
       courseType: Course?.courseType as "Full Time" | "Part Time" | undefined,
@@ -122,20 +115,89 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
     defaultValue: form.getValues("campuses"),
   });
 
-  const onSubmit = async (values: z.infer<typeof CourseFormSchema>) => {
+  const handleNumberInput = (value: string) => {
+    if (!value) return 0;
+    return Number(value.replace(/[^0-9]/g, ""));
+  };
+
+  const handleFeeInput = (value: string) => {
+    return value.replace(/[^0-9]/g, "");
+  };
+
+  const addShift = (campusIndex: number, shiftName: ShiftName) => {
+    const currentShifts =
+      form.getValues(`campuses.${campusIndex}.shifts`) || {};
+
+    form.setValue(
+      `campuses.${campusIndex}.shifts`,
+      {
+        ...currentShifts,
+        [shiftName]: {
+          seats: 0,
+          fees: [{ country: "", fee: "" }],
+        },
+      },
+      { shouldValidate: true, shouldDirty: true },
+    );
+  };
+
+  const removeShift = (campusIndex: number, shiftName: ShiftName) => {
+    const currentShifts =
+      form.getValues(`campuses.${campusIndex}.shifts`) || {};
+    const nextShifts = { ...currentShifts };
+
+    delete nextShifts[shiftName];
+
+    form.setValue(`campuses.${campusIndex}.shifts`, nextShifts, {
+      shouldValidate: true,
+      shouldDirty: true,
+    });
+  };
+
+  const addCountryFee = (campusIndex: number, shiftName: ShiftName) => {
+    const currentFees =
+      form.getValues(`campuses.${campusIndex}.shifts.${shiftName}.fees`) || [];
+
+    form.setValue(
+      `campuses.${campusIndex}.shifts.${shiftName}.fees`,
+      [...currentFees, { country: "", fee: "" }],
+      { shouldValidate: true, shouldDirty: true },
+    );
+  };
+
+  const removeCountryFee = (
+    campusIndex: number,
+    shiftName: ShiftName,
+    feeIndex: number,
+  ) => {
+    const currentFees =
+      form.getValues(`campuses.${campusIndex}.shifts.${shiftName}.fees`) || [];
+
+    form.setValue(
+      `campuses.${campusIndex}.shifts.${shiftName}.fees`,
+      currentFees.filter((_, index) => index !== feeIndex),
+      { shouldValidate: true, shouldDirty: true },
+    );
+  };
+
+  const onSubmit = async (values: CourseFormValues) => {
     try {
       if (type === "Create") {
         const created = await createCourse({
           ...values,
           createdAt: new Date(),
         });
+
         if (created) {
           form.reset();
           toast.success("Course added successfully!");
           onSuccess?.();
         }
-      } else if (type === "Update" && CourseId) {
+      }
+
+      if (type === "Update" && CourseId) {
         const updated = await updateCourse(CourseId, values);
+
         if (updated) {
           toast.success("Course updated successfully!");
           onSuccess?.();
@@ -147,19 +209,6 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
     }
   };
 
-  /* ================= HELPER ================= */
-  const handleNumberInput = (value: string) => {
-    // Prevent negative numbers
-    if (!value) return undefined;
-    const num = Number(value.replace(/[^0-9]/g, ""));
-    return num >= 0 ? num : 0;
-  };
-
-  const handleFeeInput = (value: string) => {
-    // Prevent negative fee
-    return value.startsWith("-") ? "" : value;
-  };
-
   return (
     <div className="w-full min-w-0 overflow-x-hidden">
       <Form {...form}>
@@ -169,7 +218,6 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
         >
           <h2 className="text-xl font-semibold">Course Details</h2>
 
-          {/* Course Name */}
           <FormField
             control={form.control}
             name="name"
@@ -184,7 +232,6 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
             )}
           />
 
-          {/* Description */}
           <FormField
             control={form.control}
             name="description"
@@ -199,21 +246,20 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
             )}
           />
 
-          {/* Campuses */}
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Campuses</h3>
-            {fields.map((field, index) => {
-              const campusShifts = watchedCampuses[index]?.shifts || {};
+
+            {fields.map((field, campusIndex) => {
+              const campusShifts = watchedCampuses?.[campusIndex]?.shifts || {};
 
               return (
                 <div
                   key={field.id}
                   className="space-y-4 border p-4 rounded-xl bg-orange-50 dark:bg-gray-900"
                 >
-                  {/* Campus Name */}
                   <FormField
                     control={form.control}
-                    name={`campuses.${index}.campus`}
+                    name={`campuses.${campusIndex}.campus`}
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Campus Name</FormLabel>
@@ -225,25 +271,46 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
                     )}
                   />
 
-                  {/* Shifts */}
-                  <div className="space-y-4">
-                    {/* Morning Shift */}
-                    {campusShifts.morning && (
-                      <div className="grid grid-cols-2 gap-4">
+                  {shiftNames.map((shiftName) => {
+                    const shift = campusShifts[shiftName];
+                    if (!shift) return null;
+
+                    return (
+                      <div
+                        key={shiftName}
+                        className="space-y-3 rounded-lg border bg-white p-4 dark:bg-gray-800"
+                      >
+                        <div className="flex items-center justify-between gap-3">
+                          <h4 className="font-medium">
+                            {shiftLabels[shiftName]} Shift
+                          </h4>
+
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => removeShift(campusIndex, shiftName)}
+                          >
+                            Remove Shift
+                          </Button>
+                        </div>
+
                         <FormField
                           control={form.control}
-                          name={`campuses.${index}.shifts.morning.seats`}
+                          name={`campuses.${campusIndex}.shifts.${shiftName}.seats`}
                           render={({ field }) => (
                             <FormItem>
-                              <FormLabel>Morning Seats</FormLabel>
+                              <FormLabel>
+                                {shiftLabels[shiftName]} Seats
+                              </FormLabel>
                               <FormControl>
                                 <Input
                                   type="number"
                                   min={0}
-                                  value={field.value ?? ""}
-                                  onChange={(e) =>
+                                  value={field.value ?? 0}
+                                  onChange={(event) =>
                                     field.onChange(
-                                      handleNumberInput(e.target.value),
+                                      handleNumberInput(event.target.value),
                                     )
                                   }
                                 />
@@ -252,187 +319,99 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
                             </FormItem>
                           )}
                         />
-                        <FormField
-                          control={form.control}
-                          name={`campuses.${index}.shifts.morning.fee`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Morning Fee</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Enter morning fee €"
-                                  value={field.value ?? ""}
-                                  onChange={(e) =>
-                                    field.onChange(
-                                      handleFeeInput(e.target.value),
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    )}
 
-                    {/* Afternoon Shift */}
-                    {campusShifts.afternoon && (
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name={`campuses.${index}.shifts.afternoon.seats`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Afternoon Seats</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  value={field.value ?? ""}
-                                  onChange={(e) =>
-                                    field.onChange(
-                                      handleNumberInput(e.target.value),
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`campuses.${index}.shifts.afternoon.fee`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Afternoon Fee</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Enter afternoon fee €"
-                                  value={field.value ?? ""}
-                                  onChange={(e) =>
-                                    field.onChange(
-                                      handleFeeInput(e.target.value),
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    )}
+                        <div className="space-y-3">
+                          <FormLabel>Country Fees</FormLabel>
 
-                    {/* General Shift */}
-                    {campusShifts.general && (
-                      <div className="grid grid-cols-2 gap-4">
-                        <FormField
-                          control={form.control}
-                          name={`campuses.${index}.shifts.general.seats`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>General Seats</FormLabel>
-                              <FormControl>
-                                <Input
-                                  type="number"
-                                  min={0}
-                                  value={field.value ?? ""}
-                                  onChange={(e) =>
-                                    field.onChange(
-                                      handleNumberInput(e.target.value),
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                        <FormField
-                          control={form.control}
-                          name={`campuses.${index}.shifts.general.fee`}
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>General Fee</FormLabel>
-                              <FormControl>
-                                <Input
-                                  placeholder="Enter General fee €"
-                                  value={field.value ?? ""}
-                                  onChange={(e) =>
-                                    field.onChange(
-                                      handleFeeInput(e.target.value),
-                                    )
-                                  }
-                                />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </div>
-                    )}
+                          {(shift.fees || []).map((_, feeIndex) => (
+                            <div
+                              key={feeIndex}
+                              className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_1fr_auto]"
+                            >
+                              <FormField
+                                control={form.control}
+                                name={`campuses.${campusIndex}.shifts.${shiftName}.fees.${feeIndex}.country`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Input placeholder="Country" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
 
-                    {/* Add Shift Buttons */}
-                    <div className="flex gap-2">
-                      {!campusShifts.morning && (
+                              <FormField
+                                control={form.control}
+                                name={`campuses.${campusIndex}.shifts.${shiftName}.fees.${feeIndex}.fee`}
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormControl>
+                                      <Input
+                                        placeholder="Fee"
+                                        value={field.value ?? ""}
+                                        onChange={(event) =>
+                                          field.onChange(
+                                            handleFeeInput(event.target.value),
+                                          )
+                                        }
+                                      />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                onClick={() =>
+                                  removeCountryFee(
+                                    campusIndex,
+                                    shiftName,
+                                    feeIndex,
+                                  )
+                                }
+                              >
+                                Remove
+                              </Button>
+                            </div>
+                          ))}
+
+                          <Button
+                            type="button"
+                            variant="secondary"
+                            onClick={() =>
+                              addCountryFee(campusIndex, shiftName)
+                            }
+                          >
+                            + Add Country Fee
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+
+                  <div className="flex flex-wrap gap-2">
+                    {shiftNames.map((shiftName) =>
+                      !campusShifts[shiftName] ? (
                         <Button
+                          key={shiftName}
                           type="button"
                           variant="secondary"
-                          onClick={() => {
-                            const currentShifts =
-                              form.getValues(`campuses.${index}.shifts`) || {};
-                            form.setValue(`campuses.${index}.shifts`, {
-                              ...currentShifts,
-                              morning: { seats: 0, fee: "" },
-                            });
-                          }}
+                          onClick={() => addShift(campusIndex, shiftName)}
                         >
-                          + Add Morning Shift
+                          + Add {shiftLabels[shiftName]} Shift
                         </Button>
-                      )}
-                      {!campusShifts.afternoon && (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() => {
-                            const currentShifts =
-                              form.getValues(`campuses.${index}.shifts`) || {};
-                            form.setValue(`campuses.${index}.shifts`, {
-                              ...currentShifts,
-                              afternoon: { seats: 0, fee: "" },
-                            });
-                          }}
-                        >
-                          + Add Afternoon Shift
-                        </Button>
-                      )}
-                      {!campusShifts.general && (
-                        <Button
-                          type="button"
-                          variant="secondary"
-                          onClick={() => {
-                            const currentShifts =
-                              form.getValues(`campuses.${index}.shifts`) || {};
-                            form.setValue(`campuses.${index}.shifts`, {
-                              ...currentShifts,
-                              general: { seats: 0, fee: "" },
-                            });
-                          }}
-                        >
-                          + Add General Shift
-                        </Button>
-                      )}
-                    </div>
+                      ) : null,
+                    )}
                   </div>
 
-                  {/* Remove Campus */}
                   {fields.length > 1 && (
                     <Button
                       type="button"
                       variant="destructive"
-                      onClick={() => remove(index)}
+                      onClick={() => remove(campusIndex)}
                     >
                       Remove Campus
                     </Button>
@@ -450,7 +429,6 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
             </Button>
           </div>
 
-          {/* Course Duration */}
           <FormField
             control={form.control}
             name="courseDuration"
@@ -465,7 +443,6 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
             )}
           />
 
-          {/* Course Type */}
           <FormField
             control={form.control}
             name="courseType"
@@ -475,7 +452,7 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
                 <Select value={field.value} onValueChange={field.onChange}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select course type (optional)" />
+                      <SelectValue placeholder="Select course type optional" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -488,8 +465,7 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
             )}
           />
 
-          {/* Dates */}
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <FormField
               control={form.control}
               name="startDate"
@@ -504,12 +480,20 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
                           ? field.value.toISOString().split("T")[0]
                           : ""
                       }
-                      onChange={(e) => field.onChange(new Date(e.target.value))}
+                      onChange={(event) =>
+                        field.onChange(
+                          event.target.value
+                            ? new Date(event.target.value)
+                            : undefined,
+                        )
+                      }
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
+
             <FormField
               control={form.control}
               name="endDate"
@@ -524,15 +508,21 @@ const CourseForm = ({ type, Course, CourseId, onSuccess }: CourseFormProps) => {
                           ? field.value.toISOString().split("T")[0]
                           : ""
                       }
-                      onChange={(e) => field.onChange(new Date(e.target.value))}
+                      onChange={(event) =>
+                        field.onChange(
+                          event.target.value
+                            ? new Date(event.target.value)
+                            : undefined,
+                        )
+                      }
                     />
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
           </div>
 
-          {/* Submit */}
           <Button
             type="submit"
             size="lg"
