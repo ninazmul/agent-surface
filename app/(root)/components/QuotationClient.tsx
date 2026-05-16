@@ -65,10 +65,10 @@ export default function QuotationClient({
   }, [userId]);
 
   const [accepted, setAccepted] = useState(false);
-  const [language, setLanguage] = useState("en");
+  const [language, setLanguage] = useState<"en" | "pt" | "es">("en");
   const [currentStep, setCurrentStep] = useState(1);
   const [quotationAccepted, setQuotationAccepted] = useState<boolean>(
-    data?.quotationStatus || false
+    data?.quotationStatus || false,
   );
 
   useEffect(() => {
@@ -122,8 +122,8 @@ export default function QuotationClient({
                     isCompleted
                       ? "text-green-600"
                       : isActive
-                      ? "text-primary-600"
-                      : "text-gray-400"
+                        ? "text-primary-600"
+                        : "text-gray-400"
                   }`}
                 >
                   {/* ✅ Icon */}
@@ -213,11 +213,13 @@ export default function QuotationClient({
                   </p>{" "}
                   <p>
                     {" "}
-                    <span className="font-medium">Email:</span> {data.email}{" "}
+                    <span className="font-medium">Email:</span>{" "}
+                    {data.email}{" "}
                   </p>{" "}
                   <p>
                     {" "}
-                    <span className="font-medium">Phone:</span> {data.number}{" "}
+                    <span className="font-medium">Phone:</span>{" "}
+                    {data.number}{" "}
                   </p>{" "}
                 </div>{" "}
               </div>{" "}
@@ -289,7 +291,8 @@ export default function QuotationClient({
                   </p>{" "}
                   <p>
                     {" "}
-                    <strong>Branch:</strong> {agency?.branchAddress || "N/A"}{" "}
+                    <strong>Branch:</strong>{" "}
+                    {agency?.branchAddress || "N/A"}{" "}
                   </p>{" "}
                 </div>{" "}
               </div>
@@ -309,7 +312,10 @@ export default function QuotationClient({
         {currentStep === 2 && (
           <div>
             <div className="flex justify-end mb-3">
-              <Tabs defaultValue="en" onValueChange={(val) => setLanguage(val)}>
+              <Tabs
+                defaultValue="en"
+                onValueChange={(val) => setLanguage(val as "en" | "pt" | "es")}
+              >
                 <TabsList>
                   <TabsTrigger value="en">English</TabsTrigger>
                   <TabsTrigger value="pt">Portuguese</TabsTrigger>
