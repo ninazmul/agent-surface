@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Trash, SortAsc, SortDesc, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
-import { deleteStudentResource } from "@/lib/actions/student-resource.actions";
+import { deleteResourcePriceList } from "@/lib/actions/resource-pricelist.actions";
 import { IResourcePriceList } from "@/lib/database/models/resource-pricelist.model";
 import Image from "next/image";
 import UpdateResourcePricelistDialog from "@/components/shared/UpdateResourcePricelistDialog";
@@ -80,7 +80,7 @@ const ResourcePriceListCards = ({
 
   const handleDelete = async (id: string) => {
     try {
-      await deleteStudentResource(id);
+      await deleteResourcePriceList(id);
       toast.success("Resource deleted successfully");
       router.refresh();
     } catch (err) {
