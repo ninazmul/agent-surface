@@ -4,6 +4,7 @@ import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, useWatch } from "react-hook-form";
 import { useMemo, useRef, useState, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import Select from "react-select";
 import countries from "world-countries";
 import { Info } from "lucide-react";
@@ -153,6 +154,8 @@ const LeadForm = ({
   services,
   onSuccess,
 }: LeadFormProps) => {
+  const router = useRouter();
+  const pathname = usePathname();
   const { startUpload } = useUploadThing("mediaUploader");
 
   const [passportFile, setPassportFile] = useState<File[]>([]);
@@ -369,7 +372,16 @@ const LeadForm = ({
           });
 
           toast.success("Lead created successfully!");
-          onSuccess?.();
+          router.refresh();
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            if (pathname.startsWith("/lead")) {
+              router.push("/profile");
+            } else {
+              router.push("/leads");
+            }
+          }
         }
       }
 
@@ -421,7 +433,16 @@ const LeadForm = ({
           });
 
           toast.success("Lead updated successfully!");
-          onSuccess?.();
+          router.refresh();
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            if (pathname.startsWith("/lead")) {
+              router.push("/profile");
+            } else {
+              router.push("/leads");
+            }
+          }
         }
       }
     } catch (error) {

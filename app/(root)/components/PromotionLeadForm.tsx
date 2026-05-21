@@ -3,6 +3,7 @@
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -149,6 +150,7 @@ const PromotionLeadForm = ({
   promotion,
   onSuccess,
 }: PromotionLeadFormProps) => {
+  const router = useRouter();
   const { startUpload } = useUploadThing("mediaUploader");
 
   const [passportFile, setPassportFile] = useState<File[]>([]);
@@ -323,7 +325,12 @@ const PromotionLeadForm = ({
             route: `/leads`,
           });
           toast.success(`Leads created for ${values.name}`);
-          onSuccess?.();
+          router.refresh();
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            router.push("/promotions");
+          }
         }
       } else if (type === "Update" && LeadId) {
         const updated = await updateLead(LeadId, {
@@ -363,7 +370,12 @@ const PromotionLeadForm = ({
             route: `/leads`,
           });
           toast.success("Lead updated successfully!");
-          onSuccess?.();
+          router.refresh();
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            router.push("/promotions");
+          }
         }
       }
     } catch (error) {

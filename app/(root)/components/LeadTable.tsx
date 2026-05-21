@@ -93,6 +93,10 @@ const LeadTable = ({
   const itemsPerPage = 10;
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [localLeads, setLocalLeads] = useState<ILead[]>(leads);
+
+  useEffect(() => {
+    setLocalLeads(leads);
+  }, [leads]);
   const [selectedLeads, setSelectedLeads] = useState<string[]>([]);
   const [profiles, setProfiles] = useState<Record<string, IProfile>>({});
 
